@@ -25,10 +25,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate optimization archives
+      - name: Validate recorded evidence
         shell: bash
         working-directory: .
-        run: python3 benchmarks/verify-optimization-archives.py
+        run: |
+          python3 benchmarks/verify-optimization-archives.py
+          python3 benchmarks/summarize-mutable-map.py --archive benchmarks/results/mutable-map
+          python3 docs/audits/managed-mutation-sdk/verify.py
 
       - name: Read the compiler pin
         id: compiler

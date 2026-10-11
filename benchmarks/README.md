@@ -343,6 +343,21 @@ trials. It contains 40 workload entries (including two control entries),
 120 fresh canisters, and 414 measurements. These are synchronous operation
 costs; allocation-driven message-end GC remains outside the measured interval.
 
+## Mutable map
+
+The [mutable-map report](results/mutable-map/README.md) compares against
+`mo:core/Map` 2.5.0 at 1,000, 10,000, and 100,000 entries. It records three
+trials per workload, with instructions and cumulative allocated/reclaimed bytes.
+Setup, seed cloning, and correctness checks are outside the measured interval.
+The report includes exact reproduction commands and scalar ordering comparisons;
+its baseline is separate from the persistent-map comparisons.
+
+Validate the saved evidence without rebuilding the actors:
+
+```sh
+python3 benchmarks/summarize-mutable-map.py --archive benchmarks/results/mutable-map
+```
+
 ## CandidX repository correctness suite
 
 [Saved correctness reports](results/native-comparison/candidx-correctness/summary.json)

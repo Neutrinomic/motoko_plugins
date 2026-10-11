@@ -13,6 +13,9 @@ Each package in this repository is independent:
 | --- | --- | --- |
 | `candidx` | `to_candid_canonical(...) : { #ok : Blob; #err : Text }` | Generated typed traversal and a Wasm shape-table helper |
 | `json` | `to_json(value)`, `from_json<T>(text)` | Typed heap visitors, streaming JSON parser/writer, managed Result values |
+| `cbor` | `to_cbor(value)`, `from_cbor<T>(bytes)` | Deterministic encoding and typed decoding with managed Result values |
+| `pure-map` | `pmap_*` through `Map.mo` | Persistent trees with shared branches and payloads |
+| `mutable-map` | `mmap_*` through `Map.mo` | In-place B-tree operations on caller-owned managed arrays and records |
 | `sha256` | `sha256(Blob) : Blob` | Direct Blob access and a one-shot Wasm SHA-256 kernel |
 
 The CandidX package extracts the direct encoder from the CandidX compiler patch.
