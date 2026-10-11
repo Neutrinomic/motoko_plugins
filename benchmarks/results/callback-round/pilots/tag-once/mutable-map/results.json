@@ -1,0 +1,271 @@
+{
+  "label": "callback-tag-once-mutable-map",
+  "recorded_utc": "2026-10-11T17:37:40.492Z",
+  "wasm_sha256": "905514a92c786ccfb85ef9750ad0dafb2642dafb1c04a139d29142d39841a99c",
+  "wasm_bytes": 455881,
+  "trials": 1,
+  "source_sha256": "d9929dff83e8983032d9bd32b8bf5bfa5b205bac2bcd0411831844ded8f98242",
+  "cases_sha256": "f86a89af044f3366a54f095ceb1739455d134a776c89a09a078465ba44cdeec2",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.11.1",
+  "implementations": {
+    "core": {
+      "package": "core",
+      "version": "2.5.0",
+      "module": "Map"
+    },
+    "plugin_custom": {
+      "package": "plugin/mutable-map",
+      "version": "ABI 1",
+      "comparison": "Motoko callback"
+    },
+    "plugin_static": {
+      "package": "plugin/mutable-map",
+      "version": "ABI 1",
+      "comparison": "native Nat64 ordering"
+    }
+  },
+  "provenance": {
+    "compiler_revision": "abfba892fe4bd8fa2bc88e25dca0b895d35c1962",
+    "compiler_dirty": true,
+    "moc_sha256": "a5a68803ecc8d48509c77052889f05eb8b5e3e983ee55b2027e9689939d79498",
+    "plugin_cmxs_sha256": "9a8bd4fb041c8f61eba57149403e7a1cb0993f716c575f097ce16448bd813fe7",
+    "plugin_source_sha256": {
+      "plugins/mutable-map/compiler/generator.ml": "915e403547dea5e8e97c6c5c04568742e8a640be5d00f3aee891ad4135d728ad",
+      "plugins/mutable-map/compiler/reference.ml": "c42812a2d9ec45c45c7cdea9fa9426f08e2d8f026ae2b3d3dfc1ab89f8a68ffe",
+      "plugins/mutable-map/compiler/register.ml": "cb3b1c6133f51515190979c60c0aec722e2498c466a79a56cc50e39c90ea3165",
+      "plugins/mutable-map/compiler/schema.ml": "a79ab1a5e837ace6636a3a02c35f8df555ba5cf856378ffdde92035efbc2202c",
+      "plugins/mutable-map/motoko/Core.mo": "cfdf3461369edf3edb6bbbd2c25583e84754fce23d6bdf6b81a6b8fe59f2e07e",
+      "plugins/mutable-map/motoko/Map.mo": "7c9ef15f886df4cfbf38543a911cecb62307245e65b61d116d8d90adfa980438",
+      "plugins/mutable-map/plugin.json": "0af7cd8fd673678e49c8f029eb67c6a46ea272e196b3c9f86047b3cc77840b71"
+    },
+    "core_version": "2.5.0",
+    "mops_lock_sha256": "a5678b395e56a7a53c0c0037185c26c8f6ae087dbbb24d397bf724a639b70aee",
+    "full_provenance_sha256": "7a57bfc0dedb85296e088aebd1f42b80ce34163a3ba6767153a729efed3123df"
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Fresh canister per workload/trial. Same compiler, boxed Nat64 keys above 2^63, Nat values, exact-key comparator and distinct shuffled insertion sequence. Populated-map seeds are built by repeated add outside timing; before each phase both implementations clone their seed outside timing, then four forced GC increments run. Construction cases have empty seeds and time only the public constructor on prepared arrays/iterators. Updates mutate their fresh input map, retaining old-value/Bool results; each phase starts from the same initial bindings. Point operations batch 32 distinct spread keys. Insert/contains alternate hits and interleaved misses; other hit/miss rows are separate. Cursor creation retains 4 cursors at 100k or 8 otherwise; checked consumption is outside timing. Full consumption includes cursor creation and an order-sensitive bounded hash plus count. Seeks create 4/8 cursors spanning the key range and consume 16 entries each. Find thresholds are first/middle/last/absent and validate exact predicate counts. Full scans/transforms/clone/clear/builders run once. Raw counters include common loop, retained-result assignment and checksum work. Allocation is cumulative allocated bytes, not peak/live heap or RSS; synchronous reclaimed bytes are reported and end-of-message GC is excluded. Divide batch totals by operations_per_phase for the stated workload, never per iterator next. Core baseline is mutable mo:core/Map 2.5.0; only find/getEntry use the explicitly listed adapters. Shuffled means a deterministic coprime-stride permutation, not a claim about uniformly random permutations.",
+  "correctness": "The checked-result query runs outside timing and returns ok only after independent ordinal bindings, complete original seed contents, update old-value/Bool results, final map contents/sizes and balanced-tree invariants pass. Seed checks detect clone aliasing after measured mutation. Clone results are mutated outside timing to verify input independence. Iterator outputs are checked in exact order with repeated exhaustion; timed full scans/folds use an independent order-sensitive checksum and count. Find validates earliest matching entry and exact predicate count. Constructors and transforms validate complete entries and invariants. Both phases use the same oracle; failures are retained by the shared runner and rejected by the summary validator.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "mutable-map-get-hit-1000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 163821,
+          "allocated_bytes": 3040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 81027,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 58737,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "mutable-map-get-miss-1000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 171028,
+          "allocated_bytes": 3072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 84459,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 60801,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "mutable-map-get-hit-100000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 246437,
+          "allocated_bytes": 3936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 123029,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 88219,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "mutable-map-get-miss-100000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 261702,
+          "allocated_bytes": 4096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 126525,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 90731,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

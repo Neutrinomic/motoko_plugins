@@ -82,9 +82,12 @@ module Make (B : P.Backend) = struct
     | Static -> (match T.promote kt with
       | T.Prim p -> a ^^ b ^^ Compare.scalar env p
       | _ -> invalid_arg "mutable-map: unsupported static key type")
-    | Callback -> bind env "comparison" (Call.local env (Schema.compare kt) comparator [a; b]) (fun o ->
-      o ^^ Variant.test_is env "less" ^^ ifv (num (-1))
-        (o ^^ Variant.test_is env "equal" ^^ ifv (num 0) (num 1)))
+    | Callback ->
+      bind env "order_tag"
+        (Call.local env (Schema.compare kt) comparator [a; b] ^^ Variant.get_variant_tag env)
+        (fun tag ->
+          tag ^^ compile_eq_const (Variant.hash_variant_label env "less") ^^ ifv (num (-1))
+            (tag ^^ compile_eq_const (Variant.hash_variant_label env "equal") ^^ ifv (num 0) (num 1)))
   (* Return the insertion position and whether an equivalent key was found. *)
   let locate env ordering kt nt node comparator needle =
     invoke [node; comparator; needle]

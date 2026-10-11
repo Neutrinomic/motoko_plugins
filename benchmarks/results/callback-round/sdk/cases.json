@@ -1,0 +1,81 @@
+{
+  "methodology": "Three trials per case, fresh canister per workload/trial. Same actor source, baseline and candidate compilers. Dynamic callbacks are read from mutable actor fields. Count 0, 1 and 4096 iterations to expose per-argument savings. Setup and checksum oracle outside counters; allocation is cumulative allocated bytes, not peak/live memory.",
+  "correctness": "Actor independently computes expected arithmetic sums and asserts each measured checksum in bytesResult.",
+  "cases": [
+    {
+      "name": "callbacks-0",
+      "index": 0,
+      "family": "SDK callback dispatch",
+      "phases": [
+        {
+          "label": "callback0",
+          "method": "callback0",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback1",
+          "method": "callback1",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback2",
+          "method": "callback2",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "callbacks-1",
+      "index": 1,
+      "family": "SDK callback dispatch",
+      "phases": [
+        {
+          "label": "callback0",
+          "method": "callback0",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback1",
+          "method": "callback1",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback2",
+          "method": "callback2",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "callbacks-4096",
+      "index": 2,
+      "family": "SDK callback dispatch",
+      "phases": [
+        {
+          "label": "callback0",
+          "method": "callback0",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback1",
+          "method": "callback1",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        },
+        {
+          "label": "callback2",
+          "method": "callback2",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    }
+  ]
+}

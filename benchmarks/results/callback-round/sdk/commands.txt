@@ -1,0 +1,36 @@
+Recorded compiler revisions and exact artifact hashes: provenance.json.
+Build each compiler revision with `make -C src moc` in the pinned Nix shell.
+Build the archived fixture_callbacks.ml using the baseline compiler's SDK
+interfaces (the normal test/compute-plugins/fixture_tools.py command), then use
+that same plugin.cmxs for both actor compilations. This change leaves the
+plugin interface identical and the baseline fixture loads with both compilers.
+
+Baseline command at measurement time (canonical tree was then abfba892f):
+/srv/shared/code/motoko_experiments/motoko_sha/bin/moc --plugin /srv/shared/code/motoko_experiments/motoko_sha/_build/compute-plugin-tests/callbacks -o _build/callback-dispatch/baseline.wasm _build/callback-dispatch/main.mo
+
+Final candidate command (callback-round/sdk clean fc7612098):
+bin/moc --plugin /srv/shared/code/motoko_experiments/motoko_sha/_build/compute-plugin-tests/callbacks -A M0244 -o _build/callback-dispatch/candidate.wasm _build/callback-dispatch/main.mo
+
+M0244 is suppressed only for intentional mutable callback fields in the
+microbenchmark. They force dynamic calls and are never reassigned. This does
+not affect generated code. Baseline compilation emitted these warnings.
+
+Run once for each label (baseline or candidate), from callback-round/sdk:
+node _build/callback-dispatch/run.mjs --wasm _build/callback-dispatch/<label>.wasm --cases _build/callback-dispatch/cases.json --out _build/callback-dispatch/<label>.json --label <label> --trials 3 --sdk-package /srv/shared/code/candidx/ts/package.json --canonicalizer /srv/shared/code/candidx/ts/dist/index.js --delete-canisters true
+
+Final compiler checks, inside the canonical pinned Nix environment:
+cd /srv/shared/code/motoko_experiments/callback-round/sdk
+export OCAMLPATH="$PWD/_build/ocaml-compat${OCAMLPATH:+:$OCAMLPATH}"
+export PATH="$PWD/bin:$PWD/src:$PATH"
+make -C src moc
+test/compute-plugins/build.sh --skip-motoko-build
+test-runner -b test/compute-plugins/run
+test-runner -b test/compute-plugins/fail
+test-runner -b test/compute-plugins/trap
+test-runner -b test/compute-plugins/run-drun
+python3 test/compute-plugins/packaging.py
+
+The newly added trap expectations were generated with test-runner -a and then
+checked without -a. Full native/JS release build and Dune unit tests were run
+before committing the exact production change; the final rebuild only updates
+the compiler source-version metadata.

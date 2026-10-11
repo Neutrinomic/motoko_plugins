@@ -1,0 +1,165 @@
+{
+  "label": "callback-default-smoke",
+  "recorded_utc": "2026-10-11T17:40:42.217Z",
+  "wasm_sha256": "b9e00e569404f957083f31abe71fbfa3e45efe63347d4fd8d892c3a5733c9c62",
+  "wasm_bytes": 455893,
+  "trials": 1,
+  "source_sha256": "d9929dff83e8983032d9bd32b8bf5bfa5b205bac2bcd0411831844ded8f98242",
+  "cases_sha256": "9678d39d4bd87758e7c84e0ce5f3df06bb8118597a6ddb8549339775775a3403",
+  "runner_sha256": "182947b3807f50b749bf248d552a816afd6449d984541acee9820f971581ace2",
+  "node_version": "v24.11.1",
+  "implementations": {
+    "core": {
+      "package": "core",
+      "version": "2.5.0",
+      "module": "Map"
+    },
+    "plugin_custom": {
+      "package": "plugin/mutable-map",
+      "version": "ABI 1",
+      "comparison": "Motoko callback"
+    },
+    "plugin_static": {
+      "package": "plugin/mutable-map",
+      "version": "ABI 1",
+      "comparison": "native Nat64 ordering"
+    }
+  },
+  "provenance": {
+    "compiler_revision": "abfba892fe4bd8fa2bc88e25dca0b895d35c1962",
+    "compiler_dirty": true,
+    "moc_sha256": "a5a68803ecc8d48509c77052889f05eb8b5e3e983ee55b2027e9689939d79498",
+    "plugin_cmxs_sha256": "10ccabc607c263887176c2432e2b16205207abe6bf595a9614de54eb6501c648",
+    "plugin_source_sha256": {
+      "plugins/mutable-map/compiler/generator.ml": "e901c06932a6ca74d2486d31ad0e6dcdc64d9d5435b7168394db6a0711a0d3b1",
+      "plugins/mutable-map/compiler/reference.ml": "c42812a2d9ec45c45c7cdea9fa9426f08e2d8f026ae2b3d3dfc1ab89f8a68ffe",
+      "plugins/mutable-map/compiler/register.ml": "cb3b1c6133f51515190979c60c0aec722e2498c466a79a56cc50e39c90ea3165",
+      "plugins/mutable-map/compiler/schema.ml": "a79ab1a5e837ace6636a3a02c35f8df555ba5cf856378ffdde92035efbc2202c",
+      "plugins/mutable-map/motoko/Core.mo": "cfdf3461369edf3edb6bbbd2c25583e84754fce23d6bdf6b81a6b8fe59f2e07e",
+      "plugins/mutable-map/motoko/Map.mo": "7c9ef15f886df4cfbf38543a911cecb62307245e65b61d116d8d90adfa980438",
+      "plugins/mutable-map/plugin.json": "0af7cd8fd673678e49c8f029eb67c6a46ea272e196b3c9f86047b3cc77840b71"
+    },
+    "core_version": "2.5.0",
+    "mops_lock_sha256": "a5678b395e56a7a53c0c0037185c26c8f6ae087dbbb24d397bf724a639b70aee",
+    "full_provenance_sha256": "4a282fbd2a5cebfe314a730390cfb9972dae4df07a2775b60f8d1b1d80ed5a07"
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Default-protocol regression smoke: fresh canister per workload/trial, then all three phases on that canister with reset and four GC increments before each.",
+  "correctness": "The checked-result query runs outside timing and returns ok only after independent ordinal bindings, complete original seed contents, update old-value/Bool results, final map contents/sizes and balanced-tree invariants pass. Seed checks detect clone aliasing after measured mutation. Clone results are mutated outside timing to verify input independence. Iterator outputs are checked in exact order with repeated exhaustion; timed full scans/folds use an independent order-sensitive checksum and count. Find validates earliest matching entry and exact predicate count. Constructors and transforms validate complete entries and invariants. Both phases use the same oracle; failures are retained by the shared runner and rejected by the summary validator.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "mutable-map-get-hit-1000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 163821,
+          "allocated_bytes": 3040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 81667,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 58737,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "mutable-map-get-miss-1000",
+      "family": "mutable-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 171028,
+          "allocated_bytes": 3072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 85099,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 60801,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

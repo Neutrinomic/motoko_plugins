@@ -134,9 +134,11 @@ module Make (B : P.Backend) = struct
       | T.Prim prim -> a ^^ b ^^ Compare.scalar env prim
       | _ -> invalid_arg "pure map: unsupported static key type")
     | Callback ->
-      bind env "order" (Call.local env (Schema.compare kt) comparator [a; b]) (fun order ->
-        order ^^ Variant.test_is env "less" ^^ ifv (num (-1))
-          (order ^^ Variant.test_is env "equal" ^^ ifv (num 0) (num 1)))
+      bind env "order_tag"
+        (Call.local env (Schema.compare kt) comparator [a; b] ^^ Variant.get_variant_tag env)
+        (fun tag ->
+          tag ^^ compile_eq_const (Variant.hash_variant_label env "less") ^^ ifv (num (-1))
+            (tag ^^ compile_eq_const (Variant.hash_variant_label env "equal") ^^ ifv (num 0) (num 1)))
   let search env ordering kt initial comparator needle =
     invoke [initial; comparator; needle]
       (helper env ("search_" ^ ordering_name ordering kt) 3 1 (fun env args ->

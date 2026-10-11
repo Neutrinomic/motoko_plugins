@@ -15,7 +15,7 @@ const options = { wasm: null, cases: null, out: null, label: 'local',
   server: 'pocket-ic-server', trials: 3, filter: '.',
   'sdk-package': resolve(root, '../../candidx/ts/package.json'),
   canonicalizer: resolve(root, '../../candidx/ts/dist/index.js'),
-  'cbor-python': 'python3', 'delete-canisters': 'false' };
+  'cbor-python': 'python3', 'delete-canisters': 'false', 'fresh-per-phase': 'false' };
 for (let i = 2; i < process.argv.length; i += 2) {
   const key = process.argv[i].replace(/^--/, '');
   if (!(key in options) || process.argv[i + 1] === undefined) throw Error(`Unknown option ${process.argv[i]}`);
@@ -23,8 +23,10 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 if (!options.wasm || !options.cases || !options.out || !Number.isSafeInteger(options.trials) || options.trials < 1)
   throw Error('Usage: node benchmarks/run.mjs --wasm main.wasm --cases cases.json --out result.json [--label baseline] [--trials 3] [--filter regex]');
-if (!['true', 'false'].includes(options['delete-canisters']))
-  throw Error('--delete-canisters must be true or false');
+for (const name of ['delete-canisters', 'fresh-per-phase']) {
+  if (!['true', 'false'].includes(options[name])) throw Error(`--${name} must be true or false`);
+}
+const freshPerPhase = options['fresh-per-phase'] === 'true';
 const require = createRequire(resolve(options['sdk-package']));
 const { IDL } = require('@icp-sdk/core/candid');
 const { Principal } = require('@icp-sdk/core/principal');
@@ -139,12 +141,13 @@ const report = {
   variant_payload: manifest.variant_payload,
   ...(manifest.implementations === undefined ? {} : { implementations: manifest.implementations }),
   ...(manifest.provenance === undefined ? {} : { provenance: manifest.provenance }),
-  measurement_protocol: { fresh_canister: 'per workload/trial', forced_gc_calls_before_phase: 4,
+  measurement_protocol: { fresh_canister: freshPerPhase ? 'per workload/trial/phase' : 'per workload/trial', forced_gc_calls_before_phase: 4,
     synchronous_gc: 'included in instruction count; reclaimed_bytes reported',
     end_of_message_gc: 'excluded',
-    canister_cleanup: options['delete-canisters'] === 'true' ? 'stop and delete after each completed trial' : 'delete PocketIC instance after the complete run' },
-  methodology: manifest.methodology ??
-    'Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.',
+    canister_cleanup: options['delete-canisters'] === 'true' ? `stop and delete after each completed ${freshPerPhase ? 'phase' : 'trial'}` : 'delete PocketIC instance after the complete run' },
+  methodology: (manifest.methodology ??
+    'Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.') +
+    (freshPerPhase ? ' Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.' : ''),
   correctness: manifest.correctness ?? 'Every SHA-256 phase is checked against the oracle digest in the workload manifest. Every canonical Candid phase is checked against host canonicalization of ordinary Candid. Equivalent phase outputs must also match byte-for-byte within each trial.',
   failed_measurements: 0,
   cases: []
@@ -190,70 +193,73 @@ try {
       hostReference = new Uint8Array(IDL.encode([IDL.Vec(choice)], [values]));
     }
     for (let trial = 0; trial < options.trials; trial++) {
-      const [made] = await call(management, 'provisional_create_canister_with_cycles', [Create],
-        [{ amount: [10n ** 15n], settings: [{ controllers: [[anon]] }], specified_id: [] }], [Created], false, effective);
-      const canister = made.canister_id;
-      await call(management, 'install_code', [Install], [{ mode: { install: null }, canister_id: canister,
-        wasm_module: installWasm, arg: new Uint8Array(IDL.encode([], [])) }], [], false,
-        { CanisterId: base64(canister.toUint8Array()) });
-      await call(canister, 'configure', [IDL.Nat], [BigInt(spec.index)]);
       let ordinary = hostReference;
       let canonicalReference;
       const equivalentOutputs = new Map();
-      for (const phase of phases) {
-        await call(canister, 'clear');
-        for (let i = 0; i < 4; i++) await call(canister, '__motoko_gc_trigger');
-        let sample;
-        try {
-          [sample] = await call(canister, phase.method, [], [], [Measurement]);
-          if (phase.require_no_gc) strictEqual(sample.reclaimed, 0n, 'Unexpected synchronous garbage collection');
-          const [bytes] = await call(canister, 'bytesResult', [], [], [IDL.Vec(IDL.Nat8)], true);
-          strictEqual(sample.outputSize, BigInt(bytes.length), 'Reply size mismatch');
-          if (phase.kind === 'ordinary_candid') { ordinary = bytes; canonicalReference = undefined; }
-          else if (phase.kind === 'canonical_candid') {
-            if (!ordinary) throw Error(`${spec.name}: ordinary Candid reference did not succeed`);
-            canonicalReference ??= canonicalize(ordinary);
-            deepStrictEqual(bytes, canonicalReference, `${spec.name}/${phase.label}: canonical bytes`);
-          } else if (phase.kind === 'sha256') {
-            strictEqual(Buffer.from(bytes).toString('hex'), spec.expected_sha256_hex.toLowerCase(), `${spec.name}/${phase.label}: SHA-256 digest`);
-          } else if (phase.kind === 'json') {
-            const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-            deepStrictEqual(JSON.parse(text), spec.expected_json, `${spec.name}/${phase.label}: JSON value`);
-          } else if (phase.kind === 'cbor') {
-            const decoded = execFileSync(options['cbor-python'], [resolve(root, 'benchmarks/cbor-oracle.py')],
-              { input: base64(bytes), encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
-            deepStrictEqual(JSON.parse(decoded), spec.expected_cbor, `${spec.name}/${phase.label}: CBOR value`);
-          } else if (phase.kind === 'checked_decode') {
-            // The actor checks every retained typed value against its
-            // independently constructed input in this query, outside timing.
-            strictEqual(Buffer.from(bytes).toString('utf8'), 'ok', `${spec.name}/${phase.label}: typed decoder check`);
+      const groups = freshPerPhase ? phases.map(phase => [phase]) : [phases];
+      for (const group of groups) {
+        const [made] = await call(management, 'provisional_create_canister_with_cycles', [Create],
+          [{ amount: [10n ** 15n], settings: [{ controllers: [[anon]] }], specified_id: [] }], [Created], false, effective);
+        const canister = made.canister_id;
+        await call(management, 'install_code', [Install], [{ mode: { install: null }, canister_id: canister,
+          wasm_module: installWasm, arg: new Uint8Array(IDL.encode([], [])) }], [], false,
+          { CanisterId: base64(canister.toUint8Array()) });
+        await call(canister, 'configure', [IDL.Nat], [BigInt(spec.index)]);
+        for (const phase of group) {
+          await call(canister, 'clear');
+          for (let i = 0; i < 4; i++) await call(canister, '__motoko_gc_trigger');
+          let sample;
+          try {
+            [sample] = await call(canister, phase.method, [], [], [Measurement]);
+            if (phase.require_no_gc) strictEqual(sample.reclaimed, 0n, 'Unexpected synchronous garbage collection');
+            const [bytes] = await call(canister, 'bytesResult', [], [], [IDL.Vec(IDL.Nat8)], true);
+            strictEqual(sample.outputSize, BigInt(bytes.length), 'Reply size mismatch');
+            if (phase.kind === 'ordinary_candid') { ordinary = bytes; canonicalReference = undefined; }
+            else if (phase.kind === 'canonical_candid') {
+              if (!ordinary) throw Error(`${spec.name}: ordinary Candid reference did not succeed`);
+              canonicalReference ??= canonicalize(ordinary);
+              deepStrictEqual(bytes, canonicalReference, `${spec.name}/${phase.label}: canonical bytes`);
+            } else if (phase.kind === 'sha256') {
+              strictEqual(Buffer.from(bytes).toString('hex'), spec.expected_sha256_hex.toLowerCase(), `${spec.name}/${phase.label}: SHA-256 digest`);
+            } else if (phase.kind === 'json') {
+              const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+              deepStrictEqual(JSON.parse(text), spec.expected_json, `${spec.name}/${phase.label}: JSON value`);
+            } else if (phase.kind === 'cbor') {
+              const decoded = execFileSync(options['cbor-python'], [resolve(root, 'benchmarks/cbor-oracle.py')],
+                { input: base64(bytes), encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+              deepStrictEqual(JSON.parse(decoded), spec.expected_cbor, `${spec.name}/${phase.label}: CBOR value`);
+            } else if (phase.kind === 'checked_decode') {
+              // The actor checks every retained typed value against its
+              // independently constructed input in this query, outside timing.
+              strictEqual(Buffer.from(bytes).toString('utf8'), 'ok', `${spec.name}/${phase.label}: typed decoder check`);
+            }
+            if (phase.kind === 'canonical_candid' || phase.kind === 'sha256') {
+              if (equivalentOutputs.has(phase.kind))
+                deepStrictEqual(bytes, equivalentOutputs.get(phase.kind), `${spec.name}/${phase.label}: branch outputs differ`);
+              else equivalentOutputs.set(phase.kind, bytes);
+            }
+            result.measurements.push({ trial, phase: phase.label, instructions: sample.instructions,
+              allocated_bytes: sample.allocated, reclaimed_bytes: sample.reclaimed,
+              output_bytes: sample.outputSize, output_sha256: sha(bytes) });
+            console.log(`${options.label} ${spec.name} trial ${trial + 1} ${phase.label}: ${sample.instructions} instructions, ${sample.allocated} allocated, ${sample.reclaimed} reclaimed`);
+          } catch (error) {
+            report.failed_measurements++;
+            result.measurements.push({ trial, phase: phase.label,
+              ...(sample === undefined ? {} : { instructions: sample.instructions,
+                allocated_bytes: sample.allocated, reclaimed_bytes: sample.reclaimed }), error: String(error) });
+            console.log(`${options.label} ${spec.name} trial ${trial + 1} ${phase.label}: ${error}`);
+            if (!/Canister(?:Called)?Trap|CanisterInstructionLimitExceeded/.test(String(error))) throw error;
           }
-          if (phase.kind === 'canonical_candid' || phase.kind === 'sha256') {
-            if (equivalentOutputs.has(phase.kind))
-              deepStrictEqual(bytes, equivalentOutputs.get(phase.kind), `${spec.name}/${phase.label}: branch outputs differ`);
-            else equivalentOutputs.set(phase.kind, bytes);
-          }
-          result.measurements.push({ trial, phase: phase.label, instructions: sample.instructions,
-            allocated_bytes: sample.allocated, reclaimed_bytes: sample.reclaimed,
-            output_bytes: sample.outputSize, output_sha256: sha(bytes) });
-          console.log(`${options.label} ${spec.name} trial ${trial + 1} ${phase.label}: ${sample.instructions} instructions, ${sample.allocated} allocated, ${sample.reclaimed} reclaimed`);
-        } catch (error) {
-          report.failed_measurements++;
-          result.measurements.push({ trial, phase: phase.label,
-            ...(sample === undefined ? {} : { instructions: sample.instructions,
-              allocated_bytes: sample.allocated, reclaimed_bytes: sample.reclaimed }), error: String(error) });
-          console.log(`${options.label} ${spec.name} trial ${trial + 1} ${phase.label}: ${error}`);
-          if (!/Canister(?:Called)?Trap|CanisterInstructionLimitExceeded/.test(String(error))) throw error;
+          await save();
         }
-        await save();
-      }
-      // All measured outputs and failures have been recorded before cleanup.
-      // Large map matrices otherwise retain hundreds of populated canisters.
-      // A cleanup failure is fatal and preserves the existing saved samples.
-      if (options['delete-canisters'] === 'true') {
-        const target = { CanisterId: base64(canister.toUint8Array()) };
-        await call(management, 'stop_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
-        await call(management, 'delete_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
+        // All measured outputs and failures have been recorded before cleanup.
+        // Large map matrices otherwise retain hundreds of populated canisters.
+        // A cleanup failure is fatal and preserves the existing saved samples.
+        if (options['delete-canisters'] === 'true') {
+          const target = { CanisterId: base64(canister.toUint8Array()) };
+          await call(management, 'stop_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
+          await call(management, 'delete_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
+        }
       }
     }
   }
