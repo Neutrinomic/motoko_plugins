@@ -1,0 +1,396 @@
+{
+  "label": "candidate",
+  "recorded_utc": "2026-10-11T16:10:21.098Z",
+  "wasm_sha256": "e5b6ad3a6cf113bcad540dbc0eea8484fd457818e14a3f811de432daecea4cf0",
+  "wasm_bytes": 2531571,
+  "trials": 3,
+  "source_sha256": "d596f7a1838e8525fdd1994ef3bedef6c8e9cbcbee9ec06bc18eeadb10037b00",
+  "cases_sha256": "aa6cf059846ed2556de5c6509dc8a2a333143a58a59f233d5a1f38f734ad5a8f",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "variant_width": 4096,
+  "variant_payload": "nat",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.",
+  "correctness": "Every SHA-256 phase is checked against the oracle digest in the workload manifest. Every canonical Candid phase is checked against host canonicalization of ordinary Candid. Equivalent phase outputs must also match byte-for-byte within each trial.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "candid-wide-4096-empty",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_17",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_17",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 1882,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 402,
+          "output_sha256": "4d7cb6788e25eddb57b7721f973400f13f13dbe1ab316aa426ba07f3f64eae69"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 5519,
+          "allocated_bytes": 616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 1882,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 402,
+          "output_sha256": "4d7cb6788e25eddb57b7721f973400f13f13dbe1ab316aa426ba07f3f64eae69"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 5519,
+          "allocated_bytes": 616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 1882,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 402,
+          "output_sha256": "4d7cb6788e25eddb57b7721f973400f13f13dbe1ab316aa426ba07f3f64eae69"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 5519,
+          "allocated_bytes": 616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        }
+      ]
+    },
+    {
+      "name": "candid-wide-4096-singleton-high",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_18",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_18",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 3403,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 405,
+          "output_sha256": "a41ae18b87876a70440dfd4ed645b293c607376e86408303e1a87304a376f5cf"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 9497,
+          "allocated_bytes": 848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "7abf595e13a9e1460ea3833d019d637e38588789566a04179e0b34861ef8d673"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 3403,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 405,
+          "output_sha256": "a41ae18b87876a70440dfd4ed645b293c607376e86408303e1a87304a376f5cf"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 9497,
+          "allocated_bytes": 848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "7abf595e13a9e1460ea3833d019d637e38588789566a04179e0b34861ef8d673"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 3403,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 405,
+          "output_sha256": "a41ae18b87876a70440dfd4ed645b293c607376e86408303e1a87304a376f5cf"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 9497,
+          "allocated_bytes": 848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "7abf595e13a9e1460ea3833d019d637e38588789566a04179e0b34861ef8d673"
+        }
+      ]
+    },
+    {
+      "name": "candid-wide-4096-pair-same-high",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_19",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_19",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 4896,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 408,
+          "output_sha256": "3e8f4944040965c4ccd238df2e73ed343804af2b5cbf5ef41170e282cc687877"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 12138,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "7c85ff04630231240d9025e78a50a3362a7b78097b57af98f96780d7d1621108"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 4896,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 408,
+          "output_sha256": "3e8f4944040965c4ccd238df2e73ed343804af2b5cbf5ef41170e282cc687877"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 12138,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "7c85ff04630231240d9025e78a50a3362a7b78097b57af98f96780d7d1621108"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 4896,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 408,
+          "output_sha256": "3e8f4944040965c4ccd238df2e73ed343804af2b5cbf5ef41170e282cc687877"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 12138,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "7c85ff04630231240d9025e78a50a3362a7b78097b57af98f96780d7d1621108"
+        }
+      ]
+    },
+    {
+      "name": "candid-wide-4096-pair-far",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_20",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_20",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 3664,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 407,
+          "output_sha256": "60ab9b8a781cb6582acd2cbad632b01d9a29aacbd2fd91092cbd08ee364b3253"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 13933,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 29,
+          "output_sha256": "bf527f75eaf489e89610786d2849bddc8790610f6bfd52f7b2cdea2b439b9981"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 3664,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 407,
+          "output_sha256": "60ab9b8a781cb6582acd2cbad632b01d9a29aacbd2fd91092cbd08ee364b3253"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 13933,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 29,
+          "output_sha256": "bf527f75eaf489e89610786d2849bddc8790610f6bfd52f7b2cdea2b439b9981"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 3664,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 407,
+          "output_sha256": "60ab9b8a781cb6582acd2cbad632b01d9a29aacbd2fd91092cbd08ee364b3253"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 13933,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 29,
+          "output_sha256": "bf527f75eaf489e89610786d2849bddc8790610f6bfd52f7b2cdea2b439b9981"
+        }
+      ]
+    },
+    {
+      "name": "candid-wide-4096-sparse-65",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_21",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_21",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 61387,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 172067,
+          "allocated_bytes": 6792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 61387,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 172067,
+          "allocated_bytes": 6792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 61387,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 172067,
+          "allocated_bytes": 6792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 594,
+          "output_sha256": "5171e40247f6092bc81b309a970f1268e6fd85caa8cd294ee65886eaf0d8ad6e"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

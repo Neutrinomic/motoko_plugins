@@ -1,0 +1,488 @@
+{
+  "label": "candidate",
+  "recorded_utc": "2026-10-11T16:09:41.657Z",
+  "wasm_sha256": "fd596d276e67e94dfd687c16c4f8597b4aede3e97ac27eeaf94f4777bcaf304c",
+  "wasm_bytes": 1401116,
+  "trials": 3,
+  "source_sha256": "616fbd6ed3de34e97962209d52103e149960b7969e98c77f5c87e88aef15cc83",
+  "cases_sha256": "4f6d43b21c17614fe912608d96a7e775bcd0af0beb7b9b4845d27169d360630f",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "variant_width": 1024,
+  "variant_payload": "nat",
+  "implementations": {},
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Same compiler and actor for all implementations; fresh canister per workload/trial. Inputs are configured outside measurement. Output is cleared and four GC increments run before each phase. Raw performanceCounter(0) deltas include counter/assignment overhead; control is reported separately. Native CandidX includes to_candid plus canonicalize and successful Result unwrapping. Normalize is canonicalize alone on ordinary bytes saved outside measurement. Native SHA is Mops sha2 Sha256.fromBlob(#sha256, input). Synchronous GC, if any, is included and reported; plugin phases require zero reclamation. Reply encoding, input setup, and message-end GC are outside the interval.",
+  "correctness": "Every canonical Candid output is checked against host canonicalization of the ordinary Candid output for the same input. Both SHA implementations are checked against Python hashlib digests. Equivalent phases must return identical bytes.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "control",
+      "family": "control",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_0",
+          "kind": "control",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 256,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 256,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 256,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "candid-empty",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_9",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "native_9",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "normalize",
+          "method": "normalize_9",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_9",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 996,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 17548,
+          "allocated_bytes": 2792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 0,
+          "phase": "normalize",
+          "instructions": 16824,
+          "allocated_bytes": 2704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 582,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 996,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 17548,
+          "allocated_bytes": 2792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 1,
+          "phase": "normalize",
+          "instructions": 16824,
+          "allocated_bytes": 2704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 582,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 996,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 17548,
+          "allocated_bytes": 2792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 2,
+          "phase": "normalize",
+          "instructions": 16824,
+          "allocated_bytes": 2704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 582,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "0fee102bd16b053022b69f2c65fd5e2f41d150ce9c214ac8731cfaf496ebda4e"
+        }
+      ]
+    },
+    {
+      "name": "candid-sparse-1024",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_15",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "native_15",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "normalize",
+          "method": "normalize_15",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_15",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 1657774,
+          "allocated_bytes": 38904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 19412,
+          "output_sha256": "006644412bab263abfd00ebc4d5dd1891e8d5a2c74c5cdc6501b45b53b296ad2"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 88379476,
+          "allocated_bytes": 3578064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 0,
+          "phase": "normalize",
+          "instructions": 86721942,
+          "allocated_bytes": 3539160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 6057260,
+          "allocated_bytes": 22600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 1657774,
+          "allocated_bytes": 38904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 19412,
+          "output_sha256": "006644412bab263abfd00ebc4d5dd1891e8d5a2c74c5cdc6501b45b53b296ad2"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 88379476,
+          "allocated_bytes": 3578064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 1,
+          "phase": "normalize",
+          "instructions": 86721942,
+          "allocated_bytes": 3539160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 6057260,
+          "allocated_bytes": 22600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 1657774,
+          "allocated_bytes": 38904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 19412,
+          "output_sha256": "006644412bab263abfd00ebc4d5dd1891e8d5a2c74c5cdc6501b45b53b296ad2"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 88379476,
+          "allocated_bytes": 3578064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 2,
+          "phase": "normalize",
+          "instructions": 86721942,
+          "allocated_bytes": 3539160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 6057260,
+          "allocated_bytes": 22600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 17350,
+          "output_sha256": "1da427e9ba568f3d2446eceb6a20c435742c069d32a5990b8d6e9541c818298f"
+        }
+      ]
+    },
+    {
+      "name": "candid-variants-1024",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_19",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "native_19",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "normalize",
+          "method": "normalize_19",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_19",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "ordinary",
+          "instructions": 9808988,
+          "allocated_bytes": 20072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 1428890507,
+          "allocated_bytes": 27091416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 0,
+          "phase": "normalize",
+          "instructions": 1419081823,
+          "allocated_bytes": 27071344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 2269134,
+          "allocated_bytes": 60280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 1,
+          "phase": "ordinary",
+          "instructions": 9808988,
+          "allocated_bytes": 20072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 1428890507,
+          "allocated_bytes": 27091416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 1,
+          "phase": "normalize",
+          "instructions": 1419081823,
+          "allocated_bytes": 27071344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 2269134,
+          "allocated_bytes": 60280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 2,
+          "phase": "ordinary",
+          "instructions": 9808988,
+          "allocated_bytes": 20072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 1428890507,
+          "allocated_bytes": 27091416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 2,
+          "phase": "normalize",
+          "instructions": 1419081823,
+          "allocated_bytes": 27071344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 2269134,
+          "allocated_bytes": 60280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 9998,
+          "output_sha256": "72af6bf2ee81ed9a926ab0c0ce207538ffe11910791cbfac625b55c085b0ddd3"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

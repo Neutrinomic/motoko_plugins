@@ -1,0 +1,46 @@
+{
+  "label": "candidate",
+  "recorded_utc": "2026-10-11T16:02:32.635Z",
+  "wasm_sha256": "be01acc3dd284176a6dac846d48780b83d5e631c73a09409fb382da42d852c54",
+  "wasm_bytes": 2479987,
+  "trials": 3,
+  "source_sha256": "d596f7a1838e8525fdd1994ef3bedef6c8e9cbcbee9ec06bc18eeadb10037b00",
+  "cases_sha256": "aa6cf059846ed2556de5c6509dc8a2a333143a58a59f233d5a1f38f734ad5a8f",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "variant_width": 4096,
+  "variant_payload": "nat",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.",
+  "correctness": "Every SHA-256 phase is checked against the oracle digest in the workload manifest. Every canonical Candid phase is checked against host canonicalization of ordinary Candid. Equivalent phase outputs must also match byte-for-byte within each trial.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "candid-wide-4096-empty",
+      "family": "candidx",
+      "phases": [
+        {
+          "label": "ordinary",
+          "method": "ordinary_17",
+          "kind": "ordinary_candid",
+          "require_no_gc": true
+        },
+        {
+          "label": "plugin",
+          "method": "bench_17",
+          "kind": "canonical_candid",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": []
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0",
+  "fatal_error": "Error: install_code: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister lxzze-o7777-77777-aaaaa-cai: Canister's Wasm module is not valid: Wasm module contains a function at index 137 with complexity 1061344 which exceeds the maximum complexity allowed 1000000..\\nTry breaking large functions up into multiple smaller functions. See documentation: https://docs.internetcomputer.org/references/execution-errors#wasm-module-function-complexity-too-high\",\"error_code\":\"CanisterInvalidWasm\",\"certified\":true}}"
+}

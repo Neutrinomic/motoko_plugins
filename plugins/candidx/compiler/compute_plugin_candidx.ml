@@ -12,9 +12,6 @@ let () = Plugin_codegen.register Plugin_codegen.{
     ("candid_canonical_field", [I64Type; I64Type; I64Type], [I64Type]);
     ("candid_canonical_end", [I64Type], [I64Type]);
     ("candid_canonical_variant", [I64Type; I64Type; I64Type], [I64Type]);
-    ("candid_canonical_variants_begin", [I64Type], [I64Type]);
-    ("candid_canonical_variants_push", [I64Type; I64Type; I64Type], [I64Type]);
-    ("candid_canonical_variants_end", [I64Type], [I64Type]);
     ("candid_canonical_unary", [I64Type; I64Type; I64Type], [I64Type]);
     ("candid_canonical_join", [I64Type; I64Type; I64Type], [I64Type]);
     ("candid_canonical_join_begin", [I64Type], [I64Type]);

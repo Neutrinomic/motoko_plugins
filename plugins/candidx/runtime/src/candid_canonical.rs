@@ -11,8 +11,6 @@ const MAX_TYPES: usize = 1024;
 const MAX_BYTES: usize = 32 * 1024 * 1024;
 const MAX_SCRATCH: usize = 256 * 1024 * 1024;
 const MISSING: i64 = i64::MIN;
-// Internal builder mode, outside the supported compound opcode range.
-const PRIMITIVE_VARIANTS: i64 = 0;
 
 type Checked<T> = core::result::Result<T, Error>;
 
@@ -24,39 +22,34 @@ enum Error {
     FieldIdRange = 2,
     HeaderPointerRange = 4,
     HeaderSizeChanged = 5,
-    IncompatiblePrimitiveVariantPayloads = 6,
-    IncompatibleValueShapes = 7,
-    IndexRange = 8,
-    InvalidFieldBuilderMode = 10,
-    InvalidFieldBuilderOpcode = 11,
-    InvalidFieldShape = 12,
-    InvalidPrimitiveVariantPayload = 13,
-    InvalidShapeUnion = 14,
-    InvalidUnaryShape = 15,
-    InvalidVariantCollectorMode = 16,
-    MissingDerivedVariant = 17,
-    MissingFieldBuilder = 18,
-    MissingFieldShape = 19,
-    MissingShapeJoiner = 20,
-    MissingUnaryShape = 21,
-    MissingVariantCollector = 22,
-    MissingVariantShape = 23,
-    NullShapeContext = 24,
-    OutputByteLimit = 26,
-    OutputTypeTableLimit = 27,
-    RootIndexRange = 28,
-    ScratchAllocationFailed = 29,
-    ScratchByteLimit = 30,
-    ShapeContextIsFinalized = 31,
-    ShapeReferenceRange = 32,
-    TypeNestingLimit = 34,
-    UnfinishedFieldBuilder = 36,
-    UnfinishedShapeJoiner = 37,
-    UnorderedFieldIds = 38,
-    UnsupportedCompoundShape = 39,
-    UnsupportedShapeReference = 40,
-    ValueNestingLimit = 43,
-    ValueTraversalLimit = 44,
+    IncompatibleValueShapes = 6,
+    IndexRange = 7,
+    InvalidFieldBuilderOpcode = 9,
+    InvalidFieldShape = 10,
+    InvalidShapeUnion = 11,
+    InvalidUnaryShape = 12,
+    MissingDerivedVariant = 13,
+    MissingFieldBuilder = 14,
+    MissingFieldShape = 15,
+    MissingShapeJoiner = 16,
+    MissingUnaryShape = 17,
+    MissingVariantShape = 18,
+    NullShapeContext = 19,
+    OutputByteLimit = 21,
+    OutputTypeTableLimit = 22,
+    RootIndexRange = 23,
+    ScratchAllocationFailed = 24,
+    ScratchByteLimit = 25,
+    ShapeContextIsFinalized = 26,
+    ShapeReferenceRange = 27,
+    TypeNestingLimit = 29,
+    UnfinishedFieldBuilder = 31,
+    UnfinishedShapeJoiner = 32,
+    UnorderedFieldIds = 33,
+    UnsupportedCompoundShape = 34,
+    UnsupportedShapeReference = 35,
+    ValueNestingLimit = 38,
+    ValueTraversalLimit = 39,
 }
 
 // Reserved status values cannot alias primitive opcodes, node IDs or MISSING.
@@ -69,23 +62,18 @@ const ERRORS: &[&str] = &[
     "function and service values are excluded",
     "header pointer range",
     "header size changed",
-    "incompatible primitive variant payloads",
     "incompatible value shapes",
     "index range",
     "integer length limit",
-    "invalid field builder mode",
     "invalid field builder opcode",
     "invalid field shape",
-    "invalid primitive variant payload",
     "invalid shape union",
     "invalid unary shape",
-    "invalid variant collector mode",
     "missing derived variant",
     "missing field builder",
     "missing field shape",
     "missing shape joiner",
     "missing unary shape",
-    "missing variant collector",
     "missing variant shape",
     "null shape context",
     "output buffer not filled",
@@ -180,8 +168,6 @@ struct Builder {
     fields: Vec<Field>,
     height: usize,
     previous: i64,
-    // Includes repeated source elements skipped by a primitive collector.
-    count: usize,
 }
 struct Joiner {
     // Each occupied level represents a contiguous block twice the size of
@@ -437,12 +423,6 @@ impl Context {
         if ![-20, -21].contains(&op) {
             return Err(Error::InvalidFieldBuilderOpcode);
         }
-        self.begin_builder(op)?;
-
-        Ok(())
-    }
-
-    fn begin_builder(&mut self, op: i64) -> Checked<()> {
         if self.building > MAX_DEPTH {
             return Err(Error::TypeNestingLimit);
         }
@@ -454,7 +434,6 @@ impl Context {
                     fields: Vec::new(),
                     height: 1,
                     previous: MISSING,
-                    count: 0,
                 },
             )?;
         }
@@ -476,9 +455,6 @@ impl Context {
             .builders
             .get_mut(self.building.wrapping_sub(1))
             .ok_or(Error::MissingFieldBuilder)?;
-        if builder.op == PRIMITIVE_VARIANTS {
-            return Err(Error::InvalidFieldBuilderMode);
-        }
         if builder.fields.len() >= MAX_ITEMS {
             return Err(Error::CollectionLengthLimit);
         }
@@ -500,9 +476,6 @@ impl Context {
         self.open()?;
         if self.building == 0 {
             return Err(Error::MissingFieldBuilder);
-        }
-        if self.builders[self.building - 1].op == PRIMITIVE_VARIANTS {
-            return Err(Error::InvalidFieldBuilderMode);
         }
         self.building -= 1;
         let builder = &mut self.builders[self.building];
@@ -535,79 +508,6 @@ impl Context {
             child,
         };
         self.intern_validated(-21, MISSING, &[field], self.height(child) + 1)
-    }
-
-    fn variants_begin(&mut self) -> Checked<()> {
-        self.open()?;
-        self.begin_builder(PRIMITIVE_VARIANTS)?;
-        self.builders[self.building - 1].count = 0;
-
-        Ok(())
-    }
-
-    fn variants_push(&mut self, id: u64, child: i64) -> Checked<()> {
-        self.open()?;
-        // The compiler uses this collector only when each source case has a
-        // fixed primitive payload. Such a payload never needs a shape join.
-        if !primitive(child) || child == -17 {
-            return Err(Error::InvalidPrimitiveVariantPayload);
-        }
-        let field = Field {
-            id: label(id)?,
-            child,
-        };
-        let builder = self
-            .builders
-            .get_mut(self.building.wrapping_sub(1))
-            .ok_or(Error::MissingVariantCollector)?;
-        if builder.op != PRIMITIVE_VARIANTS {
-            return Err(Error::InvalidVariantCollectorMode);
-        }
-        if builder.count >= MAX_ITEMS {
-            return Err(Error::CollectionLengthLimit);
-        }
-        builder.count += 1;
-        // Only adjacent duplicates avoid storage. Cyclic repetitions remain
-        // buffered until the final sort, so scratch is bounded by input size,
-        // not merely by the number of distinct selected cases.
-        if builder.fields.last() == Some(&field) {
-            return Ok(());
-        }
-        self.scratch.push(&mut builder.fields, field)?;
-
-        Ok(())
-    }
-
-    fn variants_end(&mut self) -> Checked<i64> {
-        self.open()?;
-        let position = self
-            .building
-            .checked_sub(1)
-            .ok_or(Error::MissingVariantCollector)?;
-        let builder = &mut self.builders[position];
-        if builder.op != PRIMITIVE_VARIANTS {
-            return Err(Error::InvalidVariantCollectorMode);
-        }
-        let mut fields = take(&mut builder.fields);
-        fields.sort_unstable_by_key(|field| field.id);
-        for pair in fields.windows(2) {
-            if pair[0].id == pair[1].id && pair[0].child != pair[1].child {
-                return Err(Error::IncompatiblePrimitiveVariantPayloads);
-            }
-        }
-        fields.dedup_by_key(|field| field.id);
-        // Only the completed union survives: no singleton or intermediate
-        // union nodes are needed for this array's element type.
-        let result = if fields.is_empty() {
-            -17
-        } else {
-            self.intern_validated(-21, MISSING, &fields, 1)?
-        };
-        let builder = &mut self.builders[position];
-        builder.fields = fields;
-        builder.previous = MISSING;
-        self.building = position;
-        Ok(result)
     }
 
     fn unary(&mut self, op: i64, child: i64) -> Checked<i64> {
@@ -1104,31 +1004,6 @@ pub(crate) unsafe extern "C" fn candid_canonical_variant(ctx: usize, id: u64, ch
     }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_variants_begin(ctx: usize) -> i64 {
-    match unsafe { (|| context(ctx)?.variants_begin())() } {
-        Ok(()) => 0,
-        Err(error) => status(error),
-    }
-}
-#[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_variants_push(
-    ctx: usize,
-    id: u64,
-    child: i64,
-) -> i64 {
-    match unsafe { (|| context(ctx)?.variants_push(id, child))() } {
-        Ok(()) => 0,
-        Err(error) => status(error),
-    }
-}
-#[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_variants_end(ctx: usize) -> i64 {
-    match unsafe { (|| context(ctx)?.variants_end())() } {
-        Ok(value) => value,
-        Err(error) => status(error),
-    }
-}
-#[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_unary(ctx: usize, op: i64, child: i64) -> i64 {
     match unsafe { (|| context(ctx)?.unary(op, child))() } {
         Ok(value) => value,
@@ -1246,14 +1121,6 @@ mod tests {
         assert!(catch_unwind(AssertUnwindSafe(f)).is_err());
     }
 
-    fn primitive_variants(ctx: &mut Context, fields: &[(u32, i64)]) -> i64 {
-        ctx.variants_begin().unwrap();
-        for (id, child) in fields {
-            ctx.variants_push(u64::from(*id), *child).unwrap();
-        }
-        ctx.variants_end().unwrap()
-    }
-
     #[test]
     fn abi_reports_errors_without_unwinding_or_retaining_call_state() {
         for (depth, count, message) in [
@@ -1305,180 +1172,6 @@ mod tests {
             assert_ne!(code, MISSING);
             assert!(code < 0);
         }
-    }
-
-    #[test]
-    fn primitive_variant_collections_match_general_unions_and_canonical_headers() {
-        let primitives: Vec<_> = (-16..=-1).chain(core::iter::once(-24)).collect();
-        for length in 0..128 {
-            let mut general = Context::new();
-            let mut expected = -17;
-            let mut fields = Vec::new();
-            for i in 0..length {
-                let case = (i * 17 + length * 11) % 23;
-                let id = (case as u32).wrapping_mul(0x1000_0001);
-                let child = primitives[case % primitives.len()];
-                fields.push((id, child));
-                let singleton = general.variant(u64::from(id), child).unwrap();
-                expected = general.join(expected, singleton, 0).unwrap();
-            }
-            let expected = general.unary(-19, expected).unwrap();
-            general.root(expected).unwrap();
-            let mut collected = Context::new();
-            let variant = primitive_variants(&mut collected, &fields);
-            assert_eq!(collected.nodes.len(), usize::from(length != 0));
-            let vector = collected.unary(-19, variant).unwrap();
-            collected.root(vector).unwrap();
-            assert_eq!(bytes(&mut collected), bytes(&mut general));
-        }
-    }
-
-    #[test]
-    fn primitive_variant_collections_reuse_storage_and_preserve_nested_builders() {
-        let mut ctx = Context::new();
-        ctx.begin(-20).unwrap();
-        ctx.variants_begin().unwrap();
-        ctx.variants_push(u64::from(u32::MAX), -24).unwrap();
-        let inner = primitive_variants(&mut ctx, &[(1, -2), (0, -1), (1, -2)]);
-        assert_eq!(ctx.case_index(inner, 1).unwrap(), 1);
-        ctx.variants_push(0, -1).unwrap();
-        let outer = ctx.variants_end().unwrap();
-        assert_eq!(ctx.field_type(outer, u64::from(u32::MAX)).unwrap(), -24);
-        ctx.field(0, outer).unwrap();
-        ctx.field(1, inner).unwrap();
-        let record = ctx.end().unwrap();
-        assert_eq!(ctx.field_type(record, 0).unwrap(), outer);
-        assert_eq!(ctx.field_type(record, 1).unwrap(), inner);
-        let fields = [(9, -3), (2, -16), (9, -3), (0, -1)];
-        let wanted = primitive_variants(&mut ctx, &fields);
-        let allocated = ctx.scratch.used;
-        for _ in 0..32 {
-            assert_eq!(primitive_variants(&mut ctx, &fields), wanted);
-            assert_eq!(primitive_variants(&mut ctx, &[]), -17);
-        }
-        assert_eq!(ctx.scratch.used, allocated);
-        // A collector must not leave a negative Empty reference in the
-        // record builder's previous-node cache when this level is reused.
-        assert_eq!(compound(&mut ctx, -20, &[(0, outer), (1, inner)]), record);
-    }
-
-    #[test]
-    fn primitive_variant_collections_enforce_payload_label_and_lifecycle_checks() {
-        let mut ctx = Context::new();
-        rejects(|| ctx.variants_push(0, -1).unwrap());
-        rejects(|| {
-            ctx.variants_end().unwrap();
-        });
-        let compound = ctx.unary(-18, -3).unwrap();
-        ctx.variants_begin().unwrap();
-        rejects(|| ctx.variants_push(0, compound).unwrap());
-        for invalid_child in [-17, -18, -19, -20, -21, -22, -23, -25, 0, MISSING] {
-            rejects(|| ctx.variants_push(0, invalid_child).unwrap());
-        }
-        rejects(|| ctx.variants_push(u64::from(u32::MAX) + 1, -1).unwrap());
-        rejects(|| ctx.field(0, -1).unwrap());
-        rejects(|| {
-            ctx.end().unwrap();
-        });
-        rejects(|| {
-            ctx.types_size().unwrap();
-        });
-        assert_eq!(ctx.variants_end().unwrap(), -17);
-        ctx.begin(-20).unwrap();
-        rejects(|| ctx.variants_push(0, -1).unwrap());
-        rejects(|| {
-            ctx.variants_end().unwrap();
-        });
-        ctx.end().unwrap();
-        ctx.types_size().unwrap();
-        rejects(|| ctx.variants_begin().unwrap());
-        rejects(|| ctx.variants_push(0, -1).unwrap());
-        rejects(|| {
-            ctx.variants_end().unwrap();
-        });
-        let mut ctx = Context::new();
-        ctx.variants_begin().unwrap();
-        ctx.variants_push(7, -1).unwrap();
-        ctx.variants_push(8, -2).unwrap();
-        ctx.variants_push(7, -3).unwrap();
-        rejects(|| {
-            ctx.variants_end().unwrap();
-        });
-    }
-
-    #[test]
-    fn primitive_variant_collections_check_nesting_visits_length_and_scratch() {
-        let mut ctx = Context::new();
-        for _ in 0..=MAX_DEPTH {
-            ctx.variants_begin().unwrap();
-        }
-        rejects(|| ctx.variants_begin().unwrap());
-        for _ in 0..=MAX_DEPTH {
-            assert_eq!(ctx.variants_end().unwrap(), -17);
-        }
-        rejects(|| ctx.visit((MAX_DEPTH + 1) as u64, 0).unwrap());
-        ctx.visit(2, MAX_ITEMS as u64).unwrap();
-        rejects(|| ctx.visit(2, 1).unwrap());
-        let mut ctx = Context::new();
-        ctx.scratch.limit = ctx.scratch.used;
-        rejects(|| ctx.variants_begin().unwrap());
-        let mut ctx = Context::new();
-        ctx.variants_begin().unwrap();
-        ctx.scratch.limit = ctx.scratch.used;
-        rejects(|| ctx.variants_push(0, -1).unwrap());
-        let mut ctx = Context::new();
-        ctx.variants_begin().unwrap();
-        for _ in 0..MAX_ITEMS {
-            ctx.variants_push(0, -1).unwrap();
-        }
-        // The source count is still enforced when identical adjacent pairs
-        // consume no additional scratch storage.
-        assert!(ctx.scratch.used < 2048);
-        rejects(|| ctx.variants_push(0, -1).unwrap());
-        let shape = ctx.variants_end().unwrap();
-        assert_eq!(ctx.nodes[shape as usize].fields.len(), 1);
-    }
-
-    #[test]
-    fn wide_primitive_variant_collections_retain_only_the_final_union() {
-        let mut ctx = Context::new();
-        ctx.variants_begin().unwrap();
-        for id in (0..6000).rev() {
-            ctx.variants_push(id, -1).unwrap();
-        }
-        let variant = ctx.variants_end().unwrap();
-        assert_eq!(ctx.nodes.len(), 1);
-        for id in 0..6000 {
-            assert_eq!(ctx.case_index(variant, id).unwrap(), id);
-        }
-        let vector = ctx.unary(-19, variant).unwrap();
-        ctx.root(vector).unwrap();
-        assert!(bytes(&mut ctx).len() < 18_000);
-        // The general balanced collector retains ~4.8 MiB of intermediate
-        // shapes here. This path retains a growing buffer and one field list.
-        assert!(ctx.scratch.used < 400 * 1024);
-    }
-
-    #[test]
-    fn largest_valid_cyclic_primitive_variant_array_stays_below_scratch_limit() {
-        let mut ctx = Context::new();
-        let count = (MAX_ITEMS - 1) / 2;
-        ctx.visit(0, 1).unwrap();
-        ctx.visit(1, count as u64).unwrap();
-        ctx.visit(2, count as u64).unwrap();
-        ctx.variants_begin().unwrap();
-        for i in 0..count {
-            ctx.variants_push(((i * 17) % 64) as u64, -1).unwrap();
-        }
-        let variant = ctx.variants_end().unwrap();
-        assert_eq!(ctx.nodes.len(), 1);
-        assert_eq!(ctx.nodes[variant as usize].fields.len(), 64);
-        let vector = ctx.unary(-19, variant).unwrap();
-        ctx.root(vector).unwrap();
-        assert!(bytes(&mut ctx).len() < 160);
-        // Unlike adjacent duplicates, cyclic cases are buffered until sort.
-        // Account for every old growth buffer near the source visit limit.
-        assert!(ctx.scratch.used < 34 * 1024 * 1024);
     }
 
     #[test]

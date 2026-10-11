@@ -36,8 +36,8 @@ module Make (B : Plugin_codegen.Backend) = struct
     let code = call env "candidx" ("candid_canonical_" ^ name) in
     if name = "new" || name = "done" then code else
     checked env code ^^
-    (if List.mem name ["visit"; "begin"; "field"; "variants_begin";
-        "variants_push"; "join_begin"; "join_push"; "root"]
+    (if List.mem name ["visit"; "begin"; "field";
+        "join_begin"; "join_push"; "root"]
      then G.i Drop else G.nop)
 
   let canonical_primitive t =
@@ -232,10 +232,17 @@ module Make (B : Plugin_codegen.Backend) = struct
                 match canonical_primitive (normalize f.typ) with
                 | Some op -> op <> -17L
                 | None -> false) fs ->
-              (* Each case has one fixed primitive payload shape. Collect
-                 selected fields and intern the union once, without retaining
-                 singleton shapes or intermediate unions. Compound payloads
-                 still use the general balanced reduction below. *)
+              (* Source cases determine each primitive payload opcode. Track
+                 selected cases in local bits, then emit each field once in
+                 canonical order; repeated input tags need no scratch storage. *)
+              let cases = sort_by_hash fs in
+              let bits = Array.init ((List.length cases + 63) / 64)
+                (fun _ -> new_local env "canonical_variant_bits") in
+              let bit i = compile_unboxed_const
+                (Int64.shift_left 1L (i mod 64)) in
+              let groups = Array.make (Array.length bits) [] in
+              List.iteri (fun i case ->
+                groups.(i / 64) <- (i, case) :: groups.(i / 64)) cases;
               unary (-19L) (
                 get_length ^^ compile_eq_const 0L ^^
                 E.if1 I64Type (compile_unboxed_const (-17L))
@@ -245,21 +252,50 @@ module Make (B : Plugin_codegen.Backend) = struct
                        Arr.unsafe_idx env ^^ load_ptr) typ)
                      (visit (get_depth ^^ compile_add_const 1L) get_length ^^
                       visit (get_depth ^^ compile_add_const 2L) get_length ^^
-                      get_context ^^ canonical_call env "variants_begin" ^^
                       Arr.for_each env get_x get_length (fun value ->
-                        select_variant env value (sort_by_hash fs) None
-                          (fun id f ->
-                            match canonical_primitive (normalize f.typ) with
-                            | Some op ->
-                              get_context ^^ compile_unboxed_const
-                                (Wasm.I64_convert.extend_i32_u
-                                  (Lib.Uint32.to_int32 id)) ^^
-                              compile_unboxed_const op ^^
-                              canonical_call env "variants_push"
-                            | None -> fail env
-                                "unsupported source type")
-                      ) ^^
-                      get_context ^^ canonical_call env "variants_end")))
+                        select_variant env value
+                          (List.mapi (fun i (_, f) -> i, f) cases) None
+                          (fun i _ ->
+                            let set_bits, get_bits = bits.(i / 64) in
+                            get_bits ^^ bit i ^^
+                            G.i (Binary (Wasm_exts.Values.I64 I64Op.Or)) ^^
+                            set_bits)) ^^
+                      get_context ^^ compile_unboxed_const (-21L) ^^
+                      canonical_call env "begin" ^^
+                      G.concat_map (fun (i, group) ->
+                        let fields = List.rev group in
+                        (* One helper per machine word bounds function complexity.
+                           Its exact key needs only the emitted labels/opcodes,
+                           not the potentially very wide enclosing source type. *)
+                        let name = "canonical_variant_fields_" ^ String.concat ";"
+                          (List.map (fun (_, (id, f)) ->
+                            Printf.sprintf "%Ld:%Ld"
+                              (Wasm.I64_convert.extend_i32_u (Lib.Uint32.to_int32 id))
+                              (Option.get (canonical_primitive (normalize f.typ)))) fields) in
+                        let _, get_bits = bits.(i) in
+                        get_bits ^^ compile_eq_const 0L ^^ E.if0 G.nop
+                          (get_context ^^ get_bits ^^ checked env
+                            (Func.share_code Func.Always env
+                              name
+                              ["context", I64Type; "bits", I64Type] [I64Type]
+                              (fun env getters ->
+                                let get_context = List.nth getters 0 in
+                                let get_bits = List.nth getters 1 in
+                                G.concat_map (fun (j, (id, f)) ->
+                                  get_bits ^^ bit j ^^
+                                  G.i (Binary (Wasm_exts.Values.I64 I64Op.And)) ^^
+                                  compile_eq_const 0L ^^ E.if0 G.nop
+                                    (get_context ^^ compile_unboxed_const
+                                       (Wasm.I64_convert.extend_i32_u
+                                         (Lib.Uint32.to_int32 id)) ^^
+                                     compile_unboxed_const (Option.get
+                                       (canonical_primitive (normalize f.typ))) ^^
+                                     canonical_call env "field")
+                                ) fields ^^ compile_unboxed_zero)) ^^
+                           G.i Drop)
+                      ) (List.mapi (fun i group -> i, group)
+                           (Array.to_list groups)) ^^
+                      get_context ^^ canonical_call env "end")))
             | _, _, _ when not (joins_fields typ) ->
               let set_joined, get_joined = new_local env "joined_type" in
               compile_unboxed_const (-17L) ^^ set_joined ^^
