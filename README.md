@@ -49,6 +49,44 @@ The [first optimization report](benchmarks/results/optimization-round/README.md)
 and [original library comparison](benchmarks/results/codec-comparison/README.md)
 retain their original measurements.
 
+## Callback optimization
+
+The latest [callback report](benchmarks/results/callback-round/README.md) measures
+36 point workloads at 1,000, 10,000 and 100,000 entries, with **612 samples**
+across before/after builds. Each implementation now runs in its own fresh
+canister. The same actor and inputs are used for both builds; Core and scalar
+ordering controls are unchanged, as are all allocation/reclamation counts.
+
+Selected **100,000-entry** results, in instructions per call:
+
+| Map | Operation | Core | Plugin before | Plugin now | Reduction | Plugin allocated B |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Persistent | Lookup, hit | 3,324.09 | 2,524.38 | 2,410.75 | 4.50% | 0 |
+| Persistent | Insert new key | 14,112.34 | 10,137.75 | 10,019.75 | 1.16% | 1,289.25 |
+| Persistent | Overwrite | 12,817.72 | 6,056.12 | 5,942.50 | 1.88% | 1,143 |
+| Mutable | Lookup, hit | 7,701.16 | 3,876.91 | 3,765.66 | 2.87% | 0 |
+| Mutable | Insert new key | 12,818.78 | 5,497.94 | 5,382.94 | 2.09% | 40 |
+| Mutable | Overwrite | 8,529.06 | 4,491.41 | 4,380.16 | 2.48% | 40 |
+| Mutable | Remove, hit | 14,060.38 | 7,767.81 | 7,654.47 | 1.46% | 0 |
+
+Three identical trials, averaging 32 calls per batch. Compiler `fc7612098`
+removes redundant callback argument spills; both map plugins load each
+comparison result's tag once. The [isolated SDK benchmark](benchmarks/results/callback-round/sdk/README.md)
+measures **5 fewer instructions per two-argument callback**, without allocation.
+ABI 1 and the public APIs are unchanged. Generic keys and values remain shared
+Motoko references.
+
+Scalar ordering still saves more: lookup uses 1,345.19 instructions for the
+persistent map and 2,712.34 for the mutable map. That difference includes
+comparator work and boxed-key handling, as well as dispatch. Known-callback
+specialization/inlining is a further opportunity, not part of these changes.
+
+The full matrices below retain their original compilers and measurement
+protocols. The new report includes a phase-order diagnostic: the earlier
+apparent scalar-removal regression disappears when scalar ordering runs first
+or in a fresh canister. Its exact cause is not isolated; fresh canisters avoid
+that execution-history bias in the new comparisons.
+
 ## Mutable map costs
 
 The mutable plugin updates ordinary Motoko nodes in place; keys and values stay
@@ -82,8 +120,10 @@ public-API adapters listed in the full table.
 The plugin uses fewer instructions in 135 workloads, ties in two, and loses in
 one; `size` and `isEmpty` are effectively at parity. The 100,000-entry `map`
 transform uses **26.7% more instructions**, with fewer allocated bytes.
-Scalar ordering is not always cheaper: 100,000-entry `removeNat64` uses more
-instructions than the callback path, while both use fewer than Core.
+This archived run measured implementations sequentially in one canister per
+workload/trial. Its apparent scalar-removal regression was sensitive to phase
+order; the [fresh-canister comparison](benchmarks/results/callback-round/README.md)
+above supersedes that conclusion, while preserving these original results.
 These are comparisons of complete implementations, including
 wrapper functions, rather than a measurement of plugin dispatch alone.
 

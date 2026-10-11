@@ -15,7 +15,7 @@ const options = { wasm: null, cases: null, out: null, label: 'local',
   server: 'pocket-ic-server', trials: 3, filter: '.',
   'sdk-package': resolve(root, '../../candidx/ts/package.json'),
   canonicalizer: resolve(root, '../../candidx/ts/dist/index.js'),
-  'cbor-python': 'python3', 'delete-canisters': 'false', 'fresh-per-phase': 'false' };
+  'cbor-python': 'python3', 'delete-canisters': 'false', 'fresh-per-phase': 'true' };
 for (let i = 2; i < process.argv.length; i += 2) {
   const key = process.argv[i].replace(/^--/, '');
   if (!(key in options) || process.argv[i + 1] === undefined) throw Error(`Unknown option ${process.argv[i]}`);

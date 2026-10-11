@@ -1,5 +1,14 @@
 # PocketIC compute-plugin benchmarks
 
+The runner now defaults to a **fresh canister per workload, trial and
+implementation phase**. All current actors configure deterministic inputs;
+ordinary Candid references are retained by the host across phases. The
+[callback report](results/callback-round/README.md) demonstrates why isolation
+matters: sequential phases changed mutable-map removal costs despite zero
+measured allocation/reclamation. `--fresh-per-phase false` retains sequential
+execution for explicit diagnostics. Archived results keep their recorded
+protocols; descriptions below of earlier cohorts are historical.
+
 Current generators target the development plugin API and include successful
 `#ok` unwrapping inside each CandidX measurement. The SDK remains at ABI 1
 while the compiler PR is unmerged. Archived reports retain their original
