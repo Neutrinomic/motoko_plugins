@@ -52,9 +52,15 @@ for path in args.reports:
         assert len(declarations) == len(expected) and \
             {phase["label"] for phase in declarations} == expected, \
             f"{identity}: unexpected phase declarations"
-        require_no_gc = {"plugin"} | {
-            phase["label"] for phase in declarations if phase["require_no_gc"]
-        }
+        # Archived explicit phases allowed GC unless require_no_gc was true;
+        # legacy_requires_no_gc applied only to the runner's inferred phases.
+        require_no_gc = {"plugin"}
+        for phase in declarations:
+            policy = phase.get("require_no_gc", False)
+            assert type(policy) is bool, \
+                f"{identity}/{phase['label']}: require_no_gc must be a boolean"
+            if policy:
+                require_no_gc.add(phase["label"])
         phases = {phase: [] for phase in expected}
         observed = set()
         for sample in case["measurements"]:
