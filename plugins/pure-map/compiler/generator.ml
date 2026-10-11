@@ -137,20 +137,22 @@ module Make (B : P.Backend) = struct
       bind env "order" (Call.local env (Schema.compare kt) comparator [a; b]) (fun order ->
         order ^^ Variant.test_is env "less" ^^ ifv (num (-1))
           (order ^^ Variant.test_is env "equal" ^^ ifv (num 0) (num 1)))
-  let rec search env ordering kt tree comparator needle d =
-    invoke [tree; comparator; needle; d]
-      (helper env ("search_" ^ ordering_name ordering kt) 4 1 (fun env args ->
-        let tree = List.nth args 0 and comparator = List.nth args 1
-        and needle = List.nth args 2 and d = List.nth args 3 in
-        check_depth env d ^^
-        present env tree ^^ ifv
-          (bind env "comparison" (compare env ordering kt comparator needle (key env tree)) (fun order ->
-            order ^^ num 0 ^^ eq ^^ ifv tree
-              (search env ordering kt
+  let search env ordering kt initial comparator needle =
+    invoke [initial; comparator; needle]
+      (helper env ("search_" ^ ordering_name ordering kt) 3 1 (fun env args ->
+        let comparator = List.nth args 1 and needle = List.nth args 2 in
+        let set_tree, tree = new_local env "pmap_search_tree" in
+        let set_depth, depth = new_local env "pmap_search_depth" in
+        List.nth args 0 ^^ set_tree ^^ num 0 ^^ set_depth ^^
+        G.loop0 (G.with_current_depth (fun loop ->
+          present env tree ^^ E.if0
+            (bind env "comparison" (compare env ordering kt comparator needle (key env tree)) (fun order ->
+              order ^^ num 0 ^^ eq ^^ E.if0 G.nop
                 (order ^^ num 0 ^^ compile_comparison I64Op.LtS ^^
-                  ifv (left env tree) (right env tree))
-                comparator needle (d ^^ num 1 ^^ add))))
-          (null env)))
+                  ifv (left env tree) (right env tree) ^^ set_tree ^^
+                  depth ^^ num 1 ^^ add ^^ set_depth ^^
+                  check_depth env depth ^^ G.branch_to_ loop)))
+            G.nop)) ^^ tree))
   let optional_value env vt tree = present env tree ^^ ifv
     (Opt.inject env vt (value env tree)) (null env)
   let optional_entry env tree = present env tree ^^ ifv
@@ -306,7 +308,7 @@ module Make (B : P.Backend) = struct
     in
     let code = match operation with
     | Get | Get_entry | Contains ->
-      bind env "found" (search env ordering kt tree comparator (argument needle) (num 0)) (fun found ->
+      bind env "found" (search env ordering kt tree comparator (argument needle)) (fun found ->
         match operation with
         | Get -> optional_value env vt found
         | Contains -> present env found

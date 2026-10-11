@@ -1,0 +1,316 @@
+{
+  "label": "local",
+  "recorded_utc": "2026-10-11T15:54:10.429Z",
+  "wasm_sha256": "7794382e0c991f0ac4e53d94cbe9a1dfd24fff96625b2ce6332ef73ae3dc8285",
+  "wasm_bytes": 538420,
+  "trials": 1,
+  "source_sha256": "ca275adf053ce22ca789041c299054f70912a67ebd2fde73ccfc0aac57a7b967",
+  "cases_sha256": "0760f743fcf62d77d0d75a23a3139cfc2464e23d525b8bdc99e34349b09afb75",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "implementations": {
+    "core": {
+      "package": "core",
+      "version": "2.5.0",
+      "module": "pure/Map"
+    },
+    "plugin_custom": {
+      "package": "plugin/pure-map",
+      "version": "ABI 1",
+      "comparison": "Motoko callback"
+    },
+    "plugin_static": {
+      "package": "plugin/pure-map",
+      "version": "ABI 1",
+      "comparison": "native Nat64 ordering"
+    }
+  },
+  "provenance": {
+    "compiler_revision": "c320bf90d0b63a058b5de2c41a42c96e8b82243f",
+    "compiler_dirty": false,
+    "moc_sha256": "722ba089cc3f6fb7710423363c3adc55d0af9f841eaa5a283e97eb08f3c8335c",
+    "plugin_cmxs_sha256": "9969907022a2982732141711809ea7f12dbb70e5513b5effaf8390af9f229623",
+    "plugin_source_sha256": {
+      "plugins/pure-map/compiler/generator.ml": "4d89dcfdcb5317c9aea0614d8ba95deda0f86cd03ff652306def1389963e50cf",
+      "plugins/pure-map/compiler/reference.ml": "67aea7eb1a4cdeaa52d50a4ba98ee9ca3c4a6adba2dc87d45f016c1552ac715a",
+      "plugins/pure-map/compiler/register.ml": "49248b57a193b2aea26db73f80b40f29afba9cc892816fdb36fe78ce5729d46a",
+      "plugins/pure-map/compiler/schema.ml": "6887acba069165b2a2e9bfa910f7b9c9cea6cf86a3bf3aeb5c844e1bd60f836e",
+      "plugins/pure-map/motoko/Map.mo": "f653cbdbcfbfa456db5ddc78d6113ca8d926a39d6e435aa30991dc53fd9b888c",
+      "plugins/pure-map/plugin.json": "1894976ef0a43f2512ed41f55f5042a744ff03ef9f1450c30fadc511d0dfd8fa"
+    },
+    "core_version": "2.5.0",
+    "mops_lock_sha256": "a5678b395e56a7a53c0c0037185c26c8f6ae087dbbb24d397bf724a639b70aee",
+    "full_provenance_sha256": "31eec60d5d2d0a923edd06b4f8a0ffbd0b67566ce12c8dfe01afbbfa8e149ffa"
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Public function costs on exactly 1000/10000/100000 records by default. Same compiler, actor, boxed Nat64 keys, Nat values, lawful exact-key comparator, and shuffled distinct insertion order. Fresh canister per case/trial; map population, input arrays, output slots, prepared full snapshots and input builder iterators are outside timing. Construction rows separately measure fromIter/fromArray; other rows operate on populated maps. Points perform 32 calls with distinct spread keys; evolving updates retain first/middle/final roots. Contains/insert/delete/alter/update alternate hits and interleaved misses. Iterator creation retains4 cursors at 100k or 8 otherwise, consumed and exhausted only during validation. Iterator consumption measures creation plus full traversal and bounded order-sensitive hash/count, not output array copying. Seek rows create 4/8 cursors at positions spanning the complete rank range and consume 16 entries each. Find rows use the public Map.find with an ordered threshold predicate matching multiple entries where possible, first/middle/last/absent thresholds separately. Rank/select use 8 spread positions; split uses 3/4. Full scans/transforms/builders run once. Raw instruction/allocation/reclamation numbers include common loop, counter, retained-result assignment and checksum work; synchronous reclamation is reported, end-of-message GC excluded. Allocations are cumulative heap bytes, not retained live memory or RSS. Divide batch totals by operations_per_phase for costs per stated workload, not per iterator next. Core missing APIs use only the explicit public compositions documented per case; no complete map conversion or invented plugin API. Full snapshots compare Core root capture/replay via entries with plugin snapshot/replay metadata. Distinct builder inputs avoid Core 2.5 duplicate-size constructor defect.",
+  "correctness": "Checked-result query runs outside timing. It validates complete original maps after every phase, every old-value/Bool result, complete first/middle/final retained update versions and final outputs against an independent ordinal-slot oracle, sizes and plugin AVL invariants. Created cursors and snapshots are consumed in exact expected order and checked for repeatable exhaustion; consumed cursors retain their remaining suffix for exact validation. Timed traversal/folds use a bounded order-sensitive Nat64 checksum plus independent entry/callback count; expected checksum is generated from ordinal bindings outside timing. Split outputs are checked completely. Builder input cursors must be exhausted. Predicate search verifies the earliest matching key and exact predicate-call count. The query returns ok only after checks pass.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "map-functions-get-hit-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_0",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 65318,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 52749,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 29946,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "map-functions-get-miss-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static_1",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 71606,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 56437,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 32266,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "map-functions-getEntry-hit-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_2",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_2",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 70822,
+          "allocated_bytes": 1280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 57165,
+          "allocated_bytes": 1280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "map-functions-containsKey-mixed-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_3",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_3",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 69878,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 54169,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "map-functions-fromIter-shuffled-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_15",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_15",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 7605488,
+          "allocated_bytes": 1394952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 8140350,
+          "allocated_bytes": 487880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "map-functions-fromArray-shuffled-1000",
+      "family": "pure-map-functions",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core_16",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom_16",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 7606083,
+          "allocated_bytes": 1395104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 7066561,
+          "allocated_bytes": 463216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

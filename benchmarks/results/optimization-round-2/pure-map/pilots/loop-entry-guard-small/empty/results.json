@@ -1,0 +1,148 @@
+{
+  "label": "opt2-empty-after",
+  "recorded_utc": "2026-10-11T15:58:38.551Z",
+  "wasm_sha256": "c33cc35d94857aa0baaa8d8a22e6d9c5e4470a3d5137f57707dd25284b727418",
+  "wasm_bytes": 254975,
+  "trials": 3,
+  "source_sha256": "bd2ce2919f26b47ca415d5db3f60852b3cb56d9afd1d92276ba510b3212c06b4",
+  "cases_sha256": "df519951fdac190d68301f276a46ed417c058b99b4714ca60e627f466836064e",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "provenance": {
+    "compiler_revision": "c320bf90d0b63a058b5de2c41a42c96e8b82243f",
+    "compiler_dirty": false,
+    "moc_sha256": "722ba089cc3f6fb7710423363c3adc55d0af9f841eaa5a283e97eb08f3c8335c",
+    "plugin_cmxs_sha256": "326d4593d7bb9110f2848c93bde55f5f53ec734e5b2ccc4ffee3950cc921cb8e",
+    "plugin_source_sha256": {
+      "plugins/pure-map/compiler/generator.ml": "4526d41d34e996ea4d57333624a570ebf2299735083887521318f434866e658b",
+      "plugins/pure-map/compiler/reference.ml": "67aea7eb1a4cdeaa52d50a4ba98ee9ca3c4a6adba2dc87d45f016c1552ac715a",
+      "plugins/pure-map/compiler/register.ml": "49248b57a193b2aea26db73f80b40f29afba9cc892816fdb36fe78ce5729d46a",
+      "plugins/pure-map/compiler/schema.ml": "6887acba069165b2a2e9bfa910f7b9c9cea6cf86a3bf3aeb5c844e1bd60f836e",
+      "plugins/pure-map/motoko/Map.mo": "01107cd94c9c8a4879ddc5bdbc3460e2a43df314c19b9cbd2d99b8a459492015",
+      "plugins/pure-map/plugin.json": "1894976ef0a43f2512ed41f55f5042a744ff03ef9f1450c30fadc511d0dfd8fa"
+    },
+    "core_version": "2.5.0",
+    "mops_lock_sha256": "a5678b395e56a7a53c0c0037185c26c8f6ae087dbbb24d397bf724a639b70aee",
+    "full_provenance_sha256": "e4fe7cf92ce8b1e271024f2b405c8c2f1c5a585cb3cfe0ae5ba7d3056e423e71"
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.",
+  "correctness": "Each phase retains its last lookup result; bytesResult asserts absence outside timing. The map stays empty.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "map-empty-get-miss-0",
+      "family": "pure-map",
+      "phases": [
+        {
+          "label": "core",
+          "method": "bench_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_custom",
+          "method": "bench_plugin_custom",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin_static",
+          "method": "bench_plugin_static",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "core",
+          "instructions": 17272,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_custom",
+          "instructions": 12856,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin_static",
+          "instructions": 11192,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "core",
+          "instructions": 17272,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin_custom",
+          "instructions": 12856,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin_static",
+          "instructions": 11192,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "core",
+          "instructions": 17272,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin_custom",
+          "instructions": 12856,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin_static",
+          "instructions": 11192,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

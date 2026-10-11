@@ -749,10 +749,12 @@ module {
           var out = start;
           while (left < middle and right < end) {
             // Stable merge: equal keys keep their original order.
-            if (compare(source[left].0, source[right].0) != #greater) {
-              target[out] := source[left]; left += 1;
+            let leftEntry = source[left];
+            let rightEntry = source[right];
+            if (compare(leftEntry.0, rightEntry.0) != #greater) {
+              target[out] := leftEntry; left += 1;
             } else {
-              target[out] := source[right]; right += 1;
+              target[out] := rightEntry; right += 1;
             };
             out += 1;
           };
