@@ -11,10 +11,15 @@ its calls specialize directly to the plugin implementation.
 | `mo:fast/SHA256` | `digest(bytes)` → 32-byte Blob | `sha256` |
 | `mo:fast/Map` | Mutable ordered map | `mutable-map` |
 | `mo:fast/pure/Map` | Persistent ordered map | `pure-map` |
+| `mo:fast/Set` | Core-compatible mutable ordered set | `mutable-set` |
+| `mo:fast/pure/Set` | Persistent ordered set with rank/select and split/join | `pure-set` |
 | `mo:fast/CoreMap` | Mutable map ↔ `mo:core/pure/Map` conversions | `mutable-map` |
 
-`CoreMap` uses the declared `core` dependency. The six primary modules do not
-import Core. Map conversions rebuild the tree while sharing keys and values.
+`CoreMap` and the mutable `Set` module use the declared `core` dependency for
+conversions. Other modules import only `Prim`. Conversions rebuild the tree
+while sharing elements, keys, and values. `Set.toPure`/`fromPure` use
+`mo:core/pure/Set`, preserving Core's mutable Set interface; the separate
+`mo:fast/pure/Set` has its own persistent representation.
 
 ## Use from a checkout
 
@@ -89,6 +94,27 @@ the [mutable map](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugin
 and [pure map](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/pure-map)
 API documentation, including comparator and iterator contracts.
 
+```motoko
+import Set "mo:fast/Set";
+import PureSet "mo:fast/pure/Set";
+
+let mutable = Set.empty<Nat>();
+assert Set.insertNat(mutable, 42);
+assert not Set.insertNat(mutable, 42);
+assert Set.containsNat(mutable, 42);
+
+let original = PureSet.empty<Nat>();
+let updated = PureSet.addNat(original, 42);
+assert PureSet.isEmpty(original);
+assert PureSet.containsNat(updated, 42);
+```
+
+The [mutable Set](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/mutable-set)
+exposes every Core mutable Set function, plus `find` and direct scalar helpers.
+The [pure Set](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/pure-set)
+shares unchanged branches when updated. Both store elements directly without
+dummy map values. Elements remain shared Motoko references.
+
 ## Aliases and callbacks
 
 The codec and hash exports are compiler intrinsic aliases: they add no
@@ -108,3 +134,4 @@ codec call behind an abstract generic wrapper; codecs need concrete types.
 
 Instruction and allocation comparisons are in the
 [repository README](https://github.com/Neutrinomic/motoko_plugins#readme).
+The [Ash test guide](tests/ash/README.md) lists public API coverage and commands.

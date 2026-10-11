@@ -83,4 +83,5 @@ if ((${#test_directories[@]} == 0)); then
   exit 1
 fi
 test-runner -b "${accept[@]}" "${test_directories[@]}"
+python3 "$plugins_root/tests/check-expectations.py"
 python3 "$plugins_root/tests/packaging.py" --motoko "$motoko_root"

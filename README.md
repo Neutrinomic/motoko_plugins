@@ -7,7 +7,7 @@ compiler's memory and GC helpers. The SDK also supports typed mutation of
 caller-owned Motoko arrays and records through the ordinary GC write barriers.
 
 Use the [`fast` Mops package](packages/fast/) for imports such as
-`mo:fast/JSON`, `mo:fast/SHA256`, and `mo:fast/Map`.
+`mo:fast/JSON`, `mo:fast/SHA256`, `mo:fast/Map`, and `mo:fast/Set`.
 
 ## Instruction and allocation costs
 
@@ -591,6 +591,8 @@ available as historical evidence.
 | [JSON](plugins/json/) | `JSON.encode(value)`, `JSON.decode<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
 | [Mutable map](plugins/mutable-map/) | `Map.get`, `Map.add`, `Map.remove` | In-place ordered maps with generic keys/values, shared payloads, and managed GC writes |
 | [Pure map](plugins/pure-map/) | `pure/Map`: `get`, `add`, `remove` | Persistent ordered maps with generic keys/values, Motoko callbacks, and native scalar comparisons |
+| [Mutable set](plugins/mutable-set/) | `Set.contains`, `Set.add`, `Set.remove` | Core-compatible mutable Set API, with key-only B-tree nodes and native scalar comparisons |
+| [Pure set](plugins/pure-set/) | `pure/Set`: `contains`, `add`, `remove` | Persistent key-only AVL trees with shared subtrees, rank/select, and split/join |
 | [SHA-256](plugins/sha256/) | `SHA256.digest(bytes)` | One-shot SHA-256 with direct Blob access |
 
 The compiler support is proposed in
@@ -608,13 +610,17 @@ cd /path/to/motoko
 nix develop
 make -C rts
 ../plugins/scripts/build.sh --motoko "$PWD"
+(cd ../plugins/packages/fast && mops install)
 bin/moc --plugin ../plugins/dist/candidx \
         --plugin ../plugins/dist/sha256 \
         --plugin ../plugins/dist/json \
         --plugin ../plugins/dist/cbor \
         --plugin ../plugins/dist/pure-map \
         --plugin ../plugins/dist/mutable-map \
+        --plugin ../plugins/dist/mutable-set \
+        --plugin ../plugins/dist/pure-set \
         --package fast ../plugins/packages/fast/src \
+        --package core ../plugins/packages/fast/.mops/core@2.5.0/src \
         app.mo -o app.wasm
 ```
 
@@ -625,6 +631,8 @@ import JSON "mo:fast/JSON";
 import CBOR "mo:fast/CBOR";
 import Map "mo:fast/pure/Map";
 import MutableMap "mo:fast/Map";
+import Set "mo:fast/Set";
+import PureSet "mo:fast/pure/Set";
 
 switch (CandidX.encode({ value = 42 })) {
   case (#ok bytes) { let digest = SHA256.digest(bytes) };
@@ -640,6 +648,13 @@ assert Map.getNat64(updated, key) == ?"answer";
 let mutable = MutableMap.empty<Nat64, Text>();
 MutableMap.addNat64(mutable, key, "answer");
 assert MutableMap.getNat64(mutable, key) == ?"answer";
+let members = Set.empty<Nat64>();
+Set.addNat64(members, key);
+assert Set.containsNat64(members, key);
+let oldMembers = PureSet.empty<Nat64>();
+let newMembers = PureSet.addNat64(oldMembers, key);
+assert PureSet.isEmpty(oldMembers);
+assert PureSet.containsNat64(newMembers, key);
 ```
 
 The [`fast` Mops package](packages/fast/) provides these modules. To use it from
@@ -651,7 +666,7 @@ imports, while `--plugin` loads the matching compiler extension.
 
 The build creates a matching dynamically linked native compiler and independent
 packages in `dist/<name>/`, each containing `plugin.cmxs`. Kernel-based packages
-also contain `runtime.wasm`; both map packages emit managed Wasm directly.
+also contain `runtime.wasm`; the map and set packages emit managed Wasm directly.
 To build selected plugins, append their names:
 
 ```sh
@@ -685,12 +700,19 @@ plugins/
   mutable-map/
     compiler/         native B-tree operations and interpreter reference
     tests/            differential, aliasing, GC, and upgrade checks
+  pure-set/
+    compiler/         key-only AVL operations and interpreter reference
+    tests/            persistence, nullable elements, and GC checks
+  mutable-set/
+    compiler/         key-only B-tree operations and interpreter reference
+    tests/            structural updates, type rejection, and invariants
   sha256/
     ...
 packages/fast/        Mops package metadata, README, and license
-  src/                CandidX, JSON, CBOR, SHA256, Map, CoreMap modules
-    pure/Map.mo       persistent Map library
-  tests/              public import and intrinsic-alias checks
+  src/                CandidX, JSON, CBOR, SHA256, Map, CoreMap, Set modules
+    pure/             persistent Map and Set libraries
+  tests/              public import, rejection, and trap checks
+    ash/              public API and GC canister tests on PocketIC
 scripts/              shared build and test commands
 tests/integration/    tests combining plugins and exercising GC
 benchmarks/           PocketIC harness and recorded results
@@ -716,6 +738,22 @@ The suite exercises source and IR interpretation, compiled Wasm, diagnostics,
 package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
+
+The [public module suite](packages/fast/tests/ash/) adds **174 Ash tests** across
+the eight plugins and the `CoreMap` adapter: reference models, independent
+codec/hash vectors, malformed inputs, boundary cases, structural sharing,
+composition, and incremental GC. Run from this repository with an Ash toolchain
+using the matching compiler:
+
+```sh
+scripts/test-ash.sh
+# For an Ash source checkout with canister mocArgs support:
+scripts/test-ash.sh --ash-source /path/to/ash
+```
+
+These correctness tests are separate from the performance measurements above.
+Per-module API inventories and execution requirements are in the
+[test guide](packages/fast/tests/ash/README.md).
 
 The [managed-mutation SDK audit](docs/audits/managed-mutation-sdk/README.md)
 records independent tests across four execution engines and mutation during
