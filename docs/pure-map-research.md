@@ -1,5 +1,11 @@
 # Persistent ordered-map plugin research
 
+Implementation update: [pure-map](../plugins/pure-map/) now uses managed AVL
+nodes with integrated synchronous Motoko callbacks and native scalar ordering.
+The SDK supports opaque generic types and passes arguments without temporary
+tuples. The initial hybrid recommendation below predates that SDK work; this
+document preserves the options and tradeoffs considered during research.
+
 Research date: 2026-10-11. Compiler inspected read-only at
 `be7aa9f9b51b1737221d335465b7acc9a8dce423`; plugin ABI is **1**.
 API reference: `/srv/shared/code/sr9/sr9scol/core/src/pure/BMap.sr9`

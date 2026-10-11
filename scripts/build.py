@@ -34,15 +34,20 @@ def fail(message):
 
 def discover(names):
     available = {}
+    module_names = set()
     for path in sorted((ROOT / "plugins").glob("*/plugin.json")):
         manifest = json.loads(path.read_text())
         if not isinstance(manifest, dict):
             fail(f"{path}: expected a JSON object")
         name = manifest.get("name", "")
-        if not re.fullmatch(r"[a-z][a-z0-9_]*", name) or name != path.parent.name:
-            fail(f"{path}: name must match its directory and use lowercase identifiers")
-        crate = manifest.get("runtime_crate", "")
-        if not re.fullmatch(r"[a-z][a-z0-9_-]*", crate):
+        if not re.fullmatch(r"[a-z][a-z0-9_-]*", name) or name != path.parent.name:
+            fail(f"{path}: name must match its directory and use lowercase names")
+        module_name = name.replace("-", "_")
+        if module_name in module_names:
+            fail(f"{path}: package name collides after OCaml module normalization")
+        module_names.add(module_name)
+        crate = manifest.get("runtime_crate")
+        if crate is not None and not re.fullmatch(r"[a-z][a-z0-9_-]*", crate):
             fail(f"{path}: invalid runtime_crate")
         packages = manifest.get("ocaml_packages", [])
         if not isinstance(packages, list) or not all(
@@ -87,9 +92,8 @@ def prepare_host(motoko, env, skip_build):
     if not (motoko / "src/codegen/plugin_codegen.mli").is_file():
         fail(f"{motoko} does not contain a Motoko compiler with the plugin API")
     if not skip_build:
-        run(["bash", "src/source_id/gen.sh"], cwd=motoko, env=env)
         run(
-            ["dune", "build", "--root", "src", "--profile=release", "exes/moc.exe"],
+            ["make", "-C", "src", "moc", "DUNE_OPTS=--profile=release"],
             cwd=motoko, env=env, label="Building the dynamically linked Motoko compiler",
         )
     host_build = motoko / "src/_build/default"
@@ -112,7 +116,7 @@ def compiler_plugin(manifest, includes, work, env):
     sources = sorted(source.glob("*.mli")) + sorted(source.glob("*.ml"))
     if not any(path.suffix == ".ml" for path in sources):
         fail(f"{source}: expected OCaml source files")
-    pack = "Motoko_plugin_" + name
+    pack = "Motoko_plugin_" + name.replace("-", "_")
     common = []
     if manifest["ocaml_packages"]:
         common += ["-package", ",".join(manifest["ocaml_packages"])]
@@ -147,6 +151,10 @@ def compiler_plugin(manifest, includes, work, env):
 
 
 def runtimes(manifests, motoko, env):
+    outputs = {}
+    manifests = [m for m in manifests if m.get("runtime_crate") is not None]
+    if not manifests:
+        return outputs
     runtime_env = env.copy()
     flags = [f"--remap-path-prefix={ROOT}=.", "-C", "link-arg=--import-memory"]
     # Keep caller flags, including profiling/debug options, while ensuring the
@@ -168,7 +176,6 @@ def runtimes(manifests, motoko, env):
     for manifest in manifests:
         command += ["--package", manifest["runtime_crate"]]
     run(command, env=runtime_env, label="Building Wasm runtimes")
-    outputs = {}
     for manifest in manifests:
         wasm = cargo_target / target.stem / "release" / (
             manifest["runtime_crate"].replace("-", "_") + ".wasm"
@@ -194,6 +201,32 @@ def git_dirty(path):
     return bool(result.stdout.strip()) if result.returncode == 0 else None
 
 
+def sha256(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def source_hashes(manifest):
+    package = ROOT / "plugins" / manifest["name"]
+    paths = [package / "plugin.json", ROOT / "scripts/build.py", ROOT / "scripts/build.sh"]
+    paths += list((package / "compiler").glob("*.ml"))
+    paths += list((package / "compiler").glob("*.mli"))
+    if manifest.get("runtime_crate") is not None:
+        paths += [ROOT / "Cargo.toml", ROOT / "Cargo.lock"]
+        # All workspace runtime sources are captured, including local sibling
+        # dependencies. Build products live in _build, outside these trees.
+        paths += [path for runtime in (ROOT / "plugins").glob("*/runtime")
+                  for path in runtime.rglob("*") if path.is_file()]
+    return {path.relative_to(ROOT).as_posix(): sha256(path) for path in sorted(set(paths))}
+
+
+def compiler_source_hashes(motoko):
+    files = run(["git", "ls-files", "-z", "--cached", "--others",
+                 "--exclude-standard", "--", "src"], cwd=motoko, capture=True).split("\0")
+    files.append("rts/motoko-rts/wasm64-none-shared.json")
+    return {name: sha256(motoko / name) for name in sorted(set(files))
+            if name and (motoko / name).is_file()}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--motoko", type=Path, required=True, help="Motoko source checkout")
@@ -206,12 +239,17 @@ def main():
     motoko = args.motoko.resolve()
     manifests = discover(args.plugins)
     env, ocaml_version = build_environment()
+    compiler_sources = compiler_source_hashes(motoko)
     moc, includes = prepare_host(motoko, env, args.skip_motoko_build)
+    inputs = {manifest["name"]: source_hashes(manifest) for manifest in manifests}
+    moc_hash = sha256(moc)
     runtime_outputs = runtimes(manifests, motoko, env)
     metadata = {
         "motoko_revision": git_revision(motoko),
         "motoko_dirty": git_dirty(motoko),
         "motoko_version": run([moc, "--version"], env=env, capture=True).strip(),
+        "moc_sha256": moc_hash,
+        "motoko_source_sha256": compiler_sources,
         "ocaml_version": ocaml_version,
         "rustc_version": run(["rustc", "--version"], env=env, capture=True).strip(),
         "plugins_revision": git_revision(ROOT),
@@ -230,7 +268,8 @@ def main():
             staged = work / "package"
             staged.mkdir()
             shutil.copy2(compiled, staged / "plugin.cmxs")
-            shutil.copy2(runtime_outputs[name], staged / "runtime.wasm")
+            if name in runtime_outputs:
+                shutil.copy2(runtime_outputs[name], staged / "runtime.wasm")
             probe = work / "check.mo"
             probe.write_text("()\n")
             run(
@@ -238,11 +277,15 @@ def main():
                 label=f"[{name}] checking compatibility with the selected compiler",
             )
             hashes = {
-                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-                for path in (staged / "plugin.cmxs", staged / "runtime.wasm")
+                path.name: sha256(path)
+                for path in staged.iterdir()
             }
+            if source_hashes(manifest) != inputs[name]:
+                fail(f"[{name}] plugin inputs changed during the build; retry on a stable snapshot")
+            if compiler_source_hashes(motoko) != compiler_sources or sha256(moc) != moc_hash:
+                fail("Compiler inputs changed during the build; retry on a stable snapshot")
             (staged / "build.json").write_text(json.dumps(
-                {"name": name, **metadata, "sha256": hashes}, indent=2,
+                {"name": name, **metadata, "source_sha256": inputs[name], "sha256": hashes}, indent=2,
             ) + "\n")
             destination = ROOT / "dist" / name
             destination.parent.mkdir(exist_ok=True)

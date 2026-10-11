@@ -4,7 +4,7 @@ open Wasm_exts.Types
 let () = Plugin_codegen.register Plugin_codegen.{
   abi = 1;
   name = "candidx";
-  runtime = "runtime.wasm";
+  runtime = Some "runtime.wasm";
   imports = [
     ("candid_canonical_new", [], [I64Type]);
     ("candid_canonical_visit", [I64Type; I64Type; I64Type], [I64Type]);
@@ -34,14 +34,14 @@ let () = Plugin_codegen.register Plugin_codegen.{
       id = "candidx_encode";
       name = "to_candid_canonical";
       arguments = Mo_values.Compute_plugin.Shared;
-      type_parameters = 0;
+      type_parameters = [];
       result_type = (fun _ _ ->
         let open Mo_types.Type in
         Ok (Variant [
           {lab = "err"; typ = text; src = empty_src};
           {lab = "ok"; typ = blob; src = empty_src};
         ]));
-      evaluate = (fun _ ts vs ->
+      evaluate = Mo_values.Compute_plugin.pure (fun _ ts vs ->
         let open Mo_values.Value in
         Ok (match Reference.encode_values ts vs with
         | Ok bytes -> Variant ("ok", Blob (Bytes.to_string bytes))

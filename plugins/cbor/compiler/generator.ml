@@ -246,12 +246,14 @@ end
 module Encoder = struct
   module Make (B : Plugin_codegen.Backend) = struct
     module Visitor = Make(B)
-    let compile = Visitor.compile_encode
+    let compile env s arguments = Plugin_codegen.{representation = Managed;
+      code = G.concat arguments ^^ Visitor.compile_encode env s}
   end
 end
 module Decoder = struct
   module Make (B : Plugin_codegen.Backend) = struct
     module Visitor = Make(B)
-    let compile = Visitor.compile_decode
+    let compile env s arguments = Plugin_codegen.{representation = Managed;
+      code = G.concat arguments ^^ Visitor.compile_decode env s}
   end
 end

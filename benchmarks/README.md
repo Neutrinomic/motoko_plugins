@@ -15,6 +15,9 @@ measures JSON and CBOR against three native Mops implementations each, plus
 fresh CandidX and SHA-256 comparisons on ABI 1. The
 [JSON optimization report](results/json-optimized/README.md) records instruction
 and allocation reductions independently of those library comparisons.
+The [persistent-map comparison](results/pure-map/README.md) measures Core's
+pure map against plugin callback and scalar ordering, including updates,
+retained histories, ranges, filters, and set operations.
 
 The recorded [first-pass results](results/README.md) and
 [second-pass results](results/pass2/README.md) include raw reports and artifact
@@ -110,6 +113,50 @@ and hashes, Wasm hashes, the PocketIC version, and failures. The comparison
 script rejects failed or incomplete reports and checks matching output hashes
 and sizes before reporting reductions. When using `--filter`, apply the same
 filter to both runs so the comparison covers matching workloads.
+
+## Persistent ordered map
+
+The [report](results/pure-map/README.md) contains the complete point and bulk
+tables, allocation counts, pinned inputs, and correctness evidence. Point
+workloads use maps of 16, 256, 4,096, and 65,536 entries; bulk workloads use
+256 and 4,096. Both map implementations already share unchanged subtrees.
+
+After building the plugins against the pinned, clean compiler checkout, run
+from this repository root:
+
+```sh
+mkdir -p _build/map-comparison/deps
+cp benchmarks/results/pure-map/dependencies/mops.{toml,lock} \
+  _build/map-comparison/deps/
+(cd _build/map-comparison/deps && mops install --no-toolchain --lock check)
+python3 benchmarks/generate-map-comparison.py --out _build/map-comparison/point
+python3 benchmarks/generate-map-comparison.py --out _build/map-comparison/bulk \
+  --sizes 256,4096 \
+  --operations bulk-sorted,scan,range,filter-all,filter-half,union-small,intersection-small,difference-small
+for map_suite in point bulk; do
+  map_dir="_build/map-comparison/$map_suite"
+  python3 benchmarks/build-map-comparison.py \
+    --motoko "$MOTOKO_ROOT" --deps _build/map-comparison/deps \
+    --out "$map_dir" --require-clean-compiler
+  node benchmarks/run.mjs --wasm "$map_dir/main.wasm" \
+    --cases "$map_dir/cases.json" --out "$map_dir/results.json" \
+    --label "pure-map-$map_suite" --trials 3
+  python3 benchmarks/summarize-map.py "$map_dir/results.json" \
+    --cases "$map_dir/cases.json" --out "$map_dir/summary.csv"
+done
+```
+
+The build helper checks the dependency lock, compiler revision and binary,
+plugin artifact hashes, and the source hashes recorded when the package was
+built. It rejects stale packages or changing compiler inputs. Each phase
+checks its complete ordered result, original maps, retained histories, and
+plugin tree invariants outside timing. The summary rejects missing trials,
+failed checks, or mismatched manifests. Synchronous GC is permitted and
+reported equally for every implementation; end-of-message GC is excluded.
+
+The bulk table labels Core adapters explicitly: its public API has no seek,
+union, intersection, or difference operation. These compare complete
+algorithms and capabilities, not plugin boundary overhead alone.
 
 ## Typed JSON
 

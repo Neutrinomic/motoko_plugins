@@ -1,7 +1,7 @@
 # Adding a plugin
 
-Put each plugin in `plugins/<name>/`. Use a lowercase name with underscores;
-the directory, manifest, and registered package name should agree.
+Put each plugin in `plugins/<name>/`. Use a lowercase name with underscores or hyphens;
+the directory and manifest name must agree. Registered package names must be unique.
 
 ```text
 plugins/example/
@@ -39,8 +39,10 @@ copies of the compiler libraries into the package. Additional OCaml libraries
 must already be available in the host; naming a package does not bundle it.
 
 Place all compiler `.ml` and `.mli` files in `compiler/`. The build orders them
-using `ocamldep`; no per-plugin Dune project is needed. The runtime is a Rust
-`cdylib` crate. The root Cargo workspace discovers `plugins/*/runtime`, sharing
+using `ocamldep`; no per-plugin Dune project is needed. An external runtime is a Rust
+`cdylib` crate. A plugin that emits managed code only omits `runtime_crate`,
+registers `runtime = None` and `imports = []`, and ships only its native
+component; no dummy Wasm module is needed. The root Cargo workspace discovers `plugins/*/runtime`, sharing
 one lockfile and release profile across plugins. Update `Cargo.lock` when
 adding a crate or dependency.
 
@@ -52,7 +54,9 @@ From the Motoko checkout in its Nix development shell:
 
 The build uses that compiler's Wasm64 target, validates the runtime, checks
 native loading, and writes `dist/example/`. `build.json` records toolchain
-versions, source revisions, and artifact hashes. Generated binaries and
+versions, source revisions, compiler binary and source hashes, plugin build-input
+hashes, and artifact hashes. Inputs are captured before compilation and checked
+again before publishing the package. Generated binaries and
 intermediates are ignored by Git.
 
 ## Compiler component
@@ -69,21 +73,39 @@ a newer host without rebuilding for its semantics.
 During this development phase, update the SDK and plugins together. Do not
 keep legacy entry points or add backward compatibility shims.
 
-Each binding supplies an argument policy (`Shared` or `Fixed types`),
-an explicit type parameter count, a result-type function, and an interpreter
-reference returning `Value.value`. The result-type function validates the
-supported schema and returns its concrete Motoko result type. Expected runtime
+Each binding supplies an argument policy (`Shared` or `Fixed schema`),
+a list of explicit type parameter modes (`Concrete` or `Opaque`), a result-type
+function, and a continuation-based interpreter reference. A fixed schema maps
+explicit type arguments to expected input types, enabling contextual typing of
+literals and typed callbacks. Concrete parameters require known layouts;
+opaque parameters can preserve generic values, including closures and mutable
+payloads, without inspecting them. All occurrences retain the same Motoko type.
+The result-type function validates the supported schema and returns its Motoko
+result type. Use `Compute_plugin.pure` for callback-free references, or the
+provided evaluator's typed `call` operation for ordinary Motoko callbacks. Expected runtime
 failures belong in a Motoko `#err` value; the evaluator's outer OCaml `Error`
 means an interpreter failure.
 
 A generator over `Plugin_codegen.Backend` receives a specialization record
-with `type_arguments`, `argument_types`, and `result_type`. It consumes the
-packed argument and leaves the vanilla result on the Wasm stack. Use managed
+with `type_arguments`, `argument_types`, and `result_type`, plus a getter for
+each already evaluated vanilla argument. Arguments are evaluated left-to-right
+exactly once using ordinary sequence arities; no implicit heap argument tuple
+is allocated. Return `{code; representation = Managed}` for a vanilla result,
+or `Tuple n` for the vanilla fields of a statically known tuple result. The
+compiler validates the exact tuple arity (zero or at least two) without
+promoting opaque type bounds. Immediate destructuring needs no result allocation;
+a context retaining the tuple uses the compiler's ordinary tuple constructor.
+Opaque values remain managed, even when their bound happens to be a tuple. Use managed
 constructors for records, variants, arrays, options, text, and boxed scalars.
 The array builder initializes all slots before running element code, so a
 decoder can return an error midway safely. Record and variant builders evaluate
-payloads before allocation. No generated code or runtime callback may introduce
-a GC safepoint.
+payloads before allocation. No generated code may introduce a GC safepoint. `Backend.Call.local` calls
+fully instantiated synchronous local closures through the normal compiler
+calling convention. Only vanilla managed references may remain live across
+callbacks; borrowed raw pointers may not. The current compiler collects after
+synchronous message frames return, so callbacks can allocate and reenter a
+plugin without collecting their caller. Do not implement closure offsets or
+indirect-call signatures inside a plugin.
 
 See [JSON](../plugins/json/) for explicit output specialization and typed
 errors, and the matching compiler's `src/codegen/plugin_codegen.mli` for the

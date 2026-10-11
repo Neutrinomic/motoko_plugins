@@ -82,7 +82,7 @@ def check_compatibility(work, source):
         "module P = Codegen.Plugin_codegen\n"
         "let () = P.register P.{\n"
         "  abi = P.abi_version + 1; name = \"unsupported_abi\";\n"
-        "  runtime = \"runtime.wasm\"; imports = []; bindings = [];\n"
+        "  runtime = Some \"runtime.wasm\"; imports = []; bindings = [];\n"
         "}\n"
     )
     includes = []

@@ -4,24 +4,24 @@ open Mo_types
 open Wasm_exts.Types
 
 let encode = C.{
-  id = "cbor_encode"; name = "to_cbor"; arguments = Shared; type_parameters = 0;
+  id = "cbor_encode"; name = "to_cbor"; arguments = Shared; type_parameters = [];
   result_type = (fun _ -> function
     | [typ] -> (match Schema.validate typ with Ok () -> Ok (Schema.result_type (Type.Prim Type.Blob)) | Error e -> Error e)
     | _ -> Error "to_cbor expects exactly one argument (parenthesize a tuple argument)");
-  evaluate = Reference.encode;
+  evaluate = Mo_values.Compute_plugin.pure Reference.encode;
 }
 let decode = C.{
-  id = "cbor_decode"; name = "from_cbor"; arguments = Fixed [Type.Prim Type.Blob]; type_parameters = 1;
+  id = "cbor_decode"; name = "from_cbor"; arguments = Fixed (fun _ -> Ok [Type.Prim Type.Blob]); type_parameters = [Mo_values.Compute_plugin.Concrete];
   result_type = (fun type_arguments _ -> match type_arguments with
     | [typ] -> (match Schema.validate typ with Ok () -> Ok (Schema.result_type typ) | Error e -> Error e)
     | _ -> Error "from_cbor requires one explicit result type");
-  evaluate = Reference.decode;
+  evaluate = Mo_values.Compute_plugin.pure Reference.decode;
 }
 
 let signature name params results = "cbor_" ^ name, params, results
 let i n = List.init n (fun _ -> I64Type)
 let () = P.register P.{
-  abi = 1; name = "cbor"; runtime = "runtime.wasm";
+  abi = 1; name = "cbor"; runtime = Some "runtime.wasm";
   imports = List.map (fun (name, args, results) -> signature name (i args) (i results)) [
     "new",2,1; "done",1,0; "ok",1,1; "enter",1,1; "leave",1,0; "finish",1,0;
     "collection",2,1; "check_string",2,1; "check_bigint",2,1;

@@ -35,7 +35,7 @@ if [[ -z "$motoko_root" ]]; then
   exit 2
 fi
 motoko_root=$(cd -- "$motoko_root" && pwd)
-if [[ ! -x "$motoko_root/bin/moc" || ! -d "$motoko_root/test" ]]; then
+if [[ ! -x "$motoko_root/bin/moc" || ! -x "$motoko_root/src/moc" || ! -d "$motoko_root/test" ]]; then
   echo "Not a built Motoko compiler checkout: $motoko_root" >&2
   exit 2
 fi
@@ -48,7 +48,11 @@ fi
 for manifest in "${plugin_manifests[@]}"; do
   plugin_directory=${manifest%/plugin.json}
   plugin=${plugin_directory##*/}
-  for artifact in plugin.cmxs runtime.wasm; do
+  artifacts=(plugin.cmxs)
+  if python3 -c 'import json,sys; sys.exit(json.load(open(sys.argv[1])).get("runtime_crate") is None)' "$manifest"; then
+    artifacts+=(runtime.wasm)
+  fi
+  for artifact in "${artifacts[@]}"; do
     if [[ ! -f "$plugins_root/dist/$plugin/$artifact" ]]; then
       echo "Missing dist/$plugin/$artifact; run scripts/build.sh --motoko PATH first." >&2
       exit 2

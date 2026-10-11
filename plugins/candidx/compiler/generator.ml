@@ -747,15 +747,15 @@ module Make (B : Plugin_codegen.Backend) = struct
     G.setter_for get_position
 
   let serialize_static ?(suffix = "") env ts header visits =
-    Func.share_code1 Func.Always env
+    Func.share_code Func.Always env
       (Strm.name_for ("serialize_canonical" ^ suffix) ts)
-      ("x", I64Type) [I64Type] (fun env get_x ->
+      (List.mapi (fun i _ -> "argument" ^ string_of_int i, I64Type) ts)
+      [I64Type] (fun env arguments ->
         let set_remaining, get_remaining = new_local env "remaining_visits" in
         let set_size, get_size = new_local env "canonical_size" in
         let set_blob, get_blob = new_local env "canonical_blob" in
         let set_position, get_position = new_local env "canonical_position" in
-        let argument i = if List.length ts = 1 then get_x else
-          get_x ^^ Tuple.load_n env (Int64.of_int i) in
+        let argument i = List.nth arguments i in
         compile_unboxed_const (Int64.of_int (2_000_000 - visits)) ^^
         set_remaining ^^
         G.concat_mapi (fun i typ ->
@@ -781,17 +781,17 @@ module Make (B : Plugin_codegen.Backend) = struct
         get_blob)
 
   let serialize_canonical env ts : G.t =
-    Func.share_code1 Func.Always env
+    Func.share_code Func.Always env
       (Strm.name_for "serialize_canonical" ts)
-      ("x", I64Type) [I64Type] (fun env get_x ->
+      (List.mapi (fun i _ -> "argument" ^ string_of_int i, I64Type) ts)
+      [I64Type] (fun env arguments ->
         let set_context, get_context = new_local env "canonical_context" in
         let set_header_size, get_header_size =
           new_local env "canonical_header_size" in
         let set_size, get_size = new_local env "canonical_payload_size" in
         let set_blob, get_blob = new_local env "canonical_blob" in
         let set_position, get_position = new_local env "canonical_position" in
-        let argument i = if List.length ts = 1 then get_x else
-          get_x ^^ Tuple.load_n env (Int64.of_int i)
+        let argument i = List.nth arguments i
         in
         let wire i = get_context ^^ compile_unboxed_const (Int64.of_int i) ^^
           canonical_call env "root_type"
@@ -831,7 +831,7 @@ module Make (B : Plugin_codegen.Backend) = struct
 
   let compile_raw env ts =
     if not (canonical_schema_valid ts) then
-      G.i Drop ^^ compile_unboxed_const
+      G.concat_map (fun _ -> G.i Drop) ts ^^ compile_unboxed_const
         (Errors.code "source type field ids must strictly increase")
     else match static_header ts with
     | Some (header, visits) -> serialize_static env ts header visits
@@ -860,11 +860,12 @@ module Make (B : Plugin_codegen.Backend) = struct
           (Text.lit env "unknown encoder error") in
         Variant.inject env "err" text)
 
-  let compile env specialization =
+  let compile env specialization arguments =
     let set_result, get_result = new_local env "canonical_result" in
+    Plugin_codegen.{representation = Managed; code = G.concat arguments ^^
     compile_raw env specialization.Mo_values.Compute_plugin.argument_types ^^
     set_result ^^ is_error get_result ^^
     E.if1 I64Type (get_result ^^ error_result env)
-      (Variant.inject env "ok" get_result)
+      (Variant.inject env "ok" get_result)}
 
 end
