@@ -142,6 +142,8 @@ artifact hashes and ABI labels.
 The [design document](docs/design.md) describes compiler specialization, memory
 borrowing, compatibility, and the relationship to Wasm components. Plugins are
 trusted compiler extensions; the shared-memory interface is not a sandbox.
+The [persistent-map research](docs/pure-map-research.md) compares structurally
+shared trees and proposes SDK changes for discussion before implementation.
 
 Existing licenses are preserved. CandidX carries MIT licenses in its compiler
 and runtime directories. Other extracted material uses the Motoko license in
