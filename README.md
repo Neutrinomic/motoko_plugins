@@ -9,6 +9,50 @@ caller-owned Motoko arrays and records through the ordinary GC write barriers.
 Use the [`fast` Mops package](packages/fast/) for imports such as
 `mo:fast/JSON`, `mo:fast/SHA256`, `mo:fast/Map`, and `mo:fast/Set`.
 
+The Map and Set modules expose their Core counterparts' function interfaces,
+including implicit comparators. Ordinary native key operations such as
+`Map.get(map, Nat64.compare, key)` select native scalar ordering automatically,
+including through aliases and generic wrappers. The compiler proves the
+comparison from its body; unrecognized or effectful comparators retain their
+callback behavior. The SDK provides one shared `Compare.dispatch` facility,
+without changing closure layouts, GC representation, or ABI 1.
+See the [package guide](packages/fast/) for the API and storage caveats:
+switching an import does not migrate existing Core container values or stable
+data.
+
+## Automatic comparator costs
+
+Ordinary `Nat64.compare` lookups at **100,000 entries** now use **25.5–39.6%
+fewer instructions** than the previous plugins. Core 2.5.0 uses **2.74–3.59×
+as many instructions**. Explicit scalar helpers remain optional; the ordinary
+API gets most of their benefit.
+
+| Container | Core instructions | Previous plugin | Automatic | Explicit Nat64 | Core/automatic | Allocated B, Core / automatic |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Mutable Map `get` | 7,242.72 | 3,556.09 | 2,648.03 | 2,590.03 | 2.74× | 117 / 0 |
+| Pure Map `get` | 3,034.47 | 1,466.53 | 962.28 | 904.28 | 3.15× | 0 / 0 |
+| Mutable Set `contains` | 6,945.38 | 3,346.47 | 2,325.91 | 2,267.91 | 2.99× | 117 / 0 |
+| Pure Set `contains` | 2,754.91 | 1,272.53 | 768.28 | 710.28 | 3.59× | 40 / 0 |
+
+Per-call averages of 32 probes; three identical PocketIC trials, each in a fresh
+canister. Keys alternate between low `Nat64` values and values at or above `2^63`;
+map values are `Nat`. Compiler `92b1bde` is compared with `fc7612098`, using
+identical public modules, generated programs, RTS and measurement harness.
+Setup and validation are outside the measured interval. Allocation is
+cumulative bytes, including temporary garbage, not peak or retained memory.
+Core comparisons measure complete container implementations.
+
+The [full report](benchmarks/results/comparator-dispatch/README.md) covers
+**864 samples**: construction, lookup, insertion and deletion at **1,000,
+10,000 and 100,000 entries**, plus aliases, generic wrappers, custom callbacks,
+and empty/singleton containers. Allocation is unchanged in all 84 before/after
+cases. The tradeoffs are small fixed instruction costs: empty operations add
+32–35 instructions, and the measured unknown-only callback lookups add 9.
+Complete canister Wasm grows by 150–9,389 bytes (0.06–3.39%) across those cases;
+this includes the RTS, harness and validation. The report also measures mixed
+known/unknown comparator programs without treating them as an isolated
+dispatch-cost measurement.
+
 ## Instruction and allocation costs
 
 Recorded PocketIC measurements for the ABI 1 plugins, using the same compiler
@@ -61,7 +105,8 @@ The [Set comparison](benchmarks/results/set-comparison/README.md) records
 Both store elements directly, without dummy map values.
 
 Selected **100,000-element** results follow, using small `Nat` keys, Core 2.5.0,
-and compiler `fc7612098`. Point operations are per-call averages of 32 probes;
+and compiler `fc7612098`, before automatic comparator selection. Point operations
+are per-call averages of 32 probes;
 construction, traversal and union rows measure the complete operation.
 
 | Set | Operation | Core instructions | Plugin callback | Plugin native Nat | Core allocated B | Plugin allocated B |
@@ -92,17 +137,17 @@ algorithms, not just plugin dispatch overhead. The
 operation and scalar comparison; the [archive](benchmarks/results/set-comparison/)
 contains raw metrics, source hashes and reproduction details.
 
-## Callback optimization
+## Earlier callback optimization
 
-The latest [callback report](benchmarks/results/callback-round/README.md) measures
+The earlier [callback report](benchmarks/results/callback-round/README.md) measures
 36 point workloads at 1,000, 10,000 and 100,000 entries, with **612 samples**
-across before/after builds. Each implementation now runs in its own fresh
+across before/after builds. Each implementation runs in its own fresh
 canister. The same actor and inputs are used for both builds; Core and scalar
 ordering controls are unchanged, as are all allocation/reclamation counts.
 
 Selected **100,000-entry** results, in instructions per call:
 
-| Map | Operation | Core | Plugin before | Plugin now | Reduction | Plugin allocated B |
+| Map | Operation | Core | Plugin before | Plugin after that round | Reduction | Plugin allocated B |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | Persistent | Lookup, hit | 3,324.09 | 2,524.38 | 2,410.75 | 4.50% | 0 |
 | Persistent | Insert new key | 14,112.34 | 10,137.75 | 10,019.75 | 1.16% | 1,289.25 |
@@ -119,16 +164,17 @@ measures **5 fewer instructions per two-argument callback**, without allocation.
 ABI 1 and the public APIs are unchanged. Generic keys and values remain shared
 Motoko references.
 
-Scalar ordering still saves more: lookup uses 1,345.19 instructions for the
-persistent map and 2,712.34 for the mutable map. That difference includes
-comparator work and boxed-key handling, as well as dispatch. Known-callback
-specialization/inlining is a further opportunity, not part of these changes.
+In that cohort, explicit scalar ordering saves more: lookup uses 1,345.19
+instructions for the persistent map and 2,712.34 for the mutable map. That difference includes
+comparator work and boxed-key handling, as well as dispatch. The current SDK
+selects scalar ordering through ordinary proven comparators; general callback
+inlining remains a separate opportunity.
 
 The full matrices below retain their original compilers and measurement
-protocols. The new report includes a phase-order diagnostic: the earlier
+protocols. The callback report includes a phase-order diagnostic: the earlier
 apparent scalar-removal regression disappears when scalar ordering runs first
 or in a fresh canister. Its exact cause is not isolated; fresh canisters avoid
-that execution-history bias in the new comparisons.
+that execution-history bias in those comparisons.
 
 ## Mutable map costs
 

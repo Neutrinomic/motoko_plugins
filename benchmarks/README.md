@@ -1,5 +1,13 @@
 # PocketIC compute-plugin benchmarks
 
+The [automatic comparator comparison](results/comparator-dispatch/README.md)
+measures ordinary Core-compatible Map/Set calls before and after native scalar
+selection, alongside Core 2.5.0 and explicit Nat64 helpers. It includes mutable
+and pure containers at 1,000, 10,000 and 100,000 entries, empty/singleton cases,
+and custom comparator controls. Instructions, cumulative allocation, and whole
+canister Wasm sizes are recorded. See the
+[runner guide](comparator-dispatch/README.md) for reproduction and verification.
+
 The runner now defaults to a **fresh canister per workload, trial and
 implementation phase**. All current actors configure deterministic inputs;
 ordinary Candid references are retained by the host across phases. The
