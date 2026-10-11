@@ -22,11 +22,14 @@ assert Prim.sha256("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 assert Prim.sha256("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") ==
   "\63\53\61\c4\8b\b9\ea\b1\41\98\e7\6e\a8\ab\7f\1a\41\68\5d\6a\d6\2a\a9\14\6d\30\1d\4f\17\eb\0a\e0";
 
-// Fixed-signature functions retain ordinary callback and alias behavior.
+// Inferred aliases preserve specialization. Explicit wrappers are ordinary
+// Motoko functions and can be stored or passed as callbacks.
+let hash = Prim.sha256;
+assert hash("abc") == Prim.sha256("abc");
 func apply(hash : Blob -> Blob, data : Blob) : Blob = hash(data);
-let digest : Blob -> Blob = Prim.sha256;
+func digest(data : Blob) : Blob { Prim.sha256(data) };
 assert apply(digest, "abc") == Prim.sha256("abc");
-let callbacks : [Blob -> Blob] = [Prim.sha256, digest];
+let callbacks : [Blob -> Blob] = [func(data) { hash(data) }, digest];
 assert callbacks[1]("abc") == callbacks[0]("abc");
 
 // A returned result remains valid across later calls and allocations.

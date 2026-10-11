@@ -20,9 +20,8 @@ assert before and after, "Reports contain no workloads"
 assert before.keys() == after.keys(), "Workload sets differ; use the same filter for both runs"
 assert baseline["pocket_ic_version"] == candidate["pocket_ic_version"], "PocketIC versions differ"
 assert baseline["variant_width"] == candidate["variant_width"], "Variant widths differ"
-assert baseline.get("variant_payload", "nat") == candidate.get("variant_payload", "nat"), "Variant payloads differ"
-if "source_sha256" in baseline and "source_sha256" in candidate:
-    assert baseline["source_sha256"] == candidate["source_sha256"], "Actor source differs"
+assert baseline["variant_payload"] == candidate["variant_payload"], "Variant payloads differ"
+assert baseline["source_sha256"] == candidate["source_sha256"], "Actor source differs"
 print("| Workload | Baseline instructions | Candidate instructions | Reduction | Baseline allocated | Candidate allocated |")
 print("|---|---:|---:|---:|---:|---:|")
 for name, case in after.items():

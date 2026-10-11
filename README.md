@@ -53,10 +53,10 @@ To build selected plugins, append their names:
 Prebuilt packages load with `--plugin` without rebuilding the compiler. Native
 components must match the compiler interfaces, OCaml toolchain, and host
 platform; incompatible packages produce an unsupported-plugin error. Rebuild
-packages when changing the compiler. ABI 2 adds typed managed results; ABI 1
-packages are incompatible. CandidX callers must unwrap `#ok` or handle `#err`
-before using the Blob. Static Linux/musl and JavaScript compiler
-builds cannot load native `.cmxs` files.
+packages when changing the compiler. The development SDK uses ABI 1; all plugin
+functions use the same specialization mechanism and can return managed Motoko
+values. Static Linux/musl and JavaScript compiler builds cannot load native
+`.cmxs` files.
 
 ## Repository layout
 
@@ -97,7 +97,7 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-Current ABI 2 results: [CandidX versus its native Motoko library](benchmarks/results/typed-results/README.md)
+Recorded ABI 2 results: [CandidX versus its native Motoko library](benchmarks/results/typed-results/README.md)
 and [JSON encode/decode instruction costs](benchmarks/results/json/README.md).
 
 Earlier comparisons against Motoko libraries include:

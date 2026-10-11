@@ -31,7 +31,7 @@ def natural(value, context):
 for path in args.reports:
     report = json.loads(path.read_text())
     assert not report.get("fatal_error"), f"{path}: {report.get('fatal_error')}"
-    assert report.get("failed_measurements", 0) == 0, f"{path}: failed benchmark phases"
+    assert report["failed_measurements"] == 0, f"{path}: failed benchmark phases"
     assert report["cases"], f"{path}: no workloads"
     versions.add(report["pocket_ic_version"])
     trials = report["trials"]
@@ -48,13 +48,12 @@ for path in args.reports:
         expected = ({"plugin"} if case["family"] == "control" else
                     {"native", "plugin"} if case["family"] == "sha256" else
                     {"ordinary", "native", "normalize", "plugin"})
-        declarations = case.get("phases")
-        if declarations is not None:
-            assert len(declarations) == len(expected) and \
-                {phase["label"] for phase in declarations} == expected, \
-                f"{identity}: unexpected phase declarations"
+        declarations = case["phases"]
+        assert len(declarations) == len(expected) and \
+            {phase["label"] for phase in declarations} == expected, \
+            f"{identity}: unexpected phase declarations"
         require_no_gc = {"plugin"} | {
-            phase["label"] for phase in declarations or [] if phase.get("require_no_gc")
+            phase["label"] for phase in declarations if phase["require_no_gc"]
         }
         phases = {phase: [] for phase in expected}
         observed = set()

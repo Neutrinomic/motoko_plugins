@@ -17,14 +17,19 @@ configure = []
 
 def add(name, value=None, setup=""):
     index = len(cases)
+    method = f"bench_{index}"
     spec = {"name": name, "index": index,
-            "family": "control" if value is None else "candidx",
-            "method": f"bench_{index}"}
-    expressions = [(spec["method"], '""' if value is None else
+            "family": "control" if value is None else "candidx", "phases": []}
+    expressions = [(method, '""' if value is None else
                     f"expectOk(Prim.to_candid_canonical({value}))")]
     if value is not None:
-        spec["ordinary_method"] = f"ordinary_{index}"
-        expressions.append((spec["ordinary_method"], f"to_candid({value})"))
+        ordinary_method = f"ordinary_{index}"
+        expressions.append((ordinary_method, f"to_candid({value})"))
+        spec["phases"].append({"label": "ordinary", "method": ordinary_method,
+                               "kind": "ordinary_candid", "require_no_gc": True})
+    spec["phases"].append({"label": "plugin", "method": method,
+                           "kind": "control" if value is None else "canonical_candid",
+                           "require_no_gc": True})
     for method, expression in expressions:
         methods.append(f"""
   public func {method}() : async Measurement {{

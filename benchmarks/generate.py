@@ -26,15 +26,20 @@ configure = []
 
 def add(name, expression, setup="", family="candidx", ordinary=None, expected=None):
     index = len(cases)
-    entry = {"name": name, "index": index, "family": family,
-             "method": f"bench_{index}"}
+    method = f"bench_{index}"
+    entry = {"name": name, "index": index, "family": family, "phases": []}
     if expected is not None:
         entry["expected_sha256_hex"] = expected
     configure.append(f"case {index} {{ {setup} }};")
-    expressions = [(entry["method"], f"expectOk({expression})" if family == "candidx" else expression)]
+    expressions = [(method, f"expectOk({expression})" if family == "candidx" else expression)]
     if ordinary is not None:
-        entry["ordinary_method"] = f"ordinary_{index}"
-        expressions.append((entry["ordinary_method"], ordinary))
+        ordinary_method = f"ordinary_{index}"
+        expressions.append((ordinary_method, ordinary))
+        entry["phases"].append({"label": "ordinary", "method": ordinary_method,
+                                "kind": "ordinary_candid", "require_no_gc": True})
+    entry["phases"].append({"label": "plugin", "method": method,
+                            "kind": {"candidx": "canonical_candid", "sha256": "sha256", "control": "control"}[family],
+                            "require_no_gc": True})
     for method, expr in expressions:
         methods.append(f"""
   public func {method}() : async Measurement {{

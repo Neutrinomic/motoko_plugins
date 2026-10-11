@@ -29,9 +29,6 @@ limits return `#err(message)` in both interpreters and compiled Wasm. Successful
 calls return `#ok(bytes)`. Error propagation releases no persistent resources;
 all scratch allocations are reclaimed by Motoko's ordinary GC.
 
-This replaces the experimental ABI 1 Blob result. Update callers to handle the
-Result, rebuild plugins for ABI 2, and recompile the canister.
-
 This is a typed intrinsic: inferred aliases preserve specialization, while
 ordinary function annotations cannot erase its identity. Wrap calls in an
 explicitly typed Motoko function when passing an encoder as a callback.

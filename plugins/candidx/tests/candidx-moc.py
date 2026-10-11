@@ -10,11 +10,12 @@ this repository with that checkout's bin/moc. To test a
 frozen build, set CANDIDX_TEST_ARTIFACTS to a directory containing moc,
 mo-rts.wasm, mo-rts-debug.wasm, and candidx/{plugin.cmxs,runtime.wasm}.
 
-Only generated probes are supported: their unqualified legacy operator calls
-are changed to Prim.to_candid_canonical in adjacent .plugin.mo copies and
-their Result is unwrapped for the legacy probe API. Expected #err results
-become probe traps. Values, assertions, and oracle sources are preserved. This is not a general
-Motoko source rewriter. Every translation and its source hashes are logged in
+This is a bridge to the independent upstream test driver. Only its generated
+probes are supported: their unqualified encoder calls are changed to
+Prim.to_candid_canonical in adjacent .plugin.mo copies. Results are unwrapped
+to meet the driver's Blob-or-trap assertion contract. Values, assertions, and
+oracle sources are preserved. This is not a general Motoko source rewriter.
+Every translation and its source hashes are logged in
 CANDIDX_TEST_ROOT/compiler-invocations.jsonl.
 """
 
@@ -31,7 +32,7 @@ CALL = re.compile(r"(?<![A-Za-z0-9_.])to_candid_canonical\s*(?=\()")
 
 
 def translate_probe(source):
-    """Wrap generated legacy calls without changing their input expressions."""
+    """Bridge upstream generated calls without changing their input expressions."""
     calls = list(CALL.finditer(source))
     for call in reversed(calls):
         start = source.index("(", call.end())
@@ -56,7 +57,7 @@ def translate_probe(source):
                     break
             position += 1
         if depth:
-            raise RuntimeError("Unclosed legacy call in generated probe")
+            raise RuntimeError("Unclosed encoder call in generated probe")
         source = (source[:call.start()] + "__candidxExpectOk(Prim.to_candid_canonical" +
                   source[call.end():position + 1] + ")" + source[position + 1:])
     if calls:

@@ -61,11 +61,15 @@ Register a `Codegen.Plugin_codegen.plugin` during native module initialization.
 Choose unique package names, internal function IDs, and public Prim names.
 Private Wasm export names may be reused by separate packages.
 
-Pin the required compiler ABI in the source, currently `abi = 2`. Do not read
+Pin the required compiler ABI in the source, currently `abi = 1`. It remains
+at 1 during development of the compiler PR. Do not read
 the running host's `abi_version` as the package requirement: that could accept
 a newer host without rebuilding for its semantics.
 
-Each binding supplies an argument policy (`Blob`, `Shared`, or `Fixed types`),
+During this development phase, update the SDK and plugins together. Do not
+keep legacy entry points or add backward compatibility shims.
+
+Each binding supplies an argument policy (`Shared` or `Fixed types`),
 an explicit type parameter count, a result-type function, and an interpreter
 reference returning `Value.value`. The result-type function validates the
 supported schema and returns its concrete Motoko result type. Expected runtime
@@ -83,8 +87,9 @@ a GC safepoint.
 
 See [JSON](../plugins/json/) for explicit output specialization and typed
 errors, and the matching compiler's `src/codegen/plugin_codegen.mli` for the
-exact interface. ABI 1 generators/evaluators must migrate to this contract;
-changing only their version number is insufficient.
+exact interface. All plugin bindings are compiler intrinsics. Inferred aliases
+preserve their specialization; explicit Motoko wrappers provide ordinary
+function values when an application needs callbacks.
 
 ## Runtime and tests
 

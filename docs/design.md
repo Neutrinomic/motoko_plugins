@@ -20,11 +20,11 @@ It does not use the standalone CandidX Wasm module. Its `cx` profile and limits
 are preserved: value-derived types, omission of absent optional record fields,
 canonical NaNs, at most 32 MiB output, 2,000,000 visited items, 1,024 output types,
 and depth 256. Unsupported actual function/service values and invalid schemas
-return `#err` in ABI 2. Ordinary `to_candid` and `from_candid` retain their existing behavior.
+return `#err`. Ordinary `to_candid` and `from_candid` retain their existing behavior.
 
 Performance and allocation tables below record the original ABI 1 artifacts.
 They predate CandidX's Result wrapper and the JSON plugin; see each report's
-artifact hashes. Current measurements are recorded separately for
+artifact hashes. Additional ABI 2 measurements are recorded separately for
 [CandidX](../benchmarks/results/typed-results/README.md) and
 [JSON](../benchmarks/results/json/README.md).
 
@@ -58,17 +58,17 @@ FFI declarations are needed. Only referenced runtimes are linked. Multiple
 packages can be loaded in either order. Packages use the compiler and OCaml
 toolchain they were built with; rebuild them after changing the compiler.
 
-`sha256` is an ordinary first-class `Blob -> Blob` function.
-`to_candid_canonical` is a typed intrinsic: the compiler preserves the identity
-of the operation through inferred aliases and specializes every call using
+Every plugin binding is a compiler intrinsic. The compiler preserves the
+operation's identity through inferred aliases and specializes every call using
 the actual argument types. Its type cannot be erased to an ordinary function
-annotation. A normal explicitly typed wrapper is useful when passing an
-encoder as a callback:
+annotation. An explicitly typed Motoko wrapper provides a function value for
+callbacks:
 
 ```motoko
 func encodeHeight(x : Nat) : { #ok : Blob; #err : Text } {
   Prim.to_candid_canonical(x)
 };
+func hash(bytes : Blob) : Blob { Prim.sha256(bytes) };
 ```
 
 Argument lists and tuple values remain distinct, as with ordinary Candid:
@@ -124,9 +124,9 @@ wrong host platform; their original reason is retained.
 
 Compatibility is checked using OCaml's native interface/implementation checks
 and the explicit plugin ABI, rather than an exact Motoko release allowlist.
-A semantically incompatible SDK change must advance its ABI version even if
-the OCaml signatures remain unchanged. A successful compatibility check does
-not prove that the plugin implementation is correct.
+The ABI remains 1 during development of the compiler PR. Packages must be
+rebuilt against the matching compiler checkout. A successful compatibility
+check does not prove that the plugin implementation is correct.
 
 Package names, internal function IDs, and plugin Prim names must be distinct;
 duplicates fail during loading. Separate packages may reuse private runtime
@@ -312,19 +312,19 @@ The versioned compiler interface is
    result there. Specialization includes input types, explicit type arguments,
    and the checked result type.
 
-The package's required ABI must be fixed at build time, such as `abi = 2` for
+The package's required ABI must be fixed at build time, such as `abi = 1` for
 the current SDK. Do not copy `Plugin_codegen.abi_version` from the running
 host: a plugin built with opaque or interface-only dependencies can otherwise
 adopt a newer host's ABI without having been rebuilt for its semantics.
 
-ABI 2 supports a fixed `Blob -> Blob` policy, fixed input type lists, and
-variadic shared inputs. Intrinsics can take explicit concrete type arguments
+The argument policies are fixed input type lists and variadic shared inputs.
+Intrinsics can take explicit concrete type arguments
 and return records, variants, arrays, options, text, and scalars. JSON uses
 `from_json<T>` to specialize the decoder for `T` and return typed `#ok`/`#err`.
 The backend constructors manage forwarding, initialization, allocation, and
 write barriers, including early failures during array construction. No callback
 or safepoint may run during the borrowed-pointer interval. See the
-[authoring guide](adding-a-plugin.md) for migration from ABI 1.
+[authoring guide](adding-a-plugin.md) for package registration and the SDK contract.
 
 The SHA-256 package is the small example. CandidX demonstrates recursive type
 specialization. Kernel modules are Wasm64 shared libraries with `dylink.0`

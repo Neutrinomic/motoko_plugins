@@ -3,7 +3,7 @@ module G = Codegen.InstrList
 
 module Generator = struct
   module Make (B : P.Backend) = struct
-    let compile env _types =
+    let compile env _specialization =
       let set_input, get_input = B.new_local env "sha256_input" in
       let set_result, get_result = B.new_local env "sha256_result" in
       let size = G.i (Wasm_exts.Ast.Const Wasm.Source.{
@@ -24,7 +24,7 @@ end
 let binding = Mo_values.Compute_plugin.{
   id = "sha256_digest";
   name = "sha256";
-  arguments = Blob;
+  arguments = Fixed [Mo_types.Type.blob];
   type_parameters = 0;
   result_type = (fun _ _ -> Ok Mo_types.Type.blob);
   evaluate = (fun _type_arguments _types -> function
@@ -34,7 +34,7 @@ let binding = Mo_values.Compute_plugin.{
 
 let () =
   P.register P.{
-    abi = 2;
+    abi = 1;
     name = "sha256";
     runtime = "runtime.wasm";
     imports = ["sha256_digest",

@@ -1,11 +1,19 @@
 # SHA-256
 
-`Prim.sha256(Blob) : Blob` computes a 32-byte SHA-256 digest. It is an ordinary
-first-class Motoko function backed by a one-shot Rust Wasm kernel.
+`Prim.sha256(Blob) : Blob` computes a 32-byte SHA-256 digest. It is a compiler
+intrinsic backed by a one-shot Rust Wasm kernel.
 
 ```motoko
 import Prim "mo:⛔";
 let digest = Prim.sha256("abc");
+```
+
+Inferred aliases preserve the intrinsic. Use an ordinary Motoko wrapper when
+passing the operation as a callback or storing it in a function-typed field:
+
+```motoko
+func hash(bytes : Blob) : Blob { Prim.sha256(bytes) };
+let callbacks : [Blob -> Blob] = [hash];
 ```
 
 Build with `scripts/build.sh --motoko /path/to/motoko sha256`, then pass

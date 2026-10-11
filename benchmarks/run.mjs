@@ -31,16 +31,10 @@ const base64 = bytes => Buffer.from(bytes).toString('base64');
 const wasm = new Uint8Array(await readFile(resolve(options.wasm)));
 const installWasm = gzipSync(wasm);
 const manifest = JSON.parse(await readFile(resolve(options.cases), 'utf8'));
-const explicitPhases = manifest.cases.some(spec => spec.phases !== undefined);
 const phaseKinds = new Set(['ordinary_candid', 'canonical_candid', 'sha256',
   'control', 'json', 'checked_decode']);
 function phasesFor(spec) {
-  const kind = { candidx: 'canonical_candid', sha256: 'sha256', control: 'control' }[spec.family];
-  const phases = spec.phases ?? [
-    ...(spec.ordinary_method ? [{ label: 'ordinary', method: spec.ordinary_method,
-      kind: 'ordinary_candid', require_no_gc: true }] : []),
-    { label: 'plugin', method: spec.method, kind, require_no_gc: true }
-  ];
+  const phases = spec.phases;
   if (!Array.isArray(phases) || phases.length === 0) throw Error(`${spec.name}: no phases`);
   const labels = new Set();
   let hasReference = spec.reference_variant_count !== undefined;
@@ -50,7 +44,7 @@ function phasesFor(spec) {
     labels.add(phase.label);
     if (typeof phase.method !== 'string' || !phase.method || !phaseKinds.has(phase.kind))
       throw Error(`${spec.name}/${phase.label}: invalid method or kind`);
-    if (phase.require_no_gc !== undefined && typeof phase.require_no_gc !== 'boolean')
+    if (typeof phase.require_no_gc !== 'boolean')
       throw Error(`${spec.name}/${phase.label}: require_no_gc must be a boolean`);
     if (phase.kind === 'ordinary_candid') hasReference = true;
     if (phase.kind === 'canonical_candid' && !hasReference)
@@ -130,15 +124,14 @@ const report = {
   runner_sha256: sha(await readFile(fileURLToPath(import.meta.url))),
   node_version: process.version,
   variant_width: manifest.variant_width,
-  variant_payload: manifest.variant_payload ?? 'nat',
+  variant_payload: manifest.variant_payload,
   ...(manifest.implementations === undefined ? {} : { implementations: manifest.implementations }),
   ...(manifest.provenance === undefined ? {} : { provenance: manifest.provenance }),
   measurement_protocol: { fresh_canister: 'per workload/trial', forced_gc_calls_before_phase: 4,
     synchronous_gc: 'included in instruction count; reclaimed_bytes reported',
-    end_of_message_gc: 'excluded', legacy_requires_no_gc: true },
-  methodology: manifest.methodology ?? (explicitPhases ?
-    'Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Explicit phases permit synchronous reclamation unless require_no_gc is true. Ordinary Candid phases are references/context, not equivalent canonical encoders.' :
-    'Fresh canister per workload/trial; configure inputs outside measurement; four forced GC increments before each operation. Each update measures one call using performanceCounter(0) and rts_total_allocation, retains its output, and replies after measurement. Raw counts include counter/assignment overhead; control is reported separately. Ordinary to_candid has different semantics and is context, not an equivalent implementation.'),
+    end_of_message_gc: 'excluded' },
+  methodology: manifest.methodology ??
+    'Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.',
   correctness: manifest.correctness ?? 'Every SHA-256 phase is checked against the oracle digest in the workload manifest. Every canonical Candid phase is checked against host canonicalization of ordinary Candid. Equivalent phase outputs must also match byte-for-byte within each trial.',
   failed_measurements: 0,
   cases: []
@@ -172,8 +165,7 @@ try {
   const effective = { CanisterId: created.Created.topology.default_effective_canister_id.canister_id };
   for (const spec of selectedCases) {
     const phases = phasesFor(spec);
-    const result = { name: spec.name, family: spec.family,
-      ...(spec.phases === undefined ? {} : { phases }), measurements: [] };
+    const result = { name: spec.name, family: spec.family, phases, measurements: [] };
     report.cases.push(result);
     let hostReference;
     if (spec.reference_variant_count !== undefined) {
@@ -242,7 +234,7 @@ try {
   }
   await save();
   console.log(out);
-  if (explicitPhases && report.failed_measurements > 0) process.exitCode = 1;
+  if (report.failed_measurements > 0) process.exitCode = 1;
 } catch (error) {
   report.fatal_error = String(error);
   await save();

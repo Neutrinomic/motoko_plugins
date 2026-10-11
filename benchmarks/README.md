@@ -1,10 +1,12 @@
 # PocketIC compute-plugin benchmarks
 
-Current generators target plugin ABI 2 and include successful `#ok` unwrapping
-inside each CandidX measurement. Archived reports retain their original ABI 1
-artifacts and measurements; they have not been regenerated or relabeled.
-The [typed-result CandidX report](results/typed-results/README.md) records fresh
-ABI 2 native-library comparisons and both complete 500-record fuzz seeds.
+Current generators target the development plugin API and include successful
+`#ok` unwrapping inside each CandidX measurement. The SDK remains at ABI 1
+while the compiler PR is unmerged. Archived reports retain their original
+artifact hashes and version labels, including runs made during the temporary
+ABI 2 development version.
+The [typed-result CandidX report](results/typed-results/README.md) records
+native-library comparisons and both complete 500-record fuzz seeds.
 The [JSON report](results/json/README.md) records typed encoding and decoding
 costs for records, arrays, and binary data.
 
@@ -217,9 +219,9 @@ The reusable [compiler adapter](../plugins/candidx/tests/candidx-moc.py) lets th
 invoke the plugin without modifying their oracles or original probes. Pass its
 absolute path as both `--moc` and `--runtime-moc`, and pass `--skip-wasm` to
 exclude the standalone Wasm backend. Set `CANDIDX_TEST_ROOT` to a directory
-containing the driver's `--out` directory. It only rewrites unqualified legacy
+containing the driver's `--out` directory. It rewrites the upstream probes'
 `to_candid_canonical(...)` calls to `Prim.to_candid_canonical(...)` and unwraps
-the Result for the legacy probe API in adjacent copies, recording source hashes
+the Result for the upstream driver's Blob-or-trap contract in adjacent copies, recording source hashes
 and translations. Expected `#err` results become traps only in this test adapter.
 
 Follow the sibling CandidX repository's test setup for its Python/Wasmtime,

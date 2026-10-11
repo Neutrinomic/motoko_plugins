@@ -93,20 +93,17 @@ def branch(original, name, value):
 additional = []
 for case in manifest["cases"]:
     index = case["index"]
-    plugin = {"label": "plugin", "method": case["method"], "require_no_gc": True}
+    plugin = next(phase for phase in case["phases"] if phase["label"] == "plugin")
     if case["family"] == "control":
-        plugin["kind"] = "control"
         case["phases"] = [plugin]
     elif case["family"] == "sha256":
-        plugin["kind"] = "sha256"
         native = f"native_{index}"
-        additional.append(branch(case["method"], native, "SHA256.fromBlob(#sha256, bytes)"))
+        additional.append(branch(plugin["method"], native, "SHA256.fromBlob(#sha256, bytes)"))
         case["phases"] = [
-            {"label": "native", "method": native, "kind": "sha256"}, plugin,
+            {"label": "native", "method": native, "kind": "sha256", "require_no_gc": False}, plugin,
         ]
     else:
-        plugin["kind"] = "canonical_candid"
-        ordinary = case["ordinary_method"]
+        ordinary = next(phase["method"] for phase in case["phases"] if phase["label"] == "ordinary")
         ordinary_body = method(ordinary)
         ordinary_expression = expression(ordinary_body)
         # Save the ordinary bytes after all measurement counters were sampled.
@@ -117,13 +114,13 @@ for case in manifest["cases"]:
             marker, "    ordinaryInput := output;\n" + marker, 1), 1)
         native, normalize = f"native_{index}", f"normalize_{index}"
         additional.extend([
-            branch(case["method"], native, f"nativeCanonical({ordinary_expression})"),
-            branch(case["method"], normalize, "nativeCanonical(ordinaryInput)"),
+            branch(plugin["method"], native, f"nativeCanonical({ordinary_expression})"),
+            branch(plugin["method"], normalize, "nativeCanonical(ordinaryInput)"),
         ])
         case["phases"] = [
-            {"label": "ordinary", "method": ordinary, "kind": "ordinary_candid"},
-            {"label": "native", "method": native, "kind": "canonical_candid"},
-            {"label": "normalize", "method": normalize, "kind": "canonical_candid"},
+            {"label": "ordinary", "method": ordinary, "kind": "ordinary_candid", "require_no_gc": False},
+            {"label": "native", "method": native, "kind": "canonical_candid", "require_no_gc": False},
+            {"label": "normalize", "method": normalize, "kind": "canonical_candid", "require_no_gc": False},
             plugin,
         ]
 
