@@ -3,7 +3,6 @@
 import Prim "mo:⛔";
 import Map "mo:fast/Map";
 import Core "mo:core/Map";
-import Interop "mo:fast/CoreMap";
 func cmp(a : Nat, b : Nat) : Map.Order { if (a < b) #less else if (a == b) #equal else #greater };
 let actual = Map.empty<Nat, ?Nat>();
 let expected = Core.empty<Nat, ?Nat>();
@@ -43,7 +42,7 @@ while (i < 12000) {
   i += 1;
 };
 check();
-let converted = Interop.fromPure<Nat, ?Nat>(Interop.toPure<Nat, ?Nat>(actual, cmp), cmp);
+let converted = Map.fromPure<Nat, ?Nat>(Map.toPure<Nat, ?Nat>(actual, cmp), cmp);
 assert Map.toArray(converted) == Map.toArray(actual);
 Map.clear(converted);
 check();

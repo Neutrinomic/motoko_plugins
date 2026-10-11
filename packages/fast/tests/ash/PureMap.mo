@@ -63,8 +63,8 @@ persistent actor {
       check(Map.clone(singleton), [(7, 70)]);
       assert Map.minEntry(singleton) == ?(7, 70);
       assert Map.maxEntry(singleton) == ?(7, 70);
-      assert Map.toText(empty, Nat.toText, Nat.toText) == "Map{}";
-      assert Map.toText(singleton, Nat.toText, Nat.toText) == "Map{7 -> 70}";
+      assert Map.toText(empty, Nat.toText, Nat.toText) == "PureMap{}";
+      assert Map.toText(singleton, Nat.toText, Nat.toText) == "PureMap{(7, 70)}";
     })
   };
 
@@ -448,7 +448,7 @@ persistent actor {
       assert Map.foldLeft<Nat, Nat, Nat>(empty, 42, func(a, _, _) { calls += 1; a }) == 42;
       assert Map.foldRight<Nat, Nat, Nat>(empty, 43, func(_, _, a) { calls += 1; a }) == 43;
       assert calls == 0;
-      assert Map.toText(self, Nat.toText, Nat.toText) == "Map{1 -> 10, 2 -> 20, 3 -> 30}";
+      assert Map.toText(self, Nat.toText, Nat.toText) == "PureMap{(1, 10), (2, 20), (3, 30)}";
     })
   };
 
@@ -461,13 +461,13 @@ persistent actor {
       assert Map.get(mapped, cmp, 7) == ?"71";
       Map.assertValid(mapped, cmp);
       calls := 0;
-      let filtered = Map.filter(self, func(k : Nat, v : Nat) : Bool { assert k == calls and v == k * 10; calls += 1; k % 3 == 0 });
+      let filtered = Map.filter(self, cmp, func(k : Nat, v : Nat) : Bool { assert k == calls and v == k * 10; calls += 1; k % 3 == 0 });
       check(filtered, Array.filter<(Nat, Nat)>(sequence(20), func(e) { e.0 % 3 == 0 }));
       assert calls == 20;
-      check(Map.filter(self, func(_ : Nat, _ : Nat) : Bool { true }), sequence(20));
-      check(Map.filter(self, func(_ : Nat, _ : Nat) : Bool { false }), []);
+      check(Map.filter(self, cmp, func(_ : Nat, _ : Nat) : Bool { true }), sequence(20));
+      check(Map.filter(self, cmp, func(_ : Nat, _ : Nat) : Bool { false }), []);
       calls := 0;
-      let fm = Map.filterMap<Nat, Nat, Nat>(self, func(k, v) { assert k == calls; calls += 1; if (k % 4 == 0) ?(v + 7) else null });
+      let fm = Map.filterMap<Nat, Nat, Nat>(self, cmp, func(k, v) { assert k == calls; calls += 1; if (k % 4 == 0) ?(v + 7) else null });
       check(fm, [(0, 7), (4, 47), (8, 87), (12, 127), (16, 167)]);
       assert calls == 20;
       calls := 0;
@@ -544,29 +544,29 @@ persistent actor {
       let valueLess = Map.fromArray<Nat, Nat>([(1, 9), (2, 20)], cmp);
       let keyLess = Map.fromArray<Nat, Nat>([(0, 999), (2, 20)], cmp);
       let empty = Map.empty<Nat, Nat>();
-      assert Map.equal(a, cmp, b, same);
-      assert not Map.equal(a, cmp, prefix, same);
-      assert not Map.equal(a, cmp, valueLess, same);
-      assert not Map.equal(a, cmp, keyLess, same);
-      assert Map.equal(empty, cmp, empty, same);
+      assert Map.equal(a, b, cmp, same);
+      assert not Map.equal(a, prefix, cmp, same);
+      assert not Map.equal(a, valueLess, cmp, same);
+      assert not Map.equal(a, keyLess, cmp, same);
+      assert Map.equal(empty, empty, cmp, same);
       assert Map.isSubmap(prefix, cmp, a, same);
       assert Map.isSubmap(empty, cmp, a, same);
       assert not Map.isSubmap(a, cmp, prefix, same);
       assert not Map.isSubmap(valueLess, cmp, a, same);
       assert not Map.isSubmap(keyLess, cmp, a, same);
-      assert Map.compare(a, cmp, b, cmp) == #equal;
-      assert Map.compare(prefix, cmp, a, cmp) == #less;
-      assert Map.compare(a, cmp, prefix, cmp) == #greater;
-      assert Map.compare(valueLess, cmp, a, cmp) == #less;
-      assert Map.compare(a, cmp, valueLess, cmp) == #greater;
-      assert Map.compare(keyLess, cmp, a, cmp) == #less;
-      assert Map.compare(a, cmp, keyLess, cmp) == #greater;
-      assert Map.compare(empty, cmp, empty, cmp) == #equal;
+      assert Map.compare(a, b, cmp, cmp) == #equal;
+      assert Map.compare(prefix, a, cmp, cmp) == #less;
+      assert Map.compare(a, prefix, cmp, cmp) == #greater;
+      assert Map.compare(valueLess, a, cmp, cmp) == #less;
+      assert Map.compare(a, valueLess, cmp, cmp) == #greater;
+      assert Map.compare(keyLess, a, cmp, cmp) == #less;
+      assert Map.compare(a, keyLess, cmp, cmp) == #greater;
+      assert Map.compare(empty, empty, cmp, cmp) == #equal;
       var calls = 0;
-      assert not Map.equal(a, cmp, valueLess, func(x : Nat, y : Nat) : Bool { calls += 1; x == y });
+      assert not Map.equal(a, valueLess, cmp, func(x : Nat, y : Nat) : Bool { calls += 1; x == y });
       assert calls == 1;
       calls := 0;
-      assert Map.compare(a, cmp, keyLess, func(x : Nat, y : Nat) : Map.Order { calls += 1; cmp(x, y) }) == #greater;
+      assert Map.compare(a, keyLess, cmp, func(x : Nat, y : Nat) : Map.Order { calls += 1; cmp(x, y) }) == #greater;
       assert calls == 0; // key comparison wins before comparing values
     })
   };
@@ -726,8 +726,8 @@ persistent actor {
       let empty = Map.empty<Nat, Nat>();
       var calls = 0;
       assert Map.isEmpty(Map.map<Nat, Nat, Text>(empty, func(_, _) { calls += 1; "never" }));
-      check(Map.filter(empty, func(_ : Nat, _ : Nat) : Bool { calls += 1; true }), []);
-      check(Map.filterMap<Nat, Nat, Nat>(empty, func(_, _) { calls += 1; ?0 }), []);
+      check(Map.filter(empty, cmp, func(_ : Nat, _ : Nat) : Bool { calls += 1; true }), []);
+      check(Map.filterMap<Nat, Nat, Nat>(empty, cmp, func(_, _) { calls += 1; ?0 }), []);
       let (yes, no) = Map.partition(empty, func(_ : Nat, _ : Nat) : Bool { calls += 1; true });
       check(yes, []);
       check(no, []);
@@ -809,7 +809,7 @@ persistent actor {
       let before = Map.singleton<Nat, Payload>(1, payload);
       let copy = Map.clone(before);
       let after = Map.addNat(before, 2, { var value = 20; read = func() : Nat { 99 } });
-      let filtered = Map.filter(after, func(k : Nat, _ : Payload) : Bool { k == 1 });
+      let filtered = Map.filter(after, cmp, func(k : Nat, _ : Payload) : Bool { k == 1 });
       let snapshot = Map.snapshot(before);
       payload.value := 123;
       captured := 456;

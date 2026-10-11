@@ -10,6 +10,7 @@
 /// entries in this same map. Any mutation attempt invalidates existing iterators;
 /// do not resume them. There is no runtime lock or fail-fast iterator check.
 import Prim "mo:⛔";
+import PureMap "mo:core/pure/Map";
 
 module {
   public type Order = {#less; #equal; #greater};
@@ -21,6 +22,15 @@ module {
   };
   /// Stable when K and V are stable. The representation is private by contract.
   public type Map<K, V> = {var root : ?Node<K, V>; var size : Nat};
+
+  /// Converts to Core's immutable map, sharing keys and values. Rebuilds the
+  /// tree in O(n log n); the two maps can then be updated independently.
+  public func toPure<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order)) : PureMap.Map<K, V> {
+    PureMap.fromIter(entries(self), compare)
+  };
+  public func fromPure<K, V>(self : PureMap.Map<K, V>, compare : (implicit : (K, K) -> Order)) : Map<K, V> {
+    fromIter(PureMap.entries(self), compare)
+  };
 
   func malformed() : None { Prim.trap("mutable-map: malformed tree") };
   func count<K, V>(node : Node<K, V>) : Nat { Prim.nat32ToNat(node.count) };
@@ -41,35 +51,35 @@ module {
   public func size<K, V>(self : Map<K, V>) : Nat { self.size };
   public func isEmpty<K, V>(self : Map<K, V>) : Bool { self.size == 0 };
 
-  public func get<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : ?V {
+  public func get<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : ?V {
     Prim.mmap_get<K, V>(self, compare, key)
   };
-  public func getEntry<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : ?(K, V) {
+  public func getEntry<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : ?(K, V) {
     Prim.mmap_get_entry<K, V>(self, compare, key)
   };
-  public func containsKey<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : Bool {
+  public func containsKey<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : Bool {
     Prim.mmap_contains<K, V>(self, compare, key)
   };
   /// Equal keys replace both the stored key and value. Returns true on insertion.
-  public func insert<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K, value : V) : Bool {
+  public func insert<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K, value : V) : Bool {
     Prim.mmap_insert<K, V>(self, compare, key, value)
   };
-  public func add<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K, value : V) {
+  public func add<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K, value : V) {
     Prim.mmap_add<K, V>(self, compare, key, value)
   };
-  public func swap<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K, value : V) : ?V {
+  public func swap<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K, value : V) : ?V {
     Prim.mmap_swap<K, V>(self, compare, key, value)
   };
-  public func replace<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K, value : V) : ?V {
+  public func replace<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K, value : V) : ?V {
     Prim.mmap_replace<K, V>(self, compare, key, value)
   };
-  public func remove<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) {
+  public func remove<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) {
     Prim.mmap_remove<K, V>(self, compare, key)
   };
-  public func delete<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : Bool {
+  public func delete<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : Bool {
     Prim.mmap_delete<K, V>(self, compare, key)
   };
-  public func take<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : ?V {
+  public func take<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : ?V {
     Prim.mmap_take<K, V>(self, compare, key)
   };
 
@@ -219,11 +229,11 @@ module {
   public func entries<K, V>(self : Map<K, V>) : Iter<(K, V)> { cursor(self, false, null) };
   public func reverseEntries<K, V>(self : Map<K, V>) : Iter<(K, V)> { cursor(self, true, null) };
   /// Inclusive: start at the least key greater than or equal to key.
-  public func entriesFrom<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : Iter<(K, V)> {
+  public func entriesFrom<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : Iter<(K, V)> {
     cursor(self, false, ?(compare, key))
   };
   /// Inclusive: start at the greatest key less than or equal to key.
-  public func reverseEntriesFrom<K, V>(self : Map<K, V>, compare : (K, K) -> Order, key : K) : Iter<(K, V)> {
+  public func reverseEntriesFrom<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), key : K) : Iter<(K, V)> {
     cursor(self, true, ?(compare, key))
   };
   public func keys<K, V>(self : Map<K, V>) : Iter<K> {
@@ -251,15 +261,18 @@ module {
     };
     {var root = copy(self.root, 0); var size = self.size}
   };
-  public func fromIter<K, V>(iter : Iter<(K, V)>, compare : (K, K) -> Order) : Map<K, V> {
+  public func fromIter<K, V>(iter : Iter<(K, V)>, compare : (implicit : (K, K) -> Order)) : Map<K, V> {
     let result = empty<K, V>();
     for ((key, value) in iter) add(result, compare, key, value);
     result
   };
-  public func fromArray<K, V>(input : [(K, V)], compare : (K, K) -> Order) : Map<K, V> {
+  public func fromArray<K, V>(input : [(K, V)], compare : (implicit : (K, K) -> Order)) : Map<K, V> {
     fromIter(input.values(), compare)
   };
-  public func fromVarArray<K, V>(input : [var (K, V)], compare : (K, K) -> Order) : Map<K, V> {
+  public func toMap<K, V>(self : Iter<(K, V)>, compare : (implicit : (K, K) -> Order)) : Map<K, V> {
+    fromIter(self, compare)
+  };
+  public func fromVarArray<K, V>(input : [var (K, V)], compare : (implicit : (K, K) -> Order)) : Map<K, V> {
     fromIter(input.values(), compare)
   };
   public func toArray<K, V>(self : Map<K, V>) : [(K, V)] {
@@ -379,19 +392,19 @@ module {
     };
     {var root = copy(self.root, 0); var size = self.size}
   };
-  public func filter<K, V>(self : Map<K, V>, compare : (K, K) -> Order, predicate : (K, V) -> Bool) : Map<K, V> {
+  public func filter<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), predicate : (K, V) -> Bool) : Map<K, V> {
     let result = empty<K, V>();
     forEach(self, func(key, value) { if (predicate(key, value)) add(result, compare, key, value) });
     result
   };
-  public func filterMap<K, V, W>(self : Map<K, V>, compare : (K, K) -> Order, transform : (K, V) -> ?W) : Map<K, W> {
+  public func filterMap<K, V, W>(self : Map<K, V>, compare : (implicit : (K, K) -> Order), transform : (K, V) -> ?W) : Map<K, W> {
     let result = empty<K, W>();
     forEach(self, func(key, value) {
       switch (transform(key, value)) { case null {}; case (?mapped) add(result, compare, key, mapped) }
     });
     result
   };
-  public func equal<K, V>(self : Map<K, V>, other : Map<K, V>, compareKey : (K, K) -> Order, equalValue : (V, V) -> Bool) : Bool {
+  public func equal<K, V>(self : Map<K, V>, other : Map<K, V>, compareKey : (implicit : (compare : (K, K) -> Order)), equalValue : (implicit : (equal : (V, V) -> Bool))) : Bool {
     if (self.size != other.size) return false;
     let a = entries(self);
     let b = entries(other);
@@ -403,7 +416,7 @@ module {
       }
     }
   };
-  public func compare<K, V>(self : Map<K, V>, other : Map<K, V>, compareKey : (K, K) -> Order, compareValue : (V, V) -> Order) : Order {
+  public func compare<K, V>(self : Map<K, V>, other : Map<K, V>, compareKey : (implicit : (compare : (K, K) -> Order)), compareValue : (implicit : (compare : (V, V) -> Order))) : Order {
     let a = entries(self);
     let b = entries(other);
     loop {
@@ -420,7 +433,7 @@ module {
       }
     }
   };
-  public func toText<K, V>(self : Map<K, V>, keyText : K -> Text, valueText : V -> Text) : Text {
+  public func toText<K, V>(self : Map<K, V>, keyText : (implicit : (toText : K -> Text)), valueText : (implicit : (toText : V -> Text))) : Text {
     var text = "Map{";
     var separator = "";
     forEach(self, func(key, value) {
@@ -432,7 +445,7 @@ module {
 
   /// Explicit O(n) check of ordering, occupancy, cleared slots, equal leaf
   /// depths, and total size. It is never part of a normal point operation.
-  public func assertValid<K, V>(self : Map<K, V>, compare : (K, K) -> Order) {
+  public func assertValid<K, V>(self : Map<K, V>, compare : (implicit : (K, K) -> Order)) {
     var leafDepth : ?Nat = null;
     func walk(tree : ?Node<K, V>, lower : ?K, upper : ?K, depth : Nat) : Nat {
       if (depth > 128) malformed();

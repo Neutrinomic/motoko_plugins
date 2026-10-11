@@ -1,7 +1,8 @@
 # Mutable Map coverage
 
-`Map.mo` exercises all 58 public functions of `mo:fast/Map` through the package
-import, loading only the mutable-map native plugin. The 17 Ash methods run on
+`Map.mo`, `MapConversions.mo`, and `CoreAPI.mo` exercise all 61 public functions
+of `mo:fast/Map` through the package import. The dedicated suites load only the
+mutable-map native plugin. This suite’s 17 Ash methods run on
 PocketIC. Three stress methods use update calls because full-tree validation
 after thousands of changes exceeds a query's instruction budget.
 
@@ -20,6 +21,8 @@ The tables list test method suffixes; every method has the `test_` prefix.
 | `minEntry`, `maxEntry` | `empty_contracts`, `ordered_iterators_and_inclusive_seeks`, `differential_mixed_operations`: both comparator directions and changing endpoints. |
 | `entries`, `reverseEntries`, `entriesFrom`, `reverseEntriesFrom`, `keys`, `values` | `ordered_iterators_and_inclusive_seeks`: all exact keys and gaps across a multilevel tree, inclusive endpoints, out-of-range seeks, descending comparison, repeated exhaustion and interleaved independent cursors. `empty_contracts` checks empty cursors. |
 | `clone` | `clone_reference_payloads_and_closures`: independently mutable binding trees, shared mutable keys/values and closure state, null values, clearing the source. `empty_contracts` checks empty clone. |
+| `toPure`, `fromPure` | [MapConversions](MapConversions.md): independently built sources, shared payloads, detached bindings, both orderings. |
+| `toMap` | `CoreAPI.test_mutable_map_implicit_api`: one identical consumer compiled against Core and Fast, omitted and explicit comparators. |
 | `fromIter`, `fromArray`, `fromVarArray`, `toArray`, `toVarArray` | `constructors_and_detached_arrays`: empty inputs, duplicate key last-wins behavior, ordered output, mutation of input/output arrays does not change the map. |
 | `foldLeft`, `foldRight`, `forEach` | `folds_find_and_short_circuit_order`: exact ascending/descending callback order and counts, independently calculated totals. `empty_contracts`: no callbacks on empty maps. |
 | `find`, `any`, `all` | `folds_find_and_short_circuit_order`: first/middle/last/missing matches, exact early-stop call counts, all-true/all-false and vacuous empty results. |

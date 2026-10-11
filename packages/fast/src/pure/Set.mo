@@ -31,25 +31,25 @@ module {
   };
 
   /// Returns the stored representative, which may differ from the search key.
-  public func get<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : ?T {
+  public func get<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : ?T {
     Prim.pset_get<T>(self, compare, element)
   };
-  public func contains<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : Bool {
+  public func contains<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : Bool {
     Prim.pset_contains<T>(self, compare, element)
   };
   /// Duplicate additions return the original set and retain its element.
-  public func add<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : Set<T> {
+  public func add<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : Set<T> {
     Prim.pset_add<T>(self, compare, element)
   };
   /// The Boolean is true exactly when an element was added.
-  public func insert<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : (Set<T>, Bool) {
+  public func insert<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : (Set<T>, Bool) {
     Prim.pset_insert<T>(self, compare, element)
   };
-  public func remove<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : Set<T> {
+  public func remove<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : Set<T> {
     Prim.pset_remove<T>(self, compare, element)
   };
   /// The Boolean is true exactly when an element was removed.
-  public func delete<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : (Set<T>, Bool) {
+  public func delete<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : (Set<T>, Bool) {
     Prim.pset_delete<T>(self, compare, element)
   };
 
@@ -162,10 +162,10 @@ module {
     }
   };
   /// Number of elements strictly below element, also its insertion position.
-  public func rank<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : Nat {
+  public func rank<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : Nat {
     Prim.pset_rank<T>(self, compare, element).0
   };
-  public func indexOf<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : ?Nat {
+  public func indexOf<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : ?Nat {
     let (index, found) = Prim.pset_rank<T>(self, compare, element);
     if (found) ?index else null
   };
@@ -173,11 +173,11 @@ module {
     Prim.pset_select<T>(self, index)
   };
   /// Splits around element, returning its stored representative if present.
-  public func splitLookup<T>(self : Set<T>, compare : (T, T) -> Order, element : T) : (Set<T>, ?T, Set<T>) {
+  public func splitLookup<T>(self : Set<T>, compare : (implicit : (T, T) -> Order), element : T) : (Set<T>, ?T, Set<T>) {
     Prim.pset_split<T>(self, compare, element)
   };
   /// Checked join of disjoint ranges around one intervening element.
-  public func joinDisjoint<T>(left : Set<T>, compare : (T, T) -> Order, element : T, right : Set<T>) : Set<T> {
+  public func joinDisjoint<T>(left : Set<T>, compare : (implicit : (T, T) -> Order), element : T, right : Set<T>) : Set<T> {
     switch (max(left)) {
       case (?key) { if (compare(key, element) != #less) Prim.trap("pure-set: overlapping join") };
       case null {};
@@ -188,7 +188,7 @@ module {
     };
     Prim.pset_join<T>(left, element, right)
   };
-  public func concatDisjoint<T>(left : Set<T>, compare : (T, T) -> Order, right : Set<T>) : Set<T> {
+  public func concatDisjoint<T>(left : Set<T>, compare : (implicit : (T, T) -> Order), right : Set<T>) : Set<T> {
     switch (max(left), min(right)) {
       case (?a, ?b) { if (compare(a, b) != #less) Prim.trap("pure-set: overlapping concatenation") };
       case _ {};
@@ -289,7 +289,7 @@ module {
   };
   /// Predicates run once in ascending order. Accepted subtrees are shared.
   /// compare is retained for the Core pure/Set interface; ordering is unchanged.
-  public func filter<T>(self : Set<T>, _compare : (T, T) -> Order, criterion : T -> Bool) : Set<T> {
+  public func filter<T>(self : Set<T>, _compare : (implicit : (compare : (T, T) -> Order)), criterion : T -> Bool) : Set<T> {
     func walk(tree : Set<T>, depth : Nat32) : (Set<T>, Bool) {
       if (depth > 128) malformed();
       switch tree {
@@ -309,7 +309,7 @@ module {
 
   /// Equal elements retain the larger input's representative (self on ties),
   /// matching Core pure/Set. Empty branches and untouched base paths are shared.
-  public func union<T>(self : Set<T>, other : Set<T>, compare : (T, T) -> Order) : Set<T> {
+  public func union<T>(self : Set<T>, other : Set<T>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     func walk(extra : Set<T>, base : Set<T>, depth : Nat32) : (Set<T>, Bool) {
       if (depth > 128) malformed();
       switch (extra, base) {
@@ -329,7 +329,7 @@ module {
   };
   /// Retains representatives from the smaller input (other on size ties),
   /// matching Core pure/Set. A wholly surviving subtree is returned unchanged.
-  public func intersection<T>(self : Set<T>, other : Set<T>, compare : (T, T) -> Order) : Set<T> {
+  public func intersection<T>(self : Set<T>, other : Set<T>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     func walk(retained : Set<T>, searched : Set<T>, depth : Nat32) : (Set<T>, Bool) {
       if (depth > 128) malformed();
       switch (retained, searched) {
@@ -353,7 +353,7 @@ module {
     else walk(other, self, (0 : Nat32)).0
   };
   /// Removes other's elements, preserving self's remaining representatives.
-  public func difference<T>(self : Set<T>, other : Set<T>, compare : (T, T) -> Order) : Set<T> {
+  public func difference<T>(self : Set<T>, other : Set<T>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     func walk(retained : Set<T>, removed : Set<T>, depth : Nat32) : (Set<T>, Bool) {
       if (depth > 128) malformed();
       switch (retained, removed) {
@@ -375,7 +375,7 @@ module {
     };
     walk(self, other, (0 : Nat32)).0
   };
-  public func isSubset<T>(self : Set<T>, other : Set<T>, compare : (T, T) -> Order) : Bool {
+  public func isSubset<T>(self : Set<T>, other : Set<T>, compare : (implicit : (T, T) -> Order)) : Bool {
     let count = size(self);
     if (count == 0) return true;
     let otherCount = size(other);
@@ -383,7 +383,7 @@ module {
     if (count == otherCount) return equal(self, other, compare);
     all(self, func(element : T) : Bool { contains(other, compare, element) })
   };
-  public func equal<T>(self : Set<T>, other : Set<T>, compare : (T, T) -> Order) : Bool {
+  public func equal<T>(self : Set<T>, other : Set<T>, compare : (implicit : (T, T) -> Order)) : Bool {
     if (size(self) != size(other)) return false;
     let a = values(self);
     let b = values(other);
@@ -395,7 +395,7 @@ module {
       }
     }
   };
-  public func compare<T>(self : Set<T>, other : Set<T>, compareElement : (T, T) -> Order) : Order {
+  public func compare<T>(self : Set<T>, other : Set<T>, compareElement : (implicit : (compare : (T, T) -> Order))) : Order {
     let a = values(self);
     let b = values(other);
     loop {
@@ -420,7 +420,7 @@ module {
   };
   /// Linear-time construction after checking strict ordering. Elements are
   /// retained by reference, including their mutable payloads.
-  public func fromSortedDistinctArray<T>(input : [T], compare : (T, T) -> Order) : Set<T> {
+  public func fromSortedDistinctArray<T>(input : [T], compare : (implicit : (T, T) -> Order)) : Set<T> {
     var i = 1;
     while (i < input.size()) {
       if (compare(input[i - 1], input[i]) != #less) Prim.trap("pure-set: expected sorted distinct elements");
@@ -430,7 +430,7 @@ module {
   };
   /// Stable sorting keeps the first input representative of each equal group.
   /// Final nodes are allocated once; already sorted distinct input is linear.
-  public func fromArray<T>(input : [T], compare : (T, T) -> Order) : Set<T> {
+  public func fromArray<T>(input : [T], compare : (implicit : (T, T) -> Order)) : Set<T> {
     let count = input.size();
     if (count == 0) return null;
     if (count == 1) return singleton(input[0]);
@@ -485,7 +485,7 @@ module {
     Prim.pset_from_sorted<T>(Prim.Array_tabulate<T>(unique, func(i : Nat) : T { source[i] }))
   };
   /// Consumes the iterator once and retains its first equal representative.
-  public func fromIter<T>(iter : Iter<T>, compare : (T, T) -> Order) : Set<T> {
+  public func fromIter<T>(iter : Iter<T>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     var buffer = Prim.Array_init<?T>(8, null);
     var count = 0;
     for (element in iter) {
@@ -502,16 +502,16 @@ module {
       switch (buffer[i]) { case (?element) element; case null malformed() }
     }), compare)
   };
-  public func toSet<T>(self : Iter<T>, compare : (T, T) -> Order) : Set<T> {
+  public func toSet<T>(self : Iter<T>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     fromIter(self, compare)
   };
-  public func map<T, U>(self : Set<T>, compare : (U, U) -> Order, project : T -> U) : Set<U> {
+  public func map<T, U>(self : Set<T>, compare : (implicit : (U, U) -> Order), project : T -> U) : Set<U> {
     let iter = values(self);
     fromIter<U>({next = func() : ?U {
       switch (iter.next()) { case null null; case (?element) ?project(element) }
     }}, compare)
   };
-  public func filterMap<T, U>(self : Set<T>, compare : (U, U) -> Order, project : T -> ?U) : Set<U> {
+  public func filterMap<T, U>(self : Set<T>, compare : (implicit : (U, U) -> Order), project : T -> ?U) : Set<U> {
     let iter = values(self);
     fromIter<U>({next = func() : ?U {
       loop {
@@ -524,15 +524,15 @@ module {
       }
     }}, compare)
   };
-  public func join<T>(self : Iter<Set<T>>, compare : (T, T) -> Order) : Set<T> {
+  public func join<T>(self : Iter<Set<T>>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     var result = empty<T>();
     for (set in self) { result := union(result, set, compare) };
     result
   };
-  public func flatten<T>(self : Set<Set<T>>, compare : (T, T) -> Order) : Set<T> {
+  public func flatten<T>(self : Set<Set<T>>, compare : (implicit : (T, T) -> Order)) : Set<T> {
     join(values(self), compare)
   };
-  public func toText<T>(self : Set<T>, elementFormat : T -> Text) : Text {
+  public func toText<T>(self : Set<T>, elementFormat : (implicit : (toText : T -> Text))) : Text {
     var text = "PureSet{";
     var separator = "";
     forEach(self, func(element : T) {
@@ -543,7 +543,7 @@ module {
   };
 
   /// Full O(n) validation is explicit, never a hidden point-operation cost.
-  public func assertValid<T>(self : Set<T>, compare : (T, T) -> Order) {
+  public func assertValid<T>(self : Set<T>, compare : (implicit : (T, T) -> Order)) {
     func walk(tree : Set<T>, lower : ?T, upper : ?T, depth : Nat32) : (Nat32, Nat) {
       if (depth > 128) malformed();
       switch tree {

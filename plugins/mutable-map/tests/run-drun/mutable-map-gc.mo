@@ -1,4 +1,4 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src --package core $MOTOKO_CORE
 //MOC-FLAG --sanity-checks --force-gc -A M0236
 //SKIP run
 //SKIP run-ir

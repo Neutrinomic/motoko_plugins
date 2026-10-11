@@ -749,7 +749,7 @@ plugins/
   sha256/
     ...
 packages/fast/        Mops package metadata, README, and license
-  src/                CandidX, JSON, CBOR, SHA256, Map, CoreMap, Set modules
+  src/                CandidX, JSON, CBOR, SHA256, Map, Set modules
     pure/             persistent Map and Set libraries
   tests/              public import, rejection, and trap checks
     ash/              public API and GC canister tests on PocketIC
@@ -779,9 +779,9 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-The [public module suite](packages/fast/tests/ash/) adds **174 Ash tests** across
-the eight plugins and the `CoreMap` adapter: reference models, independent
-codec/hash vectors, malformed inputs, boundary cases, structural sharing,
+The [public module suite](packages/fast/tests/ash/) adds **186 Ash checks** across
+the eight plugins and shared Core/Fast API consumers: reference models,
+independent codec/hash vectors, malformed inputs, boundary cases, structural sharing,
 composition, and incremental GC. Run from this repository with an Ash toolchain
 using the matching compiler:
 

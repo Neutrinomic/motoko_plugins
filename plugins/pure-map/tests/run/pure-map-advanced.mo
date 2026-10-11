@@ -120,13 +120,13 @@ let transformed = Map.map(all, func(key : Nat, value : Nat) : Nat {
 assert nextKey == 40;
 check(transformed, Prim.Array_tabulate<(Nat, Nat)>(40, func(i) { (i, i * 3 + 7) }));
 nextKey := 0;
-let even = Map.filter(all, func(key : Nat, _ : Nat) : Bool {
+let even = Map.filter(all, cmp, func(key : Nat, _ : Nat) : Bool {
   assert key == nextKey; nextKey += 1; key % 2 == 0
 });
 check(even, filtered(allEntries, func(key, _) { key % 2 == 0 }));
 assert nextKey == 40;
-check(Map.filter(all, func(_, _) { true }), allEntries);
-check(Map.filter(all, func(_, _) { false }), []);
+check(Map.filter(all, cmp, func(_, _) { true }), allEntries);
+check(Map.filter(all, cmp, func(_, _) { false }), []);
 let (yes, no) = Map.partition(all, func(key : Nat, _ : Nat) : Bool { key % 3 == 0 });
 check(yes, filtered(allEntries, func(key, _) { key % 3 == 0 }));
 check(no, filtered(allEntries, func(key, _) { key % 3 != 0 }));

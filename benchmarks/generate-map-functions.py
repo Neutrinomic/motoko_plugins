@@ -188,7 +188,7 @@ def body(name, module):
     if name == 'map':
         return f'{output_map} := {module}.map({input_map}, transform);'
     if name == 'filterMap':
-        return f'{output_map} := ' + ('Map.filterMap(pluginInput, transformSome);' if plugin else 'Core.filterMap(coreInput, compare, transformSome);')
+        return f'{output_map} := ' + ('Map.filterMap(pluginInput, compare, transformSome);' if plugin else 'Core.filterMap(coreInput, compare, transformSome);')
     if name == 'rank':
         expression = 'Map.rank(pluginInput, compare, rankKeys[i])' if plugin else 'coreRank(coreInput, rankKeys[i])'
         return f'var i = 0; while (i < iterations) {{ numbers[i] := {expression}; i += 1 }};'

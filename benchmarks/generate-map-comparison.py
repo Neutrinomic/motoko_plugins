@@ -81,8 +81,8 @@ def measure(label, module, input_name, output_name, history_name):
         case 8 { tree := Map.fromSortedDistinctArray(sortedInput, compare) };
         case 9 { for ((_, value) in Map.entries(tree)) sum += value };
         case 10 { for ((_, value) in Map.entriesInRange(tree, compare, #inclusive rangeStart, #exclusive rangeEnd)) sum += value };
-        case 11 { tree := Map.filter(pluginInput, func(_ : Nat64, _ : Nat) : Bool { true }) };
-        case 12 { tree := Map.filter(pluginInput, func(_ : Nat64, value : Nat) : Bool { value % 2 == 0 }) };
+        case 11 { tree := Map.filter(pluginInput, compare, func(_ : Nat64, _ : Nat) : Bool { true }) };
+        case 12 { tree := Map.filter(pluginInput, compare, func(_ : Nat64, value : Nat) : Bool { value % 2 == 0 }) };
         case 13 { tree := Map.union(pluginInput, compare, pluginRight) };
         case 14 { tree := Map.intersection(pluginInput, compare, pluginRight) };
         case 15 { tree := Map.difference(pluginInput, compare, pluginRight) };

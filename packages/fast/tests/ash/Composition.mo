@@ -6,7 +6,6 @@ import CandidX "mo:fast/CandidX";
 import SHA256 "mo:fast/SHA256";
 import Map "mo:fast/Map";
 import PureMap "mo:fast/pure/Map";
-import CoreMap "mo:fast/CoreMap";
 import Set "mo:fast/Set";
 import PureSet "mo:fast/pure/Set";
 
@@ -50,7 +49,7 @@ persistent actor {
         i += 1;
       };
       assert Map.toArray(mutable) == PureMap.toArray(pure);
-      assert Map.toArray(CoreMap.fromPure<Nat, Row>(CoreMap.toPure(mutable, compare), compare)) == Map.toArray(mutable);
+      assert Map.toArray(Map.fromPure<Nat, Row>(Map.toPure(mutable, compare), compare)) == Map.toArray(mutable);
       let identifiers = Set.empty<Nat64>();
       var pureIdentifiers = PureSet.empty<Nat64>();
       for (row in restored.values()) {

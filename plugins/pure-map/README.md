@@ -54,12 +54,15 @@ than the lower-level `Prim.pmap_*` intrinsics.
 | Iteration and snapshots | `entries`, `reverseEntries`, `entriesFrom`, `reverseEntriesFrom`, bounded forward/reverse iterators, `keys`, `values`, `snapshot`, `rangeSnapshot`, `replay` |
 | Set operations | `union`, `unionWith`, `intersection`, `intersectionWith`, `difference`, `symmetricDifference`, `isDisjoint`, `isSubmap` |
 | Callbacks and transforms | `map`, `mapKeys`, `filter`, `filterMap`, `partition`, `foldLeft`, `foldRight`, `foldValues`, `forEach`, `find`, `any`, `all`, `equal`, `compare`, `toText` |
-| Bulk construction | `fromSortedDistinctArray`, `fromArray`, `fromIter`, `addList`, `toArray`, sorted `thaw`/`thawAppend`/`freeze` builder |
+| Bulk construction | `fromSortedDistinctArray`, `fromArray`, `fromIter`, `toMap`, `addList`, `toArray`, sorted `thaw`/`thawAppend`/`freeze` builder |
 | Debugging | `assertValid`, `treeDepth`, `nodeCount` |
 
-Most point operations have the core pure Map argument order `(map, comparator,
-key, value)`. `add` replaces both the stored key and value when comparator keys
-are equal. `swap`, `replace`, `take`, and `update` return the previous optional
+Every `mo:core/pure/Map` function is available with the same argument order,
+result type, and implicit comparator/formatter parameters. `filter` and
+`filterMap` accept Core’s comparator argument; preserving the tree’s ordering
+does not require calling it. `equal` and `compare` take the two maps first.
+The storage representation remains specific to this plugin. `add` replaces
+both the stored key and value when comparator keys are equal. `swap`, `replace`, `take`, and `update` return the previous optional
 value. `replace` does not insert a missing key. `alter` calls its update function
 exactly once, after one comparator search, including for an absent key. An
 optional value remains distinct from an absent binding: `?null` is a stored

@@ -1,4 +1,4 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map --plugin ../../../../dist/pure-map --plugin ../../../../dist/json --plugin ../../../../dist/cbor --plugin ../../../../dist/candidx --plugin ../../../../dist/sha256 --package fast ../../../../packages/fast/src
+//MOC-FLAG --plugin ../../../../dist/mutable-map --plugin ../../../../dist/pure-map --plugin ../../../../dist/json --plugin ../../../../dist/cbor --plugin ../../../../dist/candidx --plugin ../../../../dist/sha256 --package fast ../../../../packages/fast/src --package core $MOTOKO_CORE
 //MOC-FLAG --sanity-checks -A M0236
 import Prim "mo:⛔";
 import Mutable "mo:fast/Map";

@@ -1,5 +1,4 @@
 import Test "mo:test";
-import Convert "mo:fast/CoreMap";
 import Map "mo:fast/Map";
 import Pure "mo:core/pure/Map";
 import Iter "mo:core/Iter";
@@ -11,11 +10,11 @@ persistent actor {
 
   public query func test_empty_both_directions() : async Test.Metrics {
     Test.test(func() {
-      let fromMutable = Convert.toPure(Map.empty<Nat, Nat>(), cmp);
+      let fromMutable = Map.toPure(Map.empty<Nat, Nat>(), cmp);
       assert Pure.size(fromMutable) == 0;
       assert Pure.get(fromMutable, cmp, 1) == null;
       assert Iter.toArray(Pure.entries(fromMutable)) == [];
-      let fromPure = Convert.fromPure<Nat, Nat>(Pure.empty<Nat, Nat>(), cmp);
+      let fromPure = Map.fromPure<Nat, Nat>(Pure.empty<Nat, Nat>(), cmp);
       assert Map.size(fromPure) == 0;
       assert Map.getNat(fromPure, 1) == null;
       Map.assertValid(fromPure, cmp);
@@ -37,8 +36,8 @@ persistent actor {
           Map.add(mutable, order, key, value);
           pure := Pure.add(pure, order, key, value);
         };
-        let toPure = Convert.toPure(mutable, order);
-        let fromPure = Convert.fromPure<Nat, ?Nat>(pure, order);
+        let toPure = Map.toPure(mutable, order);
+        let fromPure = Map.fromPure<Nat, ?Nat>(pure, order);
         let expected = Iter.toArray(Pure.entries(pure));
         assert Iter.toArray(Pure.entries(toPure)) == expected;
         assert Map.toArray(fromPure) == expected;
@@ -55,7 +54,7 @@ persistent actor {
         Map.clear(fromPure);
         assert Pure.size(toPure) == 700 and Pure.size(pure) == 700;
         assert Iter.toArray(Pure.entries(toPure)) == expected;
-        let again = Convert.fromPure<Nat, ?Nat>(toPure, order);
+        let again = Map.fromPure<Nat, ?Nat>(toPure, order);
         Map.remove(again, order, 100);
         Map.add(again, order, 900, ?900);
         assert Pure.get(toPure, order, 100) == ?null;
@@ -75,15 +74,15 @@ persistent actor {
       let lookup : Key = {id = 7; name = "lookup"};
       let mutable = Map.singleton<Key, Text>(old, "old value");
       Map.add(mutable, order, replacement, "new value");
-      let converted = Convert.toPure(mutable, order);
+      let converted = Map.toPure(mutable, order);
       assert Iter.toArray(Pure.entries(converted)) == [(replacement, "new value")];
       assert Pure.get(converted, order, lookup) == ?"new value";
-      let roundtrip = Convert.fromPure<Key, Text>(converted, order);
+      let roundtrip = Map.fromPure<Key, Text>(converted, order);
       assert Map.getEntry(roundtrip, order, lookup) == ?(replacement, "new value");
       assert Map.size(roundtrip) == 1;
       // Also start from an independently built core persistent map.
       let core = Pure.singleton<Key, Text>(replacement, "core value");
-      let copy = Convert.fromPure<Key, Text>(core, order);
+      let copy = Map.fromPure<Key, Text>(core, order);
       assert Map.getEntry(copy, order, lookup) == ?(replacement, "core value");
       assert Map.replace(copy, order, old, "changed") == ?"core value";
       assert Iter.toArray(Pure.entries(core)) == [(replacement, "core value")];
@@ -101,8 +100,8 @@ persistent actor {
       let key : Key = {id = 7; var note = 0};
       let value : Payload = {var count = 0; call = func() : Nat { called += 1; called }};
       let original = Map.singleton<Key, ?Payload>(key, ?value);
-      let pure = Convert.toPure(original, order);
-      let rebuilt = Convert.fromPure<Key, ?Payload>(pure, order);
+      let pure = Map.toPure(original, order);
+      let rebuilt = Map.fromPure<Key, ?Payload>(pure, order);
       switch (Pure.entries(pure).next()) {
         case (?(storedKey, ?storedValue)) {
           storedKey.note := 11;
@@ -127,7 +126,7 @@ persistent actor {
       assert Pure.size(pure) == 1;
       assert not Pure.containsKey(pure, order, {id = 9; var note = 0});
       // Stored nullable values are distinct from missing bindings after conversion.
-      let nullable = Convert.toPure(rebuilt, order);
+      let nullable = Map.toPure(rebuilt, order);
       switch (Pure.get(nullable, order, {id = 9; var note = 0})) {
         case (?null) {};
         case _ assert false;

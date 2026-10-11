@@ -5,7 +5,6 @@ import CandidX "mo:fast/CandidX";
 import SHA256 "mo:fast/SHA256";
 import Map "mo:fast/Map";
 import PureMap "mo:fast/pure/Map";
-import CoreMap "mo:fast/CoreMap";
 import CorePure "mo:core/pure/Map";
 
 persistent actor {
@@ -76,9 +75,9 @@ persistent actor {
   public query func test_core_map_conversion() : async Test.Metrics {
     Test.test(func() {
       let map = Map.singleton<Nat, Text>(42, "answer");
-      let core = CoreMap.toPure(map, compare);
+      let core = Map.toPure(map, compare);
       assert CorePure.get(core, compare, 42) == ?"answer";
-      let copy = CoreMap.fromPure(core, compare);
+      let copy = Map.fromPure(core, compare);
       Map.clear(copy);
       assert Map.getNat(map, 42) == ?"answer";
       assert CorePure.get(core, compare, 42) == ?"answer";

@@ -1,6 +1,6 @@
-# CoreMap coverage
+# Mutable Map conversion coverage
 
-`CoreMap.mo` exercises both public functions of `mo:fast/CoreMap` in four Ash
+`MapConversions.mo` exercises `toPure` and `fromPure` on `mo:fast/Map` in four Ash
 methods, loading only the mutable-map native plugin. The immutable source or
 destination is `mo:core/pure/Map`, not the native pure-map plugin.
 

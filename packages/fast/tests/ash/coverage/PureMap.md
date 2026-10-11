@@ -7,8 +7,9 @@ Run from the plugins repository with the current compiler and built native
 scripts/test-ash.sh PureMap
 ```
 
-`PureMap.mo` contains 22 independent PocketIC tests. All 100 exported functions
-in `src/pure/Map.mo` have semantic assertions. Expected results use literal
+`PureMap.mo` contains 22 independent PocketIC tests. All 101 exported functions
+in `src/pure/Map.mo` have semantic assertions across this suite and the shared
+`CoreAPI.mo` contract suite, which covers `toMap` and implicit arguments. Expected results use literal
 arrays, array filtering, or an independent slot model. Public types `Map`,
 `Order`, `Bound`, `Iter`, `EntryIter`, `EntrySnapshot`, and `Builder` are used by
 these tests. This is API coverage, not a claim that every possible input or

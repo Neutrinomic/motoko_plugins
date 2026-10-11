@@ -13,13 +13,18 @@ its calls specialize directly to the plugin implementation.
 | `mo:fast/pure/Map` | Persistent ordered map | `pure-map` |
 | `mo:fast/Set` | Core-compatible mutable ordered set | `mutable-set` |
 | `mo:fast/pure/Set` | Persistent ordered set with rank/select and split/join | `pure-set` |
-| `mo:fast/CoreMap` | Mutable map ↔ `mo:core/pure/Map` conversions | `mutable-map` |
 
-`CoreMap` and the mutable `Set` module use the declared `core` dependency for
-conversions. Other modules import only `Prim`. Conversions rebuild the tree
-while sharing elements, keys, and values. `Set.toPure`/`fromPure` use
-`mo:core/pure/Set`, preserving Core's mutable Set interface; the separate
-`mo:fast/pure/Set` has its own persistent representation.
+`Map` and `Set` expose every function from their `mo:core` counterparts,
+including implicit comparator and formatter arguments. Their `toPure` and
+`fromPure` conversions use Core’s pure Map/Set types, matching Core’s interface.
+These two modules use the declared `core` dependency; other modules import only
+`Prim`. Conversions rebuild the tree while sharing keys, values, and elements.
+
+Both pure modules also provide Core’s function interfaces, with additional
+operations. The plugin containers have different storage representations from
+Core: changing an import does not migrate existing stable data or make Core
+and Fast container values interchangeable. In particular, mutable conversions
+return Core’s pure types, not `mo:fast/pure/Map` or `mo:fast/pure/Set`.
 
 ## Use from a checkout
 
@@ -78,15 +83,16 @@ It returns `CandidX.Result` and currently provides encoding only.
 ```motoko
 import Map "mo:fast/Map";
 import PureMap "mo:fast/pure/Map";
+import Nat "mo:core/Nat";
 
 let mutable = Map.empty<Nat, Text>();
-Map.addNat(mutable, 42, "answer");
-assert Map.getNat(mutable, 42) == ?"answer";
+Map.add(mutable, Nat.compare, 42, "answer");
+assert Map.get(mutable, Nat.compare, 42) == ?"answer";
 
 let original = PureMap.empty<Nat, Text>();
-let updated = PureMap.addNat(original, 42, "answer");
-assert PureMap.getNat(original, 42) == null;
-assert PureMap.getNat(updated, 42) == ?"answer";
+let updated = PureMap.add(original, Nat.compare, 42, "answer");
+assert PureMap.get(original, Nat.compare, 42) == null;
+assert PureMap.get(updated, Nat.compare, 42) == ?"answer";
 ```
 
 The maps retain their Core-style interfaces and typed shared payloads. See
@@ -97,16 +103,17 @@ API documentation, including comparator and iterator contracts.
 ```motoko
 import Set "mo:fast/Set";
 import PureSet "mo:fast/pure/Set";
+import Nat "mo:core/Nat";
 
 let mutable = Set.empty<Nat>();
-assert Set.insertNat(mutable, 42);
-assert not Set.insertNat(mutable, 42);
-assert Set.containsNat(mutable, 42);
+assert Set.insert(mutable, Nat.compare, 42);
+assert not Set.insert(mutable, Nat.compare, 42);
+assert Set.contains(mutable, Nat.compare, 42);
 
 let original = PureSet.empty<Nat>();
-let updated = PureSet.addNat(original, 42);
+let updated = PureSet.add(original, Nat.compare, 42);
 assert PureSet.isEmpty(original);
-assert PureSet.containsNat(updated, 42);
+assert PureSet.contains(updated, Nat.compare, 42);
 ```
 
 The [mutable Set](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/mutable-set)

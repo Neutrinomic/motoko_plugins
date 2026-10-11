@@ -73,7 +73,7 @@ for name, digest in compiler_sources.items():
         raise ValueError(f'Compiler source differs from plugin build: {name}')
 
 source_paths = sorted((root / 'plugins/mutable-map/compiler').glob('*')) + [
-    root / 'packages/fast/src/Map.mo', root / 'packages/fast/src/CoreMap.mo',
+    root / 'packages/fast/src/Map.mo',
     root / 'plugins/mutable-map/plugin.json']
 source_hashes = {path.relative_to(root).as_posix(): sha(path)
                  for path in source_paths if path.is_file()}
