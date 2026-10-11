@@ -779,7 +779,7 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-The [public module suite](packages/fast/tests/ash/) adds **186 Ash checks** across
+The [public module suite](packages/fast/tests/ash/) adds **202 Ash checks** across
 the eight plugins and shared Core/Fast API consumers: reference models,
 independent codec/hash vectors, malformed inputs, boundary cases, structural sharing,
 composition, and incremental GC. Run from this repository with an Ash toolchain

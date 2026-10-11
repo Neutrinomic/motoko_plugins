@@ -11,12 +11,19 @@ import Nat "mo:core/Nat";
 let set = Set.empty<Nat>();
 Set.add(set, Nat.compare, 42);
 assert Set.contains(set, Nat.compare, 42);
-assert Set.deleteNat(set, 42);
+assert Set.delete(set, Nat.compare, 42);
 ```
 
 The native point operations are `contains`, `add`, `insert`, `remove`, and
-`delete`. Each also has `Nat`, `Nat64`, `Text`, and `Blob` helpers that use native
-ordering without comparator callbacks. Lookup and updates are logarithmic.
+`delete`. Ordinary calls using a proven scalar comparator, such as
+`Set.contains(set, Nat64.compare, key)`, automatically select native ordering.
+This also works when that comparator arrives through an alias, record field,
+or generic function. Unrecognized comparators, including effectful comparators,
+retain normal callback behavior; `Float.compare` remains a callback. Matching a key type or function
+name alone never selects native ordering.
+
+Optional `Nat`, `Nat64`, `Text`, and `Blob` helpers use ascending native ordering
+without a comparator argument. Lookup and updates are logarithmic.
 Nodes hold up to 31 elements directly: there is no dummy map value or allocated
 key/value tuple. Clone copies tree nodes and arrays but shares the elements.
 

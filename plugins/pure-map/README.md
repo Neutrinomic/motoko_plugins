@@ -10,17 +10,20 @@ the copied path. Multi-value results stay on the Wasm stack when destructured.
 The plugin emits Wasm directly through the compiler SDK. It needs no separate
 runtime module, Rust allocator, external pointers, or canister-owned plugin
 state. Generic key/value types retain their real Motoko types. Integrated
-search calls ordinary Motoko comparators through the compiler's closure calling
-convention, and native scalar-order helpers avoid comparator dispatch when the
-key order is known.
+search accepts ordinary Motoko comparators. The compiler selects native scalar
+ordering when it proves the comparator implements a supported scalar order,
+including when that comparator arrives through an alias, record field, or
+generic function. Unrecognized comparators, including effectful comparators,
+retain normal callback behavior; `Float.compare` also remains a callback.
 
 ```motoko
 import Map "mo:fast/pure/Map";
+import Nat "mo:core/Nat";
 
-let original = Map.addNat<Text>(Map.empty(), 42, "answer");
-let changed = Map.addNat(original, 7, "seven");
-assert Map.getNat(original, 7) == null;
-assert Map.getNat(changed, 42) == ?"answer";
+let original = Map.add<Nat, Text>(Map.empty(), Nat.compare, 42, "answer");
+let changed = Map.add(original, Nat.compare, 7, "seven");
+assert Map.get(original, Nat.compare, 7) == null;
+assert Map.get(changed, Nat.compare, 42) == ?"answer";
 
 func reverse(a : Nat, b : Nat) : Map.Order {
   if (a > b) #less else if (a == b) #equal else #greater
@@ -34,7 +37,8 @@ Build and compile from the matching Motoko checkout's Nix shell:
 ```sh
 ../plugins/scripts/build.sh --motoko "$PWD" pure-map
 bin/moc --plugin ../plugins/dist/pure-map \
-  --package fast ../plugins/packages/fast/src app.mo -o app.wasm
+  --package fast ../plugins/packages/fast/src \
+  --package core "$MOTOKO_CORE" app.mo -o app.wasm
 ```
 
 The package uses ABI **1**. It must be built against the exact compatible native
@@ -87,8 +91,8 @@ the map does not silently deep-copy them. Closures are valid transient values
 and retain Motoko's usual stable-type restrictions.
 
 Use one lawful, stable ordering for every operation on a map. Changing a stored
-key's order through mutation invalidates its ordering. The native scalar helpers
-use ascending Motoko order; do not use them with a map built under a different
+key's order through mutation invalidates its ordering. Native scalar helpers
+remain optional and use ascending Motoko order; do not use them with a map built under a different
 comparator. The lower-level static intrinsics also support fixed integer types,
 `Bool`, `Char`, and `Principal`. Floating-point keys require an explicit lawful
 comparator, including a chosen NaN policy.

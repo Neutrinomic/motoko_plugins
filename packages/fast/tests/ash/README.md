@@ -1,6 +1,6 @@
 # Public module tests with Ash
 
-These 13 configurations execute **186 checks** (180 distinct Motoko methods)
+These 14 configurations execute **202 checks** (196 distinct Motoko methods)
 on PocketIC through Ash. They exercise the public `mo:fast` modules, independent wire
 oracles, comparisons with Core containers, error recovery, persistence, and GC.
 
@@ -48,6 +48,7 @@ does not require unrelated plugins.
 | --- | ---: | --- | --- |
 | [CBOR](CBOR.mo) | 34 | Exact wire vectors, typed decoding, all binary16 patterns, malformed inputs, quotas, retained results | [Config](CBOR.ash.json) · [Inventory](coverage/CBOR.md) |
 | [CandidX](CandidX.mo) | 16 | Canonical bytes, variadic arguments, type joins, recursion, references, quotas | [Config](CandidX.ash.json) · [Inventory](coverage/CandidX.md) |
+| [Comparators](Comparators.mo) | 16 | Automatic scalar ordering, aliases and implicit calls, callback effects, multi-value results, allocation | [Config](Comparators.ash.json) · [Inventory](coverage/Comparators.md) |
 | [Composition](Composition.mo) | 3 | All eight plugins together, codec pipelines, recovery after failures, retained managed values across messages | [Config](Composition.ash.json) · [Inventory](#composition-inventory) |
 | [CoreAPI](CoreAPI.mo) | 12 | Six identical consumer methods run against Core and Fast; implicit comparators/formatters, Core signatures and types | [Config](CoreAPI.ash.json) · [Inventory](coverage/CoreAPI.md) |
 | [MapConversions](MapConversions.mo) | 4 | Both Map conversions, independent bindings, shared payloads, comparator-equivalent keys | [Config](MapConversions.ash.json) · [Inventory](coverage/MapConversions.md) |
@@ -59,7 +60,7 @@ does not require unrelated plugins.
 | [Set](Set.mo) | 15 | All 66 functions, Core semantics, B-tree removal, nested optional elements, scalar keys | [Config](Set.ash.json) · [Inventory](coverage/Set.md) |
 | [SetGC](SetGC.mo) | 2 | Shared native helpers, mixed element types, incremental GC and write barriers | [Config](SetGC.ash.json) · [Inventory](coverage/SetGC.md) |
 | [Smoke](Smoke.mo) | 7 | Package imports, codec results, hash pipeline, both map modules and Core conversion | [Config](Smoke.ash.json) · [Inventory](#smoke-inventory) |
-| **Total** | **186** | | |
+| **Total** | **202** | | |
 
 `Map` now exposes 61 functions and `pure/Map` 101; `MapConversions` and
 `CoreAPI` cover their conversions and `toMap` additions. `CoreAPI` changes only
@@ -87,11 +88,16 @@ and invariants with deterministic sequences and boundary sizes. The Set GC
 regression also calls native primitives directly to exercise helper sharing
 between concrete element types.
 
+Comparator tests preserve aliases, custom ordering, callback effects and
+argument evaluation across all four container plugins. Membership through
+opaque managed keys allocates zero bytes; typed Nat64 locals can independently
+require boxing at generic calls, as detailed in the comparator inventory.
+
 This is finite behavioral coverage, not proof for every input, native branch,
 or runtime state. Compile-fail cases, expected traps, interpreter agreement,
 and upgrade checks remain in the separate compiler/plugin test suites. The
 inventories identify additional limits and which assertions cover each API.
-The accompanying native suite passes 101 Motoko fixtures and 57 Rust kernel
+The accompanying native suite passes 103 Motoko fixtures and 57 Rust kernel
 tests, plus package compatibility checks, against the pinned compiler.
 
 Ash's instruction and heap figures measure correctness-test closures, usually

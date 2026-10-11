@@ -8,6 +8,7 @@ open Schema
 let ( ^^ ) = G.( ^^ )
 
 module Make (B : P.Backend) = struct
+  type comparison = Dynamic | Scalar of T.prim
   open B
   let num n = compile_unboxed_const (Int64.of_int n)
   let add = G.i (Binary (Wasm_exts.Values.I64 I64Op.Add))
@@ -126,14 +127,12 @@ module Make (B : P.Backend) = struct
           l)
         r))
 
-  let ordering_name ordering kt = match ordering with
-    | Callback -> "callback"
-    | Static -> "static_" ^ T.string_of_typ (T.promote kt)
+  let ordering_name = function
+    | Dynamic -> "callback"
+    | Scalar prim -> "static_" ^ T.string_of_typ (T.Prim prim)
   let compare env ordering kt comparator a b = match ordering with
-    | Static -> (match T.promote kt with
-      | T.Prim prim -> a ^^ b ^^ Compare.scalar env prim
-      | _ -> invalid_arg "pure map: unsupported static key type")
-    | Callback ->
+    | Scalar prim -> a ^^ b ^^ Compare.scalar env prim
+    | Dynamic ->
       bind env "order_tag"
         (Call.local env (Schema.compare kt) comparator [a; b] ^^ Variant.get_variant_tag env)
         (fun tag ->
@@ -141,7 +140,7 @@ module Make (B : P.Backend) = struct
             (tag ^^ compile_eq_const (Variant.hash_variant_label env "equal") ^^ ifv (num 0) (num 1)))
   let search env ordering kt initial comparator needle =
     invoke [initial; comparator; needle]
-      (helper env ("search_" ^ ordering_name ordering kt) 3 1 (fun env args ->
+      (helper env ("search_" ^ ordering_name ordering) 3 1 (fun env args ->
         let comparator = List.nth args 1 and needle = List.nth args 2 in
         let set_tree, tree = new_local env "pmap_search_tree" in
         let set_depth, depth = new_local env "pmap_search_depth" in
@@ -163,7 +162,7 @@ module Make (B : P.Backend) = struct
     | Prim Null | Opt _ | Any | Con _ -> "nullable" | _ -> "plain")
   let rec update env operation ordering kt vt tree comparator needle payload d =
     let operation = match operation with Add -> Put | Remove -> Take | x -> x in
-    let name = "update_" ^ Schema.name operation ^ "_" ^ ordering_name ordering kt ^ "_" ^ option_class vt in
+    let name = "update_" ^ Schema.name operation ^ "_" ^ ordering_name ordering ^ "_" ^ option_class vt in
     invoke [tree; comparator; needle; payload; d]
       (helper env name 5 3 (fun env args ->
         let tree = List.nth args 0 and comparator = List.nth args 1
@@ -228,7 +227,7 @@ module Make (B : P.Backend) = struct
 
   let rec split env ordering kt tree comparator needle d =
     invoke [tree; comparator; needle; d]
-      (helper env ("split_" ^ ordering_name ordering kt) 4 3 (fun env args ->
+      (helper env ("split_" ^ ordering_name ordering) 4 3 (fun env args ->
         let tree = List.nth args 0 and comparator = List.nth args 1
         and needle = List.nth args 2 and d = List.nth args 3 in
         let set_l, l = new_local env "pmap_split_left" in
@@ -250,7 +249,7 @@ module Make (B : P.Backend) = struct
         l ^^ old ^^ r))
   let rec rank env ordering kt tree comparator needle index d =
     invoke [tree; comparator; needle; index; d]
-      (helper env ("rank_" ^ ordering_name ordering kt) 5 2 (fun env args ->
+      (helper env ("rank_" ^ ordering_name ordering) 5 2 (fun env args ->
         let tree = List.nth args 0 and comparator = List.nth args 1
         and needle = List.nth args 2 and index = List.nth args 3
         and d = List.nth args 4 in
@@ -295,19 +294,14 @@ module Make (B : P.Backend) = struct
              (from_sorted env entries (middle ^^ num 1 ^^ add)
                (length ^^ half ^^ sub ^^ num 1 ^^ sub))))))))
 
-  let compile operation ordering env specialization arguments =
+  let compile_body operation source_ordering ordering env specialization arguments =
     let kt, vt = match specialization.C.type_arguments with
       | [k; v] -> k, v | _ -> invalid_arg "pure map specialization" in
     let argument i = List.nth arguments i in
     let tree = match arguments with x :: _ -> x | [] -> null env in
-    let comparator = if ordering = Callback then (match operation with
+    let comparator = if source_ordering = Callback then (match operation with
       | Join | Concat | Select | From_sorted -> null env | _ -> argument 1) else null env in
-    let needle = if ordering = Callback then 2 else 1 in
-    let representation = match operation with
-      | Put | Replace | Take | Alter | Rank -> P.Tuple 2
-      | Split -> P.Tuple 3
-      | _ -> P.Managed
-    in
+    let needle = if source_ordering = Callback then 2 else 1 in
     let code = match operation with
     | Get | Get_entry | Contains ->
       bind env "found" (search env ordering kt tree comparator (argument needle)) (fun found ->
@@ -343,5 +337,32 @@ module Make (B : P.Backend) = struct
         (bind env "found" (select env tree (argument 1 ^^ BigNum.to_word64 env) (num 0))
           (optional_entry env)) (null env)
     | From_sorted -> from_sorted env tree (num 0) (tree ^^ Arr.len env)
+    in code
+
+  let compile operation source_ordering env specialization arguments =
+    let comparison = match source_ordering, specialization.C.type_arguments with
+      | Callback, _ -> Dynamic
+      | Static, key :: _ -> (match T.promote key with
+          | T.Prim prim -> Scalar prim
+          | _ -> invalid_arg "unsupported static key type")
+      | Static, [] -> invalid_arg "missing key type"
+    in
+    let representation = match operation with
+      | Put | Replace | Take | Alter | Rank -> P.Tuple 2
+      | Split -> P.Tuple 3
+      | _ -> P.Managed
+    in
+    let result_types = match representation with
+      | P.Tuple count -> List.init count (fun _ -> I64Type)
+      | _ -> [I64Type]
+    in
+    let code = match source_ordering, operation with
+      | Callback, (Join | Concat | Select | From_sorted)
+      | Static, _ -> compile_body operation source_ordering comparison env specialization arguments
+      | Callback, _ ->
+        Compare.dispatch env ~comparator_index:1 arguments result_types
+          (fun child_env primitive arguments ->
+            let comparison = match primitive with None -> Dynamic | Some prim -> Scalar prim in
+            compile_body operation source_ordering comparison child_env specialization arguments)
     in P.{code; representation}
 end

@@ -26,6 +26,15 @@ Core: changing an import does not migrate existing stable data or make Core
 and Fast container values interchangeable. In particular, mutable conversions
 return Core’s pure types, not `mo:fast/pure/Map` or `mo:fast/pure/Set`.
 
+Native key operations reached through ordinary calls such as
+`Map.get(map, Nat64.compare, key)` automatically use native ordering when the compiler proves the comparator's scalar semantics.
+Passing the same comparator through aliases, record fields, or generic
+functions keeps this optimization. Unrecognized comparators, including effectful
+comparators, preserve normal callback behavior; `Float.compare` also remains a callback. Explicit
+helpers such as `getNat64` remain optional. Recognition depends on the function
+body, never just its name or the key type. Comparisons in ordinary Motoko
+traversal code keep their usual calling convention.
+
 ## Use from a checkout
 
 This package is not published to the Mops registry yet. Add a local dependency

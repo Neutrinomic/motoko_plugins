@@ -11,6 +11,7 @@ let ( ^^ ) = G.( ^^ )
    Structural steps finish before invoking a comparator. All retained state is
    managed; the SDK supplies forwarding, bounds checks and mutation barriers. *)
 module Make (B : P.Backend) = struct
+  type comparison = Dynamic | Scalar of T.prim
   open B
   let num n = compile_unboxed_const (Int64.of_int n)
   let add = G.i (Binary (Wasm_exts.Values.I64 I64Op.Add))
@@ -76,13 +77,12 @@ module Make (B : P.Backend) = struct
       loop_up env "shift_left" first finish (fun i ->
         Arr.set env arr_type value_type arr i (arr ^^ i ^^ num 1 ^^ add ^^ Arr.get env)) ^^
       Arr.set env arr_type value_type arr finish (null env))
-  let ordering_name ordering kt = match ordering with
-    | Callback -> "callback" | Static -> "static_" ^ T.string_of_typ (T.promote kt)
+  let ordering_name = function
+    | Dynamic -> "callback"
+    | Scalar prim -> "static_" ^ T.string_of_typ (T.Prim prim)
   let compare env ordering kt comparator a b = match ordering with
-    | Static -> (match T.promote kt with
-      | T.Prim p -> a ^^ b ^^ Compare.scalar env p
-      | _ -> invalid_arg "mutable-map: unsupported static key type")
-    | Callback ->
+    | Scalar prim -> a ^^ b ^^ Compare.scalar env prim
+    | Dynamic ->
       bind env "order_tag"
         (Call.local env (Schema.compare kt) comparator [a; b] ^^ Variant.get_variant_tag env)
         (fun tag ->
@@ -91,7 +91,7 @@ module Make (B : P.Backend) = struct
   (* Return the insertion position and whether an equivalent key was found. *)
   let locate env ordering kt nt node comparator needle =
     invoke [node; comparator; needle]
-      (helper env ("locate_" ^ ordering_name ordering kt) 3 2 (fun env args ->
+      (helper env ("locate_" ^ ordering_name ordering) 3 2 (fun env args ->
         let node = List.nth args 0 and comparator = List.nth args 1 and needle = List.nth args 2 in
         let set_lo, lo = new_local env "mmap_lo" and set_hi, hi = new_local env "mmap_hi" in
         let set_found, found = new_local env "mmap_found" in
@@ -131,7 +131,7 @@ module Make (B : P.Backend) = struct
         set_count env nt parent (n ^^ num 1 ^^ add)))))))
   let search env ordering kt nt root comparator needle =
     invoke [root; comparator; needle]
-      (helper env ("search_" ^ ordering_name ordering kt) 3 2 (fun env args ->
+      (helper env ("search_" ^ ordering_name ordering) 3 2 (fun env args ->
         let set_node, node = new_local env "mmap_search_node" in
         let set_index, index = new_local env "mmap_search_index" in
         let set_found, found = new_local env "mmap_search_found" in
@@ -148,7 +148,7 @@ module Make (B : P.Backend) = struct
         node ^^ index))
   let insert env ordering kt nt et mt map comparator needle payload =
     invoke [map; comparator; needle; payload]
-      (helper env ("insert_" ^ ordering_name ordering kt) 4 1 (fun env args ->
+      (helper env ("insert_" ^ ordering_name ordering) 4 1 (fun env args ->
         let map = List.nth args 0 and comparator = List.nth args 1
         and needle = List.nth args 2 and payload = List.nth args 3 in
         let set_node, current = new_local env "mmap_insert_node" in
@@ -268,7 +268,7 @@ module Make (B : P.Backend) = struct
      comparator can reenter a read of this map. *)
   let rec delete env ordering kt nt et mt map current comparator needle depth =
     invoke [map; current; comparator; needle; depth]
-      (helper env ("delete_" ^ ordering_name ordering kt) 5 1 (fun env args ->
+      (helper env ("delete_" ^ ordering_name ordering) 5 1 (fun env args ->
         let map = List.nth args 0 and current = List.nth args 1
         and comparator = List.nth args 2 and needle = List.nth args 3 and depth = List.nth args 4 in
         let set_index, index = new_local env "mmap_delete_index" in
@@ -309,11 +309,11 @@ module Make (B : P.Backend) = struct
                          (index ^^ checked_count env nt current ^^ lt ^^ ifv index (index ^^ num 1 ^^ sub) ^^ set_index ^^
                           merge env nt et current index ^^ set_next ^^ collapse env nt mt map))) G.nop ^^
              delete env ordering kt nt et mt map next comparator needle (depth ^^ num 1 ^^ add)))))
-  let compile operation ordering env specialization arguments =
+  let compile_body operation source_ordering ordering env specialization arguments =
     let kt, vt = match specialization.C.type_arguments with
       | [k; v] -> k, v | _ -> invalid_arg "mutable-map: type arguments" in
     let nt = Schema.node kt vt and et = Schema.entry kt vt and mt = Schema.map kt vt in
-    let map, comparator, needle, payload = match ordering, arguments with
+    let map, comparator, needle, payload = match source_ordering, arguments with
       | Callback, map :: comparator :: needle :: rest -> map, comparator, needle, rest
       | Static, map :: needle :: rest -> map, num 0, needle, rest
       | _ -> invalid_arg "mutable-map: arguments" in
@@ -349,5 +349,23 @@ module Make (B : P.Backend) = struct
               store env mt map "size" T.nat
                 (size ^^ num 1 ^^ sub ^^ BigNum.from_word64 env))) G.nop ^^
           old_result old))
-    in P.{code; representation = Managed}
+    in code
+
+  let compile operation source_ordering env specialization arguments =
+    let comparison = match source_ordering, specialization.C.type_arguments with
+      | Callback, _ -> Dynamic
+      | Static, key :: _ -> (match T.promote key with
+          | T.Prim prim -> Scalar prim
+          | _ -> invalid_arg "unsupported static key type")
+      | Static, [] -> invalid_arg "missing key type"
+    in
+    let representation = P.Managed in
+    let code = match source_ordering with
+      | Callback ->
+        Compare.dispatch env ~comparator_index:1 arguments [I64Type]
+          (fun child_env primitive arguments ->
+            let comparison = match primitive with None -> Dynamic | Some prim -> Scalar prim in
+            compile_body operation source_ordering comparison child_env specialization arguments)
+      | Static -> compile_body operation source_ordering comparison env specialization arguments
+    in P.{code; representation}
 end

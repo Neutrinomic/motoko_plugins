@@ -59,8 +59,16 @@ previous optional value; `delete` returns whether a key was removed.
 | Comparison and diagnostics | `equal`, `compare`, `toText`, `assertValid` |
 | Core interop | `toPure`, `fromPure` |
 
-Scalar helpers use ascending natural ordering without a comparator callback.
-They must only be used on maps built with that ordering. The lower-level
+Point operations such as `Map.get(map, Nat64.compare, key)` select native scalar
+ordering when the compiler proves the comparator implements a supported scalar
+order. Passing that comparator through an alias, record field, or generic
+function keeps this optimization. Unrecognized comparators, including effectful
+comparators and `Float.compare`, retain ordinary callback behavior; matching a
+function name or key type is insufficient.
+
+Scalar helpers remain optional and use ascending natural ordering without a
+comparator argument. They must only be used on maps built with that ordering.
+The lower-level
 `Prim.mmap_*_static<K,V>` operations also support the other integer types,
 `Bool`, `Char`, and `Principal`; unsupported key types are rejected at compile
 time. The normal functions accept any lawful synchronous comparator.

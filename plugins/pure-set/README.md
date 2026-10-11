@@ -27,10 +27,16 @@ larger input (left on equal sizes); intersection retains representatives from
 the smaller input (right on equal sizes), matching Core 2.5.0. Set algebra uses
 native split/join operations and shares surviving subtrees.
 
-`addNat`, `containsNat64`, and corresponding `get`, `insert`, `remove`, and
-`delete` helpers for `Nat`, `Nat64`, `Text`, and `Blob` use direct scalar
-comparisons. Generic operations support arbitrary Motoko elements and comparator
-callbacks. `fromSortedDistinctArray` validates ordering and constructs a tree
+Native key operations, including lookup, updates, rank and split, automatically
+select scalar ordering when the compiler proves it, including comparators passed through
+aliases, record fields, or generic functions. Unrecognized comparators, including
+effectful comparators, retain ordinary callbacks; `Float.compare` remains a callback. A matching
+function name or key type alone is insufficient.
+
+`addNat`, `containsNat64`, and the corresponding `get`, `insert`, `remove`, and
+`delete` helpers remain optional ways to select ascending scalar order without
+a comparator argument. Generic operations support arbitrary Motoko elements.
+`fromSortedDistinctArray` validates ordering and constructs a tree
 in linear time; `fromArray` uses stable sorting and keeps the first occurrence
 of each element. Iterators use a lazy stack proportional to tree height.
 
