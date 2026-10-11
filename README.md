@@ -1,9 +1,10 @@
 # Motoko plugins
 
-Native compiler plugins for fast, pure computation in Motoko. Each package
+Native compiler plugins for fast computation in Motoko. Each package
 adds functions to `Prim`, specializes calls during compilation, and links its
 optional Wasm runtime into the canister. Plugin code reads Motoko values through the
-compiler's memory and GC helpers.
+compiler's memory and GC helpers. The SDK also supports typed mutation of
+caller-owned Motoko arrays and records through the ordinary GC write barriers.
 
 ## Instruction and allocation costs
 
@@ -401,6 +402,11 @@ The suite exercises source and IR interpretation, compiled Wasm, diagnostics,
 package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
+
+The [managed-mutation SDK audit](docs/audits/managed-mutation-sdk/README.md)
+records independent tests across four execution engines and mutation during
+incremental marking, evacuation, and pointer updating. Container and assignment
+type checks happen during compilation; runtime bounds and GC barriers remain.
 
 The [JSON optimization report](benchmarks/results/json-optimized/README.md)
 records a 22.8% instruction reduction and 90.6% less allocation when decoding

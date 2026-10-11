@@ -222,14 +222,25 @@ no declared runtime is rejected. The pure-map implementation demonstrates
 managed structural sharing, callbacks, scalar comparison helpers, and a
 codegen-only package.
 
+Managed plugins can also construct and update ordinary mutable Motoko arrays
+and record fields through `Arr.tabulate_mut`, `Arr.set`, `Object.lit`,
+`Object.load`, and `Object.set`. The SDK checks container shape, field mutability,
+and assignment subtyping during compilation. Generated stores retain runtime
+bounds checks and the compiler's existing forwarding and GC write barriers.
+State belongs to the caller's managed objects and can persist like ordinary
+Motoko data; there is no separate plugin heap. Setter operands are evaluated
+once, left to right, before bounds checking and storing. See the
+[independent mutation audit](audits/managed-mutation-sdk/README.md).
+
 The no-safepoint invariant is part of this compiler ABI. A future collector
 that moves objects during allocation would require changing this adapter or
 introducing rooted handles before these plugins could use it.
 
 ## Garbage and accidental implementation errors
 
-These plugins have no persistent per-call state, but pure computation
-can still allocate temporary garbage. SHA-256 allocates only its final digest
+The codec and hash kernels have no persistent per-call state, but computation
+can still allocate temporary garbage. Managed collections retain caller-owned
+objects according to ordinary Motoko reachability. SHA-256 allocates only its final digest
 Blob. CandidX's fixed-shape paths allocate their final Blob and a small Result variant. Dynamic
 shape discovery additionally allocates Rust structures backed by ordinary
 pointer-free Motoko Blobs. Dropping the Rust context does not immediately free
@@ -373,8 +384,10 @@ Imported or already relocated addresses are not supported as relative offsets.
 Plugins are trusted compiler extensions. Native components execute inside
 `moc`, and linked Wasm shares memory with the application. The import validator
 checks the runtime ABI; it is not a sandbox or a proof that an implementation
-is pure. Authors must not mutate inputs, retain heap pointers, keep mutable
-state between operations, or call a collector. Kernel algorithms remain in
+is pure. Borrowed-pointer runtime kernels must not mutate inputs, retain heap
+pointers, keep mutable state between operations, or call a collector. Generated
+managed code may mutate caller-owned objects through the typed SDK helpers
+described above. Kernel algorithms remain in
 the packages rather than the compiler's ordinary runtime.
 
 Runtime authors must validate the Wasm binary before packaging it, for example
