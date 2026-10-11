@@ -1,0 +1,149 @@
+{
+  "cases": [
+    {
+      "name": "cbor-empty-array-decode",
+      "index": 0,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-nat-zero-decode",
+      "index": 1,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-int-negative-decode",
+      "index": 2,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-big-positive-decode",
+      "index": 3,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_3_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-big-negative-decode",
+      "index": 4,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_4_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-nats-1024-decode",
+      "index": 5,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_5_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-ints-1024-decode",
+      "index": 6,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_6_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-big-ints-256-decode",
+      "index": 7,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_7_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-mixed-scalars-256-decode",
+      "index": 8,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_8_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-nat-negative-error",
+      "index": 9,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_9_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-late-integer-error",
+      "index": 10,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_10_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    }
+  ],
+  "correctness": "Successful CBOR input is independently encoded with cbor2 canonical=True. Outside timing the actor compares each retained typed result with a separately constructed complete Motoko value. Error cases compare the complete expected kind, message, path and offset; valid negative-to-Nat and malformed late uint32 inputs exercise typed errors. The checked_decode phase checks the actor validation reply.",
+  "methodology": "Inputs and independent typed expected values are configured outside timing. The timed phase includes typed Result unwrapping and retained result assignment. Every retained result is compared with the full expected value outside timing. Successful CBOR input is independently encoded with cbor2 canonical=True. Error cases assert complete typed error records; one valid negative integer cannot fit Nat and one truncated uint32 follows a correctly encoded bignum. Three fresh-canister trials, no GC permitted."
+}

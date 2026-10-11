@@ -1,0 +1,88 @@
+--- _build/opt2-cbor/baseline/lib.rs	2026-10-11 15:53:28.901492539 +0000
++++ _build/opt2-cbor/pilot/scratch-reference.rs	2026-10-11 15:56:19.210280621 +0000
+@@ -4,7 +4,7 @@
+ #![cfg_attr(not(test), no_std)]
+ #![cfg_attr(not(test), feature(alloc_error_handler))]
+ extern crate alloc;
+-use alloc::{boxed::Box, collections::BTreeSet, string::String, vec, vec::Vec};
++use alloc::{boxed::Box, collections::BTreeSet, string::String, vec::Vec};
+ use core::fmt::Write;
+ 
+ #[cfg(not(test))]
+@@ -584,9 +584,10 @@
+     little.reverse();
+     (negative, little)
+ }
+-fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool) -> Vec<u8> {
++fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool, out: &mut Vec<u8>) {
+     let data = trim_zero(data);
+-    let mut out = Vec::with_capacity((data.len() * 8).div_ceil(7) + 1);
++    out.clear();
++    out.reserve_exact((data.len() * 8).div_ceil(7) + 1);
+     let mut pending = 0u32;
+     let mut bits = 0;
+     for &byte in data.iter().rev() {
+@@ -616,7 +617,6 @@
+             *byte |= 128;
+         }
+     }
+-    out
+ }
+ unsafe fn ctx<'a>(ptr: usize) -> &'a mut Context {
+     unsafe { &mut *(ptr as *mut Context) }
+@@ -874,16 +874,22 @@
+ pub unsafe extern "C" fn cbor_read_bigint(c: usize, signed: usize) {
+     let c = unsafe { ctx(c) };
+     c.borrowed = None;
+-    c.scalar = match c.read_integer() {
++    match c.read_integer() {
+         Some((negative, _)) if negative && signed == 0 => {
+             c.fail("range", "Integer is outside the requested type's range");
+-            vec![0]
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+         Some((negative, Integer::Word(n))) => {
+-            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0)
++            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0, &mut c.scalar)
++        }
++        Some((negative, Integer::Bytes(data))) => {
++            magnitude_to_leb(data, negative, signed != 0, &mut c.scalar)
++        }
++        None => {
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+-        Some((negative, Integer::Bytes(data))) => magnitude_to_leb(data, negative, signed != 0),
+-        None => vec![0],
+     };
+ }
+ #[unsafe(no_mangle)]
+@@ -915,6 +921,7 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    use alloc::vec;
+     fn c(input: &[u8]) -> Context {
+         Context::new(Box::leak(input.to_vec().into_boxed_slice()))
+     }
+@@ -981,7 +988,8 @@
+         for n in -20_000i64..20_000 {
+             let negative = n < 0;
+             let magnitude = if negative { !(n as u64) } else { n as u64 };
+-            let leb = magnitude_to_leb(&magnitude.to_be_bytes(), negative, true);
++            let mut leb = Vec::new();
++            magnitude_to_leb(&magnitude.to_be_bytes(), negative, true, &mut leb);
+             let (got_negative, bytes) = leb_to_magnitude(&leb, true);
+             assert_eq!(got_negative, negative);
+             assert_eq!(trim_zero(&magnitude.to_be_bytes()), bytes);
+@@ -996,7 +1004,8 @@
+         for count in [9, 16, 127, 256, 4096] {
+             for negative in [false, true] {
+                 let data: Vec<_> = (0..count).map(|i| (i * 31 + 128) as u8).collect();
+-                let leb = magnitude_to_leb(&data, negative, true);
++                let mut leb = Vec::new();
++                magnitude_to_leb(&data, negative, true, &mut leb);
+                 assert_eq!(leb_to_magnitude(&leb, true), (negative, data.clone()));
+                 let mut w = c(&[]);
+                 unsafe {

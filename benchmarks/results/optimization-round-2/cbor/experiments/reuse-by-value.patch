@@ -1,0 +1,52 @@
+--- _build/opt2-cbor/baseline/lib.rs	2026-10-11 15:53:28.901492539 +0000
++++ _build/opt2-cbor/pilot-value/lib.rs	2026-10-11 15:56:59.578232298 +0000
+@@ -584,9 +584,10 @@
+     little.reverse();
+     (negative, little)
+ }
+-fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool) -> Vec<u8> {
++fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool, mut out: Vec<u8>) -> Vec<u8> {
+     let data = trim_zero(data);
+-    let mut out = Vec::with_capacity((data.len() * 8).div_ceil(7) + 1);
++    out.clear();
++    out.reserve_exact((data.len() * 8).div_ceil(7) + 1);
+     let mut pending = 0u32;
+     let mut bits = 0;
+     for &byte in data.iter().rev() {
+@@ -879,10 +880,15 @@
+             c.fail("range", "Integer is outside the requested type's range");
+             vec![0]
+         }
+-        Some((negative, Integer::Word(n))) => {
+-            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0)
++        Some((negative, Integer::Word(n))) => magnitude_to_leb(
++            &n.to_be_bytes(),
++            negative,
++            signed != 0,
++            core::mem::take(&mut c.scalar),
++        ),
++        Some((negative, Integer::Bytes(data))) => {
++            magnitude_to_leb(data, negative, signed != 0, core::mem::take(&mut c.scalar))
+         }
+-        Some((negative, Integer::Bytes(data))) => magnitude_to_leb(data, negative, signed != 0),
+         None => vec![0],
+     };
+ }
+@@ -981,7 +987,7 @@
+         for n in -20_000i64..20_000 {
+             let negative = n < 0;
+             let magnitude = if negative { !(n as u64) } else { n as u64 };
+-            let leb = magnitude_to_leb(&magnitude.to_be_bytes(), negative, true);
++            let leb = magnitude_to_leb(&magnitude.to_be_bytes(), negative, true, Vec::new());
+             let (got_negative, bytes) = leb_to_magnitude(&leb, true);
+             assert_eq!(got_negative, negative);
+             assert_eq!(trim_zero(&magnitude.to_be_bytes()), bytes);
+@@ -996,7 +1002,7 @@
+         for count in [9, 16, 127, 256, 4096] {
+             for negative in [false, true] {
+                 let data: Vec<_> = (0..count).map(|i| (i * 31 + 128) as u8).collect();
+-                let leb = magnitude_to_leb(&data, negative, true);
++                let leb = magnitude_to_leb(&data, negative, true, Vec::new());
+                 assert_eq!(leb_to_magnitude(&leb, true), (negative, data.clone()));
+                 let mut w = c(&[]);
+                 unsafe {

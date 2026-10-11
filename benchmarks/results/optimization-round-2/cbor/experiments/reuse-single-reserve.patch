@@ -1,0 +1,121 @@
+--- _build/opt2-cbor/baseline/lib.rs	2026-10-11 15:53:28.901492539 +0000
++++ _build/opt2-cbor/pilot-single/lib.rs	2026-10-11 15:57:32.696193117 +0000
+@@ -4,7 +4,7 @@
+ #![cfg_attr(not(test), no_std)]
+ #![cfg_attr(not(test), feature(alloc_error_handler))]
+ extern crate alloc;
+-use alloc::{boxed::Box, collections::BTreeSet, string::String, vec, vec::Vec};
++use alloc::{boxed::Box, collections::BTreeSet, string::String, vec::Vec};
+ use core::fmt::Write;
+ 
+ #[cfg(not(test))]
+@@ -584,40 +584,36 @@
+     little.reverse();
+     (negative, little)
+ }
+-fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool) -> Vec<u8> {
++fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool, out: &mut Vec<u8>) {
+     let data = trim_zero(data);
+-    let mut out = Vec::with_capacity((data.len() * 8).div_ceil(7) + 1);
++    out.clear();
++    out.reserve_exact((data.len() * 8).div_ceil(7) + 1);
++    // Set continuation and sign-complement bits as each group is produced.
++    // Only the final group's continuation bit then needs clearing.
++    let mask = if negative { 255 } else { 128 };
+     let mut pending = 0u32;
+     let mut bits = 0;
+     for &byte in data.iter().rev() {
+         pending |= u32::from(byte) << bits;
+         bits += 8;
+         while bits >= 7 {
+-            out.push((pending & 127) as u8);
++            out.push((pending & 127) as u8 ^ mask);
+             pending >>= 7;
+             bits -= 7;
+         }
+     }
+     if pending != 0 || out.is_empty() {
+-        out.push(pending as u8);
++        out.push(pending as u8 ^ mask);
+     }
+-    while out.len() > 1 && out.last() == Some(&0) {
++    while out.len() > 1 && out.last() == Some(&mask) {
+         out.pop();
+     }
+-    if signed && out.last().is_some_and(|b| b & 64 != 0) {
+-        out.push(0);
++    if signed && out.last().is_some_and(|b| (b ^ mask) & 64 != 0) {
++        out.push(mask);
+     }
+-    let last = out.len() - 1;
+-    for (i, byte) in out.iter_mut().enumerate() {
+-        if negative {
+-            *byte ^= 127;
+-        }
+-        if i != last {
+-            *byte |= 128;
+-        }
+-    }
+-    out
++    *out.last_mut().expect("nonempty LEB") &= 127;
+ }
++
+ unsafe fn ctx<'a>(ptr: usize) -> &'a mut Context {
+     unsafe { &mut *(ptr as *mut Context) }
+ }
+@@ -874,16 +870,22 @@
+ pub unsafe extern "C" fn cbor_read_bigint(c: usize, signed: usize) {
+     let c = unsafe { ctx(c) };
+     c.borrowed = None;
+-    c.scalar = match c.read_integer() {
++    match c.read_integer() {
+         Some((negative, _)) if negative && signed == 0 => {
+             c.fail("range", "Integer is outside the requested type's range");
+-            vec![0]
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+         Some((negative, Integer::Word(n))) => {
+-            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0)
++            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0, &mut c.scalar)
++        }
++        Some((negative, Integer::Bytes(data))) => {
++            magnitude_to_leb(data, negative, signed != 0, &mut c.scalar)
++        }
++        None => {
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+-        Some((negative, Integer::Bytes(data))) => magnitude_to_leb(data, negative, signed != 0),
+-        None => vec![0],
+     };
+ }
+ #[unsafe(no_mangle)]
+@@ -915,6 +917,7 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    use alloc::vec;
+     fn c(input: &[u8]) -> Context {
+         Context::new(Box::leak(input.to_vec().into_boxed_slice()))
+     }
+@@ -981,7 +984,8 @@
+         for n in -20_000i64..20_000 {
+             let negative = n < 0;
+             let magnitude = if negative { !(n as u64) } else { n as u64 };
+-            let leb = magnitude_to_leb(&magnitude.to_be_bytes(), negative, true);
++            let mut leb = Vec::new();
++            magnitude_to_leb(&magnitude.to_be_bytes(), negative, true, &mut leb);
+             let (got_negative, bytes) = leb_to_magnitude(&leb, true);
+             assert_eq!(got_negative, negative);
+             assert_eq!(trim_zero(&magnitude.to_be_bytes()), bytes);
+@@ -996,7 +1000,8 @@
+         for count in [9, 16, 127, 256, 4096] {
+             for negative in [false, true] {
+                 let data: Vec<_> = (0..count).map(|i| (i * 31 + 128) as u8).collect();
+-                let leb = magnitude_to_leb(&data, negative, true);
++                let mut leb = Vec::new();
++                magnitude_to_leb(&data, negative, true, &mut leb);
+                 assert_eq!(leb_to_magnitude(&leb, true), (negative, data.clone()));
+                 let mut w = c(&[]);
+                 unsafe {

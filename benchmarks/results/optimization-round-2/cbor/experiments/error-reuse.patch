@@ -1,0 +1,39 @@
+--- plugins/cbor/runtime/src/lib.rs	2026-10-11 16:01:50.892984090 +0000
++++ _build/opt2-cbor/before-error-revert/lib.rs	2026-10-11 16:01:50.875984097 +0000
+@@ -4,7 +4,7 @@
+ #![cfg_attr(not(test), no_std)]
+ #![cfg_attr(not(test), feature(alloc_error_handler))]
+ extern crate alloc;
+-use alloc::{boxed::Box, collections::BTreeSet, string::String, vec, vec::Vec};
++use alloc::{boxed::Box, collections::BTreeSet, string::String, vec::Vec};
+ use core::fmt::Write;
+ 
+ #[cfg(not(test))]
+@@ -877,7 +877,8 @@
+     match c.read_integer() {
+         Some((negative, _)) if negative && signed == 0 => {
+             c.fail("range", "Integer is outside the requested type's range");
+-            c.scalar = vec![0];
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+         Some((negative, Integer::Word(n))) => {
+             magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0, &mut c.scalar)
+@@ -886,7 +887,8 @@
+             magnitude_to_leb(data, negative, signed != 0, &mut c.scalar)
+         }
+         None => {
+-            c.scalar = vec![0];
++            c.scalar.clear();
++            c.scalar.push(0);
+         }
+     };
+ }
+@@ -919,6 +921,7 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    use alloc::vec;
+     fn c(input: &[u8]) -> Context {
+         Context::new(Box::leak(input.to_vec().into_boxed_slice()))
+     }

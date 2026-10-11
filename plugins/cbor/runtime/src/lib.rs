@@ -584,39 +584,37 @@ fn leb_to_magnitude(leb: &[u8], signed: bool) -> (bool, Vec<u8>) {
     little.reverse();
     (negative, little)
 }
-fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool) -> Vec<u8> {
+fn magnitude_to_leb(data: &[u8], negative: bool, signed: bool, out: &mut Vec<u8>) {
     let data = trim_zero(data);
-    let mut out = Vec::with_capacity((data.len() * 8).div_ceil(7) + 1);
+    out.clear();
+    let capacity = (data.len() * 8).div_ceil(7) + 1;
+    if out.capacity() < capacity {
+        *out = Vec::with_capacity(capacity);
+    }
+    // Set continuation and sign-complement bits as each group is produced.
+    // Only the final group's continuation bit then needs clearing.
+    let mask = if negative { 255 } else { 128 };
     let mut pending = 0u32;
     let mut bits = 0;
     for &byte in data.iter().rev() {
         pending |= u32::from(byte) << bits;
         bits += 8;
         while bits >= 7 {
-            out.push((pending & 127) as u8);
+            out.push((pending & 127) as u8 ^ mask);
             pending >>= 7;
             bits -= 7;
         }
     }
     if pending != 0 || out.is_empty() {
-        out.push(pending as u8);
+        out.push(pending as u8 ^ mask);
     }
-    while out.len() > 1 && out.last() == Some(&0) {
+    while out.len() > 1 && out.last() == Some(&mask) {
         out.pop();
     }
-    if signed && out.last().is_some_and(|b| b & 64 != 0) {
-        out.push(0);
+    if signed && out.last().is_some_and(|b| (b ^ mask) & 64 != 0) {
+        out.push(mask);
     }
-    let last = out.len() - 1;
-    for (i, byte) in out.iter_mut().enumerate() {
-        if negative {
-            *byte ^= 127;
-        }
-        if i != last {
-            *byte |= 128;
-        }
-    }
-    out
+    *out.last_mut().expect("nonempty LEB") &= 127;
 }
 unsafe fn ctx<'a>(ptr: usize) -> &'a mut Context {
     unsafe { &mut *(ptr as *mut Context) }
@@ -873,17 +871,23 @@ pub unsafe extern "C" fn cbor_write_float(c: usize, value: f64) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn cbor_read_bigint(c: usize, signed: usize) {
     let c = unsafe { ctx(c) };
+    // The generated visitor consumes this LEB into a managed Motoko number
+    // before any later read can reuse the scratch buffer.
     c.borrowed = None;
-    c.scalar = match c.read_integer() {
+    match c.read_integer() {
         Some((negative, _)) if negative && signed == 0 => {
             c.fail("range", "Integer is outside the requested type's range");
-            vec![0]
+            c.scalar = vec![0];
         }
         Some((negative, Integer::Word(n))) => {
-            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0)
+            magnitude_to_leb(&n.to_be_bytes(), negative, signed != 0, &mut c.scalar)
         }
-        Some((negative, Integer::Bytes(data))) => magnitude_to_leb(data, negative, signed != 0),
-        None => vec![0],
+        Some((negative, Integer::Bytes(data))) => {
+            magnitude_to_leb(data, negative, signed != 0, &mut c.scalar)
+        }
+        None => {
+            c.scalar = vec![0];
+        }
     };
 }
 #[unsafe(no_mangle)]
@@ -981,7 +985,8 @@ mod tests {
         for n in -20_000i64..20_000 {
             let negative = n < 0;
             let magnitude = if negative { !(n as u64) } else { n as u64 };
-            let leb = magnitude_to_leb(&magnitude.to_be_bytes(), negative, true);
+            let mut leb = Vec::new();
+            magnitude_to_leb(&magnitude.to_be_bytes(), negative, true, &mut leb);
             let (got_negative, bytes) = leb_to_magnitude(&leb, true);
             assert_eq!(got_negative, negative);
             assert_eq!(trim_zero(&magnitude.to_be_bytes()), bytes);
@@ -996,7 +1001,8 @@ mod tests {
         for count in [9, 16, 127, 256, 4096] {
             for negative in [false, true] {
                 let data: Vec<_> = (0..count).map(|i| (i * 31 + 128) as u8).collect();
-                let leb = magnitude_to_leb(&data, negative, true);
+                let mut leb = Vec::new();
+                magnitude_to_leb(&data, negative, true, &mut leb);
                 assert_eq!(leb_to_magnitude(&leb, true), (negative, data.clone()));
                 let mut w = c(&[]);
                 unsafe {
@@ -1012,6 +1018,42 @@ mod tests {
                 assert_eq!(r.scalar, leb);
             }
         }
+    }
+    #[test]
+    fn scalar_scratch_is_reused_and_reset_between_borrowed_values_and_errors() {
+        // 2^64, text, -1, 0, malformed input. Reading a borrowed string must
+        // not leave scalar_part pointing at that string for the next integer.
+        let mut r = c(&[
+            0xc2, 0x49, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0x61, b'x', 0x20, 0, 0xff,
+        ]);
+        unsafe { cbor_read_bigint(pointer(&mut r), 0) };
+        assert_eq!(r.scalar, [128, 128, 128, 128, 128, 128, 128, 128, 128, 2]);
+        let capacity = r.scalar.capacity();
+        let allocation = r.scalar.as_ptr();
+        unsafe { cbor_read_string(pointer(&mut r)) };
+        assert_eq!(r.borrowed, Some(&b"x"[..]));
+        for (signed, expected) in [(1, 127), (0, 0)] {
+            unsafe { cbor_read_bigint(pointer(&mut r), signed) };
+            assert_eq!(r.scalar, [expected]);
+            assert_eq!(r.scalar.capacity(), capacity);
+            assert_eq!(r.scalar.as_ptr(), allocation);
+            assert!(r.borrowed.is_none());
+        }
+        unsafe { cbor_read_bigint(pointer(&mut r), 0) };
+        assert_eq!(r.scalar, [0]);
+        assert_eq!(error(&r).0, "unsupported");
+        let mut r = c(&[0x20]);
+        unsafe { cbor_read_bigint(pointer(&mut r), 0) };
+        assert_eq!(r.scalar, [0]);
+        assert_eq!(
+            error(&r),
+            (
+                "range",
+                "Integer is outside the requested type's range",
+                1,
+                ""
+            )
+        );
     }
     #[test]
     fn numeric_range_and_type_errors() {

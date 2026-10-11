@@ -45,3 +45,12 @@ let nan : Float = 0.0 / 0.0;
 assert ok(Prim.to_cbor(nan)) == "\f9\7e\00";
 assert ok(Prim.to_cbor(1.0 / 0.0 : Float)) == "\f9\7c\00";
 assert ok(Prim.to_cbor(-1.0 / 0.0 : Float)) == "\f9\fc\00";
+
+// Independent wire data interleaves retained big/small integers and borrowed
+// Text/Blob values. Later scratch reuse must not change earlier array entries.
+let mixed = ok(Prim.from_cbor<[(Nat, Text, ?Int, {#value : Int}, Blob)]>(
+  "\82\85\c2\49\01\00\00\00\00\00\00\00\00\61x\20\a1\65value\c3\49\01\00\00\00\00\00\00\00\00\42\00\ff\85\00\60\f6\a1\65value\00\40"));
+assert mixed == [
+  (18446744073709551616, "x", ?(-1), #value(-18446744073709551617), "\00\ff"),
+  (0, "", null, #value(0), ""),
+];
