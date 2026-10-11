@@ -30,6 +30,11 @@ retained histories, ranges, filters, and set operations.
 The [map function comparison](results/pure-map/functions/README.md) measures
 public APIs on exactly 1,000, 10,000, and 100,000 entries, with construction
 separate from operations on populated maps.
+The [Set comparison](results/set-comparison/README.md) uses Ash/PocketIC to
+compare mutable and persistent Core Sets with both plugin comparator callbacks
+and native `Nat` helpers. It records instructions and cumulative allocated
+bytes at the same three sizes; each operation/trial/implementation gets a fresh
+canister. See the [Set runner guide](set-comparison/README.md) to reproduce it.
 
 The recorded [first-pass results](results/README.md) and
 [second-pass results](results/pass2/README.md) include raw reports and artifact

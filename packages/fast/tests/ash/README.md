@@ -33,6 +33,11 @@ to pass `--plugin` and, for GC tests, `--force-gc` and `--sanity-checks`. The he
 checks Ash's schema before running. If an installed release lacks this field,
 use `--ash-source` with a checkout that supports it.
 
+CI currently runs the native suite and validates archived benchmark evidence;
+it **does not run these Ash suites**. The tested Ash checkout has local
+`mocArgs` support that is absent from its published revision. A published
+revision with that support is needed before pinning Ash in CI.
+
 ## Suites and inventories
 
 Each suite name links to its Motoko source. The configuration loads the required

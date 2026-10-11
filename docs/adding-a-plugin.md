@@ -107,6 +107,15 @@ synchronous message frames return, so callbacks can allocate and reenter a
 plugin without collecting their caller. Do not implement closure offsets or
 indirect-call signatures inside a plugin.
 
+Shared generated helpers must work for every type that reuses their code.
+In particular, a helper first compiled for immediate scalar elements must not
+omit write barriers when later reused for reference-bearing elements. Either
+specialize the helper's sharing key by representation, or use universal `Any`
+storage types for shared slot writes while keeping injection/projection typed
+at call sites. Mutable Set uses the latter approach. Its
+[mixed-type GC regression](../packages/fast/tests/ash/coverage/SetGC.md)
+exercises scalar-first helper generation followed by reference-bearing sets.
+
 See [JSON](../plugins/json/) for explicit output specialization and typed
 errors, and the matching compiler's `src/codegen/plugin_codegen.mli` for the
 exact interface. All plugin bindings are compiler intrinsics. Inferred aliases
@@ -134,6 +143,8 @@ Keep all public Motoko sources inside the Mops package; imports must not reach
 outside its directory. Update its README and add a test under
 `packages/fast/tests/run` loading only the corresponding plugin. The shared
 test script discovers these package tests automatically.
+Add public API cases to the [Ash suite](../packages/fast/tests/ash/) as well,
+using independent expectations or reference models alongside round trips.
 
 ## Runtime and tests
 

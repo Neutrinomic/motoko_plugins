@@ -52,6 +52,46 @@ The [first optimization report](benchmarks/results/optimization-round/README.md)
 and [original library comparison](benchmarks/results/codec-comparison/README.md)
 retain their original measurements.
 
+## Set costs
+
+The [Set comparison](benchmarks/results/set-comparison/README.md) records
+**162 isolated cases × three trials** at **1,000, 10,000 and 100,000 elements**.
+`mo:fast/Set` implements Core's mutable Set API with a key-only B-tree;
+`mo:fast/pure/Set` uses a persistent AVL tree that shares unchanged branches.
+Both store elements directly, without dummy map values.
+
+Selected **100,000-element** results follow, using small `Nat` keys, Core 2.5.0,
+and compiler `fc7612098`. Point operations are per-call averages of 32 probes;
+construction, traversal and union rows measure the complete operation.
+
+| Set | Operation | Core instructions | Plugin callback | Plugin native Nat | Core allocated B | Plugin allocated B |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Mutable | `contains`, hit | 6,922.00 | 3,310.31 | 2,383.84 | 117.00 | 0.00 |
+| Mutable | `insert`, new element | 10,878.44 | 5,725.00 | 4,723.59 | 190.00 | 42.50 |
+| Mutable | `delete`, present | 13,116.97 | 5,019.12 | 4,015.94 | 390.50 | 0.00 |
+| Mutable | Shuffled build | 1,122,897,592 | 537,705,079 | 441,427,620 | 16,980,040 | 1,766,408 |
+| Mutable | `values`, full traversal | 165,712,687 | 89,157,191 | — | 11,065,504 | 352 |
+| Pure | `contains`, hit | 2,939.22 | 1,257.50 | 779.03 | 40.00 | 0.00 |
+| Pure | `insert`, new element | 13,378.34 | 9,714.72 | 8,751.00 | 2,257.00 | 1,184.00 |
+| Pure | `insert`, existing element | 10,894.91 | 1,391.66 | 913.19 | 1,854.50 | 0.00 |
+| Pure | `delete`, absent | 16,865.22 | 2,676.78 | 1,795.78 | 3,112.00 | 0.00 |
+| Pure | Shuffled build | 1,201,847,247 | 881,028,223 | 794,177,092 | 208,815,600 | 109,580,416 |
+| Pure | `values`, full traversal | 141,121,330 | 66,201,770 | — | 21,600,176 | 336 |
+| Pure | `union`, 50% overlap | 1,350,943,241 | 59,278,088 | — | 229,550,160 | 7,652,120 |
+
+Medians of three identical trials. Callback and native allocation match where
+both are shown. Allocation is cumulative, including temporary garbage; it is
+not retained or peak memory. Setup and correctness checks are outside the
+measured interval, except construction itself. Traversal includes an element
+count and bounded checksum. Each case runs in a fresh canister.
+
+All measured callback and native cases use fewer instructions than Core, with
+no allocation regressions. These compare complete data structures and
+algorithms, not just plugin dispatch overhead. The
+[full tables](benchmarks/set-comparison/RESULTS.md) include every measured size,
+operation and scalar comparison; the [archive](benchmarks/results/set-comparison/)
+contains raw metrics, source hashes and reproduction details.
+
 ## Callback optimization
 
 The latest [callback report](benchmarks/results/callback-round/README.md) measures
