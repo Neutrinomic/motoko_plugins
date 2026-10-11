@@ -1,0 +1,17 @@
+diff --git a/plugins/sha256/runtime/src/lib.rs b/plugins/sha256/runtime/src/lib.rs
+index 1c36d50..97a1972 100644
+--- a/plugins/sha256/runtime/src/lib.rs
++++ b/plugins/sha256/runtime/src/lib.rs
+@@ -21,8 +21,10 @@ fn sigma1(x: u32) -> u32 {
+ #[inline(always)]
+ fn compress(state: &mut [u32; 8], block: &[u8; 64]) {
+     let mut w = [0u32; 16];
+-    for (word, bytes) in w.iter_mut().zip(block.chunks_exact(4)) {
+-        *word = u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
++    for (i, bytes) in block.chunks_exact(8).enumerate() {
++        let pair = u64::from_be_bytes(bytes.try_into().expect("word pair length"));
++        w[i * 2] = (pair >> 32) as u32;
++        w[i * 2 + 1] = pair as u32;
+     }
+     let [mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h] = *state;
+ 
