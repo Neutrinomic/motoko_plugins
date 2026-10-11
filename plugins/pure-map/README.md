@@ -70,6 +70,8 @@ replayable snapshot contains only a root and rank bounds, so capturing a range
 never copies its entries. Captured roots keep that version alive. Explicit
 `toArray` materializes entries by request. Callback transformations that change
 every binding must construct the resulting nodes; their allocation is O(n).
+Cursor descent happens on demand, including the initial rank seek. Creating a
+cursor still allocates its bounded stack and captures its complete snapshot.
 
 ## Representation and safety
 
@@ -126,3 +128,7 @@ and allocation gains therefore come from representation, generated operations,
 and algorithms rather than removing a full-map clone. See the repository
 [performance table](../../README.md) and [benchmark instructions](../../benchmarks/README.md)
 for the measured workload scope and reproducible reports.
+The [optimization-round report](../../benchmarks/results/optimization-round/pure-map/README.md)
+compares the same actors before and after wrapper simplification, including
+instructions and allocated bytes for public functions at 1,000, 10,000, and
+100,000 entries. It retains the rows where Core remains cheaper.

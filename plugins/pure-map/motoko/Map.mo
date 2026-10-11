@@ -20,8 +20,9 @@ module {
   public type EntrySnapshot<K, V> = {root : Map<K, V>; start : Nat; end : Nat; reverse : Bool};
   public type EntryIter<K, V> = {next : () -> ?(K, V); snapshot : EntrySnapshot<K, V>};
 
+  // Private traversal depths use Nat32. Checking <= 128 before every increment
+  // keeps them in 0..129, so the wrapping additions cannot wrap.
   func malformed() : None { Prim.trap("pure-map: malformed tree") };
-  func bounded(depth : Nat) { if (depth > 128) malformed() };
 
   public func empty<K, V>() : Map<K, V> { null };
   public func singleton<K, V>(key : K, value : V) : Map<K, V> { ?(1, 1, key, value, null, null) };
@@ -142,30 +143,30 @@ module {
 
   public func minEntry<K, V>(self : Map<K, V>) : ?(K, V) {
     var tree = self;
-    var depth = 0;
+    var depth : Nat32 = 0;
     loop {
-      bounded(depth);
+      if (depth > 128) malformed();
       switch tree {
         case null { return null };
         case (?node) {
           switch (node.4) { case null { return ?(node.2, node.3) }; case _ { tree := node.4 } }
         }
       };
-      depth += 1;
+      depth +%= 1;
     }
   };
   public func maxEntry<K, V>(self : Map<K, V>) : ?(K, V) {
     var tree = self;
-    var depth = 0;
+    var depth : Nat32 = 0;
     loop {
-      bounded(depth);
+      if (depth > 128) malformed();
       switch tree {
         case null { return null };
         case (?node) {
           switch (node.5) { case null { return ?(node.2, node.3) }; case _ { tree := node.5 } }
         }
       };
-      depth += 1;
+      depth +%= 1;
     }
   };
   /// Number of keys strictly smaller than key (also its insertion position).
@@ -218,8 +219,8 @@ module {
   };
   /// Clamps index to size; both outputs share untouched input subtrees.
   public func splitAt<K, V>(self : Map<K, V>, index : Nat) : (Map<K, V>, Map<K, V>) {
-    func walk(tree : Map<K, V>, count : Nat, depth : Nat) : (Map<K, V>, Map<K, V>) {
-      bounded(depth);
+    func walk(tree : Map<K, V>, count : Nat, depth : Nat32) : (Map<K, V>, Map<K, V>) {
+      if (depth > 128) malformed();
       if (count == 0) return (null, tree);
       if (count >= size(tree)) return (tree, null);
       switch tree {
@@ -227,16 +228,16 @@ module {
         case (?node) {
           let leftSize = size(node.4);
           if (count <= leftSize) {
-            let (left, middle) = walk(node.4, count, depth + 1);
+            let (left, middle) = walk(node.4, count, depth +% 1);
             (left, Prim.pmap_join<K, V>(middle, node.2, node.3, node.5))
           } else {
-            let (middle, right) = walk(node.5, count - leftSize - 1, depth + 1);
+            let (middle, right) = walk(node.5, count - leftSize - 1, depth +% 1);
             (Prim.pmap_join<K, V>(node.4, node.2, node.3, middle), right)
           }
         }
       }
     };
-    walk(self, index, 0)
+    walk(self, index, (0 : Nat32))
   };
   public func takeRank<K, V>(self : Map<K, V>, count : Nat) : Map<K, V> { splitAt(self, count).0 };
   public func dropRank<K, V>(self : Map<K, V>, count : Nat) : Map<K, V> { splitAt(self, count).1 };
@@ -285,70 +286,50 @@ module {
   };
 
   /// Each cursor uses one private O(height) mutable stack. Advancing creates
-  /// the returned entry pair, but no persistent traversal-list cells.
+  /// the returned entry pair, but no persistent traversal-list cells. Descent
+  /// is lazy, including the initial seek and the subtree after each result.
   public func replay<K, V>(view : EntrySnapshot<K, V>) : EntryIter<K, V> {
     let height = treeDepth(view.root);
     if (height > 128 or view.start > view.end or view.end > size(view.root)) malformed();
     let stack : [var Map<K, V>] = Prim.Array_init<Map<K, V>>(height + 1, null);
     var top = 0;
     var remaining : Nat = view.end - view.start;
-    func push(tree : Map<K, V>) {
-      if (top >= stack.size()) malformed();
-      stack[top] := tree;
-      top += 1;
-    };
-    func spine(first : Map<K, V>) {
-      var tree = first;
-      var depth = 0;
-      label walk loop {
-        bounded(depth);
-        switch tree {
-          case null { break walk };
-          case (?node) {
-            push(tree);
-            tree := if (view.reverse) node.5 else node.4;
-          }
-        };
-        depth += 1;
-      }
-    };
-    if (remaining > 0) {
-      var index : Nat = if (view.reverse) view.end - 1 else view.start;
-      var tree = view.root;
-      var depth = 0;
-      label seek loop {
-        bounded(depth);
-        switch tree {
-          case null { malformed() };
-          case (?node) {
-            let left = size(node.4);
-            if (index == left) { push(tree); break seek };
-            if (index < left) {
-              if (not view.reverse) push(tree);
-              tree := node.4;
-            } else {
-              if (view.reverse) push(tree);
-              index -= left + 1;
-              tree := node.5;
-            }
-          }
-        };
-        depth += 1;
-      }
-    };
+    var pending = view.root;
+    var skip : Nat = if (view.reverse) (size(view.root) - view.end : Nat) else view.start;
     {
       snapshot = view;
       next = func() : ?(K, V) {
         if (remaining == 0) return null;
-        if (top == 0) malformed();
+        var tree = pending;
+        var depth : Nat32 = 0;
+        label descend loop {
+          if (depth > 128) malformed();
+          switch tree {
+            case null { break descend };
+            case (?node) {
+              let first = if (view.reverse) node.5 else node.4;
+              if (skip > 0 and skip > size(first)) {
+                skip -= size(first) + 1;
+                tree := if (view.reverse) node.4 else node.5;
+              } else {
+                if (top >= stack.size()) malformed();
+                stack[top] := tree;
+                top += 1;
+                tree := first;
+              }
+            }
+          };
+          depth +%= 1;
+        };
+        if (top == 0 or skip > 0) malformed();
         top -= 1;
-        let tree = stack[top];
+        let current = stack[top];
         stack[top] := null;
-        switch tree {
+        switch current {
           case null malformed();
           case (?node) {
             remaining -= 1;
-            if (remaining > 0) spine(if (view.reverse) node.4 else node.5);
+            pending := if (view.reverse) node.4 else node.5;
             ?(node.2, node.3)
           }
         }
@@ -382,33 +363,33 @@ module {
 
   // Traversal callbacks execute in key order (reverse for foldRight).
   // Direct recursion avoids allocating an entry tuple per visited node.
-  public func foldLeft<K, V, A>(self : Map<K, V>, base : A, combine : (A, K, V) -> A) : A {
-    func walk(tree : Map<K, V>, accum : A, depth : Nat) : A {
-      bounded(depth);
-      switch tree {
-        case null accum;
-        case (?node) {
-          let left = walk(node.4, accum, depth + 1);
-          let middle = combine(left, node.2, node.3);
-          walk(node.5, middle, depth + 1)
-        }
+  func foldLeftTree<K, V, A>(tree : Map<K, V>, accum : A, combine : (A, K, V) -> A, depth : Nat32) : A {
+    if (depth > 128) malformed();
+    switch tree {
+      case null accum;
+      case (?node) {
+        let left = foldLeftTree(node.4, accum, combine, depth +% 1);
+        let middle = combine(left, node.2, node.3);
+        foldLeftTree(node.5, middle, combine, depth +% 1)
       }
-    };
-    walk(self, base, 0)
+    }
+  };
+  public func foldLeft<K, V, A>(self : Map<K, V>, base : A, combine : (A, K, V) -> A) : A {
+    foldLeftTree(self, base, combine, (0 : Nat32))
+  };
+  func foldRightTree<K, V, A>(tree : Map<K, V>, accum : A, combine : (K, V, A) -> A, depth : Nat32) : A {
+    if (depth > 128) malformed();
+    switch tree {
+      case null accum;
+      case (?node) {
+        let right = foldRightTree(node.5, accum, combine, depth +% 1);
+        let middle = combine(node.2, node.3, right);
+        foldRightTree(node.4, middle, combine, depth +% 1)
+      }
+    }
   };
   public func foldRight<K, V, A>(self : Map<K, V>, base : A, combine : (K, V, A) -> A) : A {
-    func walk(tree : Map<K, V>, accum : A, depth : Nat) : A {
-      bounded(depth);
-      switch tree {
-        case null accum;
-        case (?node) {
-          let right = walk(node.5, accum, depth + 1);
-          let middle = combine(node.2, node.3, right);
-          walk(node.4, middle, depth + 1)
-        }
-      }
-    };
-    walk(self, base, 0)
+    foldRightTree(self, base, combine, (0 : Nat32))
   };
   public func foldValues<K, V, A>(self : Map<K, V>, base : A, combine : (A, V) -> A) : A {
     foldLeft(self, base, func(accum : A, _key : K, value : V) : A { combine(accum, value) })
@@ -417,17 +398,17 @@ module {
     foldLeft<K, V, ()>(self, (), func(_ : (), key : K, value : V) { action(key, value) })
   };
   public func find<K, V>(self : Map<K, V>, predicate : (K, V) -> Bool) : ?(K, V) {
-    func walk(tree : Map<K, V>, depth : Nat) : ?(K, V) {
-      bounded(depth);
+    func walk(tree : Map<K, V>, depth : Nat32) : ?(K, V) {
+      if (depth > 128) malformed();
       switch tree {
         case null null;
         case (?node) {
-          switch (walk(node.4, depth + 1)) { case (?entry) { return ?entry }; case null {} };
-          if (predicate(node.2, node.3)) ?(node.2, node.3) else walk(node.5, depth + 1)
+          switch (walk(node.4, depth +% 1)) { case (?entry) { return ?entry }; case null {} };
+          if (predicate(node.2, node.3)) ?(node.2, node.3) else walk(node.5, depth +% 1)
         }
       }
     };
-    walk(self, 0)
+    walk(self, (0 : Nat32))
   };
   public func any<K, V>(self : Map<K, V>, predicate : (K, V) -> Bool) : Bool {
     switch (find(self, predicate)) { case null false; case _ true }
@@ -436,48 +417,48 @@ module {
     not any(self, func(key : K, value : V) : Bool { not predicate(key, value) })
   };
   public func map<K, V1, V2>(self : Map<K, V1>, transform : (K, V1) -> V2) : Map<K, V2> {
-    func walk(tree : Map<K, V1>, depth : Nat) : Map<K, V2> {
-      bounded(depth);
+    func walk(tree : Map<K, V1>, depth : Nat32) : Map<K, V2> {
+      if (depth > 128) malformed();
       switch tree {
         case null null;
         case (?node) {
-          let left = walk(node.4, depth + 1);
+          let left = walk(node.4, depth +% 1);
           let value = transform(node.2, node.3);
-          let right = walk(node.5, depth + 1);
+          let right = walk(node.5, depth +% 1);
           ?(node.0, node.1, node.2, value, left, right)
         }
       }
     };
-    walk(self, 0)
+    walk(self, (0 : Nat32))
   };
   /// A completely accepted subtree is returned unchanged, including the root.
   /// Every predicate is still called once, in ascending key order.
   public func filter<K, V>(self : Map<K, V>, predicate : (K, V) -> Bool) : Map<K, V> {
-    func walk(tree : Map<K, V>, depth : Nat) : (Map<K, V>, Bool) {
-      bounded(depth);
+    func walk(tree : Map<K, V>, depth : Nat32) : (Map<K, V>, Bool) {
+      if (depth > 128) malformed();
       switch tree {
         case null (null, false);
         case (?node) {
-          let (left, lc) = walk(node.4, depth + 1);
+          let (left, lc) = walk(node.4, depth +% 1);
           let keep = predicate(node.2, node.3);
-          let (right, rc) = walk(node.5, depth + 1);
+          let (right, rc) = walk(node.5, depth +% 1);
           if (keep and not lc and not rc) (tree, false)
           else if (keep) (Prim.pmap_join<K, V>(left, node.2, node.3, right), true)
           else (Prim.pmap_concat<K, V>(left, right), true)
         }
       }
     };
-    walk(self, 0).0
+    walk(self, (0 : Nat32)).0
   };
   public func filterMap<K, V1, V2>(self : Map<K, V1>, transform : (K, V1) -> ?V2) : Map<K, V2> {
-    func walk(tree : Map<K, V1>, depth : Nat) : Map<K, V2> {
-      bounded(depth);
+    func walk(tree : Map<K, V1>, depth : Nat32) : Map<K, V2> {
+      if (depth > 128) malformed();
       switch tree {
         case null null;
         case (?node) {
-          let left = walk(node.4, depth + 1);
+          let left = walk(node.4, depth +% 1);
           let value = transform(node.2, node.3);
-          let right = walk(node.5, depth + 1);
+          let right = walk(node.5, depth +% 1);
           switch value {
             case (?v) Prim.pmap_join<K, V2>(left, node.2, v, right);
             case null Prim.pmap_concat<K, V2>(left, right);
@@ -485,20 +466,20 @@ module {
         }
       }
     };
-    walk(self, 0)
+    walk(self, (0 : Nat32))
   };
 
   public func partition<K, V>(self : Map<K, V>, predicate : (K, V) -> Bool) : (Map<K, V>, Map<K, V>) {
     // Flags indicate whether a whole input subtree went to one side. They
     // preserve that exact subtree without needing equality on opaque payloads.
-    func walk(tree : Map<K, V>, depth : Nat) : (Map<K, V>, Map<K, V>, Bool, Bool) {
-      bounded(depth);
+    func walk(tree : Map<K, V>, depth : Nat32) : (Map<K, V>, Map<K, V>, Bool, Bool) {
+      if (depth > 128) malformed();
       switch tree {
         case null (null, null, true, true);
         case (?node) {
-          let (ly, ln, allLeft, noneLeft) = walk(node.4, depth + 1);
+          let (ly, ln, allLeft, noneLeft) = walk(node.4, depth +% 1);
           let keep = predicate(node.2, node.3);
-          let (ry, rn, allRight, noneRight) = walk(node.5, depth + 1);
+          let (ry, rn, allRight, noneRight) = walk(node.5, depth +% 1);
           let all = keep and allLeft and allRight;
           let none = not keep and noneLeft and noneRight;
           if (all) (tree, null, true, false)
@@ -508,7 +489,7 @@ module {
         }
       }
     };
-    let (yes, no, _, _) = walk(self, 0);
+    let (yes, no, _, _) = walk(self, (0 : Nat32));
     (yes, no)
   };
 
@@ -519,8 +500,8 @@ module {
   /// Conflicts are resolved once each in ascending key order. combine receives
   /// (right stored key, left value, right value), regardless of input sizes.
   public func unionWith<K, V>(left : Map<K, V>, compare : (K, K) -> Order, right : Map<K, V>, combine : (K, V, V) -> V) : Map<K, V> {
-    func walk(a : Map<K, V>, b : Map<K, V>, depth : Nat) : Map<K, V> {
-      bounded(depth);
+    func walk(a : Map<K, V>, b : Map<K, V>, depth : Nat32) : Map<K, V> {
+      if (depth > 128) malformed();
       switch (a, b) {
         case (null, _) b;
         case (_, null) a;
@@ -528,40 +509,40 @@ module {
           // Divide using the smaller input, preserving conflict argument order.
           if (an.1 <= bn.1) {
             let (bl, match, br) = Prim.pmap_split<K, V>(b, compare, an.2);
-            let lower = walk(an.4, bl, depth + 1);
+            let lower = walk(an.4, bl, depth +% 1);
             let entry = switch match {
               case null (an.2, an.3);
               case (?(key, value)) (key, combine(key, an.3, value));
             };
-            let upper = walk(an.5, br, depth + 1);
+            let upper = walk(an.5, br, depth +% 1);
             Prim.pmap_join<K, V>(lower, entry.0, entry.1, upper)
           } else {
             let (al, match, ar) = Prim.pmap_split<K, V>(a, compare, bn.2);
-            let lower = walk(al, bn.4, depth + 1);
+            let lower = walk(al, bn.4, depth +% 1);
             let value = switch match {
               case null bn.3;
               case (?( _, previous)) combine(bn.2, previous, bn.3);
             };
-            let upper = walk(ar, bn.5, depth + 1);
+            let upper = walk(ar, bn.5, depth +% 1);
             Prim.pmap_join<K, V>(lower, bn.2, value, upper)
           }
         }
       }
     };
-    walk(left, right, 0)
+    walk(left, right, (0 : Nat32))
   };
   /// Intersection retains the left input's key/value. Complete surviving
   /// subtrees are shared, including an entirely unchanged left map.
   public func intersection<K, V, W>(left : Map<K, V>, compare : (K, K) -> Order, right : Map<K, W>) : Map<K, V> {
-    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat) : (Map<K, V>, Bool) {
-      bounded(depth);
+    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat32) : (Map<K, V>, Bool) {
+      if (depth > 128) malformed();
       switch (a, b) {
         case (null, _) (null, false);
         case (_, null) (null, true);
         case (?node, _) {
           let (bl, match, br) = Prim.pmap_split<K, W>(b, compare, node.2);
-          let (lower, lc) = walk(node.4, bl, depth + 1);
-          let (upper, rc) = walk(node.5, br, depth + 1);
+          let (lower, lc) = walk(node.4, bl, depth +% 1);
+          let (upper, rc) = walk(node.5, br, depth +% 1);
           switch match {
             case null (Prim.pmap_concat<K, V>(lower, upper), true);
             case _ {
@@ -572,29 +553,29 @@ module {
         }
       }
     };
-    walk(left, right, 0).0
+    walk(left, right, (0 : Nat32)).0
   };
   public func intersectionWith<K, V, W, R>(left : Map<K, V>, compare : (K, K) -> Order, right : Map<K, W>, combine : (K, V, W) -> R) : Map<K, R> {
-    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat) : Map<K, R> {
-      bounded(depth);
+    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat32) : Map<K, R> {
+      if (depth > 128) malformed();
       switch (a, b) {
         case (null, _) null;
         case (_, null) null;
         case (?an, ?bn) {
           if (an.1 <= bn.1) {
             let (bl, match, br) = Prim.pmap_split<K, W>(b, compare, an.2);
-            let lower = walk(an.4, bl, depth + 1);
+            let lower = walk(an.4, bl, depth +% 1);
             let value = switch match { case null null; case (?( _, v)) ?combine(an.2, an.3, v) };
-            let upper = walk(an.5, br, depth + 1);
+            let upper = walk(an.5, br, depth +% 1);
             switch value {
               case null Prim.pmap_concat<K, R>(lower, upper);
               case (?v) Prim.pmap_join<K, R>(lower, an.2, v, upper);
             }
           } else {
             let (al, match, ar) = Prim.pmap_split<K, V>(a, compare, bn.2);
-            let lower = walk(al, bn.4, depth + 1);
+            let lower = walk(al, bn.4, depth +% 1);
             let entry = switch match { case null null; case (?(k, v)) ?(k, combine(k, v, bn.3)) };
-            let upper = walk(ar, bn.5, depth + 1);
+            let upper = walk(ar, bn.5, depth +% 1);
             switch entry {
               case null Prim.pmap_concat<K, R>(lower, upper);
               case (?(k, v)) Prim.pmap_join<K, R>(lower, k, v, upper);
@@ -603,19 +584,19 @@ module {
         }
       }
     };
-    walk(left, right, 0)
+    walk(left, right, (0 : Nat32))
   };
   /// Keys from right are removed; an unaffected left subtree is shared.
   public func difference<K, V, W>(left : Map<K, V>, compare : (K, K) -> Order, right : Map<K, W>) : Map<K, V> {
-    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat) : (Map<K, V>, Bool) {
-      bounded(depth);
+    func walk(a : Map<K, V>, b : Map<K, W>, depth : Nat32) : (Map<K, V>, Bool) {
+      if (depth > 128) malformed();
       switch (a, b) {
         case (null, _) (null, false);
         case (_, null) (a, false);
         case (?node, _) {
           let (bl, match, br) = Prim.pmap_split<K, W>(b, compare, node.2);
-          let (lower, lc) = walk(node.4, bl, depth + 1);
-          let (upper, rc) = walk(node.5, br, depth + 1);
+          let (lower, lc) = walk(node.4, bl, depth +% 1);
+          let (upper, rc) = walk(node.5, br, depth +% 1);
           switch match {
             case null {
               if (not lc and not rc) (a, false)
@@ -626,7 +607,7 @@ module {
         }
       }
     };
-    walk(left, right, 0).0
+    walk(left, right, (0 : Nat32)).0
   };
   public func symmetricDifference<K, V>(left : Map<K, V>, compare : (K, K) -> Order, right : Map<K, V>) : Map<K, V> {
     union(difference(left, compare, right), compare, difference(right, compare, left))
@@ -766,15 +747,17 @@ module {
           var left = start;
           var right = middle;
           var out = start;
-          while (out < end) {
+          while (left < middle and right < end) {
             // Stable merge: equal keys keep their original order.
-            if (left < middle and (right >= end or compare(source[left].0, source[right].0) != #greater)) {
+            if (compare(source[left].0, source[right].0) != #greater) {
               target[out] := source[left]; left += 1;
             } else {
               target[out] := source[right]; right += 1;
             };
             out += 1;
           };
+          while (left < middle) { target[out] := source[left]; left += 1; out += 1 };
+          while (right < end) { target[out] := source[right]; right += 1; out += 1 };
           start := end;
         };
         let old = source; source := target; target := old;
@@ -813,20 +796,20 @@ module {
 
   /// Full O(n) validation is explicit, never an implicit cost of a point op.
   public func assertValid<K, V>(self : Map<K, V>, compare : (K, K) -> Order) {
-    func walk(tree : Map<K, V>, lower : ?K, upper : ?K, depth : Nat) : (Nat32, Nat) {
-      bounded(depth);
+    func walk(tree : Map<K, V>, lower : ?K, upper : ?K, depth : Nat32) : (Nat32, Nat) {
+      if (depth > 128) malformed();
       switch tree {
         case null (0, 0);
         case (?node) {
           switch lower { case (?key) { if (compare(key, node.2) != #less) malformed() }; case null {} };
           switch upper { case (?key) { if (compare(node.2, key) != #less) malformed() }; case null {} };
-          let (lh, ls) = walk(node.4, lower, ?node.2, depth + 1);
-          let (rh, rs) = walk(node.5, ?node.2, upper, depth + 1);
+          let (lh, ls) = walk(node.4, lower, ?node.2, depth +% 1);
+          let (rh, rs) = walk(node.5, ?node.2, upper, depth +% 1);
           if (lh > rh + 1 or rh > lh + 1 or node.0 != 1 + (if (lh > rh) lh else rh) or node.1 != ls + rs + 1) malformed();
           (node.0, node.1)
         }
       }
     };
-    ignore walk(self, null, null, 0)
+    ignore walk(self, null, null, (0 : Nat32))
   };
 }
