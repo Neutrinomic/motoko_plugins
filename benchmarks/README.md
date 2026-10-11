@@ -18,6 +18,9 @@ and allocation reductions independently of those library comparisons.
 The [persistent-map comparison](results/pure-map/README.md) measures Core's
 pure map against plugin callback and scalar ordering, including updates,
 retained histories, ranges, filters, and set operations.
+The [map function comparison](results/pure-map/functions/README.md) measures
+public APIs on exactly 1,000, 10,000, and 100,000 entries, with construction
+separate from operations on populated maps.
 
 The recorded [first-pass results](results/README.md) and
 [second-pass results](results/pass2/README.md) include raw reports and artifact
@@ -157,6 +160,31 @@ reported equally for every implementation; end-of-message GC is excluded.
 The bulk table labels Core adapters explicitly: its public API has no seek,
 union, intersection, or difference operation. These compare complete
 algorithms and capabilities, not plugin boundary overhead alone.
+
+The function suite uses the same dependency lock and compiler checks. It
+includes `get`, `add`, `swap`, predicate search, iterator creation and
+consumption, transforms, folds, and construction. Six point workloads also
+measure the native Nat64 ordering helpers. Generate all 111 workloads, then
+run three trials with canister cleanup to bound the host memory needed by
+the large matrix:
+
+```sh
+python3 benchmarks/generate-map-functions.py --out _build/map-functions
+python3 benchmarks/build-map-comparison.py \
+  --motoko "$MOTOKO_ROOT" --deps _build/map-comparison/deps \
+  --out _build/map-functions --require-clean-compiler
+node benchmarks/run.mjs --wasm _build/map-functions/main.wasm \
+  --cases _build/map-functions/cases.json --out _build/map-functions/results.json \
+  --label pure-map-functions --trials 3 --delete-canisters true
+python3 benchmarks/summarize-map.py _build/map-functions/results.json \
+  --cases _build/map-functions/cases.json --out _build/map-functions/summary.csv
+```
+
+The function summary includes actual public API names, each Core adapter,
+the unit of work, instructions, and cumulative heap allocation. A cursor
+consumption row measures a complete traversal or 16-entry seek workload, not
+one `next()` call. Cleanup stops/deletes each canister after its trial has
+been measured, checked, and recorded; cleanup costs are outside the interval.
 
 ## Typed JSON
 

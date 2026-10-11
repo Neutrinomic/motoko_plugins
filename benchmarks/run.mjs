@@ -15,7 +15,7 @@ const options = { wasm: null, cases: null, out: null, label: 'local',
   server: 'pocket-ic-server', trials: 3, filter: '.',
   'sdk-package': resolve(root, '../../candidx/ts/package.json'),
   canonicalizer: resolve(root, '../../candidx/ts/dist/index.js'),
-  'cbor-python': 'python3' };
+  'cbor-python': 'python3', 'delete-canisters': 'false' };
 for (let i = 2; i < process.argv.length; i += 2) {
   const key = process.argv[i].replace(/^--/, '');
   if (!(key in options) || process.argv[i + 1] === undefined) throw Error(`Unknown option ${process.argv[i]}`);
@@ -23,6 +23,8 @@ for (let i = 2; i < process.argv.length; i += 2) {
 }
 if (!options.wasm || !options.cases || !options.out || !Number.isSafeInteger(options.trials) || options.trials < 1)
   throw Error('Usage: node benchmarks/run.mjs --wasm main.wasm --cases cases.json --out result.json [--label baseline] [--trials 3] [--filter regex]');
+if (!['true', 'false'].includes(options['delete-canisters']))
+  throw Error('--delete-canisters must be true or false');
 const require = createRequire(resolve(options['sdk-package']));
 const { IDL } = require('@icp-sdk/core/candid');
 const { Principal } = require('@icp-sdk/core/principal');
@@ -76,6 +78,7 @@ const Create = IDL.Record({ amount: IDL.Opt(IDL.Nat), settings: IDL.Opt(Settings
 const Install = IDL.Record({ mode: IDL.Variant({ install: IDL.Null }), canister_id: IDL.Principal,
   wasm_module: IDL.Vec(IDL.Nat8), arg: IDL.Vec(IDL.Nat8) });
 const Created = IDL.Record({ canister_id: IDL.Principal });
+const CanisterId = IDL.Record({ canister_id: IDL.Principal });
 const out = resolve(options.out);
 await mkdir(dirname(out), { recursive: true });
 const portFile = `${out}.${process.pid}.port`;
@@ -138,7 +141,8 @@ const report = {
   ...(manifest.provenance === undefined ? {} : { provenance: manifest.provenance }),
   measurement_protocol: { fresh_canister: 'per workload/trial', forced_gc_calls_before_phase: 4,
     synchronous_gc: 'included in instruction count; reclaimed_bytes reported',
-    end_of_message_gc: 'excluded' },
+    end_of_message_gc: 'excluded',
+    canister_cleanup: options['delete-canisters'] === 'true' ? 'stop and delete after each completed trial' : 'delete PocketIC instance after the complete run' },
   methodology: manifest.methodology ??
     'Fresh canister per workload/trial; configure inputs outside measurement; clear output and run four forced GC increments before each phase. Each synchronous update measures one call using performanceCounter(0), rts_total_allocation, and rts_reclaimed, retains its output, and replies after measurement. Raw counts include counter/assignment overhead and any synchronous collection; end-of-message GC is excluded. Each phase declares whether reclamation is allowed. Ordinary Candid phases are references/context, not equivalent canonical encoders.',
   correctness: manifest.correctness ?? 'Every SHA-256 phase is checked against the oracle digest in the workload manifest. Every canonical Candid phase is checked against host canonicalization of ordinary Candid. Equivalent phase outputs must also match byte-for-byte within each trial.',
@@ -242,6 +246,14 @@ try {
           if (!/Canister(?:Called)?Trap|CanisterInstructionLimitExceeded/.test(String(error))) throw error;
         }
         await save();
+      }
+      // All measured outputs and failures have been recorded before cleanup.
+      // Large map matrices otherwise retain hundreds of populated canisters.
+      // A cleanup failure is fatal and preserves the existing saved samples.
+      if (options['delete-canisters'] === 'true') {
+        const target = { CanisterId: base64(canister.toUint8Array()) };
+        await call(management, 'stop_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
+        await call(management, 'delete_canister', [CanisterId], [{ canister_id: canister }], [], false, target);
       }
     }
   }

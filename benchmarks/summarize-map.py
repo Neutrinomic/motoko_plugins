@@ -16,6 +16,9 @@ args = parser.parse_args()
 manifest = json.loads(args.cases.read_text())
 specs = {case['name']: case for case in manifest['cases']}
 assert len(specs) == len(manifest['cases']), 'Duplicate manifest case names'
+detail_fields = tuple(field for field in ('public_function', 'static_public_function',
+                                         'core_function', 'adapter_note', 'workload_kind', 'unit')
+                      if any(field in case for case in specs.values()))
 identities, seen, rows = set(), set(), []
 labels = ('core', 'plugin_custom', 'plugin_static')
 expected_digest = hashlib.sha256(b'ok').hexdigest()
@@ -44,6 +47,7 @@ for path in args.reports:
         spec = specs[name]
         assert case['phases'] == spec['phases'], f'{name}: different phase protocol'
         phases = [phase['label'] for phase in spec['phases']]
+        assert {'core', 'plugin_custom'} <= set(phases) <= set(labels), f'{name}: unsupported comparison phases'
         count = natural(spec['operations_per_phase'])
         assert count > 0
         samples = {(sample['trial'], sample['phase']): sample for sample in case['measurements']}
@@ -52,6 +56,9 @@ for path in args.reports:
             f'{name}: missing trials/phases'
         row = {'workload': name, 'map_size': spec['map_size'], 'operation': spec['operation'],
                'operations_per_phase': count, 'trials': args.expected_trials}
+        for field in detail_fields:
+            row[field] = spec.get(field, '')
+            assert isinstance(row[field], str), f'{name}: {field} must be text'
         for label in labels:
             fields = ('instructions', 'allocated_bytes', 'reclaimed_bytes')
             if label not in phases:
@@ -86,12 +93,70 @@ with args.out.open('w', newline='') as output:
     writer = csv.DictWriter(output, fieldnames=list(rows[0]))
     writer.writeheader()
     writer.writerows(rows)
-print('| Workload | Size | Core instructions/op | Plugin callback/op | Plugin scalar/op | Core/callback | Core/scalar |')
-print('| --- | ---: | ---: | ---: | ---: | ---: | ---: |')
-for row in rows:
-    counts = [f'{row[label + "_instructions_per_op"]:,.2f}'
-              if row[label + '_instructions_per_op'] != '' else '—' for label in labels]
-    ratio = f'{row["core_over_static"]:.2f}×' if row['core_over_static'] != '' else '—'
-    print(f'| {row["operation"]} | {row["map_size"]:,} | ' + ' | '.join(counts) +
-          f' | {row["core_over_custom"]:.2f}× | {ratio} |')
-print('\nRaw batch totals, allocation/op, reclamation/op, and trial ranges are in ' + str(args.out))
+has_functions = 'public_function' in detail_fields
+if has_functions:
+    assert all(row.get('workload_kind') in ('construction', 'populated-map') for row in rows), \
+        'Unknown function workload kind'
+    print('# Public map function costs\n')
+    print('Three-trial medians, normalized by the number of complete operations in each batch. '
+          'Both implementations use the same compiler and inputs. Allocated bytes include '
+          'temporary objects and retained results; they are not peak or live heap size. '
+          'Core/plugin above 1 means fewer plugin instructions.\n')
+    print('Point-function rows are per call. `get` is key lookup; `find` is ordered predicate search. Iterator `create` rows '
+          'measure cursor creation only; `consume` rows include creation and the entire '
+          'map traversal; `seek16` rows include creation and 16 entries. Fold, transform, '
+          'split, and construction rows measure the complete function call. Snapshot creation '
+          'is per captured root/snapshot. Core adapters '
+          'are listed below; see [methodology](README.md) for exact semantics and validation.\n')
+    for kind, title in (('construction', 'Construction'), ('populated-map', 'Operations on populated maps')):
+        group = [row for row in rows if row.get('workload_kind') == kind]
+        if not group:
+            continue
+        print(f'## {title}\n')
+        print('| Public function | Workload | Size | Core instructions/op | Plugin callback/op | Core allocated B/op | Plugin allocated B/op | Core/plugin |')
+        print('| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |')
+        for row in sorted(group, key=lambda row: (row['operation'], row['map_size'])):
+            values = [f'{row[field]:,.2f}' for field in
+                      ('core_instructions_per_op', 'plugin_custom_instructions_per_op',
+                       'core_allocated_bytes_per_op', 'plugin_custom_allocated_bytes_per_op')]
+            print(f'| `Map.{row["public_function"]}` | {row["operation"]} | {row["map_size"]:,} | ' +
+                  ' | '.join(values) + f' | {row["core_over_custom"]:.2f}× |')
+        print()
+    scalar_rows = [row for row in rows if row['plugin_static_instructions'] != '']
+    if scalar_rows:
+        print('## Scalar ordering on the same workloads\n')
+        print('The callback path uses the same Motoko comparator as Core. The scalar path '
+              'orders Nat64 keys directly; values remain generic Motoko references.\n')
+        print('| Scalar function | Workload | Size | Core instructions/op | Plugin callback/op | Plugin scalar/op | Core allocated B/op | Callback allocated B/op | Scalar allocated B/op |')
+        print('| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |')
+        for row in sorted(scalar_rows, key=lambda row: (row['operation'], row['map_size'])):
+            values = [f'{row[field]:,.2f}' for field in
+                      ('core_instructions_per_op', 'plugin_custom_instructions_per_op',
+                       'plugin_static_instructions_per_op', 'core_allocated_bytes_per_op',
+                       'plugin_custom_allocated_bytes_per_op', 'plugin_static_allocated_bytes_per_op')]
+            print(f'| `Map.{row.get("static_public_function", "")}` | {row["operation"]} | {row["map_size"]:,} | ' +
+                  ' | '.join(values) + ' |')
+    details = sorted({(row['operation'], row.get('core_function', ''), row.get('adapter_note', ''))
+                      for row in rows if row.get('adapter_note', '')})
+    if details:
+        print('\n## Core baseline details\n')
+        print('Explicit adapters are used where Core has no matching public API. '
+              'Seek, rank, selection, and split differences include additional plugin '
+              'algorithms and subtree metadata, not just plugin boundary overhead.\n')
+        print('| Workload | Core baseline | Note |')
+        print('| --- | --- | --- |')
+        for operation, core_function, note in details:
+            print(f'| {operation} | `{core_function}` | {note} |')
+else:
+    print('| Workload | Size | Core instructions/op | Plugin callback/op | Plugin scalar/op | Core/callback | Core/scalar |')
+    print('| --- | ---: | ---: | ---: | ---: | ---: | ---: |')
+    for row in rows:
+        counts = [f'{row[label + "_instructions_per_op"]:,.2f}'
+                  if row[label + '_instructions_per_op'] != '' else '—' for label in labels]
+        ratio = f'{row["core_over_static"]:.2f}×' if row['core_over_static'] != '' else '—'
+        print(f'| {row["operation"]} | {row["map_size"]:,} | ' + ' | '.join(counts) +
+              f' | {row["core_over_custom"]:.2f}× | {ratio} |')
+if has_functions:
+    print('\nRaw batch totals, allocation/op, reclamation/op, and trial ranges are in [summary.csv](summary.csv).')
+else:
+    print('\nRaw batch totals, allocation/op, reclamation/op, and trial ranges are in ' + str(args.out))

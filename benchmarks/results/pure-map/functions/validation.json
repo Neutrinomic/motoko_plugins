@@ -1,0 +1,80 @@
+{
+  "status": "pass",
+  "compiler_revision": "f1ccbba5e445df9db03bbc35be557187ade9b436",
+  "compiler_dirty": false,
+  "plugin_abi": 1,
+  "pocket_ic_version": "pocket-ic-server 14.0.0",
+  "recorded_utc": "2026-10-11T14:32:18.465Z",
+  "pocketic": {
+    "workloads": 111,
+    "workload_variants_per_size": 37,
+    "distinct_generic_public_function_names": 27,
+    "distinct_scalar_public_function_names": 3,
+    "map_sizes": [
+      1000,
+      10000,
+      100000
+    ],
+    "trials": 3,
+    "fresh_canisters": 333,
+    "measurements": 720,
+    "phase_measurements": {
+      "core": 333,
+      "plugin_custom": 333,
+      "plugin_static": 54
+    },
+    "scalar_workloads": 18,
+    "failed_measurements": 0,
+    "all_instruction_allocation_reclamation_counts_identical_across_trials": true,
+    "synchronous_reclaimed_bytes": 0,
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "units": {
+    "instructions": "IC performanceCounter(0), complete batch normalized by operations_per_phase",
+    "allocated_bytes": "Cumulative Motoko heap allocation including temporary objects and retained results; not peak or live heap",
+    "reclaimed_bytes": "Synchronous GC inside the measured interval, included equally for every phase",
+    "operation_unit": "Each case records unit; iterator creation, whole traversal and seek+16 are distinct complete workloads",
+    "output_bytes": "2-byte correctness reply ok, not the returned object heap size"
+  },
+  "correctness": {
+    "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df",
+    "checks": [
+      "Both complete input maps and every resulting ordered map checked against independent ordinal-slot bindings",
+      "Expected sizes, retained first/middle/final update versions, old values and insertion/deletion flags",
+      "Plugin AVL ordering, balance, height and counts on initial and final maps plus both split outputs",
+      "Intermediate retained update versions checked for complete contents and size",
+      "Created cursors and snapshots fully replayed in expected order, repeatable exhaustion and remaining suffix checked",
+      "Consumed traversals/folds checked with bounded order-sensitive checksum and independent count",
+      "Predicate find returns earliest matching entry and exact callback count",
+      "Construction checks complete bindings and input iterator exhaustion"
+    ],
+    "timing": "Setup, expected values, full validation, replies, end-of-message GC and canister cleanup are outside timing; synchronous GC is inside timing"
+  },
+  "provenance_checks": {
+    "clean_pinned_compiler": true,
+    "compiler_source_files": 290,
+    "compiler_wrapper_and_rts_files": 3,
+    "package_build_inputs": 7,
+    "plugin_compiler_and_public_library_files": 6,
+    "locked_core_source_files": 57,
+    "package_cmxs_matches_build_manifest": true,
+    "actor_wasm_sha256": "296b0d19a5788ffee9aaf029a49cd62021a785e6e836a2b6bf72b46ee7c2882a",
+    "archive_raw_report_byte_identical_to_run": true,
+    "archived_source_cases_provenance_and_harness_match_measured_inputs": true,
+    "old_point_and_bulk_raw_artifacts_and_csv_unchanged": true
+  },
+  "command": "node benchmarks/run.mjs --wasm _build/map-functions/main.wasm --cases _build/map-functions/cases.json --out _build/map-functions/results.json --label pure-map-functions --trials 3 --delete-canisters true",
+  "summary_validation": "python3 benchmarks/summarize-map.py benchmarks/results/pure-map/functions/results.json --cases benchmarks/results/pure-map/functions/cases.json --out /tmp/pure-map-functions.csv",
+  "files_sha256": {
+    "main.mo": "07f49683284d1aeb1012909c3027b29dadae738c9c6131492912ec4ee45cf352",
+    "cases.json": "03e0d545d976d6044679b3bc39fa93f4894c947665918bd1769008b2493e2d1e",
+    "provenance.json": "6121cf6cb461fa98a82e740a1f079291ef5cba5ccc3382690886029995d63239",
+    "results.json": "a11ee36fc3bd7c20b7fb26d2852ae2e4d4ca8db09ea6b45c58098bc23e8b42f1",
+    "summary.csv": "fc3844c04de4dd3160171752ba0b83717dab92baa6b60f7b816870b7b1afac1a",
+    "costs.md": "d1dfd9769020a25a8d3a193697ac8a23acf808657f8878bb9c5ef79596d0afdc",
+    "harness/generate-map-functions.py": "36c1ae07eb81f2b5ec2d116fb0583ec607c29aecb3160c0900b75e354aa7c8bf",
+    "harness/build-map-comparison.py": "01883621817fd99d74e47d080dd2c28a482ddfd4752d774bfcac6f28c055a5ad",
+    "harness/summarize-map.py": "6d999e43a26c78ac7a730b28224c5a7eb53936eca0bdb0d075649fe7e66d41f3",
+    "harness/run.mjs": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e"
+  }
+}

@@ -3,9 +3,18 @@
 Measured with compiler `f1ccbba5e445df9db03bbc35be557187ade9b436`
 (`2.0.0-9-gf1ccbba5e`, clean checkout), plugin ABI 1, Core `2.5.0`, and
 PocketIC 14.0.0. Both implementations use the same compiler and actor.
-The 48 workloads used 144 fresh canisters and 384 measurements: all three
-trials had identical counts, every correctness check passed, and no
+The point/bulk suite's 48 workloads used 144 fresh canisters and 384
+measurements: all three trials had identical counts, every correctness check passed, and no
 synchronous collection occurred.
+
+The additional [public-function suite](functions/README.md) measures 37
+workload variants at **1,000, 10,000, and 100,000 entries**. Its
+[complete cost tables](functions/costs.md) show construction separately from
+populated-map operations, including `get`, `find`, `add`, `swap`, `insert`,
+iterators, folds, transforms, rank, split, and snapshots. All 111 workloads
+passed across 333 fresh canisters and 720 measurements, with identical
+three-trial counts and zero synchronous reclamation. Every row reports both
+instructions and cumulative allocation, including cases favoring Core.
 
 ## Point operations
 
@@ -193,22 +202,26 @@ Follow the [benchmark guide](../../README.md#persistent-ordered-map). The
 build helper requires a clean committed compiler for these final runs and
 checks compiler/version/binary identity, build-time plugin and host source
 hashes, package artifact hashes, and every locked Core file. Rebuilding after
-source changes is required. [point/provenance.json](point/provenance.json) and
-[bulk/provenance.json](bulk/provenance.json) record the exact inputs, including
-Map.mo and actor Wasm hashes. The
+source changes is required. [point/provenance.json](point/provenance.json),
+[bulk/provenance.json](bulk/provenance.json), and
+[functions/provenance.json](functions/provenance.json) record the exact inputs,
+including Map.mo and actor Wasm hashes. The
 [RTS reproduction check](validation/rts-reproduction.json) additionally records
 compiler wrapper and runtime Wasm hashes and confirms both actors recompile
 byte-for-byte with those inputs. The dependency manifest/lock and measured
 harness sources are archived in [dependencies/](dependencies/) and
 [harness/](harness/). Wasm binaries are identified by hash rather than committed.
+The function suite has its own [harness snapshot](functions/harness/), including
+per-trial canister cleanup, and records wrapper/RTS hashes directly. Its new
+snapshot leaves all earlier point/bulk raw artifacts unchanged.
 
 The archived harness files preserve the measured code; use the repository
 scripts from the guide for reproduction, since the scripts resolve inputs
-relative to the repository root. Validate both saved reports without running
+relative to the repository root. Validate all three saved reports without running
 PocketIC:
 
 ```sh
-for map_suite in point bulk; do
+for map_suite in point bulk functions; do
   python3 benchmarks/summarize-map.py \
     "benchmarks/results/pure-map/$map_suite/results.json" \
     --cases "benchmarks/results/pure-map/$map_suite/cases.json" \
