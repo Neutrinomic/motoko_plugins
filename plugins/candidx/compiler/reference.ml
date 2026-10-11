@@ -201,8 +201,8 @@ let encode_values types values =
     let steps = ref 0 in
     let payload_bytes = ref 0 in
     let step count depth =
-      if count > max_items - !steps || depth > max_depth then
-        fail "value traversal limit";
+      if depth > max_depth then fail "value nesting limit";
+      if count > max_items - !steps then fail "value traversal limit";
       steps := !steps + count
     in
     let bytes b =
@@ -237,7 +237,7 @@ let encode_values types values =
       in
       let rec distinct = function
         | a :: (b :: _ as rest) ->
-          if label a.T.lab = label b.T.lab then fail "duplicate field IDs";
+          if label a.T.lab = label b.T.lab then fail "source type field ids must strictly increase";
           distinct rest
         | _ -> ()
       in
@@ -319,7 +319,8 @@ let encode_values types values =
         Some_value (normalize child v (depth + 1))
       | T.Array child, V.Array vs ->
         let n = Array.length vs in
-        if n > max_items - !steps then fail "collection length limit";
+        if n > max_items then fail "collection length limit";
+        if n > max_items - !steps then fail "value traversal limit";
         if T.normalize child = T.Prim T.Nat8 then begin
           step n (if n = 0 then depth else depth + 1);
           let b = Bytes.init n (fun i -> match vs.(i) with
@@ -339,7 +340,7 @@ let encode_values types values =
           else Some (Int64.of_int i, child))
           (List.mapi (fun i (t, v) -> i, t, v) (List.combine ts vs)))
       | T.Obj (T.Actor, _, _), _ | T.Func _, _ ->
-        fail "function/service values outside data profile"
+        fail "function and service values are excluded"
       | T.Obj (_, fields, _), V.Obj values ->
         if List.length fields > max_items - !steps then
           fail "collection length limit";

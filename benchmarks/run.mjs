@@ -32,7 +32,8 @@ const wasm = new Uint8Array(await readFile(resolve(options.wasm)));
 const installWasm = gzipSync(wasm);
 const manifest = JSON.parse(await readFile(resolve(options.cases), 'utf8'));
 const explicitPhases = manifest.cases.some(spec => spec.phases !== undefined);
-const phaseKinds = new Set(['ordinary_candid', 'canonical_candid', 'sha256', 'control']);
+const phaseKinds = new Set(['ordinary_candid', 'canonical_candid', 'sha256',
+  'control', 'json', 'checked_decode']);
 function phasesFor(spec) {
   const kind = { candidx: 'canonical_candid', sha256: 'sha256', control: 'control' }[spec.family];
   const phases = spec.phases ?? [
@@ -56,6 +57,8 @@ function phasesFor(spec) {
       throw Error(`${spec.name}/${phase.label}: canonical phase needs an earlier ordinary_candid phase or host reference`);
     if (phase.kind === 'sha256' && !/^[0-9a-f]{64}$/i.test(spec.expected_sha256_hex ?? ''))
       throw Error(`${spec.name}/${phase.label}: missing SHA-256 oracle digest`);
+    if (phase.kind === 'json' && !Object.hasOwn(spec, 'expected_json'))
+      throw Error(`${spec.name}/${phase.label}: missing JSON oracle value`);
   }
   return phases;
 }
@@ -208,6 +211,13 @@ try {
             deepStrictEqual(bytes, canonicalReference, `${spec.name}/${phase.label}: canonical bytes`);
           } else if (phase.kind === 'sha256') {
             strictEqual(Buffer.from(bytes).toString('hex'), spec.expected_sha256_hex.toLowerCase(), `${spec.name}/${phase.label}: SHA-256 digest`);
+          } else if (phase.kind === 'json') {
+            const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            deepStrictEqual(JSON.parse(text), spec.expected_json, `${spec.name}/${phase.label}: JSON value`);
+          } else if (phase.kind === 'checked_decode') {
+            // The actor checks every retained typed value against its
+            // independently constructed input in this query, outside timing.
+            strictEqual(Buffer.from(bytes).toString('utf8'), 'ok', `${spec.name}/${phase.label}: typed decoder check`);
           }
           if (phase.kind === 'canonical_candid' || phase.kind === 'sha256') {
             if (equivalentOutputs.has(phase.kind))

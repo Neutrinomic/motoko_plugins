@@ -8,6 +8,12 @@
 import Prim "mo:⛔";
 
 actor {
+func expectOk(result : { #ok : Blob; #err : Text }) : Blob {
+  switch result {
+    case (#ok bytes) bytes;
+    case (#err message) Prim.trap(message);
+  }
+};
   type Entry = {
     index : Nat;
     payload : Blob;
@@ -18,26 +24,29 @@ actor {
   type Group = { entries : [Saved] };
   type Fixed = { index : Nat64; payload : Blob };
   type Choice = { #ready; #seen : Nat };
+  type Chain = ?(Nat, Chain);
 
   var retained : [Group] = [];
   var fixed : [Fixed] = [];
   var choices : [Choice] = [];
   var fixedOutput : Blob = "";
   var choicesOutput : Blob = "";
+  var failed : { #ok : Blob; #err : Text } = #err("");
   var large : Blob = "";
   var generation = 0;
   var reclaimedBefore = 0;
 
   func verify() {
     assert retained.size() == 2;
-    assert Prim.to_candid_canonical(fixed) == fixedOutput;
-    assert Prim.to_candid_canonical(choices) == choicesOutput;
+    assert failed == #err("value nesting limit");
+    assert expectOk(Prim.to_candid_canonical(fixed)) == fixedOutput;
+    assert expectOk(Prim.to_candid_canonical(choices)) == choicesOutput;
     assert fixed[63].index == Prim.natToNat64(generation + 63);
     assert choices[63] == #seen(generation + 63);
     for (group in retained.values()) {
       for (saved in group.entries.values()) {
         let encoded = saved.outputs[0];
-        assert Prim.to_candid_canonical(saved.original) == encoded;
+        assert expectOk(Prim.to_candid_canonical(saved.original)) == encoded;
         assert Prim.sha256(encoded) == saved.outputs[1];
         let decoded : ?Entry = from_candid encoded;
         assert decoded == ?saved.original;
@@ -49,7 +58,7 @@ actor {
     // Frozen wire bytes and a known SHA-256 answer also check the two plugins
     // independently of the results retained before collection.
     let abc = Prim.arrayToBlob([97, 98, 99]);
-    assert Prim.to_candid_canonical(abc) == "DIDL\01\6d\7b\01\00\03abc";
+    assert expectOk(Prim.to_candid_canonical(abc)) == "DIDL\01\6d\7b\01\00\03abc";
     assert Prim.sha256(abc) ==
       "\ba\78\16\bf\8f\01\cf\ea\41\41\40\de\5d\ae\22\23\b0\03\61\a3\96\17\7a\9c\b4\10\ff\61\f2\00\15\ad";
 
@@ -63,6 +72,15 @@ actor {
 
   public func prepare() : async () {
     generation += 1;
+    // A failed dynamic traversal leaves only GC-managed scratch. Its Result
+    // and subsequent successful outputs must survive the same forced GC.
+    var chain : Chain = null;
+    var depth = 0;
+    while (depth < 140) {
+      chain := ?(depth, chain);
+      depth += 1;
+    };
+    failed := Prim.to_candid_canonical(chain);
     large := Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(65_537,
       func(i) { Prim.natToNat8((i * 131 + 17) % 256) }));
     fixed := Prim.Array_tabulate<Fixed>(64, func(i) {
@@ -74,8 +92,8 @@ actor {
     choices := Prim.Array_tabulate<Choice>(64, func(i) {
       if (i % 2 == 0) #ready else #seen(generation + i)
     });
-    fixedOutput := Prim.to_candid_canonical(fixed);
-    choicesOutput := Prim.to_candid_canonical(choices);
+    fixedOutput := expectOk(Prim.to_candid_canonical(fixed));
+    choicesOutput := expectOk(Prim.to_candid_canonical(choices));
     retained := Prim.Array_tabulate<Group>(2, func(group) {
       { entries = Prim.Array_tabulate<Saved>(16, func(i) {
         let original : Entry = {
@@ -88,7 +106,7 @@ actor {
             state = if (i % 2 == 0) #ready else #seen(i);
           };
         };
-        let encoded = Prim.to_candid_canonical(original);
+        let encoded = expectOk(Prim.to_candid_canonical(original));
         { original; outputs = [encoded, Prim.sha256(encoded)] }
       }) }
     });

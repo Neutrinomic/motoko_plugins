@@ -61,16 +61,30 @@ Register a `Codegen.Plugin_codegen.plugin` during native module initialization.
 Choose unique package names, internal function IDs, and public Prim names.
 Private Wasm export names may be reused by separate packages.
 
-Pin the required compiler ABI in the source, currently `abi = 1`. Do not read
+Pin the required compiler ABI in the source, currently `abi = 2`. Do not read
 the running host's `abi_version` as the package requirement: that could accept
 a newer host without rebuilding for its semantics.
 
-Each binding supplies an argument policy, an interpreter reference, and a
-generator over `Plugin_codegen.Backend`. The current API supports a Blob input
-or variadic shared Motoko values, with a Blob result. The generator consumes
-the packed argument and leaves the result on the Wasm stack. Use the supplied
-layout, forwarding, and allocation helpers; consult the matching compiler's
-`src/codegen/plugin_codegen.mli` for the exact interface.
+Each binding supplies an argument policy (`Blob`, `Shared`, or `Fixed types`),
+an explicit type parameter count, a result-type function, and an interpreter
+reference returning `Value.value`. The result-type function validates the
+supported schema and returns its concrete Motoko result type. Expected runtime
+failures belong in a Motoko `#err` value; the evaluator's outer OCaml `Error`
+means an interpreter failure.
+
+A generator over `Plugin_codegen.Backend` receives a specialization record
+with `type_arguments`, `argument_types`, and `result_type`. It consumes the
+packed argument and leaves the vanilla result on the Wasm stack. Use managed
+constructors for records, variants, arrays, options, text, and boxed scalars.
+The array builder initializes all slots before running element code, so a
+decoder can return an error midway safely. Record and variant builders evaluate
+payloads before allocation. No generated code or runtime callback may introduce
+a GC safepoint.
+
+See [JSON](../plugins/json/) for explicit output specialization and typed
+errors, and the matching compiler's `src/codegen/plugin_codegen.mli` for the
+exact interface. ABI 1 generators/evaluators must migrate to this contract;
+changing only their version number is insufficient.
 
 ## Runtime and tests
 

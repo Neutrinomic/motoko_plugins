@@ -25,14 +25,16 @@ let binding = Mo_values.Compute_plugin.{
   id = "sha256_digest";
   name = "sha256";
   arguments = Blob;
-  evaluate = (fun _types -> function
-    | [Mo_values.Value.Blob bytes] -> Ok (Sha256_reference.digest bytes)
+  type_parameters = 0;
+  result_type = (fun _ _ -> Ok Mo_types.Type.blob);
+  evaluate = (fun _type_arguments _types -> function
+    | [Mo_values.Value.Blob bytes] -> Ok (Mo_values.Value.Blob (Sha256_reference.digest bytes))
     | _ -> Error "sha256 expects one Blob argument");
 }
 
 let () =
   P.register P.{
-    abi = 1;
+    abi = 2;
     name = "sha256";
     runtime = "runtime.wasm";
     imports = ["sha256_digest",

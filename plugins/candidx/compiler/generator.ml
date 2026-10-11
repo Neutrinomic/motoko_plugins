@@ -14,7 +14,31 @@ module Make (B : Plugin_codegen.Backend) = struct
      payload writing remain generated for the source types, as in serialize.
      The plugin runtime helpers only intern/join shapes and write the resulting header.
      No callback or GC increment occurs while the scratch context is live. *)
-  let canonical_call env name = call env "candidx" ("candid_canonical_" ^ name)
+  let is_error value =
+    value ^^ compile_add_const (Int64.neg Errors.base) ^^
+    compile_unboxed_const (Int64.of_int (Array.length Errors.messages)) ^^
+    compile_comparison I64Op.LtU
+
+  (* Every shared traversal returns either its original word or a reserved
+     error status. Propagate statuses before using a shape, length or pointer. *)
+  let checked env code =
+    let set_result, get_result = new_local env "canonical_checked" in
+    code ^^ set_result ^^ is_error get_result ^^
+    E.if0 (get_result ^^ G.i Return) G.nop ^^ get_result
+
+  let fail _env message =
+    compile_unboxed_const (Errors.code message) ^^ G.i Return
+
+  let then_fail env message = E.if0 (fail env message) G.nop
+  let else_fail env message = E.if0 G.nop (fail env message)
+
+  let canonical_call env name =
+    let code = call env "candidx" ("candid_canonical_" ^ name) in
+    if name = "new" || name = "done" then code else
+    checked env code ^^
+    (if List.mem name ["visit"; "begin"; "field"; "variants_begin";
+        "variants_push"; "join_begin"; "join_push"; "root"]
+     then G.i Drop else G.nop)
 
   let canonical_primitive t =
     Option.map (fun n -> Int64.of_int32 (Int32.neg n)) (candid_primitive t)
@@ -26,12 +50,9 @@ module Make (B : Plugin_codegen.Backend) = struct
     let if_ = match result with
       | None -> E.if0
       | Some typ -> E.if1 typ in
-    (* Keep the cold error path out of every decision-tree leaf. Besides code
-       size, this matters for the IC's per-function complexity limit. *)
-    let otherwise =
-      Func.share_code Func.Always env "canonical_unexpected_variant" [] []
-        (fun env _ -> E.trap_with env "CandidX error: unexpected variant") ^^
-      G.i Unreachable in
+    (* The invalid-tag path returns a small status word; allocation and error
+       text construction happen only at the outermost plugin entry point. *)
+    let otherwise = fail env "unexpected variant" in
     if List.length fs <= 4 then
       List.fold_right (fun (id, f) next ->
         value ^^ Variant.test_is env f.Type.lab ^^
@@ -78,7 +99,9 @@ module Make (B : Plugin_codegen.Backend) = struct
     in
     visit typ
 
-  let rec canonical_shape env t =
+  let rec canonical_shape env t = checked env (canonical_shape_raw env t)
+
+  and canonical_shape_raw env t =
     let open Type in
     let t = normalize t in
     Func.share_code3 Func.Always env (Strm.name_for "canonical_shape" [t])
@@ -95,7 +118,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         in
         let unary op shape =
           get_context ^^ compile_unboxed_const op ^^ shape ^^
-          canonical_call env "unary"
+          call env "candidx" "candid_canonical_unary"
         in
         let visit depth count =
           get_context ^^ depth ^^ count ^^ canonical_call env "visit"
@@ -115,11 +138,11 @@ module Make (B : Plugin_codegen.Backend) = struct
                 (visit (get_depth ^^ compile_add_const 1L) compile_unboxed_one)
             | _ -> retain
           ) fs ^^
-          get_context ^^ canonical_call env "end"
+          get_context ^^ call env "candidx" "candid_canonical_end"
         in
         visit get_depth compile_unboxed_one ^^
         match canonical_primitive t with
-        | Some (-17L) -> E.trap_with env "CandidX error: empty has no values"
+        | Some (-17L) -> fail env "empty has no values"
         | Some op -> compile_unboxed_const op
         | None -> begin match t with
           | Prim Blob ->
@@ -153,13 +176,13 @@ module Make (B : Plugin_codegen.Backend) = struct
                   canonical_case_shape env f.typ
                 else get_context ^^ compile_unboxed_const id ^^
                   child (get_x ^^ Variant.project env) f.typ ^^
-                  canonical_call env "variant")
+                  call env "candidx" "candid_canonical_variant")
           | Array typ ->
             let set_length, get_length = new_local env "vector_length" in
             get_x ^^ Arr.len env ^^ set_length ^^
             get_length ^^ compile_unboxed_const 2_000_000L ^^
             compile_comparison I64Op.GtU ^^
-            E.then_trap_with env "CandidX error: collection length limit" ^^
+            then_fail env "collection length limit" ^^
             begin match canonical_primitive (normalize typ), normalize typ with
             | Some op, _ when op <> -17L ->
               get_length ^^ compile_eq_const 0L ^^
@@ -197,8 +220,8 @@ module Make (B : Plugin_codegen.Backend) = struct
                                   (Lib.Uint32.to_int32 id)) ^^
                               compile_unboxed_const op ^^
                               canonical_call env "variants_push"
-                            | None -> E.trap_with env
-                                "CandidX error: unsupported source type")
+                            | None -> fail env
+                                "unsupported source type")
                       ) ^^
                       get_context ^^ canonical_call env "variants_end")))
             | _, _ when not (joins_fields typ) ->
@@ -227,14 +250,17 @@ module Make (B : Plugin_codegen.Backend) = struct
                       get_context ^^ canonical_call env "join_end")))
             end
           | Func _ | Obj (Actor, _, _) ->
-            E.trap_with env
-              "CandidX error: function and service values are excluded"
-          | _ -> E.trap_with env "CandidX error: unsupported source type"
+            fail env
+              "function and service values are excluded"
+          | _ -> fail env "unsupported source type"
         end)
 
   (* Share child visits for equal payload types and intern the selected case
      directly, without opening an intermediate field-builder frame. *)
   and canonical_case_shape env typ =
+    checked env (canonical_case_shape_raw env typ)
+
+  and canonical_case_shape_raw env typ =
     Func.share_code Func.Always env (Strm.name_for "canonical_case_shape" [typ])
       ["x", I64Type; "context", I64Type; "depth", I64Type; "case_id", I64Type]
       [I64Type] (fun env getters ->
@@ -251,7 +277,8 @@ module Make (B : Plugin_codegen.Backend) = struct
             get_x ^^ Variant.project env ^^ get_context ^^
             get_depth ^^ compile_add_const 1L ^^ canonical_shape env typ
         in
-        get_context ^^ get_id ^^ child ^^ canonical_call env "variant")
+        get_context ^^ get_id ^^ child ^^
+        call env "candidx" "candid_canonical_variant")
 
   let canonical_fixed_size t =
     let open Type in
@@ -288,6 +315,17 @@ module Make (B : Plugin_codegen.Backend) = struct
      separate measurement handles vector joins without keeping a payload tree
      or allocating a capacity buffer that must later be copied or resized. *)
   let rec canonical_payload ?(static = false) ?(force_share = false) env emit t =
+    let code = canonical_payload_raw ~static ~force_share env emit t in
+    (* Fixed-width scalars and records cannot fail after shape validation.
+       The enclosing serializer checks their accumulated output size once. *)
+    (* Primitive payloads are expanded in the caller unless forced to share;
+       their local error return already exits that caller, so another status
+       check after the expansion would be redundant. *)
+    if canonical_fixed_size t <> None ||
+       (not force_share && canonical_primitive (Type.normalize t) <> None)
+    then code else checked env code
+
+  and canonical_payload_raw ~static ~force_share env emit t =
     let open Type in
     let t = normalize t in
     let name = Strm.name_for
@@ -354,7 +392,7 @@ module Make (B : Plugin_codegen.Backend) = struct
           size ^^ set_length ^^
           get_length ^^ compile_unboxed_const 2_000_000L ^^
           compile_comparison I64Op.GtU ^^
-          E.then_trap_with env "CandidX error: collection length limit" ^^
+          then_fail env "collection length limit" ^^
           (if emit then write else word get_length ^^ advance get_length)
         in
         let body = match t with
@@ -366,11 +404,11 @@ module Make (B : Plugin_codegen.Backend) = struct
             get_x ^^ BitTagged.if_tagged_scalar env [I64Type]
               (Bool.lit true)
               (get_x ^^ BigNumLibtommath.fits_unsigned_bits env 28_672) ^^
-            E.else_trap_with env "CandidX error: integer length limit" ^^
+            else_fail env "integer length limit" ^^
             get_x ^^ buffer_size env t ^^ G.i Drop ^^ set_length ^^
             get_length ^^ compile_unboxed_const 4096L ^^
             compile_comparison I64Op.GtU ^^
-            E.then_trap_with env "CandidX error: integer length limit" ^^
+            then_fail env "integer length limit" ^^
             advance get_length
         | Prim Float32 ->
           fixed 4L (
@@ -460,19 +498,22 @@ module Make (B : Plugin_codegen.Backend) = struct
             Arr.for_each env get_x get_length (fun value ->
               child value typ get_child)
           end
-        | _ -> E.trap_with env "CandidX error: unsupported source value"
+        | _ -> fail env "unsupported source value"
         in
         body ^^
-        (if emit then G.nop else
+        (if emit || canonical_fixed_size t <> None then G.nop else
           get_position ^^ compile_unboxed_const 33_554_432L ^^
           compile_comparison I64Op.GtU ^^
-          E.then_trap_with env "CandidX error: output byte limit") ^^
+          then_fail env "output byte limit") ^^
         get_position)
 
   (* Share the work after case selection as well as the scalar payload. Wide
      variants otherwise duplicate LEB loops and thousands of locals, exceeding
      the IC's per-function complexity limit even with logarithmic dispatch. *)
   and canonical_case_payload env emit typ =
+    checked env (canonical_case_payload_raw env emit typ)
+
+  and canonical_case_payload_raw env emit typ =
     let name = Strm.name_for
       (if emit then "canonical_case_write" else "canonical_case_size")
       [typ] in
@@ -507,7 +548,7 @@ module Make (B : Plugin_codegen.Backend) = struct
           get_position ^^ canonical_payload ~force_share:true env emit typ)
 
   (* Candid label collisions must also be rejected in unused source branches.
-     This compile-time walk emits a normal runtime trap for an invalid schema;
+     This compile-time walk emits a typed error for an invalid schema;
      it does not change the shared-type rules or ordinary to_candid operator. *)
   let canonical_schema_valid ts =
     let open Type in
@@ -649,20 +690,20 @@ module Make (B : Plugin_codegen.Backend) = struct
         | _ -> Arr.len env) ^^ set_length ^^
       (if depth = 256 then
         get_length ^^ compile_eq_const 0L ^^
-        E.else_trap_with env "CandidX error: value nesting limit"
+        else_fail env "value nesting limit"
        else G.nop) ^^
       (match normalize typ with
       | Array _ ->
         get_length ^^ compile_unboxed_const 2_000_000L ^^
         compile_comparison I64Op.GtU ^^
-        E.then_trap_with env "CandidX error: collection length limit"
+        then_fail env "collection length limit"
       | _ -> G.nop) ^^
       let element_nodes = match normalize typ with
         | Array t -> static_nodes t
         | _ -> 1 in
       let visits = get_length ^^ compile_mul_const (Int64.of_int element_nodes) in
       visits ^^ remaining ^^ compile_comparison I64Op.GtU ^^
-      E.then_trap_with env "CandidX error: value traversal limit" ^^
+      then_fail env "value traversal limit" ^^
       remaining ^^ visits ^^
       G.i (Binary (Wasm_exts.Values.I64 I64Op.Sub)) ^^
       G.setter_for remaining ^^
@@ -724,6 +765,9 @@ module Make (B : Plugin_codegen.Backend) = struct
         G.concat_mapi (fun i typ ->
           argument i ^^ get_size ^^ canonical_payload ~static:true env false
             typ ^^ set_size) ts ^^
+        get_size ^^ compile_unboxed_const 33_554_432L ^^
+        compile_comparison I64Op.GtU ^^
+        then_fail env "output byte limit" ^^
         alloc_blob env get_size ^^ set_blob ^^
         get_blob ^^ Blob.payload_ptr_unskewed env ^^ set_position ^^
         write_static_header get_position header ^^
@@ -733,7 +777,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         get_position ^^ get_blob ^^ Blob.payload_ptr_unskewed env ^^
         get_size ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.Add)) ^^
         compile_comparison I64Op.Eq ^^
-        E.else_trap_with env "CandidX error: output buffer not filled" ^^
+        else_fail env "output buffer not filled" ^^
         get_blob)
 
   let serialize_canonical env ts : G.t =
@@ -768,7 +812,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         set_size ^^
         get_size ^^ compile_unboxed_const 33_554_432L ^^
         compile_comparison I64Op.GtU ^^
-        E.then_trap_with env "CandidX error: output byte limit" ^^
+        then_fail env "output byte limit" ^^
         alloc_blob env get_size ^^ set_blob ^^
         get_context ^^ get_blob ^^ Blob.payload_ptr_unskewed env ^^
         canonical_call env "write_types" ^^
@@ -781,14 +825,14 @@ module Make (B : Plugin_codegen.Backend) = struct
         get_position ^^ get_blob ^^ Blob.payload_ptr_unskewed env ^^
         get_size ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.Add)) ^^
         compile_comparison I64Op.Eq ^^
-        E.else_trap_with env "CandidX error: output buffer not filled" ^^
+        else_fail env "output buffer not filled" ^^
         get_context ^^ canonical_call env "done" ^^
         get_blob)
 
-  let compile env ts =
+  let compile_raw env ts =
     if not (canonical_schema_valid ts) then
-      E.trap_with env
-        "CandidX error: source type field ids must strictly increase"
+      G.i Drop ^^ compile_unboxed_const
+        (Errors.code "source type field ids must strictly increase")
     else match static_header ts with
     | Some (header, visits) -> serialize_static env ts header visits
     | None -> match ts with
@@ -804,4 +848,23 @@ module Make (B : Plugin_codegen.Backend) = struct
             (get_x ^^ serialize_static env ts nonempty visits)
         | _ -> serialize_canonical env ts)
       | _ -> serialize_canonical env ts
+
+  let error_result env =
+    Func.share_code1 Func.Always env "canonical_error_result"
+      ("status", I64Type) [I64Type] (fun env get_status ->
+        let cases = Array.to_list (Array.mapi (fun i message ->
+          Int64.add Errors.base (Int64.of_int i), message) Errors.messages) in
+        let text = List.fold_right (fun (code, message) next ->
+          get_status ^^ compile_eq_const code ^^
+          E.if1 I64Type (Text.lit env message) next) cases
+          (Text.lit env "unknown encoder error") in
+        Variant.inject env "err" text)
+
+  let compile env specialization =
+    let set_result, get_result = new_local env "canonical_result" in
+    compile_raw env specialization.Mo_values.Compute_plugin.argument_types ^^
+    set_result ^^ is_error get_result ^^
+    E.if1 I64Type (get_result ^^ error_result env)
+      (Variant.inject env "ok" get_result)
+
 end

@@ -126,9 +126,9 @@ def main():
         used = work / "used.mo"
         used.write_text('import Prim "mo:⛔"; ignore Prim.sha256("abc");\n')
         plain = compile_program(empty, work / "plain.wasm")
-        loaded = compile_program(empty, work / "loaded.wasm", [
-            PACKAGES / "candidx", PACKAGES / "sha256",
-        ])
+        packages = [PACKAGES / manifest.parent.name
+                    for manifest in sorted((ROOT / "plugins").glob("*/plugin.json"))]
+        loaded = compile_program(empty, work / "loaded.wasm", packages)
         assert plain == loaded, "unused plugins changed the output module"
 
         # Typechecking and interpretation can load a compiler component alone.

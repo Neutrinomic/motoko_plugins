@@ -1,12 +1,15 @@
 # CandidX
 
-`Prim.to_candid_canonical(...) : Blob` encodes Motoko values directly into the
+`Prim.to_candid_canonical(...) : { #ok : Blob; #err : Text }` encodes Motoko values directly into the
 CandidX `cx` canonical profile. The compiler specializes traversal, sizing,
 and writing for the argument types. A Rust Wasm helper handles dynamic shapes.
 
 ```motoko
 import Prim "mo:⛔";
-let encoded = Prim.to_candid_canonical({ height = 42; memo = ?"hello" });
+switch (Prim.to_candid_canonical({ height = 42; memo = ?"hello" })) {
+  case (#ok encoded) { /* use the canonical Blob */ };
+  case (#err message) { /* invalid input or an encoding limit */ };
+};
 ```
 
 Build with `scripts/build.sh --motoko /path/to/motoko candidx`, then pass
@@ -21,7 +24,13 @@ tests. Ordinary Motoko `to_candid` and `from_candid` are unaffected.
 Canonical types depend on values, absent optional record fields are omitted,
 and NaNs are normalized. Limits are 32 MiB output, 2,000,000 visited items,
 1,024 output types, depth 256, and 256 MiB scratch allocation per call.
-Unsupported actual function or service values and invalid schemas trap.
+Unsupported actual function or service values, invalid schemas, and encoding
+limits return `#err(message)` in both interpreters and compiled Wasm. Successful
+calls return `#ok(bytes)`. Error propagation releases no persistent resources;
+all scratch allocations are reclaimed by Motoko's ordinary GC.
+
+This replaces the experimental ABI 1 Blob result. Update callers to handle the
+Result, rebuild plugins for ABI 2, and recompile the canister.
 
 This is a typed intrinsic: inferred aliases preserve specialization, while
 ordinary function annotations cannot erase its identity. Wrap calls in an

@@ -11,8 +11,9 @@ frozen build, set CANDIDX_TEST_ARTIFACTS to a directory containing moc,
 mo-rts.wasm, mo-rts-debug.wasm, and candidx/{plugin.cmxs,runtime.wasm}.
 
 Only generated probes are supported: their unqualified legacy operator calls
-are changed to Prim.to_candid_canonical in adjacent .plugin.mo copies. Values,
-assertions, imports, and oracle sources are preserved. This is not a general
+are changed to Prim.to_candid_canonical in adjacent .plugin.mo copies and
+their Result is unwrapped for the legacy probe API. Expected #err results
+become probe traps. Values, assertions, and oracle sources are preserved. This is not a general
 Motoko source rewriter. Every translation and its source hashes are logged in
 CANDIDX_TEST_ROOT/compiler-invocations.jsonl.
 """
@@ -29,6 +30,51 @@ ROOT = Path(__file__).resolve().parents[3]
 CALL = re.compile(r"(?<![A-Za-z0-9_.])to_candid_canonical\s*(?=\()")
 
 
+def translate_probe(source):
+    """Wrap generated legacy calls without changing their input expressions."""
+    calls = list(CALL.finditer(source))
+    for call in reversed(calls):
+        start = source.index("(", call.end())
+        depth = 0
+        quote = None
+        position = start
+        while position < len(source):
+            char = source[position]
+            if quote is not None:
+                if char == "\\":
+                    position += 2
+                    continue
+                if char == quote:
+                    quote = None
+            elif char in ("\"", "'"):
+                quote = char
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            position += 1
+        if depth:
+            raise RuntimeError("Unclosed legacy call in generated probe")
+        source = (source[:call.start()] + "__candidxExpectOk(Prim.to_candid_canonical" +
+                  source[call.end():position + 1] + ")" + source[position + 1:])
+    if calls:
+        imports = list(re.finditer(r"^import [^\n]+;", source, re.MULTILINE))
+        if not imports:
+            raise RuntimeError("Generated probe has no imports")
+        insert = imports[-1].end()
+        source = source[:insert] + """
+func __candidxExpectOk(result : { #ok : Blob; #err : Text }) : Blob {
+  switch result {
+    case (#ok bytes) bytes;
+    case (#err message) Prim.trap("CandidX error: " # message);
+  }
+};
+""" + source[insert:]
+    return source, len(calls)
+
+
 def main():
     probe_root = Path(os.environ.get("CANDIDX_TEST_ROOT", ROOT / "_build/candidx-tests")).resolve()
     probe_root.mkdir(parents=True, exist_ok=True)
@@ -39,7 +85,7 @@ def main():
         if source.suffix != ".mo" or not source.is_file():
             continue
         original = source.read_text()
-        translated, count = CALL.subn("Prim.to_candid_canonical", original)
+        translated, count = translate_probe(original)
         if not count:
             continue
         source = source.resolve()

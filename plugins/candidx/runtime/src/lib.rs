@@ -46,16 +46,3 @@ mod host {
         unsafe { compute_plugin_trap(message.as_ptr(), message.len()) }
     }
 }
-
-fn trap_with_prefix(prefix: &str, message: &str) -> ! {
-    #[cfg(test)]
-    panic!("{prefix}{message}");
-
-    #[cfg(not(test))]
-    {
-        let mut text = alloc::vec::Vec::with_capacity(prefix.len() + message.len());
-        text.extend_from_slice(prefix.as_bytes());
-        text.extend_from_slice(message.as_bytes());
-        unsafe { host::compute_plugin_trap(text.as_ptr(), text.len()) }
-    }
-}

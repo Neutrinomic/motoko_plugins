@@ -7,11 +7,12 @@ component supplies the function's type policy, specialization generator, and
 reference implementation for the interpreters. The runtime supplies compute
 kernels and temporary helpers.
 
-The two initial packages in this repository are independent:
+Each package in this repository is independent:
 
 | Package | Prim function | Implementation |
 | --- | --- | --- |
-| `candidx` | `to_candid_canonical(...) : Blob` | Generated typed traversal and a Wasm shape-table helper |
+| `candidx` | `to_candid_canonical(...) : { #ok : Blob; #err : Text }` | Generated typed traversal and a Wasm shape-table helper |
+| `json` | `to_json(value)`, `from_json<T>(text)` | Typed heap visitors, streaming JSON parser/writer, managed Result values |
 | `sha256` | `sha256(Blob) : Blob` | Direct Blob access and a one-shot Wasm SHA-256 kernel |
 
 The CandidX package extracts the direct encoder from the CandidX compiler patch.
@@ -19,7 +20,13 @@ It does not use the standalone CandidX Wasm module. Its `cx` profile and limits
 are preserved: value-derived types, omission of absent optional record fields,
 canonical NaNs, at most 32 MiB output, 2,000,000 visited items, 1,024 output types,
 and depth 256. Unsupported actual function/service values and invalid schemas
-trap. Ordinary `to_candid` and `from_candid` retain their existing behavior.
+return `#err` in ABI 2. Ordinary `to_candid` and `from_candid` retain their existing behavior.
+
+Performance and allocation tables below record the original ABI 1 artifacts.
+They predate CandidX's Result wrapper and the JSON plugin; see each report's
+artifact hashes. Current measurements are recorded separately for
+[CandidX](../benchmarks/results/typed-results/README.md) and
+[JSON](../benchmarks/results/json/README.md).
 
 ## Build and use
 
@@ -30,14 +37,19 @@ repository at `../plugins`):
 make -C rts
 ../plugins/scripts/build.sh --motoko "$PWD"
 moc --plugin ../plugins/dist/candidx \
-    --plugin ../plugins/dist/sha256 example.mo -o example.wasm
+    --plugin ../plugins/dist/sha256 \
+    --plugin ../plugins/dist/json example.mo -o example.wasm
 ```
 
 ```motoko
 import Prim "mo:⛔";
 
-let bytes = Prim.to_candid_canonical({ height = 42; memo = ?"hello" });
-let digest = Prim.sha256(bytes);
+switch (Prim.to_candid_canonical({ height = 42; memo = ?"hello" })) {
+  case (#ok bytes) { let digest = Prim.sha256(bytes) };
+  case (#err message) { Prim.debugPrint(message) };
+};
+type User = { name : Text; age : Nat8 };
+let user = Prim.from_json<User>("{\"name\":\"Ada\",\"age\":37}");
 ```
 
 Pass the same `--plugin` options for `--check`, `-r`, or `-r -iR`. They add public
@@ -54,7 +66,9 @@ annotation. A normal explicitly typed wrapper is useful when passing an
 encoder as a callback:
 
 ```motoko
-func encodeHeight(x : Nat) : Blob { Prim.to_candid_canonical(x) };
+func encodeHeight(x : Nat) : { #ok : Blob; #err : Text } {
+  Prim.to_candid_canonical(x)
+};
 ```
 
 Argument lists and tuple values remain distinct, as with ordinary Candid:
@@ -197,7 +211,7 @@ introducing rooted handles before these plugins could use it.
 
 These plugins have no persistent per-call state, but pure computation
 can still allocate temporary garbage. SHA-256 allocates only its final digest
-Blob. CandidX's fixed-shape paths also allocate only their final Blob. Dynamic
+Blob. CandidX's fixed-shape paths allocate their final Blob and a small Result variant. Dynamic
 shape discovery additionally allocates Rust structures backed by ordinary
 pointer-free Motoko Blobs. Dropping the Rust context does not immediately free
 their backing bytes: `dealloc` is a no-op, and a later Motoko GC reclaims them.
@@ -291,18 +305,26 @@ The versioned compiler interface is
 1. A unique package name, ABI version, runtime filename, and runtime import
    signatures.
 2. Public Prim bindings, each with a unique internal identity, an argument
-   policy, and an interpreter reference implementation.
+   policy, explicit type parameter count, result-type function, and an
+   interpreter reference implementation.
 3. A generator functor over `Plugin_codegen.Backend`. It consumes one packed
-   Motoko argument value on the Wasm stack and leaves the result Blob there.
+   Motoko argument value on the Wasm stack and leaves its vanilla Motoko
+   result there. Specialization includes input types, explicit type arguments,
+   and the checked result type.
 
-The package's required ABI must be fixed at build time, such as `abi = 1` for
+The package's required ABI must be fixed at build time, such as `abi = 2` for
 the current SDK. Do not copy `Plugin_codegen.abi_version` from the running
 host: a plugin built with opaque or interface-only dependencies can otherwise
 adopt a newer host's ABI without having been rebuilt for its semantics.
 
-The initial argument policies are a fixed Blob input and a variadic sequence
-of shared Motoko values. Results are Blobs. Additional type policies and result
-layouts can be added to the SDK when a concrete plugin needs them.
+ABI 2 supports a fixed `Blob -> Blob` policy, fixed input type lists, and
+variadic shared inputs. Intrinsics can take explicit concrete type arguments
+and return records, variants, arrays, options, text, and scalars. JSON uses
+`from_json<T>` to specialize the decoder for `T` and return typed `#ok`/`#err`.
+The backend constructors manage forwarding, initialization, allocation, and
+write barriers, including early failures during array construction. No callback
+or safepoint may run during the borrowed-pointer interval. See the
+[authoring guide](adding-a-plugin.md) for migration from ABI 1.
 
 The SHA-256 package is the small example. CandidX demonstrates recursive type
 specialization. Kernel modules are Wasm64 shared libraries with `dylink.0`

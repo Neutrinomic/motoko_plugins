@@ -13,13 +13,13 @@ let values : [Choice] = [
   #_3_(255), #_4_('a'), #_0_(0), #_0_(1),
 ];
 assert Prim.to_candid_canonical(values) ==
-  "DIDL\02\6d\01\6b\06\00\7d\01\7e\02\71\03\7b\04\79\ff\ff\ff\ff\0f\7f\01\00\08\02\01x\00\80\01\01\01\05\03\ff\04\61\00\00\00\00\00\00\01";
+  #ok("DIDL\02\6d\01\6b\06\00\7d\01\7e\02\71\03\7b\04\79\ff\ff\ff\ff\0f\7f\01\00\08\02\01x\00\80\01\01\01\05\03\ff\04\61\00\00\00\00\00\00\01");
 
 // Only observed cases belong in the wire type, including repeated tags.
 assert Prim.to_candid_canonical([#_0_(1), #_0_(2)] : [Choice]) ==
-  "DIDL\02\6d\01\6b\01\00\7d\01\00\02\00\01\00\02";
+  #ok("DIDL\02\6d\01\6b\01\00\7d\01\00\02\00\01\00\02");
 assert Prim.to_candid_canonical([] : [Choice]) ==
-  "DIDL\01\6d\6f\01\00\00";
+  #ok("DIDL\01\6d\6f\01\00\00");
 
 // Nested collectors must leave the enclosing record builder intact. These
 // arrays derive independent subsets before their outer vector joins them.
@@ -28,4 +28,4 @@ let nested = [
   { _0_ = [#_1_(true)] : [Choice]; _1_ = 6 : Nat8 },
 ];
 assert Prim.to_candid_canonical(nested) ==
-  "DIDL\04\6d\01\6c\02\00\02\01\7b\6d\03\6b\02\00\7d\01\7e\01\00\02\01\00\01\05\01\01\01\06";
+  #ok("DIDL\04\6d\01\6c\02\00\02\01\7b\6d\03\6b\02\00\7d\01\7e\01\00\02\01\00\01\05\01\01\01\06");

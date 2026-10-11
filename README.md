@@ -7,7 +7,8 @@ compiler's memory and GC helpers.
 
 | Plugin | Function | Description |
 | --- | --- | --- |
-| [CandidX](plugins/candidx/) | `Prim.to_candid_canonical(...) : Blob` | Canonical Candid encoding from typed Motoko values |
+| [CandidX](plugins/candidx/) | `Prim.to_candid_canonical(...) : { #ok : Blob; #err : Text }` | Canonical Candid encoding from typed Motoko values |
+| [JSON](plugins/json/) | `Prim.to_json(value)`, `Prim.from_json<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
 | [SHA-256](plugins/sha256/) | `Prim.sha256(Blob) : Blob` | One-shot SHA-256 with direct Blob access |
 
 The compiler support is proposed in
@@ -26,14 +27,19 @@ nix develop
 make -C rts
 ../plugins/scripts/build.sh --motoko "$PWD"
 bin/moc --plugin ../plugins/dist/candidx \
-        --plugin ../plugins/dist/sha256 app.mo -o app.wasm
+        --plugin ../plugins/dist/sha256 \
+        --plugin ../plugins/dist/json app.mo -o app.wasm
 ```
 
 ```motoko
 import Prim "mo:⛔";
 
-let bytes = Prim.to_candid_canonical({ value = 42 });
-let digest = Prim.sha256(bytes);
+switch (Prim.to_candid_canonical({ value = 42 })) {
+  case (#ok bytes) { let digest = Prim.sha256(bytes) };
+  case (#err message) { Prim.debugPrint(message) };
+};
+type User = { name : Text; age : Nat8 };
+let user = Prim.from_json<User>("{\"name\":\"Ada\",\"age\":37}");
 ```
 
 The build creates a matching dynamically linked native compiler and independent
@@ -47,7 +53,9 @@ To build selected plugins, append their names:
 Prebuilt packages load with `--plugin` without rebuilding the compiler. Native
 components must match the compiler interfaces, OCaml toolchain, and host
 platform; incompatible packages produce an unsupported-plugin error. Rebuild
-packages when changing the compiler. Static Linux/musl and JavaScript compiler
+packages when changing the compiler. ABI 2 adds typed managed results; ABI 1
+packages are incompatible. CandidX callers must unwrap `#ok` or handle `#err`
+before using the Blob. Static Linux/musl and JavaScript compiler
 builds cannot load native `.cmxs` files.
 
 ## Repository layout
@@ -59,6 +67,8 @@ plugins/
     compiler/         registration, code generator, interpreter reference
     runtime/          Rust crate compiled to Wasm
     tests/            plugin-specific Motoko tests and fuzz adapter
+  json/
+    ...
   sha256/
     ...
 scripts/              shared build and test commands
@@ -87,7 +97,10 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-Recorded comparisons against Motoko libraries include:
+Current ABI 2 results: [CandidX versus its native Motoko library](benchmarks/results/typed-results/README.md)
+and [JSON encode/decode instruction costs](benchmarks/results/json/README.md).
+
+Earlier comparisons against Motoko libraries include:
 
 | Workload | Motoko library instructions | Plugin instructions |
 | --- | ---: | ---: |
@@ -95,7 +108,8 @@ Recorded comparisons against Motoko libraries include:
 | CandidX, 1,024 fixed records | 37,743,426 | 351,914 |
 | CandidX, 1,024 sparse records | 88,379,476 | 5,674,118 |
 
-These are historical PocketIC measurements, not Wasm component comparisons.
+These are historical ABI 1 PocketIC measurements, not Wasm component comparisons.
+They predate the Result API and JSON plugin.
 Input setup, reply encoding, and later GC are excluded. See the
 [full results and methodology](docs/design.md#native-library-instruction-comparison).
 

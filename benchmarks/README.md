@@ -1,5 +1,13 @@
 # PocketIC compute-plugin benchmarks
 
+Current generators target plugin ABI 2 and include successful `#ok` unwrapping
+inside each CandidX measurement. Archived reports retain their original ABI 1
+artifacts and measurements; they have not been regenerated or relabeled.
+The [typed-result CandidX report](results/typed-results/README.md) records fresh
+ABI 2 native-library comparisons and both complete 500-record fuzz seeds.
+The [JSON report](results/json/README.md) records typed encoding and decoding
+costs for records, arrays, and binary data.
+
 The recorded [first-pass results](results/README.md) and
 [second-pass results](results/pass2/README.md) include raw reports and artifact
 hashes. The second pass uses the previous optimized implementation as its
@@ -95,6 +103,30 @@ script rejects failed or incomplete reports and checks matching output hashes
 and sizes before reporting reductions. When using `--filter`, apply the same
 filter to both runs so the comparison covers matching workloads.
 
+## Typed JSON
+
+Generate independent Python JSON inputs, then compile and measure the JSON
+plugin in the same environment:
+
+```sh
+python3 benchmarks/generate-json.py --out _build/json-perf
+"$MOTOKO_ROOT/bin/moc" --plugin dist/json \
+  _build/json-perf/main.mo -o _build/json-perf/main.wasm
+node benchmarks/run.mjs \
+  --wasm _build/json-perf/main.wasm --cases _build/json-perf/cases.json \
+  --out _build/json-perf/results.json --label typed-json --trials 3
+```
+
+The six workloads encode and decode a small record, 1,024 records, and a
+64 KiB Blob. The timed interval includes successful Result unwrapping and
+assignment of the retained typed result. Encoder outputs are parsed by the
+host's `JSON.parse` and compared with independently generated Python data.
+For decoding, a separate actor query compares the full decoded value with an
+independently constructed Motoko value. Its two-byte `"ok"` response is the
+reported decoder output size; it is not the size of the decoded heap object.
+Validation, UTF-8 reply conversion, and message-end GC are outside the interval.
+These measurements establish plugin costs; they do not compare JSON libraries.
+
 ## Native-library comparison
 
 This comparison puts native and plugin implementations in the same actor and
@@ -186,8 +218,9 @@ invoke the plugin without modifying their oracles or original probes. Pass its
 absolute path as both `--moc` and `--runtime-moc`, and pass `--skip-wasm` to
 exclude the standalone Wasm backend. Set `CANDIDX_TEST_ROOT` to a directory
 containing the driver's `--out` directory. It only rewrites unqualified legacy
-`to_candid_canonical(...)` calls to `Prim.to_candid_canonical(...)` in adjacent
-copies of generated probes, recording source hashes and translations.
+`to_candid_canonical(...)` calls to `Prim.to_candid_canonical(...)` and unwraps
+the Result for the legacy probe API in adjacent copies, recording source hashes
+and translations. Expected `#err` results become traps only in this test adapter.
 
 Follow the sibling CandidX repository's test setup for its Python/Wasmtime,
 Rust, OCaml, and TypeScript oracles. The saved summary includes exact commands

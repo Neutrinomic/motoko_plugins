@@ -14,50 +14,150 @@ const MISSING: i64 = i64::MIN;
 // Internal builder mode, outside the supported compound opcode range.
 const PRIMITIVE_VARIANTS: i64 = 0;
 
-fn invalid(message: &str) -> ! {
-    crate::trap_with_prefix("CandidX error: ", message)
+type Checked<T> = core::result::Result<T, Error>;
+
+// Generator-only errors reserve the gaps in these shared status numbers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+enum Error {
+    CollectionLengthLimit = 0,
+    FieldIdRange = 2,
+    HeaderPointerRange = 4,
+    HeaderSizeChanged = 5,
+    IncompatiblePrimitiveVariantPayloads = 6,
+    IncompatibleValueShapes = 7,
+    IndexRange = 8,
+    InvalidFieldBuilderMode = 10,
+    InvalidFieldBuilderOpcode = 11,
+    InvalidFieldShape = 12,
+    InvalidPrimitiveVariantPayload = 13,
+    InvalidShapeUnion = 14,
+    InvalidUnaryShape = 15,
+    InvalidVariantCollectorMode = 16,
+    MissingDerivedVariant = 17,
+    MissingFieldBuilder = 18,
+    MissingFieldShape = 19,
+    MissingShapeJoiner = 20,
+    MissingUnaryShape = 21,
+    MissingVariantCollector = 22,
+    MissingVariantShape = 23,
+    NullShapeContext = 24,
+    OutputByteLimit = 26,
+    OutputTypeTableLimit = 27,
+    RootIndexRange = 28,
+    ScratchAllocationFailed = 29,
+    ScratchByteLimit = 30,
+    ShapeContextIsFinalized = 31,
+    ShapeReferenceRange = 32,
+    TypeNestingLimit = 34,
+    UnfinishedFieldBuilder = 36,
+    UnfinishedShapeJoiner = 37,
+    UnorderedFieldIds = 38,
+    UnsupportedCompoundShape = 39,
+    UnsupportedShapeReference = 40,
+    ValueNestingLimit = 43,
+    ValueTraversalLimit = 44,
+}
+
+// Reserved status values cannot alias primitive opcodes, node IDs or MISSING.
+const ERROR_BASE: i64 = -1000;
+#[cfg(test)]
+const ERRORS: &[&str] = &[
+    "collection length limit",
+    "empty has no values",
+    "field ID range",
+    "function and service values are excluded",
+    "header pointer range",
+    "header size changed",
+    "incompatible primitive variant payloads",
+    "incompatible value shapes",
+    "index range",
+    "integer length limit",
+    "invalid field builder mode",
+    "invalid field builder opcode",
+    "invalid field shape",
+    "invalid primitive variant payload",
+    "invalid shape union",
+    "invalid unary shape",
+    "invalid variant collector mode",
+    "missing derived variant",
+    "missing field builder",
+    "missing field shape",
+    "missing shape joiner",
+    "missing unary shape",
+    "missing variant collector",
+    "missing variant shape",
+    "null shape context",
+    "output buffer not filled",
+    "output byte limit",
+    "output type-table limit",
+    "root index range",
+    "scratch allocation failed",
+    "scratch byte limit",
+    "shape context is finalized",
+    "shape reference range",
+    "source type field ids must strictly increase",
+    "type nesting limit",
+    "unexpected variant",
+    "unfinished field builder",
+    "unfinished shape joiner",
+    "unordered field IDs",
+    "unsupported compound shape",
+    "unsupported shape reference",
+    "unsupported source type",
+    "unsupported source value",
+    "value nesting limit",
+    "value traversal limit",
+];
+fn status(error: Error) -> i64 {
+    ERROR_BASE + error as i64
 }
 
 // The ephemeral allocator backs allocations with a three-word Blob header.
 // Include its alignment padding and heap-word rounding, as well as the entire
 // new allocation on every growth: old buffers remain garbage until GC.
-fn allocation_size<T>(count: usize) -> usize {
+fn allocation_size<T>(count: usize) -> Checked<usize> {
     let word = size_of::<usize>();
     let alignment = align_of::<T>().max(word);
     count
         .checked_mul(size_of::<T>())
         .and_then(|n| n.checked_add(3 * word + alignment - 1))
-        .unwrap_or_else(|| invalid("scratch byte limit"))
+        .ok_or(Error::ScratchByteLimit)
 }
 struct Scratch {
     used: usize,
     limit: usize,
 }
 impl Scratch {
-    fn charge<T>(&mut self, count: usize) {
+    fn charge<T>(&mut self, count: usize) -> Checked<()> {
         self.used = self
             .used
-            .checked_add(allocation_size::<T>(count))
+            .checked_add(allocation_size::<T>(count)?)
             .filter(|used| *used <= self.limit)
-            .unwrap_or_else(|| invalid("scratch byte limit"));
+            .ok_or(Error::ScratchByteLimit)?;
+
+        Ok(())
     }
-    fn reserve<T>(&mut self, values: &mut Vec<T>, required: usize) {
+
+    fn reserve<T>(&mut self, values: &mut Vec<T>, required: usize) -> Checked<()> {
         if values.capacity() >= required {
-            return;
+            return Ok(());
         }
         let capacity = required.max(values.capacity().saturating_mul(2));
-        self.charge::<T>(capacity);
+        self.charge::<T>(capacity)?;
         values
             .try_reserve_exact(capacity - values.len())
-            .unwrap_or_else(|_| invalid("scratch allocation failed"));
+            .map_err(|_| Error::ScratchAllocationFailed)?;
+
+        Ok(())
     }
-    fn push<T>(&mut self, values: &mut Vec<T>, value: T) {
-        let required = values
-            .len()
-            .checked_add(1)
-            .unwrap_or_else(|| invalid("scratch byte limit"));
-        self.reserve(values, required);
+
+    fn push<T>(&mut self, values: &mut Vec<T>, value: T) -> Checked<()> {
+        let required = values.len().checked_add(1).ok_or(Error::ScratchByteLimit)?;
+        self.reserve(values, required)?;
         values.push(value);
+
+        Ok(())
     }
 }
 
@@ -119,11 +219,11 @@ struct Context {
 fn primitive(t: i64) -> bool {
     (-17..=-1).contains(&t) || t == -24
 }
-fn index(value: u64) -> usize {
-    usize::try_from(value).unwrap_or_else(|_| invalid("index range"))
+fn index(value: u64) -> Checked<usize> {
+    usize::try_from(value).map_err(|_| Error::IndexRange)
 }
-fn label(value: u64) -> u32 {
-    u32::try_from(value).unwrap_or_else(|_| invalid("field ID range"))
+fn label(value: u64) -> Checked<u32> {
+    u32::try_from(value).map_err(|_| Error::FieldIdRange)
 }
 // MurmurHash64A word rounds and final avalanche (Austin Appleby, public
 // domain). Shape keys are whole words, so no byte-buffer or tail is needed.
@@ -155,7 +255,9 @@ impl Context {
             used: 0,
             limit: MAX_SCRATCH,
         };
-        scratch.charge::<Self>(1);
+        scratch
+            .charge::<Self>(1)
+            .expect("context fits scratch limit");
         Self {
             scratch,
             visits: 0,
@@ -173,23 +275,37 @@ impl Context {
             header_size: None,
         }
     }
-    fn open(&self) {
+    #[inline(always)]
+    fn open(&self) -> Checked<()> {
         if self.header_size.is_some() {
-            invalid("shape context is finalized");
+            return Err(Error::ShapeContextIsFinalized);
         }
+
+        Ok(())
     }
-    fn check(&self, t: i64) {
+
+    #[inline(always)]
+    fn check(&self, t: i64) -> Checked<()> {
         if t < 0 {
             if !primitive(t) {
-                invalid("unsupported shape reference");
+                return Err(Error::UnsupportedShapeReference);
             }
         } else if t as u64 >= self.nodes.len() as u64 {
-            invalid("shape reference range");
+            return Err(Error::ShapeReferenceRange);
+        }
+
+        Ok(())
+    }
+
+    #[inline(always)]
+    fn op(&self, t: i64) -> i64 {
+        if t < 0 {
+            t
+        } else {
+            self.nodes[t as usize].op
         }
     }
-    fn op(&self, t: i64) -> i64 {
-        if t < 0 { t } else { self.nodes[t as usize].op }
-    }
+    #[inline(always)]
     fn height(&self, t: i64) -> usize {
         if t < 0 {
             0
@@ -197,19 +313,23 @@ impl Context {
             self.nodes[t as usize].height
         }
     }
-    fn visit(&mut self, depth: u64, count: u64) {
+    #[inline(always)]
+    fn visit(&mut self, depth: u64, count: u64) -> Checked<()> {
         if depth > MAX_DEPTH as u64 {
-            invalid("value nesting limit");
+            return Err(Error::ValueNestingLimit);
         }
         self.visits = self
             .visits
-            .checked_add(index(count))
+            .checked_add(index(count)?)
             .filter(|visits| *visits <= MAX_ITEMS)
-            .unwrap_or_else(|| invalid("value traversal limit"));
+            .ok_or(Error::ValueTraversalLimit)?;
+
+        Ok(())
     }
-    fn rebuild_slots(&mut self, size: usize) {
+
+    fn rebuild_slots(&mut self, size: usize) -> Checked<()> {
         let mut slots = Vec::new();
-        self.scratch.reserve(&mut slots, size);
+        self.scratch.reserve(&mut slots, size)?;
         slots.resize(size, 0);
         for (id, node) in self.nodes.iter().enumerate() {
             let mut slot = node.hash as usize & (size - 1);
@@ -219,45 +339,55 @@ impl Context {
             slots[slot] = id + 1;
         }
         self.slots = slots;
+
+        Ok(())
     }
+
     #[inline(always)]
-    fn intern(&mut self, op: i64, child: i64, fields: &[Field]) -> i64 {
-        self.open();
+    fn intern(&mut self, op: i64, child: i64, fields: &[Field]) -> Checked<i64> {
+        self.open()?;
         let mut height = 1;
         match op {
             -18 | -19 => {
                 if !fields.is_empty() {
-                    invalid("invalid unary shape");
+                    return Err(Error::InvalidUnaryShape);
                 }
-                self.check(child);
+                self.check(child)?;
                 height += self.height(child);
             }
             -20 | -21 => {
                 if child != MISSING || fields.len() > MAX_ITEMS {
-                    invalid("invalid field shape");
+                    return Err(Error::InvalidFieldShape);
                 }
                 let mut previous = None;
                 for field in fields {
                     if previous.is_some_and(|id| id >= field.id) {
-                        invalid("unordered field IDs");
+                        return Err(Error::UnorderedFieldIds);
                     }
                     previous = Some(field.id);
-                    self.check(field.child);
+                    self.check(field.child)?;
                     height = height.max(self.height(field.child) + 1);
                 }
             }
-            _ => invalid("unsupported compound shape"),
+            _ => return Err(Error::UnsupportedCompoundShape),
         }
         self.intern_validated(op, child, fields, height)
     }
+
     // Callers establish valid child references, sorted field IDs and the
     // computed height while constructing the shape, in an open context.
-    fn intern_validated(&mut self, op: i64, child: i64, fields: &[Field], height: usize) -> i64 {
+    fn intern_validated(
+        &mut self,
+        op: i64,
+        child: i64,
+        fields: &[Field],
+        height: usize,
+    ) -> Checked<i64> {
         if fields.len() > MAX_ITEMS {
-            invalid("invalid field shape");
+            return Err(Error::InvalidFieldShape);
         }
         if height > MAX_DEPTH + 1 {
-            invalid("type nesting limit");
+            return Err(Error::TypeNestingLimit);
         }
         let hash = shape_hash(op, child, fields);
         if !self.slots.is_empty() {
@@ -270,17 +400,17 @@ impl Context {
                     && node.child == child
                     && node.fields == fields
                 {
-                    return id as i64;
+                    return Ok(id as i64);
                 }
                 slot = (slot + 1) & (self.slots.len() - 1);
             }
         }
         if self.nodes.len() + 1 > self.slots.len() / 2 {
-            self.rebuild_slots(self.slots.len().saturating_mul(2).max(8));
+            self.rebuild_slots(self.slots.len().saturating_mul(2).max(8))?;
         }
         let mut retained = Vec::new();
         if !fields.is_empty() {
-            self.scratch.reserve(&mut retained, fields.len());
+            self.scratch.reserve(&mut retained, fields.len())?;
             retained.extend_from_slice(fields);
         }
         let id = self.nodes.len();
@@ -293,24 +423,28 @@ impl Context {
                 hash,
                 height,
             },
-        );
+        )?;
         let mut slot = hash as usize & (self.slots.len() - 1);
         while self.slots[slot] != 0 {
             slot = (slot + 1) & (self.slots.len() - 1);
         }
         self.slots[slot] = id + 1;
-        id as i64
+        Ok(id as i64)
     }
-    fn begin(&mut self, op: i64) {
-        self.open();
+
+    fn begin(&mut self, op: i64) -> Checked<()> {
+        self.open()?;
         if ![-20, -21].contains(&op) {
-            invalid("invalid field builder opcode");
+            return Err(Error::InvalidFieldBuilderOpcode);
         }
-        self.begin_builder(op);
+        self.begin_builder(op)?;
+
+        Ok(())
     }
-    fn begin_builder(&mut self, op: i64) {
+
+    fn begin_builder(&mut self, op: i64) -> Checked<()> {
         if self.building > MAX_DEPTH {
-            invalid("type nesting limit");
+            return Err(Error::TypeNestingLimit);
         }
         if self.building == self.builders.len() {
             self.scratch.push(
@@ -322,46 +456,53 @@ impl Context {
                     previous: MISSING,
                     count: 0,
                 },
-            );
+            )?;
         }
         let builder = &mut self.builders[self.building];
         builder.op = op;
         builder.fields.clear();
         builder.height = 1;
         self.building += 1;
+
+        Ok(())
     }
-    fn field(&mut self, id: u64, child: i64) {
-        self.open();
-        self.check(child);
-        let id = label(id);
+
+    fn field(&mut self, id: u64, child: i64) -> Checked<()> {
+        self.open()?;
+        self.check(child)?;
+        let id = label(id)?;
         let height = self.height(child) + 1;
         let builder = self
             .builders
             .get_mut(self.building.wrapping_sub(1))
-            .unwrap_or_else(|| invalid("missing field builder"));
+            .ok_or(Error::MissingFieldBuilder)?;
         if builder.op == PRIMITIVE_VARIANTS {
-            invalid("invalid field builder mode");
+            return Err(Error::InvalidFieldBuilderMode);
         }
         if builder.fields.len() >= MAX_ITEMS {
-            invalid("collection length limit");
+            return Err(Error::CollectionLengthLimit);
         }
         if builder
             .fields
             .last()
             .is_some_and(|previous| previous.id >= id)
         {
-            invalid("unordered field IDs");
+            return Err(Error::UnorderedFieldIds);
         }
-        self.scratch.push(&mut builder.fields, Field { id, child });
+        self.scratch
+            .push(&mut builder.fields, Field { id, child })?;
         builder.height = builder.height.max(height);
+
+        Ok(())
     }
-    fn end(&mut self) -> i64 {
-        self.open();
+
+    fn end(&mut self) -> Checked<i64> {
+        self.open()?;
         if self.building == 0 {
-            invalid("missing field builder");
+            return Err(Error::MissingFieldBuilder);
         }
         if self.builders[self.building - 1].op == PRIMITIVE_VARIANTS {
-            invalid("invalid field builder mode");
+            return Err(Error::InvalidFieldBuilderMode);
         }
         self.building -= 1;
         let builder = &mut self.builders[self.building];
@@ -378,102 +519,108 @@ impl Context {
         {
             previous
         } else {
-            self.intern_validated(op, MISSING, &fields, height)
+            self.intern_validated(op, MISSING, &fields, height)?
         };
         let builder = &mut self.builders[self.building];
         builder.fields = fields;
         builder.previous = result;
-        result
+        Ok(result)
     }
-    fn variant(&mut self, id: u64, child: i64) -> i64 {
-        self.open();
-        self.check(child);
+
+    fn variant(&mut self, id: u64, child: i64) -> Checked<i64> {
+        self.open()?;
+        self.check(child)?;
         let field = Field {
-            id: label(id),
+            id: label(id)?,
             child,
         };
         self.intern_validated(-21, MISSING, &[field], self.height(child) + 1)
     }
-    fn variants_begin(&mut self) {
-        self.open();
-        self.begin_builder(PRIMITIVE_VARIANTS);
+
+    fn variants_begin(&mut self) -> Checked<()> {
+        self.open()?;
+        self.begin_builder(PRIMITIVE_VARIANTS)?;
         self.builders[self.building - 1].count = 0;
+
+        Ok(())
     }
-    fn variants_push(&mut self, id: u64, child: i64) {
-        self.open();
+
+    fn variants_push(&mut self, id: u64, child: i64) -> Checked<()> {
+        self.open()?;
         // The compiler uses this collector only when each source case has a
         // fixed primitive payload. Such a payload never needs a shape join.
         if !primitive(child) || child == -17 {
-            invalid("invalid primitive variant payload");
+            return Err(Error::InvalidPrimitiveVariantPayload);
         }
         let field = Field {
-            id: label(id),
+            id: label(id)?,
             child,
         };
         let builder = self
             .builders
             .get_mut(self.building.wrapping_sub(1))
-            .unwrap_or_else(|| invalid("missing variant collector"));
+            .ok_or(Error::MissingVariantCollector)?;
         if builder.op != PRIMITIVE_VARIANTS {
-            invalid("invalid variant collector mode");
+            return Err(Error::InvalidVariantCollectorMode);
         }
         if builder.count >= MAX_ITEMS {
-            invalid("collection length limit");
+            return Err(Error::CollectionLengthLimit);
         }
         builder.count += 1;
         // Only adjacent duplicates avoid storage. Cyclic repetitions remain
         // buffered until the final sort, so scratch is bounded by input size,
         // not merely by the number of distinct selected cases.
         if builder.fields.last() == Some(&field) {
-            return;
+            return Ok(());
         }
-        self.scratch.push(&mut builder.fields, field);
+        self.scratch.push(&mut builder.fields, field)?;
+
+        Ok(())
     }
-    fn variants_end(&mut self) -> i64 {
-        self.open();
+
+    fn variants_end(&mut self) -> Checked<i64> {
+        self.open()?;
         let position = self
             .building
             .checked_sub(1)
-            .unwrap_or_else(|| invalid("missing variant collector"));
+            .ok_or(Error::MissingVariantCollector)?;
         let builder = &mut self.builders[position];
         if builder.op != PRIMITIVE_VARIANTS {
-            invalid("invalid variant collector mode");
+            return Err(Error::InvalidVariantCollectorMode);
         }
         let mut fields = take(&mut builder.fields);
         fields.sort_unstable_by_key(|field| field.id);
-        fields.dedup_by(|later, earlier| {
-            if earlier.id != later.id {
-                return false;
+        for pair in fields.windows(2) {
+            if pair[0].id == pair[1].id && pair[0].child != pair[1].child {
+                return Err(Error::IncompatiblePrimitiveVariantPayloads);
             }
-            if earlier.child != later.child {
-                invalid("incompatible primitive variant payloads");
-            }
-            true
-        });
+        }
+        fields.dedup_by_key(|field| field.id);
         // Only the completed union survives: no singleton or intermediate
         // union nodes are needed for this array's element type.
         let result = if fields.is_empty() {
             -17
         } else {
-            self.intern_validated(-21, MISSING, &fields, 1)
+            self.intern_validated(-21, MISSING, &fields, 1)?
         };
         let builder = &mut self.builders[position];
         builder.fields = fields;
         builder.previous = MISSING;
         self.building = position;
-        result
+        Ok(result)
     }
-    fn unary(&mut self, op: i64, child: i64) -> i64 {
+
+    fn unary(&mut self, op: i64, child: i64) -> Checked<i64> {
         // Options commonly repeat. Cache vectors after the table exists,
         // avoiding an allocation for a lone outer vector or binary value.
         if op != -18 && (op != -19 || self.shape_memos.is_none()) {
-            return self.intern(op, child, &[]);
+            return Ok(self.intern(op, child, &[])?);
         }
-        self.open();
+        self.open()?;
         let key = ((op as u64).rotate_left(7) ^ child as u64).wrapping_mul(0x9e37_79b1_85eb_ca87);
         let slot = (key >> 32) as usize & (SHAPE_MEMOS - 1);
         if self.shape_memos.is_none() {
-            self.scratch.charge::<[ShapeMemo; SHAPE_MEMOS]>(1);
+            self.scratch.charge::<[ShapeMemo; SHAPE_MEMOS]>(1)?;
             self.shape_memos = Some(Box::new(
                 [ShapeMemo {
                     a: MISSING,
@@ -484,39 +631,40 @@ impl Context {
         }
         let cached = self.shape_memos.as_ref().unwrap()[slot];
         if cached.a == op && cached.b == child {
-            return cached.result;
+            return Ok(cached.result);
         }
-        let result = self.intern(op, child, &[]);
+        let result = self.intern(op, child, &[])?;
         self.shape_memos.as_mut().unwrap()[slot] = ShapeMemo {
             a: op,
             b: child,
             result,
         };
-        result
+        Ok(result)
     }
-    fn join(&mut self, a: i64, b: i64, depth: usize) -> i64 {
-        self.open();
-        self.check(a);
-        self.check(b);
+
+    fn join(&mut self, a: i64, b: i64, depth: usize) -> Checked<i64> {
+        self.open()?;
+        self.check(a)?;
+        self.check(b)?;
         if depth > MAX_DEPTH {
-            invalid("type nesting limit");
+            return Err(Error::TypeNestingLimit);
         }
         if a == b || b == -17 {
-            return a;
+            return Ok(a);
         }
         if a == -17 {
-            return b;
+            return Ok(b);
         }
         let a_op = self.op(a);
         let b_op = self.op(b);
         if a == -1 {
-            return if b_op == -18 { b } else { self.unary(-18, b) };
+            return Ok(if b_op == -18 { b } else { self.unary(-18, b)? });
         }
         if b == -1 {
-            return if a_op == -18 { a } else { self.unary(-18, a) };
+            return Ok(if a_op == -18 { a } else { self.unary(-18, a)? });
         }
         if a_op != -20 || b_op != -20 {
-            return self.join_compound(a, b, a_op, b_op, depth);
+            return Ok(self.join_compound(a, b, a_op, b_op, depth)?);
         }
         // Optional-field presence patterns recur in record vectors. Share
         // the bounded per-call memo with unary shapes.
@@ -524,7 +672,7 @@ impl Context {
         let key = ((a as u64).rotate_left(7) ^ b as u64).wrapping_mul(0x9e37_79b1_85eb_ca87);
         let slot = (key >> 32) as usize & (SHAPE_MEMOS - 1);
         if self.shape_memos.is_none() {
-            self.scratch.charge::<[ShapeMemo; SHAPE_MEMOS]>(1);
+            self.scratch.charge::<[ShapeMemo; SHAPE_MEMOS]>(1)?;
             self.shape_memos = Some(Box::new(
                 [ShapeMemo {
                     a: MISSING,
@@ -537,15 +685,23 @@ impl Context {
         // Near the depth limit, replay the recursive checks: a shallow cache
         // entry must not bypass an inner join that would exceed MAX_DEPTH.
         if cached.a == a && cached.b == b && depth + self.height(cached.result) <= MAX_DEPTH {
-            return cached.result;
+            return Ok(cached.result);
         }
-        let result = self.join_compound(a, b, a_op, b_op, depth);
+        let result = self.join_compound(a, b, a_op, b_op, depth)?;
         self.shape_memos.as_mut().unwrap()[slot] = ShapeMemo { a, b, result };
-        result
+        Ok(result)
     }
+
     // Keep the non-record path free of another function call and op loads.
     #[inline(always)]
-    fn join_compound(&mut self, a: i64, b: i64, a_op: i64, b_op: i64, depth: usize) -> i64 {
+    fn join_compound(
+        &mut self,
+        a: i64,
+        b: i64,
+        a_op: i64,
+        b_op: i64,
+        depth: usize,
+    ) -> Checked<i64> {
         if a_op == -18 || b_op == -18 {
             let left = if a_op == -18 {
                 self.nodes[a as usize].child
@@ -557,20 +713,20 @@ impl Context {
             } else {
                 b
             };
-            let child = self.join(left, right, depth + 1);
-            return self.unary(-18, child);
+            let child = self.join(left, right, depth + 1)?;
+            return Ok(self.unary(-18, child)?);
         }
         if a_op != b_op || ![-19, -20, -21].contains(&a_op) {
-            invalid("incompatible value shapes");
+            return Err(Error::IncompatibleValueShapes);
         }
         if a_op == -19 {
             let left = self.nodes[a as usize].child;
             let right = self.nodes[b as usize].child;
-            let child = self.join(left, right, depth + 1);
-            return self.unary(-19, child);
+            let child = self.join(left, right, depth + 1)?;
+            return Ok(self.unary(-19, child)?);
         }
         while self.joins.len() <= depth {
-            self.scratch.push(&mut self.joins, Vec::new());
+            self.scratch.push(&mut self.joins, Vec::new())?;
         }
         let mut fields = take(&mut self.joins[depth]);
         fields.clear();
@@ -586,14 +742,14 @@ impl Context {
                 (Some(l), Some(r)) if l.id == r.id => {
                     left += 1;
                     right += 1;
-                    (l, self.join(l.child, r.child, depth + 1))
+                    (l, self.join(l.child, r.child, depth + 1)?)
                 }
                 (Some(l), r) if r.is_none_or(|r| l.id < r.id) => {
                     left += 1;
                     (
                         l,
                         if a_op == -20 {
-                            self.join(l.child, -1, depth + 1)
+                            self.join(l.child, -1, depth + 1)?
                         } else {
                             l.child
                         },
@@ -604,13 +760,13 @@ impl Context {
                     (
                         r,
                         if a_op == -20 {
-                            self.join(-1, r.child, depth + 1)
+                            self.join(-1, r.child, depth + 1)?
                         } else {
                             r.child
                         },
                     )
                 }
-                _ => invalid("invalid shape union"),
+                _ => return Err(Error::InvalidShapeUnion),
             };
             height = height.max(self.height(child) + 1);
             self.scratch.push(
@@ -619,16 +775,17 @@ impl Context {
                     id: field.id,
                     child,
                 },
-            );
+            )?;
         }
-        let result = self.intern_validated(a_op, MISSING, &fields, height);
+        let result = self.intern_validated(a_op, MISSING, &fields, height)?;
         self.joins[depth] = fields;
-        result
+        Ok(result)
     }
-    fn join_begin(&mut self) {
-        self.open();
+
+    fn join_begin(&mut self) -> Checked<()> {
+        self.open()?;
         if self.joining > MAX_DEPTH {
-            invalid("type nesting limit");
+            return Err(Error::TypeNestingLimit);
         }
         if self.joining == self.joiners.len() {
             self.scratch.push(
@@ -637,49 +794,53 @@ impl Context {
                     levels: Vec::new(),
                     last: MISSING,
                 },
-            );
+            )?;
         }
         let joiner = &mut self.joiners[self.joining];
         joiner.levels.clear();
         joiner.last = MISSING;
         self.joining += 1;
+
+        Ok(())
     }
-    fn join_push(&mut self, mut t: i64) {
-        self.open();
-        self.check(t);
+
+    fn join_push(&mut self, mut t: i64) -> Checked<()> {
+        self.open()?;
+        self.check(t)?;
         let position = self
             .joining
             .checked_sub(1)
-            .unwrap_or_else(|| invalid("missing shape joiner"));
+            .ok_or(Error::MissingShapeJoiner)?;
         // Identical adjacent elements have the same union. Avoid advancing
         // the reduction tree for long homogeneous runs (including scalars).
         if self.joiners[position].last == t {
-            return;
+            return Ok(());
         }
         self.joiners[position].last = t;
         let mut level = 0;
         loop {
             let levels = &mut self.joiners[position].levels;
             if level == levels.len() {
-                self.scratch.push(levels, t);
-                return;
+                self.scratch.push(levels, t)?;
+                return Ok(());
             }
             let left = levels[level];
             if left == MISSING {
                 levels[level] = t;
-                return;
+                return Ok(());
             }
             levels[level] = MISSING;
-            t = self.join(left, t, 0);
+            t = self.join(left, t, 0)?;
             level += 1;
         }
     }
-    fn join_end(&mut self) -> i64 {
-        self.open();
+
+    fn join_end(&mut self) -> Checked<i64> {
+        self.open()?;
         self.joining = self
             .joining
             .checked_sub(1)
-            .unwrap_or_else(|| invalid("missing shape joiner"));
+            .ok_or(Error::MissingShapeJoiner)?;
         let position = self.joining;
         let mut joined = -17;
         // Higher levels precede lower levels in source order. The join is a
@@ -687,138 +848,162 @@ impl Context {
         for level in (0..self.joiners[position].levels.len()).rev() {
             let next = self.joiners[position].levels[level];
             if next != MISSING {
-                joined = self.join(joined, next, 0);
+                joined = self.join(joined, next, 0)?;
             }
         }
-        joined
+        Ok(joined)
     }
-    fn root(&mut self, t: i64) {
-        self.open();
-        self.check(t);
+
+    fn root(&mut self, t: i64) -> Checked<()> {
+        self.open()?;
+        self.check(t)?;
         if self.roots.len() >= MAX_ITEMS {
-            invalid("collection length limit");
+            return Err(Error::CollectionLengthLimit);
         }
-        self.scratch.push(&mut self.roots, t);
+        self.scratch.push(&mut self.roots, t)?;
+
+        Ok(())
     }
-    fn root_type(&self, position: u64) -> i64 {
-        *self
-            .roots
-            .get(index(position))
-            .unwrap_or_else(|| invalid("root index range"))
+
+    #[inline(always)]
+    fn root_type(&self, position: u64) -> Checked<i64> {
+        self.roots
+            .get(index(position)?)
+            .copied()
+            .ok_or(Error::RootIndexRange)
     }
-    fn child(&self, t: i64) -> i64 {
-        self.check(t);
+
+    #[inline(always)]
+    fn child(&self, t: i64) -> Checked<i64> {
+        self.check(t)?;
         if ![-18, -19].contains(&self.op(t)) {
-            invalid("missing unary shape");
+            return Err(Error::MissingUnaryShape);
         }
-        self.nodes[t as usize].child
+        Ok(self.nodes[t as usize].child)
     }
-    fn field_type(&self, t: i64, id: u64) -> i64 {
-        self.check(t);
+
+    #[inline(always)]
+    fn field_type(&self, t: i64, id: u64) -> Checked<i64> {
+        self.check(t)?;
         if ![-20, -21].contains(&self.op(t)) {
-            invalid("missing field shape");
+            return Err(Error::MissingFieldShape);
         }
         let fields = &self.nodes[t as usize].fields;
-        fields
-            .binary_search_by_key(&label(id), |field| field.id)
+        Ok(fields
+            .binary_search_by_key(&label(id)?, |field| field.id)
             .map(|position| fields[position].child)
-            .unwrap_or(MISSING)
+            .unwrap_or(MISSING))
     }
-    fn case_index(&self, t: i64, id: u64) -> u64 {
-        self.check(t);
+
+    #[inline(always)]
+    fn case_index(&self, t: i64, id: u64) -> Checked<u64> {
+        self.check(t)?;
         if self.op(t) != -21 {
-            invalid("missing variant shape");
+            return Err(Error::MissingVariantShape);
         }
         self.nodes[t as usize]
             .fields
-            .binary_search_by_key(&label(id), |field| field.id)
-            .unwrap_or_else(|_| invalid("missing derived variant")) as u64
+            .binary_search_by_key(&label(id)?, |field| field.id)
+            .map(|position| position as u64)
+            .map_err(|_| Error::MissingDerivedVariant)
     }
-    fn number(&mut self, t: i64, depth: usize) {
+
+    fn number(&mut self, t: i64, depth: usize) -> Checked<()> {
         if t < 0 {
-            return;
+            return Ok(());
         }
         let id = t as usize;
         if depth
             .checked_add(self.nodes[id].height)
             .is_none_or(|n| n > MAX_DEPTH + 1)
         {
-            invalid("type nesting limit");
+            return Err(Error::TypeNestingLimit);
         }
         if self.wire_ids[id] != MISSING {
-            return;
+            return Ok(());
         }
         if self.table.len() >= MAX_TYPES {
-            invalid("output type-table limit");
+            return Err(Error::OutputTypeTableLimit);
         }
         self.wire_ids[id] = self.table.len() as i64;
-        self.scratch.push(&mut self.table, t);
+        self.scratch.push(&mut self.table, t)?;
         let op = self.nodes[id].op;
         if [-18, -19].contains(&op) {
-            self.number(self.nodes[id].child, depth + 1);
+            self.number(self.nodes[id].child, depth + 1)?;
         } else {
             for field in 0..self.nodes[id].fields.len() {
-                self.number(self.nodes[id].fields[field].child, depth + 1);
+                self.number(self.nodes[id].fields[field].child, depth + 1)?;
             }
         }
+
+        Ok(())
     }
+
     fn reference(&self, t: i64) -> i64 {
-        if t < 0 { t } else { self.wire_ids[t as usize] }
-    }
-    fn header(&self, out: &mut Header) {
-        for byte in b"DIDL" {
-            out.byte(*byte);
+        if t < 0 {
+            t
+        } else {
+            self.wire_ids[t as usize]
         }
-        out.unsigned(self.table.len() as u64);
+    }
+    fn header(&self, out: &mut Header) -> Checked<()> {
+        for byte in b"DIDL" {
+            out.byte(*byte)?;
+        }
+        out.unsigned(self.table.len() as u64)?;
         for t in &self.table {
             let node = &self.nodes[*t as usize];
-            out.signed(node.op);
+            out.signed(node.op)?;
             if [-18, -19].contains(&node.op) {
-                out.signed(self.reference(node.child));
+                out.signed(self.reference(node.child))?;
             } else {
-                out.unsigned(node.fields.len() as u64);
+                out.unsigned(node.fields.len() as u64)?;
                 for field in &node.fields {
-                    out.unsigned(u64::from(field.id));
-                    out.signed(self.reference(field.child));
+                    out.unsigned(u64::from(field.id))?;
+                    out.signed(self.reference(field.child))?;
                 }
             }
         }
-        out.unsigned(self.roots.len() as u64);
+        out.unsigned(self.roots.len() as u64)?;
         for root in &self.roots {
-            out.signed(self.reference(*root));
+            out.signed(self.reference(*root))?;
         }
+
+        Ok(())
     }
-    fn types_size(&mut self) -> usize {
+
+    fn types_size(&mut self) -> Checked<usize> {
         if let Some(size) = self.header_size {
-            return size;
+            return Ok(size);
         }
         if self.building != 0 {
-            invalid("unfinished field builder");
+            return Err(Error::UnfinishedFieldBuilder);
         }
         if self.joining != 0 {
-            invalid("unfinished shape joiner");
+            return Err(Error::UnfinishedShapeJoiner);
         }
-        self.scratch.reserve(&mut self.wire_ids, self.nodes.len());
+        self.scratch.reserve(&mut self.wire_ids, self.nodes.len())?;
         self.wire_ids.resize(self.nodes.len(), MISSING);
         for root in 0..self.roots.len() {
-            self.number(self.roots[root], 0);
+            self.number(self.roots[root], 0)?;
         }
         let mut out = Header::new(None);
-        self.header(&mut out);
+        self.header(&mut out)?;
         self.header_size = Some(out.position);
-        out.position
+        Ok(out.position)
     }
-    unsafe fn write_types(&mut self, ptr: usize) -> usize {
-        let size = self.types_size();
+
+    unsafe fn write_types(&mut self, ptr: usize) -> Checked<usize> {
+        let size = self.types_size()?;
         if ptr == 0 || ptr.checked_add(size).is_none() {
-            invalid("header pointer range");
+            return Err(Error::HeaderPointerRange);
         }
         let mut out = Header::new(Some(ptr));
-        self.header(&mut out);
+        self.header(&mut out)?;
         if out.position != size {
-            invalid("header size changed");
+            return Err(Error::HeaderSizeChanged);
         }
-        out.position
+        Ok(out.position)
     }
 }
 
@@ -830,9 +1015,10 @@ impl Header {
     fn new(ptr: Option<usize>) -> Self {
         Self { ptr, position: 0 }
     }
-    fn byte(&mut self, byte: u8) {
+    #[inline(always)]
+    fn byte(&mut self, byte: u8) -> Checked<()> {
         if self.position >= MAX_BYTES {
-            invalid("output byte limit");
+            return Err(Error::OutputByteLimit);
         }
         if let Some(ptr) = self.ptr {
             // Generated code supplies an exclusively owned final Blob with
@@ -840,37 +1026,42 @@ impl Header {
             unsafe { (ptr as *mut u8).add(self.position).write(byte) };
         }
         self.position += 1;
+
+        Ok(())
     }
-    fn unsigned(&mut self, mut value: u64) {
+
+    #[inline(always)]
+    fn unsigned(&mut self, mut value: u64) -> Checked<()> {
         loop {
             let byte = (value & 127) as u8;
             value >>= 7;
-            self.byte(byte | if value == 0 { 0 } else { 128 });
+            self.byte(byte | if value == 0 { 0 } else { 128 })?;
             if value == 0 {
-                return;
+                return Ok(());
             }
         }
     }
-    fn signed(&mut self, mut value: i64) {
+
+    #[inline(always)]
+    fn signed(&mut self, mut value: i64) -> Checked<()> {
         loop {
             let byte = (value & 127) as u8;
             value >>= 7;
             let done = (value == 0 && byte < 64) || (value == -1 && byte >= 64);
-            self.byte(byte | if done { 0 } else { 128 });
+            self.byte(byte | if done { 0 } else { 128 })?;
             if done {
-                return;
+                return Ok(());
             }
         }
     }
 }
 
-// These pointers refer only to compiler-created contexts. Generated code keeps
-// serialization synchronous and calls `done` before any GC safepoint.
-unsafe fn context<'a>(ctx: usize) -> &'a mut Context {
+// Contexts and borrowed pointers remain within one synchronous generated call.
+unsafe fn context<'a>(ctx: usize) -> Checked<&'a mut Context> {
     if ctx == 0 {
-        invalid("null shape context");
+        return Err(Error::NullShapeContext);
     }
-    unsafe { &mut *(ctx as *mut Context) }
+    Ok(unsafe { &mut *(ctx as *mut Context) })
 }
 
 #[unsafe(no_mangle)]
@@ -878,115 +1069,174 @@ pub(crate) extern "C" fn candid_canonical_new() -> usize {
     Box::into_raw(Box::new(Context::new())) as usize
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_visit(ctx: usize, depth: u64, count: u64) {
-    unsafe { context(ctx).visit(depth, count) }
+pub(crate) unsafe extern "C" fn candid_canonical_visit(ctx: usize, depth: u64, count: u64) -> i64 {
+    match unsafe { (|| context(ctx)?.visit(depth, count))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_begin(ctx: usize, op: i64) {
-    unsafe { context(ctx).begin(op) }
+pub(crate) unsafe extern "C" fn candid_canonical_begin(ctx: usize, op: i64) -> i64 {
+    match unsafe { (|| context(ctx)?.begin(op))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_field(ctx: usize, id: u64, child: i64) {
-    unsafe { context(ctx).field(id, child) }
+pub(crate) unsafe extern "C" fn candid_canonical_field(ctx: usize, id: u64, child: i64) -> i64 {
+    match unsafe { (|| context(ctx)?.field(id, child))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_end(ctx: usize) -> i64 {
-    unsafe { context(ctx).end() }
+    match unsafe { (|| context(ctx)?.end())() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_variant(ctx: usize, id: u64, child: i64) -> i64 {
-    unsafe { context(ctx).variant(id, child) }
+    match unsafe { (|| context(ctx)?.variant(id, child))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_variants_begin(ctx: usize) {
-    unsafe { context(ctx).variants_begin() }
+pub(crate) unsafe extern "C" fn candid_canonical_variants_begin(ctx: usize) -> i64 {
+    match unsafe { (|| context(ctx)?.variants_begin())() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_variants_push(ctx: usize, id: u64, child: i64) {
-    unsafe { context(ctx).variants_push(id, child) }
+pub(crate) unsafe extern "C" fn candid_canonical_variants_push(
+    ctx: usize,
+    id: u64,
+    child: i64,
+) -> i64 {
+    match unsafe { (|| context(ctx)?.variants_push(id, child))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_variants_end(ctx: usize) -> i64 {
-    unsafe { context(ctx).variants_end() }
+    match unsafe { (|| context(ctx)?.variants_end())() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_unary(ctx: usize, op: i64, child: i64) -> i64 {
-    unsafe { context(ctx).unary(op, child) }
+    match unsafe { (|| context(ctx)?.unary(op, child))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_join(ctx: usize, a: i64, b: i64) -> i64 {
-    unsafe { context(ctx).join(a, b, 0) }
+    match unsafe { (|| context(ctx)?.join(a, b, 0))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_join_begin(ctx: usize) {
-    unsafe { context(ctx).join_begin() }
+pub(crate) unsafe extern "C" fn candid_canonical_join_begin(ctx: usize) -> i64 {
+    match unsafe { (|| context(ctx)?.join_begin())() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_join_push(ctx: usize, t: i64) {
-    unsafe { context(ctx).join_push(t) }
+pub(crate) unsafe extern "C" fn candid_canonical_join_push(ctx: usize, t: i64) -> i64 {
+    match unsafe { (|| context(ctx)?.join_push(t))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_join_end(ctx: usize) -> i64 {
-    unsafe { context(ctx).join_end() }
+    match unsafe { (|| context(ctx)?.join_end())() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_root(ctx: usize, t: i64) {
-    unsafe { context(ctx).root(t) }
+pub(crate) unsafe extern "C" fn candid_canonical_root(ctx: usize, t: i64) -> i64 {
+    match unsafe { (|| context(ctx)?.root(t))() } {
+        Ok(()) => 0,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_root_type(ctx: usize, index: u64) -> i64 {
-    unsafe { context(ctx).root_type(index) }
+    match unsafe { (|| context(ctx)?.root_type(index))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_types_size(ctx: usize) -> u64 {
-    unsafe { context(ctx).types_size() as u64 }
+pub(crate) unsafe extern "C" fn candid_canonical_types_size(ctx: usize) -> i64 {
+    match unsafe { (|| context(ctx)?.types_size())() } {
+        Ok(value) => value as i64,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_write_types(ctx: usize, ptr: usize) -> u64 {
-    unsafe { context(ctx).write_types(ptr) as u64 }
+pub(crate) unsafe extern "C" fn candid_canonical_write_types(ctx: usize, ptr: usize) -> i64 {
+    match unsafe { (|| context(ctx)?.write_types(ptr))() } {
+        Ok(value) => value as i64,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_child(ctx: usize, t: i64) -> i64 {
-    unsafe { context(ctx).child(t) }
+    match unsafe { (|| context(ctx)?.child(t))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_field_type(ctx: usize, t: i64, id: u64) -> i64 {
-    unsafe { context(ctx).field_type(t, id) }
+    match unsafe { (|| context(ctx)?.field_type(t, id))() } {
+        Ok(value) => value,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
-pub(crate) unsafe extern "C" fn candid_canonical_case_index(ctx: usize, t: i64, id: u64) -> u64 {
-    unsafe { context(ctx).case_index(t, id) }
+pub(crate) unsafe extern "C" fn candid_canonical_case_index(ctx: usize, t: i64, id: u64) -> i64 {
+    match unsafe { (|| context(ctx)?.case_index(t, id))() } {
+        Ok(value) => value as i64,
+        Err(error) => status(error),
+    }
 }
 #[unsafe(no_mangle)]
 pub(crate) unsafe extern "C" fn candid_canonical_done(ctx: usize) {
-    let current = unsafe { context(ctx) };
-    if current.building != 0 {
-        invalid("unfinished field builder");
+    if ctx != 0 {
+        unsafe { drop(Box::from_raw(ctx as *mut Context)) };
     }
-    if current.joining != 0 {
-        invalid("unfinished shape joiner");
-    }
-    unsafe { drop(Box::from_raw(ctx as *mut Context)) };
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use alloc::vec;
-    use std::panic::{AssertUnwindSafe, catch_unwind};
+    use std::panic::{catch_unwind, AssertUnwindSafe};
 
     fn compound(ctx: &mut Context, op: i64, fields: &[(u32, i64)]) -> i64 {
-        ctx.begin(op);
+        ctx.begin(op).unwrap();
         for (id, child) in fields {
-            ctx.field(u64::from(*id), *child);
+            ctx.field(u64::from(*id), *child).unwrap();
         }
-        ctx.end()
+        ctx.end().unwrap()
     }
     fn bytes(ctx: &mut Context) -> Vec<u8> {
-        let size = ctx.types_size();
+        let size = ctx.types_size().unwrap();
         let mut output = vec![0xaa; size + 1];
         assert_eq!(
-            unsafe { ctx.write_types(output.as_mut_ptr() as usize) },
+            unsafe { ctx.write_types(output.as_mut_ptr() as usize).unwrap() },
             size
         );
         assert_eq!(output.pop(), Some(0xaa));
@@ -997,11 +1247,64 @@ mod tests {
     }
 
     fn primitive_variants(ctx: &mut Context, fields: &[(u32, i64)]) -> i64 {
-        ctx.variants_begin();
+        ctx.variants_begin().unwrap();
         for (id, child) in fields {
-            ctx.variants_push(u64::from(*id), *child);
+            ctx.variants_push(u64::from(*id), *child).unwrap();
         }
-        ctx.variants_end()
+        ctx.variants_end().unwrap()
+    }
+
+    #[test]
+    fn abi_reports_errors_without_unwinding_or_retaining_call_state() {
+        for (depth, count, message) in [
+            (257, 0, Error::ValueNestingLimit),
+            (0, 2_000_001, Error::ValueTraversalLimit),
+        ] {
+            let ctx = candid_canonical_new();
+            unsafe {
+                assert_eq!(candid_canonical_visit(ctx, depth, count), status(message));
+                candid_canonical_done(ctx);
+            }
+        }
+        let ctx = candid_canonical_new();
+        unsafe {
+            // Discarding incomplete builders after an error is also valid.
+            assert_eq!(candid_canonical_begin(ctx, -20), 0);
+            assert_eq!(
+                candid_canonical_field(ctx, u64::MAX, -1),
+                status(Error::FieldIdRange)
+            );
+            candid_canonical_done(ctx);
+        }
+        let ctx = candid_canonical_new();
+        unsafe {
+            assert_eq!(candid_canonical_root(ctx, -3), 0);
+            assert!(candid_canonical_types_size(ctx) > 0);
+            candid_canonical_done(ctx);
+        }
+        let mut ctx = Context::new();
+        ctx.scratch.limit = ctx.scratch.used;
+        assert_eq!(ctx.unary(-18, -1), Err(Error::ScratchByteLimit));
+    }
+
+    #[test]
+    fn error_statuses_match_the_compiler_and_cannot_alias_shape_values() {
+        let compiler = include_str!("../../compiler/errors.ml");
+        let compiler_messages: Vec<_> = compiler
+            .lines()
+            .filter_map(|line| {
+                line.strip_prefix("  \"")
+                    .and_then(|text| text.strip_suffix("\";"))
+            })
+            .collect();
+        assert_eq!(compiler_messages, ERRORS);
+        for i in 0..ERRORS.len() {
+            let code = ERROR_BASE + i as i64;
+            assert_eq!(code, ERROR_BASE + i as i64);
+            assert!(!primitive(code));
+            assert_ne!(code, MISSING);
+            assert!(code < 0);
+        }
     }
 
     #[test]
@@ -1016,16 +1319,16 @@ mod tests {
                 let id = (case as u32).wrapping_mul(0x1000_0001);
                 let child = primitives[case % primitives.len()];
                 fields.push((id, child));
-                let singleton = general.variant(u64::from(id), child);
-                expected = general.join(expected, singleton, 0);
+                let singleton = general.variant(u64::from(id), child).unwrap();
+                expected = general.join(expected, singleton, 0).unwrap();
             }
-            let expected = general.unary(-19, expected);
-            general.root(expected);
+            let expected = general.unary(-19, expected).unwrap();
+            general.root(expected).unwrap();
             let mut collected = Context::new();
             let variant = primitive_variants(&mut collected, &fields);
             assert_eq!(collected.nodes.len(), usize::from(length != 0));
-            let vector = collected.unary(-19, variant);
-            collected.root(vector);
+            let vector = collected.unary(-19, variant).unwrap();
+            collected.root(vector).unwrap();
             assert_eq!(bytes(&mut collected), bytes(&mut general));
         }
     }
@@ -1033,19 +1336,19 @@ mod tests {
     #[test]
     fn primitive_variant_collections_reuse_storage_and_preserve_nested_builders() {
         let mut ctx = Context::new();
-        ctx.begin(-20);
-        ctx.variants_begin();
-        ctx.variants_push(u64::from(u32::MAX), -24);
+        ctx.begin(-20).unwrap();
+        ctx.variants_begin().unwrap();
+        ctx.variants_push(u64::from(u32::MAX), -24).unwrap();
         let inner = primitive_variants(&mut ctx, &[(1, -2), (0, -1), (1, -2)]);
-        assert_eq!(ctx.case_index(inner, 1), 1);
-        ctx.variants_push(0, -1);
-        let outer = ctx.variants_end();
-        assert_eq!(ctx.field_type(outer, u64::from(u32::MAX)), -24);
-        ctx.field(0, outer);
-        ctx.field(1, inner);
-        let record = ctx.end();
-        assert_eq!(ctx.field_type(record, 0), outer);
-        assert_eq!(ctx.field_type(record, 1), inner);
+        assert_eq!(ctx.case_index(inner, 1).unwrap(), 1);
+        ctx.variants_push(0, -1).unwrap();
+        let outer = ctx.variants_end().unwrap();
+        assert_eq!(ctx.field_type(outer, u64::from(u32::MAX)).unwrap(), -24);
+        ctx.field(0, outer).unwrap();
+        ctx.field(1, inner).unwrap();
+        let record = ctx.end().unwrap();
+        assert_eq!(ctx.field_type(record, 0).unwrap(), outer);
+        assert_eq!(ctx.field_type(record, 1).unwrap(), inner);
         let fields = [(9, -3), (2, -16), (9, -3), (0, -1)];
         let wanted = primitive_variants(&mut ctx, &fields);
         let allocated = ctx.scratch.used;
@@ -1062,44 +1365,44 @@ mod tests {
     #[test]
     fn primitive_variant_collections_enforce_payload_label_and_lifecycle_checks() {
         let mut ctx = Context::new();
-        rejects(|| ctx.variants_push(0, -1));
+        rejects(|| ctx.variants_push(0, -1).unwrap());
         rejects(|| {
-            ctx.variants_end();
+            ctx.variants_end().unwrap();
         });
-        let compound = ctx.unary(-18, -3);
-        ctx.variants_begin();
-        rejects(|| ctx.variants_push(0, compound));
+        let compound = ctx.unary(-18, -3).unwrap();
+        ctx.variants_begin().unwrap();
+        rejects(|| ctx.variants_push(0, compound).unwrap());
         for invalid_child in [-17, -18, -19, -20, -21, -22, -23, -25, 0, MISSING] {
-            rejects(|| ctx.variants_push(0, invalid_child));
+            rejects(|| ctx.variants_push(0, invalid_child).unwrap());
         }
-        rejects(|| ctx.variants_push(u64::from(u32::MAX) + 1, -1));
-        rejects(|| ctx.field(0, -1));
+        rejects(|| ctx.variants_push(u64::from(u32::MAX) + 1, -1).unwrap());
+        rejects(|| ctx.field(0, -1).unwrap());
         rejects(|| {
-            ctx.end();
+            ctx.end().unwrap();
         });
         rejects(|| {
-            ctx.types_size();
+            ctx.types_size().unwrap();
         });
-        assert_eq!(ctx.variants_end(), -17);
-        ctx.begin(-20);
-        rejects(|| ctx.variants_push(0, -1));
+        assert_eq!(ctx.variants_end().unwrap(), -17);
+        ctx.begin(-20).unwrap();
+        rejects(|| ctx.variants_push(0, -1).unwrap());
         rejects(|| {
-            ctx.variants_end();
+            ctx.variants_end().unwrap();
         });
-        ctx.end();
-        ctx.types_size();
-        rejects(|| ctx.variants_begin());
-        rejects(|| ctx.variants_push(0, -1));
+        ctx.end().unwrap();
+        ctx.types_size().unwrap();
+        rejects(|| ctx.variants_begin().unwrap());
+        rejects(|| ctx.variants_push(0, -1).unwrap());
         rejects(|| {
-            ctx.variants_end();
+            ctx.variants_end().unwrap();
         });
         let mut ctx = Context::new();
-        ctx.variants_begin();
-        ctx.variants_push(7, -1);
-        ctx.variants_push(8, -2);
-        ctx.variants_push(7, -3);
+        ctx.variants_begin().unwrap();
+        ctx.variants_push(7, -1).unwrap();
+        ctx.variants_push(8, -2).unwrap();
+        ctx.variants_push(7, -3).unwrap();
         rejects(|| {
-            ctx.variants_end();
+            ctx.variants_end().unwrap();
         });
     }
 
@@ -1107,49 +1410,49 @@ mod tests {
     fn primitive_variant_collections_check_nesting_visits_length_and_scratch() {
         let mut ctx = Context::new();
         for _ in 0..=MAX_DEPTH {
-            ctx.variants_begin();
+            ctx.variants_begin().unwrap();
         }
-        rejects(|| ctx.variants_begin());
+        rejects(|| ctx.variants_begin().unwrap());
         for _ in 0..=MAX_DEPTH {
-            assert_eq!(ctx.variants_end(), -17);
+            assert_eq!(ctx.variants_end().unwrap(), -17);
         }
-        rejects(|| ctx.visit((MAX_DEPTH + 1) as u64, 0));
-        ctx.visit(2, MAX_ITEMS as u64);
-        rejects(|| ctx.visit(2, 1));
+        rejects(|| ctx.visit((MAX_DEPTH + 1) as u64, 0).unwrap());
+        ctx.visit(2, MAX_ITEMS as u64).unwrap();
+        rejects(|| ctx.visit(2, 1).unwrap());
         let mut ctx = Context::new();
         ctx.scratch.limit = ctx.scratch.used;
-        rejects(|| ctx.variants_begin());
+        rejects(|| ctx.variants_begin().unwrap());
         let mut ctx = Context::new();
-        ctx.variants_begin();
+        ctx.variants_begin().unwrap();
         ctx.scratch.limit = ctx.scratch.used;
-        rejects(|| ctx.variants_push(0, -1));
+        rejects(|| ctx.variants_push(0, -1).unwrap());
         let mut ctx = Context::new();
-        ctx.variants_begin();
+        ctx.variants_begin().unwrap();
         for _ in 0..MAX_ITEMS {
-            ctx.variants_push(0, -1);
+            ctx.variants_push(0, -1).unwrap();
         }
         // The source count is still enforced when identical adjacent pairs
         // consume no additional scratch storage.
         assert!(ctx.scratch.used < 2048);
-        rejects(|| ctx.variants_push(0, -1));
-        let shape = ctx.variants_end();
+        rejects(|| ctx.variants_push(0, -1).unwrap());
+        let shape = ctx.variants_end().unwrap();
         assert_eq!(ctx.nodes[shape as usize].fields.len(), 1);
     }
 
     #[test]
     fn wide_primitive_variant_collections_retain_only_the_final_union() {
         let mut ctx = Context::new();
-        ctx.variants_begin();
+        ctx.variants_begin().unwrap();
         for id in (0..6000).rev() {
-            ctx.variants_push(id, -1);
+            ctx.variants_push(id, -1).unwrap();
         }
-        let variant = ctx.variants_end();
+        let variant = ctx.variants_end().unwrap();
         assert_eq!(ctx.nodes.len(), 1);
         for id in 0..6000 {
-            assert_eq!(ctx.case_index(variant, id), id);
+            assert_eq!(ctx.case_index(variant, id).unwrap(), id);
         }
-        let vector = ctx.unary(-19, variant);
-        ctx.root(vector);
+        let vector = ctx.unary(-19, variant).unwrap();
+        ctx.root(vector).unwrap();
         assert!(bytes(&mut ctx).len() < 18_000);
         // The general balanced collector retains ~4.8 MiB of intermediate
         // shapes here. This path retains a growing buffer and one field list.
@@ -1160,18 +1463,18 @@ mod tests {
     fn largest_valid_cyclic_primitive_variant_array_stays_below_scratch_limit() {
         let mut ctx = Context::new();
         let count = (MAX_ITEMS - 1) / 2;
-        ctx.visit(0, 1);
-        ctx.visit(1, count as u64);
-        ctx.visit(2, count as u64);
-        ctx.variants_begin();
+        ctx.visit(0, 1).unwrap();
+        ctx.visit(1, count as u64).unwrap();
+        ctx.visit(2, count as u64).unwrap();
+        ctx.variants_begin().unwrap();
         for i in 0..count {
-            ctx.variants_push(((i * 17) % 64) as u64, -1);
+            ctx.variants_push(((i * 17) % 64) as u64, -1).unwrap();
         }
-        let variant = ctx.variants_end();
+        let variant = ctx.variants_end().unwrap();
         assert_eq!(ctx.nodes.len(), 1);
         assert_eq!(ctx.nodes[variant as usize].fields.len(), 64);
-        let vector = ctx.unary(-19, variant);
-        ctx.root(vector);
+        let vector = ctx.unary(-19, variant).unwrap();
+        ctx.root(vector).unwrap();
         assert!(bytes(&mut ctx).len() < 160);
         // Unlike adjacent duplicates, cyclic cases are buffered until sort.
         // Account for every old growth buffer near the source visit limit.
@@ -1187,21 +1490,21 @@ mod tests {
         assert_ne!(variant, original);
         assert_eq!(compound(&mut ctx, -20, &[(7, -3)]), original);
         assert_ne!(compound(&mut ctx, -20, &[(8, -3)]), original);
-        let optional = ctx.unary(-18, -3);
+        let optional = ctx.unary(-18, -3).unwrap();
         assert_ne!(compound(&mut ctx, -20, &[(7, optional)]), original);
-        ctx.begin(-20);
+        ctx.begin(-20).unwrap();
         rejects(|| {
-            ctx.field(7, -22);
+            ctx.field(7, -22).unwrap();
         });
-        let empty = ctx.end();
+        let empty = ctx.end().unwrap();
         assert_eq!(ctx.height(empty), 1);
         let mut child = -1;
         for _ in 0..MAX_DEPTH {
-            child = ctx.unary(-19, child);
+            child = ctx.unary(-19, child).unwrap();
         }
         let deep = compound(&mut ctx, -20, &[(0, child)]);
         assert_eq!(ctx.height(deep), MAX_DEPTH + 1);
-        let too_deep = ctx.unary(-18, child);
+        let too_deep = ctx.unary(-18, child).unwrap();
         rejects(|| {
             compound(&mut ctx, -20, &[(0, too_deep)]);
         });
@@ -1209,65 +1512,65 @@ mod tests {
         // Missing record fields lift a nonoptional child; their new parent
         // height must be checked even though both input records are valid.
         rejects(|| {
-            ctx.join(deep, empty, 0);
+            ctx.join(deep, empty, 0).unwrap();
         });
     }
 
     #[test]
     fn unary_memo_does_not_bypass_reference_depth_or_finalization_checks() {
         let mut ctx = Context::new();
-        let opt = ctx.unary(-18, -3);
-        let vec = ctx.unary(-19, -3);
-        assert_eq!(ctx.unary(-18, -3), opt);
-        assert_eq!(ctx.unary(-19, -3), vec);
+        let opt = ctx.unary(-18, -3).unwrap();
+        let vec = ctx.unary(-19, -3).unwrap();
+        assert_eq!(ctx.unary(-18, -3).unwrap(), opt);
+        assert_eq!(ctx.unary(-19, -3).unwrap(), vec);
         rejects(|| {
-            ctx.unary(-18, -22);
+            ctx.unary(-18, -22).unwrap();
         });
         rejects(|| {
-            ctx.unary(-19, MISSING);
+            ctx.unary(-19, MISSING).unwrap();
         });
         let mut child = -1;
         for _ in 0..=MAX_DEPTH {
-            child = ctx.unary(-18, child);
+            child = ctx.unary(-18, child).unwrap();
         }
         rejects(|| {
-            ctx.unary(-18, child);
+            ctx.unary(-18, child).unwrap();
         });
-        ctx.root(opt);
-        ctx.types_size();
+        ctx.root(opt).unwrap();
+        ctx.types_size().unwrap();
         rejects(|| {
-            ctx.unary(-18, -3);
+            ctx.unary(-18, -3).unwrap();
         });
         rejects(|| {
-            ctx.unary(-19, -3);
+            ctx.unary(-19, -3).unwrap();
         });
         let mut ctx = Context::new();
         ctx.scratch.limit = ctx.scratch.used;
         rejects(|| {
-            ctx.unary(-18, -3);
+            ctx.unary(-18, -3).unwrap();
         });
     }
 
     #[test]
     fn singleton_variants_match_builders_and_preserve_outer_record_builder() {
         let mut ctx = Context::new();
-        let option = ctx.unary(-18, -3);
-        let empty = ctx.unary(-19, -17);
+        let option = ctx.unary(-18, -3).unwrap();
+        let empty = ctx.unary(-19, -17).unwrap();
         let record = compound(&mut ctx, -20, &[(7, -3)]);
         for child in [-1, -3, -5, option, empty, record] {
             for id in [0, 1, 128, u32::MAX] {
                 let expected = compound(&mut ctx, -21, &[(id, child)]);
-                assert_eq!(ctx.variant(u64::from(id), child), expected);
-                assert_eq!(ctx.case_index(expected, u64::from(id)), 0);
-                assert_eq!(ctx.field_type(expected, u64::from(id)), child);
+                assert_eq!(ctx.variant(u64::from(id), child).unwrap(), expected);
+                assert_eq!(ctx.case_index(expected, u64::from(id)).unwrap(), 0);
+                assert_eq!(ctx.field_type(expected, u64::from(id)).unwrap(), child);
             }
         }
-        ctx.begin(-20);
-        let nested = ctx.variant(123, -1);
-        ctx.field(7, nested);
-        let record = ctx.end();
-        assert_eq!(ctx.field_type(record, 7), nested);
-        ctx.root(record);
+        ctx.begin(-20).unwrap();
+        let nested = ctx.variant(123, -1).unwrap();
+        ctx.field(7, nested).unwrap();
+        let record = ctx.end().unwrap();
+        assert_eq!(ctx.field_type(record, 7).unwrap(), nested);
+        ctx.root(record).unwrap();
         assert_eq!(
             bytes(&mut ctx),
             b"DIDL\x02\x6c\x01\x07\x01\x6b\x01\x7b\x7f\x01\x00"
@@ -1278,50 +1581,50 @@ mod tests {
     fn singleton_variants_enforce_reference_label_depth_and_lifecycle_limits() {
         let mut ctx = Context::new();
         rejects(|| {
-            ctx.variant(0, -22);
+            ctx.variant(0, -22).unwrap();
         });
         rejects(|| {
-            ctx.variant(u64::from(u32::MAX) + 1, -1);
+            ctx.variant(u64::from(u32::MAX) + 1, -1).unwrap();
         });
         let mut child = -1;
         for _ in 0..MAX_DEPTH {
-            child = ctx.variant(0, child);
+            child = ctx.variant(0, child).unwrap();
         }
-        child = ctx.variant(0, child);
+        child = ctx.variant(0, child).unwrap();
         rejects(|| {
-            ctx.variant(0, child);
+            ctx.variant(0, child).unwrap();
         });
-        ctx.root(child);
-        ctx.types_size();
+        ctx.root(child).unwrap();
+        ctx.types_size().unwrap();
         rejects(|| {
-            ctx.variant(0, -1);
+            ctx.variant(0, -1).unwrap();
         });
         let mut ctx = Context::new();
         ctx.scratch.limit = ctx.scratch.used;
         rejects(|| {
-            ctx.variant(0, -1);
+            ctx.variant(0, -1).unwrap();
         });
     }
 
     #[test]
     fn cached_record_joins_recheck_relative_nesting_limits() {
         let mut ctx = Context::new();
-        let opt = ctx.unary(-18, -3);
+        let opt = ctx.unary(-18, -3).unwrap();
         let left = compound(&mut ctx, -20, &[(0, -3)]);
         let right = compound(&mut ctx, -20, &[(0, opt)]);
-        assert_eq!(ctx.join(left, right, 0), right);
+        assert_eq!(ctx.join(left, right, 0).unwrap(), right);
         for wrappers in [MAX_DEPTH - 2, MAX_DEPTH - 1] {
             let mut a = left;
             let mut b = right;
             for _ in 0..wrappers {
-                a = ctx.unary(-18, a);
-                b = ctx.unary(-18, b);
+                a = ctx.unary(-18, a).unwrap();
+                b = ctx.unary(-18, b).unwrap();
             }
             if wrappers == MAX_DEPTH - 2 {
-                assert_eq!(ctx.join(a, b, 0), b);
+                assert_eq!(ctx.join(a, b, 0).unwrap(), b);
             } else {
                 rejects(|| {
-                    ctx.join(a, b, 0);
+                    ctx.join(a, b, 0).unwrap();
                 });
             }
         }
@@ -1333,23 +1636,23 @@ mod tests {
         let mut ctx = Context::new();
         let a = compound(&mut ctx, -21, &[(0, -1)]);
         let b = compound(&mut ctx, -21, &[(1, -1)]);
-        let variants = ctx.join(a, b, 0);
+        let variants = ctx.join(a, b, 0).unwrap();
         assert!(ctx.shape_memos.is_none());
-        ctx.unary(-19, variants);
+        ctx.unary(-19, variants).unwrap();
         assert!(ctx.shape_memos.is_none());
-        let a = ctx.unary(-18, a);
-        let b = ctx.unary(-18, b);
-        let wanted = ctx.unary(-18, variants);
-        assert_eq!(ctx.join(a, b, 0), wanted);
+        let a = ctx.unary(-18, a).unwrap();
+        let b = ctx.unary(-18, b).unwrap();
+        let wanted = ctx.unary(-18, variants).unwrap();
+        assert_eq!(ctx.join(a, b, 0).unwrap(), wanted);
         assert!(ctx.shape_memos.is_some());
         let a = compound(&mut ctx, -20, &[(0, -1)]);
         let b = compound(&mut ctx, -20, &[(1, -1)]);
-        let wanted = ctx.join(a, b, 0);
+        let wanted = ctx.join(a, b, 0).unwrap();
         assert_eq!(ctx.shape_memos.as_ref().unwrap().len(), SHAPE_MEMOS);
         let scratch = ctx.scratch.used;
         for _ in 0..1024 {
-            assert_eq!(ctx.join(a, b, 0), wanted);
-            assert_eq!(ctx.join(b, a, 0), wanted);
+            assert_eq!(ctx.join(a, b, 0).unwrap(), wanted);
+            assert_eq!(ctx.join(b, a, 0).unwrap(), wanted);
         }
         assert_eq!(ctx.scratch.used, scratch);
     }
@@ -1390,25 +1693,25 @@ mod tests {
         let mut ctx = Context::new();
         assert_eq!(bytes(&mut ctx), b"DIDL\0\0");
         let mut ctx = Context::new();
-        ctx.root(-3);
+        ctx.root(-3).unwrap();
         assert_eq!(bytes(&mut ctx), b"DIDL\0\x01\x7d");
         let mut ctx = Context::new();
-        let blob = ctx.unary(-19, -5);
-        ctx.root(blob);
+        let blob = ctx.unary(-19, -5).unwrap();
+        ctx.root(blob).unwrap();
         assert_eq!(bytes(&mut ctx), b"DIDL\x01\x6d\x7b\x01\x00");
         let mut ctx = Context::new();
-        let opt = ctx.unary(-18, -1);
+        let opt = ctx.unary(-18, -1).unwrap();
         let record = compound(&mut ctx, -20, &[(0, -1), (1, -16), (3, opt)]);
-        ctx.root(record);
+        ctx.root(record).unwrap();
         assert_eq!(
             bytes(&mut ctx),
             b"DIDL\x02\x6c\x03\x00\x7f\x01\x70\x03\x01\x6e\x7f\x01\x00"
         );
         let mut ctx = Context::new();
-        let opt = ctx.unary(-18, -3);
+        let opt = ctx.unary(-18, -3).unwrap();
         let record = compound(&mut ctx, -20, &[(0, opt)]);
-        ctx.root(record);
-        ctx.root(opt);
+        ctx.root(record).unwrap();
+        ctx.root(opt).unwrap();
         assert_eq!(
             bytes(&mut ctx),
             b"DIDL\x02\x6c\x01\x00\x01\x6e\x7d\x02\x00\x01"
@@ -1418,21 +1721,21 @@ mod tests {
     #[test]
     fn join_retains_scalar_option_and_empty_vector_rules() {
         let mut ctx = Context::new();
-        let opt = ctx.unary(-18, -3);
-        assert_eq!(ctx.join(-1, -3, 0), opt);
-        assert_eq!(ctx.join(-3, -1, 0), opt);
-        assert_eq!(ctx.join(-1, opt, 0), opt);
-        assert_eq!(ctx.join(opt, -3, 0), opt);
-        assert_eq!(ctx.join(-17, opt, 0), opt);
-        assert_eq!(ctx.join(opt, -17, 0), opt);
-        let empty = ctx.unary(-19, -17);
-        let blob = ctx.unary(-19, -5);
-        assert_eq!(ctx.join(empty, blob, 0), blob);
-        let opt_null = ctx.unary(-18, -1);
-        let nested = ctx.join(opt_null, opt, 0);
-        assert_eq!(ctx.child(nested), opt);
+        let opt = ctx.unary(-18, -3).unwrap();
+        assert_eq!(ctx.join(-1, -3, 0).unwrap(), opt);
+        assert_eq!(ctx.join(-3, -1, 0).unwrap(), opt);
+        assert_eq!(ctx.join(-1, opt, 0).unwrap(), opt);
+        assert_eq!(ctx.join(opt, -3, 0).unwrap(), opt);
+        assert_eq!(ctx.join(-17, opt, 0).unwrap(), opt);
+        assert_eq!(ctx.join(opt, -17, 0).unwrap(), opt);
+        let empty = ctx.unary(-19, -17).unwrap();
+        let blob = ctx.unary(-19, -5).unwrap();
+        assert_eq!(ctx.join(empty, blob, 0).unwrap(), blob);
+        let opt_null = ctx.unary(-18, -1).unwrap();
+        let nested = ctx.join(opt_null, opt, 0).unwrap();
+        assert_eq!(ctx.child(nested).unwrap(), opt);
         rejects(|| {
-            ctx.join(-3, -8, 0);
+            ctx.join(-3, -8, 0).unwrap();
         });
     }
 
@@ -1440,71 +1743,71 @@ mod tests {
     fn records_lift_missing_fields_and_variants_union_selected_cases() {
         let mut ctx = Context::new();
         let a = compound(&mut ctx, -20, &[(0, -15)]);
-        let opt = ctx.unary(-18, -15);
+        let opt = ctx.unary(-18, -15).unwrap();
         let b = compound(&mut ctx, -20, &[(0, -15), (9, opt)]);
-        assert_eq!(ctx.join(a, b, 0), b);
-        assert_eq!(ctx.join(b, a, 0), b);
+        assert_eq!(ctx.join(a, b, 0).unwrap(), b);
+        assert_eq!(ctx.join(b, a, 0).unwrap(), b);
         let c = compound(&mut ctx, -20, &[(9, -15)]);
-        let joined = ctx.join(a, c, 0);
-        assert_eq!(ctx.field_type(joined, 0), opt);
-        assert_eq!(ctx.field_type(joined, 9), opt);
-        assert_eq!(ctx.field_type(joined, 10), MISSING);
+        let joined = ctx.join(a, c, 0).unwrap();
+        assert_eq!(ctx.field_type(joined, 0).unwrap(), opt);
+        assert_eq!(ctx.field_type(joined, 9).unwrap(), opt);
+        assert_eq!(ctx.field_type(joined, 10).unwrap(), MISSING);
         let a = compound(&mut ctx, -21, &[(91, -1)]);
         let b = compound(&mut ctx, -21, &[(3, -2)]);
-        let joined = ctx.join(a, b, 0);
-        assert_eq!(ctx.case_index(joined, 3), 0);
-        assert_eq!(ctx.case_index(joined, 91), 1);
-        assert_eq!(ctx.field_type(joined, 91), -1);
-        assert_eq!(ctx.join(joined, a, 0), joined);
+        let joined = ctx.join(a, b, 0).unwrap();
+        assert_eq!(ctx.case_index(joined, 3).unwrap(), 0);
+        assert_eq!(ctx.case_index(joined, 91).unwrap(), 1);
+        assert_eq!(ctx.field_type(joined, 91).unwrap(), -1);
+        assert_eq!(ctx.join(joined, a, 0).unwrap(), joined);
     }
 
     fn balanced(ctx: &mut Context, shapes: &[i64]) -> i64 {
-        ctx.join_begin();
+        ctx.join_begin().unwrap();
         for shape in shapes {
-            ctx.join_push(*shape);
+            ctx.join_push(*shape).unwrap();
         }
-        ctx.join_end()
+        ctx.join_end().unwrap()
     }
 
     #[test]
     fn balanced_joins_match_sequential_joins_of_nested_optional_shapes() {
         let mut ctx = Context::new();
-        let nat = ctx.unary(-18, -3);
-        let present_absent = ctx.unary(-18, -1);
-        let present_present = ctx.unary(-18, nat);
+        let nat = ctx.unary(-18, -3).unwrap();
+        let present_absent = ctx.unary(-18, -1).unwrap();
+        let present_present = ctx.unary(-18, nat).unwrap();
         let mut shapes = vec![];
         for value in 0..27 {
             let mut states = value;
-            ctx.begin(-20);
+            ctx.begin(-20).unwrap();
             for id in 0..3 {
                 match states % 3 {
                     0 => (),
-                    1 => ctx.field(id, present_absent),
-                    2 => ctx.field(id, present_present),
+                    1 => ctx.field(id, present_absent).unwrap(),
+                    2 => ctx.field(id, present_present).unwrap(),
                     _ => unreachable!(),
                 }
                 states /= 3;
             }
-            shapes.push(ctx.end());
+            shapes.push(ctx.end().unwrap());
         }
         // All triples exercise reassociation through every combination of
         // omitted fields and the two nested option levels, not just pairs.
         for a in &shapes {
             for b in &shapes {
                 for c in &shapes {
-                    let left = ctx.join(*a, *b, 0);
-                    let expected = ctx.join(left, *c, 0);
+                    let left = ctx.join(*a, *b, 0).unwrap();
+                    let expected = ctx.join(left, *c, 0).unwrap();
                     assert_eq!(balanced(&mut ctx, &[*a, *b, *c]), expected);
-                    let right = ctx.join(*b, *c, 0);
-                    assert_eq!(ctx.join(*a, right, 0), expected);
+                    let right = ctx.join(*b, *c, 0).unwrap();
+                    assert_eq!(ctx.join(*a, right, 0).unwrap(), expected);
                 }
             }
         }
-        let empty = ctx.unary(-19, -17);
+        let empty = ctx.unary(-19, -17).unwrap();
         let mut cases = vec![compound(&mut ctx, -21, &[(200, empty)])];
         for record in shapes {
             for id in [3, 91] {
-                let vector = ctx.unary(-19, record);
+                let vector = ctx.unary(-19, record).unwrap();
                 cases.push(compound(&mut ctx, -21, &[(id, vector)]));
             }
         }
@@ -1514,7 +1817,7 @@ mod tests {
             for i in 0..length {
                 let shape = cases[(i * 17 + length * 11) % cases.len()];
                 sequence.push(shape);
-                expected = ctx.join(expected, shape, 0);
+                expected = ctx.join(expected, shape, 0).unwrap();
             }
             assert_eq!(balanced(&mut ctx, &sequence), expected);
         }
@@ -1525,18 +1828,18 @@ mod tests {
         let mut ctx = Context::new();
         let a = compound(&mut ctx, -21, &[(0, -1)]);
         let b = compound(&mut ctx, -21, &[(1, -1)]);
-        let wanted = ctx.join(a, b, 0);
-        ctx.join_begin();
-        ctx.join_push(a);
+        let wanted = ctx.join(a, b, 0).unwrap();
+        ctx.join_begin().unwrap();
+        ctx.join_push(a).unwrap();
         let scratch = ctx.scratch.used;
         for _ in 0..10_000 {
-            ctx.join_push(a);
+            ctx.join_push(a).unwrap();
         }
         assert_eq!(ctx.scratch.used, scratch);
         let inner = balanced(&mut ctx, &[a, a, b, b, a]);
         assert_eq!(inner, wanted);
-        ctx.join_push(inner);
-        assert_eq!(ctx.join_end(), wanted);
+        ctx.join_push(inner).unwrap();
+        assert_eq!(ctx.join_end().unwrap(), wanted);
         let scratch = ctx.scratch.used;
         for _ in 0..10 {
             assert_eq!(balanced(&mut ctx, &[a, a, b, b, a]), wanted);
@@ -1548,18 +1851,18 @@ mod tests {
     #[test]
     fn wide_variant_vectors_stay_below_the_scratch_limit() {
         let mut ctx = Context::new();
-        ctx.join_begin();
+        ctx.join_begin().unwrap();
         for id in 0..6000 {
             let shape = compound(&mut ctx, -21, &[(id, -1)]);
-            ctx.join_push(shape);
+            ctx.join_push(shape).unwrap();
         }
-        let variant = ctx.join_end();
+        let variant = ctx.join_end().unwrap();
         for id in 0..6000 {
-            assert_eq!(ctx.case_index(variant, id), id);
-            assert_eq!(ctx.field_type(variant, id), -1);
+            assert_eq!(ctx.case_index(variant, id).unwrap(), id);
+            assert_eq!(ctx.field_type(variant, id).unwrap(), -1);
         }
-        let vector = ctx.unary(-19, variant);
-        ctx.root(vector);
+        let vector = ctx.unary(-19, variant).unwrap();
+        ctx.root(vector).unwrap();
         let header = bytes(&mut ctx);
         assert_eq!(ctx.table.len(), 2);
         // The sequential reduction exceeds the 256 MiB hard limit here,
@@ -1572,19 +1875,19 @@ mod tests {
     fn unfinished_and_missing_shape_accumulators_reject() {
         let mut ctx = Context::new();
         rejects(|| {
-            ctx.join_push(-1);
+            ctx.join_push(-1).unwrap();
         });
         rejects(|| {
-            ctx.join_end();
+            ctx.join_end().unwrap();
         });
-        ctx.join_begin();
+        ctx.join_begin().unwrap();
         rejects(|| {
-            ctx.types_size();
+            ctx.types_size().unwrap();
         });
-        ctx.join_end();
-        ctx.types_size();
+        ctx.join_end().unwrap();
+        ctx.types_size().unwrap();
         rejects(|| {
-            ctx.join_begin();
+            ctx.join_begin().unwrap();
         });
     }
 
@@ -1593,13 +1896,13 @@ mod tests {
         let mut ctx = Context::new();
         let a = compound(&mut ctx, -20, &[(0, -3), (1, -24)]);
         let b = compound(&mut ctx, -20, &[(0, -3)]);
-        let joined = ctx.join(a, b, 0);
+        let joined = ctx.join(a, b, 0).unwrap();
         let allocated = ctx.scratch.used;
         for _ in 0..1024 {
             assert_eq!(compound(&mut ctx, -20, &[(0, -3), (1, -24)]), a);
             assert_eq!(compound(&mut ctx, -20, &[(0, -3)]), b);
-            assert_eq!(ctx.join(a, b, 0), joined);
-            assert_eq!(ctx.join(joined, b, 0), joined);
+            assert_eq!(ctx.join(a, b, 0).unwrap(), joined);
+            assert_eq!(ctx.join(joined, b, 0).unwrap(), joined);
         }
         assert_eq!(ctx.scratch.used, allocated);
         assert_eq!(ctx.nodes.len(), 4);
@@ -1608,26 +1911,26 @@ mod tests {
     #[test]
     fn all_optional_presence_pairs_match_their_independent_expected_union() {
         let mut ctx = Context::new();
-        let inner = ctx.unary(-18, -3);
-        let present_absent = ctx.unary(-18, -1);
-        let present_present = ctx.unary(-18, inner);
+        let inner = ctx.unary(-18, -3).unwrap();
+        let present_absent = ctx.unary(-18, -1).unwrap();
+        let present_present = ctx.unary(-18, inner).unwrap();
         let mut records = Vec::new();
         let mut vectors = Vec::new();
         for value in 0..27 {
             let mut states = value;
-            ctx.begin(-20);
+            ctx.begin(-20).unwrap();
             for id in 0..3 {
                 match states % 3 {
                     0 => (),
-                    1 => ctx.field(id, present_absent),
-                    2 => ctx.field(id, present_present),
+                    1 => ctx.field(id, present_absent).unwrap(),
+                    2 => ctx.field(id, present_present).unwrap(),
                     _ => unreachable!(),
                 }
                 states /= 3;
             }
-            let record = ctx.end();
+            let record = ctx.end().unwrap();
             records.push(record);
-            vectors.push(ctx.unary(-19, record));
+            vectors.push(ctx.unary(-19, record).unwrap());
         }
         for a in 0..27 {
             for b in 0..27 {
@@ -1641,15 +1944,21 @@ mod tests {
                     right /= 3;
                     place *= 3;
                 }
-                assert_eq!(ctx.join(records[a], records[b], 0), records[expected]);
-                assert_eq!(ctx.join(vectors[a], vectors[b], 0), vectors[expected]);
+                assert_eq!(
+                    ctx.join(records[a], records[b], 0).unwrap(),
+                    records[expected]
+                );
+                assert_eq!(
+                    ctx.join(vectors[a], vectors[b], 0).unwrap(),
+                    vectors[expected]
+                );
                 let left = compound(&mut ctx, -21, &[(3, records[a])]);
                 let right = compound(&mut ctx, -21, &[(3, records[b])]);
                 let wanted = compound(&mut ctx, -21, &[(3, records[expected])]);
-                assert_eq!(ctx.join(left, right, 0), wanted);
+                assert_eq!(ctx.join(left, right, 0).unwrap(), wanted);
                 let right = compound(&mut ctx, -21, &[(91, records[b])]);
                 let wanted = compound(&mut ctx, -21, &[(3, records[a]), (91, records[b])]);
-                assert_eq!(ctx.join(left, right, 0), wanted);
+                assert_eq!(ctx.join(left, right, 0).unwrap(), wanted);
             }
         }
     }
@@ -1660,16 +1969,16 @@ mod tests {
         for id in 0..1500 {
             compound(&mut ctx, -20, &[(id, -1)]);
         }
-        ctx.root(0);
-        ctx.types_size();
+        ctx.root(0).unwrap();
+        ctx.types_size().unwrap();
         assert_eq!(ctx.table.len(), 1);
         let mut ctx = Context::new();
         for id in 0..1025 {
             let record = compound(&mut ctx, -20, &[(id, -1)]);
-            ctx.root(record);
+            ctx.root(record).unwrap();
         }
         rejects(|| {
-            ctx.types_size();
+            ctx.types_size().unwrap();
         });
     }
 
@@ -1680,42 +1989,42 @@ mod tests {
             limit: MAX_SCRATCH,
         };
         let mut values = Vec::<i64>::new();
-        scratch.reserve(&mut values, 1);
+        scratch.reserve(&mut values, 1).unwrap();
         let first = scratch.used;
         values.push(1);
-        scratch.reserve(&mut values, 2);
-        assert_eq!(scratch.used, first + allocation_size::<i64>(2));
+        scratch.reserve(&mut values, 2).unwrap();
+        assert_eq!(scratch.used, first + allocation_size::<i64>(2).unwrap());
         scratch.limit = scratch.used;
         rejects(|| {
-            scratch.reserve(&mut values, 3);
+            scratch.reserve(&mut values, 3).unwrap();
         });
         let mut ctx = Context::new();
-        ctx.visit(256, 2_000_000);
+        ctx.visit(256, 2_000_000).unwrap();
         rejects(|| {
-            ctx.visit(256, 1);
+            ctx.visit(256, 1).unwrap();
         });
         rejects(|| {
-            Context::new().visit(257, 0);
+            Context::new().visit(257, 0).unwrap();
         });
         let mut ctx = Context::new();
-        let mut t = ctx.unary(-19, -5);
+        let mut t = ctx.unary(-19, -5).unwrap();
         for _ in 0..256 {
-            t = ctx.unary(-18, t);
+            t = ctx.unary(-18, t).unwrap();
         }
         rejects(|| {
-            ctx.unary(-18, t);
+            ctx.unary(-18, t).unwrap();
         });
-        ctx.root(t);
-        ctx.types_size();
+        ctx.root(t).unwrap();
+        ctx.types_size().unwrap();
         assert_eq!(ctx.table.len(), 257);
         let mut out = Header {
             ptr: None,
             position: MAX_BYTES - 1,
         };
-        out.byte(0);
+        out.byte(0).unwrap();
         assert_eq!(out.position, MAX_BYTES);
         rejects(|| {
-            out.byte(0);
+            out.byte(0).unwrap();
         });
     }
 
@@ -1723,14 +2032,14 @@ mod tests {
     fn unsigned_labels_and_signed_type_references_are_minimal() {
         let mut ctx = Context::new();
         let record = compound(&mut ctx, -20, &[(u32::MAX, -1)]);
-        ctx.root(record);
+        ctx.root(record).unwrap();
         assert_eq!(
             bytes(&mut ctx),
             b"DIDL\x01\x6c\x01\xff\xff\xff\xff\x0f\x7f\x01\x00"
         );
         let mut output = [0; 2];
         let mut out = Header::new(Some(output.as_mut_ptr() as usize));
-        out.signed(64);
+        out.signed(64).unwrap();
         assert_eq!(out.position, 2);
         assert_eq!(output, [0xc0, 0]);
     }
@@ -1739,23 +2048,23 @@ mod tests {
     fn malformed_or_unfinished_builders_and_unsupported_shapes_reject() {
         let mut ctx = Context::new();
         rejects(|| {
-            ctx.root(-22);
+            ctx.root(-22).unwrap();
         });
         rejects(|| {
-            ctx.unary(-20, -1);
+            ctx.unary(-20, -1).unwrap();
         });
-        ctx.begin(-20);
-        ctx.field(2, -1);
+        ctx.begin(-20).unwrap();
+        ctx.field(2, -1).unwrap();
         rejects(|| {
-            ctx.field(1, -1);
+            ctx.field(1, -1).unwrap();
         });
         rejects(|| {
-            ctx.types_size();
+            ctx.types_size().unwrap();
         });
-        ctx.end();
-        ctx.types_size();
+        ctx.end().unwrap();
+        ctx.types_size().unwrap();
         rejects(|| {
-            ctx.root(-1);
+            ctx.root(-1).unwrap();
         });
     }
 
@@ -1776,7 +2085,7 @@ mod tests {
             let mut buffer = vec![0; size];
             assert_eq!(
                 candid_canonical_write_types(ctx, buffer.as_mut_ptr() as usize),
-                size as u64
+                size as i64
             );
             assert_eq!(buffer, b"DIDL\x02\x6c\x01\x00\x01\x6e\x7d\x01\x00");
             candid_canonical_done(ctx);
