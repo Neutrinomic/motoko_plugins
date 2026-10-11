@@ -21,6 +21,15 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def map_source_sha(provenance):
+    sources = provenance['plugin']['source_sha256']
+    path = 'packages/fast/src/pure/Map.mo'
+    # Archived benchmark evidence retains the source path used at measurement.
+    if path not in sources:
+        path = 'plugins/pure-map/motoko/Map.mo'
+    return sources[path]
+
+
 def load(directory, label):
     report = json.loads((directory / 'results.json').read_text())
     manifest = json.loads((directory / 'cases.json').read_text())
@@ -89,8 +98,8 @@ validation = {
     'same_actor_source_inputs_compiler_dependencies_runner_protocol': True,
     'before': {name: sha(args.before / name) for name in ('main.mo', 'cases.json', 'provenance.json', 'results.json')},
     'after': {name: sha(args.after / name) for name in ('main.mo', 'cases.json', 'provenance.json', 'results.json')},
-    'before_map_sha256': before_provenance['plugin']['source_sha256']['plugins/pure-map/motoko/Map.mo'],
-    'after_map_sha256': after_provenance['plugin']['source_sha256']['plugins/pure-map/motoko/Map.mo'],
+    'before_map_sha256': map_source_sha(before_provenance),
+    'after_map_sha256': map_source_sha(after_provenance),
 }
 (args.out / 'validation.json').write_text(json.dumps(validation, indent=2) + '\n')
 with (args.out / 'costs.md').open('w') as handle:

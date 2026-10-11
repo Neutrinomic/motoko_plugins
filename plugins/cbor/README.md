@@ -3,25 +3,26 @@
 Typed CBOR encoding and decoding without a generic value tree or Candid round trip.
 
 ```motoko
-import Prim "mo:⛔";
+import CBOR "mo:fast/CBOR";
 
 type User = {id : Nat64; name : Text; active : Bool};
-let encoded = Prim.to_cbor({id = 42 : Nat64; name = "Ada"; active = true});
+let encoded = CBOR.encode({id = 42 : Nat64; name = "Ada"; active = true});
 switch encoded {
   case (#ok bytes) {
-    let decoded = Prim.from_cbor<User>(bytes);
+    let decoded = CBOR.decode<User>(bytes);
   };
   case (#err error) { /* error.kind, message, path, offset */ };
 };
 ```
 
 ```sh
-moc --plugin ../../dist/cbor app.mo
+moc --package fast ../../packages/fast/src --plugin ../../dist/cbor app.mo
 ```
 
-`to_cbor(value)` returns `{#ok : Blob; #err : CborError}`.
-`from_cbor<T>(blob)` returns `{#ok : T; #err : CborError}` where
-`CborError = {kind : Text; message : Text; path : Text; offset : Nat64}`.
+`CBOR.encode(value)` returns `CBOR.Result<Blob>`.
+`CBOR.decode<T>(blob)` returns `CBOR.Result<T>`, defined as
+`{#ok : T; #err : CBOR.Error}` where
+`CBOR.Error = {kind : Text; message : Text; path : Text; offset : Nat64}`.
 The explicit output type supplies record names and scalar ranges. Error paths
 use JSON Pointer escaping (`~0`, `~1`); offsets count input bytes from zero and
 are zero for encoding errors. Expected input errors return `#err`; platform
@@ -85,3 +86,5 @@ Motoko GC. Results are ordinary managed Motoko values.
 The tests cover RFC encodings, every binary16 bit pattern, signed and large
 integer bridges, decoder diagnostics, quotas, interpreter/Wasm parity, and
 retained results and early decode errors across forced GC.
+
+The public module is distributed in the [`fast` Mops package](../../packages/fast/).

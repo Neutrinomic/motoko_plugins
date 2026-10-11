@@ -1,9 +1,9 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 //MOC-FLAG --package core $MOTOKO_CORE -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 import Core "mo:core/Map";
-import Interop "../../motoko/Core";
+import Interop "mo:fast/CoreMap";
 func cmp(a : Nat, b : Nat) : Map.Order { if (a < b) #less else if (a == b) #equal else #greater };
 let actual = Map.empty<Nat, ?Nat>();
 let expected = Core.empty<Nat, ?Nat>();

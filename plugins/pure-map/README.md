@@ -15,7 +15,7 @@ convention, and native scalar-order helpers avoid comparator dispatch when the
 key order is known.
 
 ```motoko
-import Map "mo:pure-map/Map";
+import Map "mo:fast/pure/Map";
 
 let original = Map.addNat<Text>(Map.empty(), 42, "answer");
 let changed = Map.addNat(original, 7, "seven");
@@ -34,12 +34,12 @@ Build and compile from the matching Motoko checkout's Nix shell:
 ```sh
 ../plugins/scripts/build.sh --motoko "$PWD" pure-map
 bin/moc --plugin ../plugins/dist/pure-map \
-  --package pure-map ../plugins/plugins/pure-map/motoko app.mo -o app.wasm
+  --package fast ../plugins/packages/fast/src app.mo -o app.wasm
 ```
 
 The package uses ABI **1**. It must be built against the exact compatible native
 compiler interfaces, like the other plugins. The public library is
-[`motoko/Map.mo`](motoko/Map.mo); applications normally use its functions rather
+[`mo:fast/pure/Map`](../../packages/fast/src/pure/Map.mo); applications normally use its functions rather
 than the lower-level `Prim.pmap_*` intrinsics.
 
 ## API

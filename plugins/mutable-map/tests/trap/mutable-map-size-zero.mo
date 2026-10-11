@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 let self = Map.singleton<Nat, Nat>(1, 2);
 self.size := 0;
 // Forged metadata must not produce a negative Nat during successful removal.

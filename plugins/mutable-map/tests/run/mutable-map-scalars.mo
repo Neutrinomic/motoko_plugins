@@ -1,7 +1,7 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 // All supported scalar layouts exercise all native operations, including
 // boxed 64-bit extrema, large integers, UTF-8, byte ordering, and null values.
 do {

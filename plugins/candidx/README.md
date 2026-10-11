@@ -1,19 +1,20 @@
 # CandidX
 
-`Prim.to_candid_canonical(...) : { #ok : Blob; #err : Text }` encodes Motoko values directly into the
+`CandidX.encode(...) : { #ok : Blob; #err : Text }` encodes Motoko values directly into the
 CandidX `cx` canonical profile. The compiler specializes traversal, sizing,
 and writing for the argument types. A Rust Wasm helper handles dynamic shapes.
 
 ```motoko
-import Prim "mo:⛔";
-switch (Prim.to_candid_canonical({ height = 42; memo = ?"hello" })) {
+import CandidX "mo:fast/CandidX";
+switch (CandidX.encode({ height = 42; memo = ?"hello" })) {
   case (#ok encoded) { /* use the canonical Blob */ };
   case (#err message) { /* invalid input or an encoding limit */ };
 };
 ```
 
 Build with `scripts/build.sh --motoko /path/to/motoko candidx`, then pass
-`--plugin /path/to/plugins/dist/candidx` to the matching compiler. See the
+`--plugin /path/to/plugins/dist/candidx` and
+`--package fast /path/to/plugins/packages/fast/src` to the matching compiler. See the
 [repository build instructions](../../README.md#build-and-use).
 
 `compiler/` contains registration, typed code generation, and the interpreter
@@ -36,3 +37,5 @@ explicitly typed Motoko function when passing an encoder as a callback.
 See [the design and validation](../../docs/design.md) and
 [benchmark reproduction](../../benchmarks/README.md). Compiler and runtime
 sources retain their MIT license files.
+
+The public module is distributed in the [`fast` Mops package](../../packages/fast/).

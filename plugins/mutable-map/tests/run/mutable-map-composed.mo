@@ -1,8 +1,8 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map --plugin ../../../../dist/pure-map --plugin ../../../../dist/json --plugin ../../../../dist/cbor --plugin ../../../../dist/candidx --plugin ../../../../dist/sha256
+//MOC-FLAG --plugin ../../../../dist/mutable-map --plugin ../../../../dist/pure-map --plugin ../../../../dist/json --plugin ../../../../dist/cbor --plugin ../../../../dist/candidx --plugin ../../../../dist/sha256 --package fast ../../../../packages/fast/src
 //MOC-FLAG --sanity-checks -A M0236
 import Prim "mo:⛔";
-import Mutable "../../motoko/Map";
-import Pure "../../../pure-map/motoko/Map";
+import Mutable "mo:fast/Map";
+import Pure "mo:fast/pure/Map";
 func compare(a : Nat, b : Nat) : Mutable.Order { if (a < b) #less else if (a == b) #equal else #greater };
 type Error = {kind : Text; message : Text; path : Text; offset : Nat64};
 func ok<T>(result : {#ok : T; #err : Error}) : T {

@@ -5,18 +5,19 @@ The compiler specializes visitors for your Motoko types; a linked Wasm kernel
 handles JSON syntax, escaping, numeric conversion, and buffering.
 
 ```sh
-moc --plugin /path/to/motoko_plugins/dist/json main.mo
+moc --package fast /path/to/motoko_plugins/packages/fast/src \
+    --plugin /path/to/motoko_plugins/dist/json main.mo
 ```
 
 ```motoko
-import Prim "mo:⛔";
+import JSON "mo:fast/JSON";
 
 type User = { name : Text; age : Nat8; nickname : ?Text };
 
-let parsed = Prim.from_json<User>("{\"name\":\"Ada\",\"age\":36}");
+let parsed = JSON.decode<User>("{\"name\":\"Ada\",\"age\":36}");
 switch parsed {
   case (#ok user) {
-    let encoded = Prim.to_json(user); // { #ok : Text; #err : JsonError }
+    let encoded : JSON.Result<Text> = JSON.encode(user);
   };
   case (#err error) {
     // error.kind, error.message, error.path, error.offset
@@ -27,19 +28,19 @@ switch parsed {
 Both operations return ordinary managed Motoko variants:
 
 ```motoko
-type JsonError = {
-  kind : Text;
-  message : Text;
-  path : Text;   // JSON Pointer; "" identifies the root
-  offset : Nat64; // UTF-8 byte offset; zero when encoding
-};
-// to_json(value) : { #ok : Text; #err : JsonError }
-// from_json<T>(text) : { #ok : T; #err : JsonError }
+// JSON.Error = {
+//   kind : Text;
+//   message : Text;
+//   path : Text;   // JSON Pointer; "" identifies the root
+//   offset : Nat64; // UTF-8 byte offset; zero when encoding
+// }
+// JSON.encode(value) : JSON.Result<Text>
+// JSON.decode<T>(text) : JSON.Result<T>
 ```
 
-`from_json<T>` requires an explicit result type. Unsupported types are rejected
-at compile time. Supply one value to `to_json`; parenthesize a tuple argument
-(`Prim.to_json((tupleValue))`).
+`JSON.decode<T>` requires an explicit result type. Unsupported types are rejected
+at compile time. Supply one value to `JSON.encode`; parenthesize a tuple argument
+(`JSON.encode((tupleValue))`).
 
 ## Mapping
 
@@ -98,3 +99,5 @@ follow normal canister behavior.
 Tests cover scalar boundaries, Unicode, recursive data, options, malformed
 JSON, quotas, source/IR/Wasm agreement, and keeping decoded records, arrays,
 bignums, and errors alive across forced GC and heap evacuation.
+
+The public module is distributed in the [`fast` Mops package](../../packages/fast/).

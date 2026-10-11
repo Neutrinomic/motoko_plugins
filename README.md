@@ -6,6 +6,9 @@ optional Wasm runtime into the canister. Plugin code reads Motoko values through
 compiler's memory and GC helpers. The SDK also supports typed mutation of
 caller-owned Motoko arrays and records through the ordinary GC write barriers.
 
+Use the [`fast` Mops package](packages/fast/) for imports such as
+`mo:fast/JSON`, `mo:fast/SHA256`, and `mo:fast/Map`.
+
 ## Instruction and allocation costs
 
 Recorded PocketIC measurements for the ABI 1 plugins, using the same compiler
@@ -581,14 +584,14 @@ available as historical evidence.
 
 ## Plugins
 
-| Plugin | Function | Description |
+| Plugin | `mo:fast` module | Description |
 | --- | --- | --- |
-| [CandidX](plugins/candidx/) | `Prim.to_candid_canonical(...) : { #ok : Blob; #err : Text }` | Canonical Candid encoding from typed Motoko values |
-| [CBOR](plugins/cbor/) | `Prim.to_cbor(value)`, `Prim.from_cbor<T>(bytes)` | Deterministic CBOR encoding and typed decoding with `#ok`/`#err` results |
-| [JSON](plugins/json/) | `Prim.to_json(value)`, `Prim.from_json<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
-| [Mutable map](plugins/mutable-map/) | `Map.get`, `Map.add`, `Map.remove`, `Prim.mmap_*` | In-place ordered maps with generic keys/values, shared payloads, and managed GC writes |
-| [Pure map](plugins/pure-map/) | `Map.get`, `Map.add`, `Map.remove`, `Prim.pmap_*` | Persistent ordered maps with generic keys/values, Motoko callbacks, and native scalar comparisons |
-| [SHA-256](plugins/sha256/) | `Prim.sha256(Blob) : Blob` | One-shot SHA-256 with direct Blob access |
+| [CandidX](plugins/candidx/) | `CandidX.encode(...)` → `#ok Blob` / `#err Text` | Canonical Candid encoding from typed Motoko values |
+| [CBOR](plugins/cbor/) | `CBOR.encode(value)`, `CBOR.decode<T>(bytes)` | Deterministic CBOR encoding and typed decoding with `#ok`/`#err` results |
+| [JSON](plugins/json/) | `JSON.encode(value)`, `JSON.decode<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
+| [Mutable map](plugins/mutable-map/) | `Map.get`, `Map.add`, `Map.remove` | In-place ordered maps with generic keys/values, shared payloads, and managed GC writes |
+| [Pure map](plugins/pure-map/) | `pure/Map`: `get`, `add`, `remove` | Persistent ordered maps with generic keys/values, Motoko callbacks, and native scalar comparisons |
+| [SHA-256](plugins/sha256/) | `SHA256.digest(bytes)` | One-shot SHA-256 with direct Blob access |
 
 The compiler support is proposed in
 [Motoko PR #6443](https://github.com/caffeinelabs/motoko/pull/6443).
@@ -610,24 +613,26 @@ bin/moc --plugin ../plugins/dist/candidx \
         --plugin ../plugins/dist/json \
         --plugin ../plugins/dist/cbor \
         --plugin ../plugins/dist/pure-map \
-        --package pure-map ../plugins/plugins/pure-map/motoko \
         --plugin ../plugins/dist/mutable-map \
-        --package mutable-map ../plugins/plugins/mutable-map/motoko \
+        --package fast ../plugins/packages/fast/src \
         app.mo -o app.wasm
 ```
 
 ```motoko
-import Prim "mo:⛔";
-import Map "mo:pure-map/Map";
-import MutableMap "mo:mutable-map/Map";
+import CandidX "mo:fast/CandidX";
+import SHA256 "mo:fast/SHA256";
+import JSON "mo:fast/JSON";
+import CBOR "mo:fast/CBOR";
+import Map "mo:fast/pure/Map";
+import MutableMap "mo:fast/Map";
 
-switch (Prim.to_candid_canonical({ value = 42 })) {
-  case (#ok bytes) { let digest = Prim.sha256(bytes) };
-  case (#err message) { Prim.debugPrint(message) };
+switch (CandidX.encode({ value = 42 })) {
+  case (#ok bytes) { let digest = SHA256.digest(bytes) };
+  case (#err message) { /* handle the encoding error */ };
 };
 type User = { name : Text; age : Nat8 };
-let user = Prim.from_json<User>("{\"name\":\"Ada\",\"age\":37}");
-let binary = Prim.to_cbor({ name = "Ada"; age = 37 : Nat8 });
+let user = JSON.decode<User>("{\"name\":\"Ada\",\"age\":37}");
+let binary = CBOR.encode({ name = "Ada"; age = 37 : Nat8 });
 let key : Nat64 = 42;
 let original = Map.empty<Nat64, Text>();
 let updated = Map.addNat64(original, key, "answer");
@@ -636,6 +641,13 @@ let mutable = MutableMap.empty<Nat64, Text>();
 MutableMap.addNat64(mutable, key, "answer");
 assert MutableMap.getNat64(mutable, key) == ?"answer";
 ```
+
+The [`fast` Mops package](packages/fast/) provides these modules. To use it from
+a local checkout, add `fast = "../plugins/packages/fast"` under `[dependencies]`
+in your application's `mops.toml`, then run `mops install` and use `mops sources`
+for the compiler package flags. It is not published to the registry yet. Load
+only the native plugins used by your imported modules; Mops resolves source
+imports, while `--plugin` loads the matching compiler extension.
 
 The build creates a matching dynamically linked native compiler and independent
 packages in `dist/<name>/`, each containing `plugin.cmxs`. Kernel-based packages
@@ -669,14 +681,16 @@ plugins/
     ...
   pure-map/
     compiler/         generated managed Wasm and interpreter reference
-    motoko/           public Map library
     tests/            differential, sharing, and GC checks
   mutable-map/
     compiler/         native B-tree operations and interpreter reference
-    motoko/           public Map library and optional Core conversion module
     tests/            differential, aliasing, GC, and upgrade checks
   sha256/
     ...
+packages/fast/        Mops package metadata, README, and license
+  src/                CandidX, JSON, CBOR, SHA256, Map, CoreMap modules
+    pure/Map.mo       persistent Map library
+  tests/              public import and intrinsic-alias checks
 scripts/              shared build and test commands
 tests/integration/    tests combining plugins and exercising GC
 benchmarks/           PocketIC harness and recorded results

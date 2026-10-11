@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map
+//MOC-FLAG --plugin ../../../../dist/pure-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 
 // The final empty child is at depth 129 and must still trap.
 var tree : Map.Map<Nat, Nat> = null;

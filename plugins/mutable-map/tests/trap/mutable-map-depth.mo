@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 // Structural fields are private by contract. Forged cyclic input must still
 // stop with a controlled trap, without unbounded recursion or raw heap writes.
 let node : Map.Node<Nat, Nat> = {

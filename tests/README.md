@@ -15,6 +15,8 @@ The script adds that compiler's `bin/` wrappers to `PATH` and invokes Motoko's
 tests. It does not install or copy tests into the compiler tree.
 
 - `plugins/<name>/tests/{run,fail,trap}` owns that plugin's behavior and errors.
+- `packages/fast/tests/run` checks public `mo:fast` codec/hash imports with only
+  the corresponding plugin loaded. Map tests also use the public package.
 - `tests/integration/` tests plugin composition, load order, specialization,
   allocation, and collection of retained values under forced GC.
 - `tests/packaging.py` checks compiler compatibility diagnostics, package

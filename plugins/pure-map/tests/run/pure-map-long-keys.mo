@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map -A M0236
+//MOC-FLAG --plugin ../../../../dist/pure-map -A M0236 --package fast ../../../../packages/fast/src
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 
 func textCompare(a : Text, b : Text) : Map.Order {
   if (a < b) #less else if (a == b) #equal else #greater

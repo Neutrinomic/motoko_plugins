@@ -1,7 +1,7 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 func cmp(a : Nat, b : Nat) : Map.Order { if (a < b) #less else if (a == b) #equal else #greater };
 func collect<T>(iter : Map.Iter<T>) : [T] {
   var out : [T] = [];

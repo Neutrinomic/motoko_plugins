@@ -113,6 +113,28 @@ exact interface. All plugin bindings are compiler intrinsics. Inferred aliases
 preserve their specialization; explicit Motoko wrappers provide ordinary
 function values when an application needs callbacks.
 
+## Public Motoko module
+
+Add the user-facing module to `packages/fast/src/`, so callers import it as
+`mo:fast/Example`. Import `Prim` inside that module and expose inferred aliases
+for typed intrinsics:
+
+```motoko
+import Prim "mo:⛔";
+module {
+  public let operation = Prim.example_operation;
+}
+```
+
+Do not annotate the alias as an ordinary function or hide concrete type
+parameters behind a generic wrapper. Inferred aliases preserve specialization
+and add no wrapper calls. Export named result/error types when applicable.
+Keep modules independent so importing one does not require unrelated plugins.
+Keep all public Motoko sources inside the Mops package; imports must not reach
+outside its directory. Update its README and add a test under
+`packages/fast/tests/run` loading only the corresponding plugin. The shared
+test script discovers these package tests automatically.
+
 ## Runtime and tests
 
 The runtime uses imported Motoko memory and the approved allocation/trap

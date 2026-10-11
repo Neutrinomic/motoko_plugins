@@ -1,7 +1,7 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map
+//MOC-FLAG --plugin ../../../../dist/pure-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 import Oracle "../lib/SortedOracle";
 
 type Tree = Map.Map<Nat, Nat>;

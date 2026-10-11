@@ -1,7 +1,7 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 //MOC-FLAG --package core $MOTOKO_CORE -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 import Core "mo:core/Map";
 type Key = {order : Nat; var tag : Nat};
 func descending(a : Key, b : Key) : Map.Order {

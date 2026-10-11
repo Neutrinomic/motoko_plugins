@@ -1,7 +1,7 @@
-//MOC-FLAG --plugin ../../../../dist/mutable-map
+//MOC-FLAG --plugin ../../../../dist/mutable-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/Map";
 type Key = {order : Nat; var tag : Nat};
 type Value = {var count : Nat; callback : () -> Nat};
 func cmp(a : Key, b : Key) : Map.Order { if (a.order < b.order) #less else if (a.order == b.order) #equal else #greater };

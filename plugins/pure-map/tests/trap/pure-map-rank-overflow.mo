@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map
+//MOC-FLAG --plugin ../../../../dist/pure-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 
 func compare(a : Nat, b : Nat) : Map.Order {
   if (a < b) #less else if (a == b) #equal else #greater

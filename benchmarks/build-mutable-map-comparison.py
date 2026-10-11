@@ -72,8 +72,9 @@ for name, digest in compiler_sources.items():
     if Path(name).is_absolute() or '..' in Path(name).parts or sha(motoko / name) != digest:
         raise ValueError(f'Compiler source differs from plugin build: {name}')
 
-source_paths = sorted((root / 'plugins/mutable-map/compiler').glob('*')) + sorted(
-    (root / 'plugins/mutable-map/motoko').glob('*.mo')) + [root / 'plugins/mutable-map/plugin.json']
+source_paths = sorted((root / 'plugins/mutable-map/compiler').glob('*')) + [
+    root / 'packages/fast/src/Map.mo', root / 'packages/fast/src/CoreMap.mo',
+    root / 'plugins/mutable-map/plugin.json']
 source_hashes = {path.relative_to(root).as_posix(): sha(path)
                  for path in source_paths if path.is_file()}
 support_paths = ('bin/wrapper.sh', 'rts/mo-rts.wasm', 'rts/mo-rts-debug.wasm')
@@ -82,7 +83,7 @@ before = {'moc': sha(compiler), 'plugin': sha(plugin / 'plugin.cmxs'),
           'source': sha(out / 'main.mo'), 'build_manifest': sha(plugin / 'build.json')}
 subprocess.run([str(motoko / 'bin/moc'), '--plugin', str(plugin),
                 '--package', 'core', str(deps / '.mops' / package / 'src'),
-                '--package', 'mutable-map', str(root / 'plugins/mutable-map/motoko'),
+                '--package', 'fast', str(root / 'packages/fast/src'),
                 '-A', 'M0235,M0236', str(out / 'main.mo'),
                 '-o', str(out / 'main.wasm')], check=True)
 after = {'moc': sha(compiler), 'plugin': sha(plugin / 'plugin.cmxs'),

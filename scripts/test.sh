@@ -72,6 +72,7 @@ cargo test --manifest-path "$plugins_root/Cargo.toml" --locked \
 cd -- "$motoko_root"
 test_directories=()
 for directory in "$plugins_root"/plugins/*/tests/{run,fail,trap,run-drun} \
+                 "$plugins_root"/packages/*/tests/{run,fail,trap,run-drun} \
                  "$plugins_root"/tests/integration/{run,fail,trap,run-drun}; do
   if [[ -d "$directory" ]]; then
     test_directories+=("$directory")

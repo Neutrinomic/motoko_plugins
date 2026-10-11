@@ -1,10 +1,10 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map
+//MOC-FLAG --plugin ../../../../dist/pure-map --package fast ../../../../packages/fast/src
 //MOC-FLAG --sanity-checks --force-gc -A M0236
 //SKIP run
 //SKIP run-ir
 //SKIP run-low
 import Prim "mo:⛔";
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 
 actor {
   type Cell = {var count : Nat};

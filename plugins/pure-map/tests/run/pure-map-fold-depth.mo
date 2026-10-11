@@ -1,6 +1,6 @@
-//MOC-FLAG --plugin ../../../../dist/pure-map
+//MOC-FLAG --plugin ../../../../dist/pure-map --package fast ../../../../packages/fast/src
 //MOC-FLAG -A M0236
-import Map "../../motoko/Map";
+import Map "mo:fast/pure/Map";
 
 // Deliberately skewed data reaches the last permitted empty-child depth.
 // The fold guard depends on actual traversal depth, not stored height.

@@ -72,7 +72,7 @@ for name, digest in compiler_sources.items():
         raise ValueError(f'Compiler source differs from plugin build: {name}')
 
 source_paths = sorted((root / 'plugins/pure-map/compiler').glob('*')) + [
-    root / 'plugins/pure-map/motoko/Map.mo', root / 'plugins/pure-map/plugin.json']
+    root / 'packages/fast/src/pure/Map.mo', root / 'plugins/pure-map/plugin.json']
 source_hashes = {path.relative_to(root).as_posix(): sha(path)
                  for path in source_paths if path.is_file()}
 support_paths = ('bin/wrapper.sh', 'rts/mo-rts.wasm', 'rts/mo-rts-debug.wasm')
@@ -81,7 +81,7 @@ before = {'moc': sha(compiler), 'plugin': sha(plugin / 'plugin.cmxs'),
           'source': sha(out / 'main.mo'), 'build_manifest': sha(plugin / 'build.json')}
 subprocess.run([str(motoko / 'bin/moc'), '--plugin', str(plugin),
                 '--package', 'core', str(deps / '.mops' / package / 'src'),
-                '--package', 'pure-map', str(root / 'plugins/pure-map/motoko'),
+                '--package', 'fast', str(root / 'packages/fast/src'),
                 '-A', 'M0235,M0236', str(out / 'main.mo'),
                 '-o', str(out / 'main.wasm')], check=True)
 after = {'moc': sha(compiler), 'plugin': sha(plugin / 'plugin.cmxs'),
