@@ -1,0 +1,20 @@
+Independent integration review completed on 2026-10-11. No blocking finding remains in the integrated CBOR evidence. This bounded review checked the archived results and SDK integration; it did not rebuild packages or rerun the compiler test suite.
+
+The actual clean compiler checkout and executable match `c320bf90d0b63a058b5de2c41a42c96e8b82243f` and SHA-256 `722ba089cc3f6fb7710423363c3adc55d0af9f841eaa5a283e97eb08f3c8335c`. Compiler source hashes, plugin package hashes, generated actor/Wasm hashes, and report metadata agree with [build.json](build.json) and [provenance.json](provenance.json). CBOR source and runtime bytes are unchanged from the [previously audited candidate](../../cbor/audit.md); its runtime SHA-256 remains `5e1b2a9cdf7089667992db920cd3e425c5ed0f20d56b4b35aaef6a32875b5ed3`. The pre-run snapshot and all historical files named in provenance still match their saved hashes.
+
+All 123 integrated samples were independently checked: 41 implementation/workload rows, each with trials 0, 1, and 2 and identical instruction, allocation, reclamation, output-length, and output-hash values. All three reports have zero failed measurements. Actor, input-manifest, and runner hashes match both earlier stages; output hashes match both earlier stages. All 23 plugin workloads have zero measured reclamation. The [comparison CSV](comparison.csv) matches the raw samples. Existing oracle checks therefore apply to identical inputs and outputs: exact canonical `cbor2` bytes for edge encoders, full typed values for decoders, and complete error kind/message/path/offset for malformed inputs.
+
+The SDK change retains complete array-slot initialization, the allocation barrier, and each pointer write barrier. It caches a compiler-owned cursor under the existing no-GC-safepoint contract. CBOR element decoders satisfy that contract, and early malformed-input returns still abandon a valid initialized allocation. The successful array cases save exactly `10 × element_count − 1` instructions: 10,239 for 1,024 records, 40,959 for 4,096 booleans, and 2,559 for each 256-element option/text array. The nested-index error saves 123 instructions. All allocations, all encoders, the other 18 plugin cases, and every native-library phase are unchanged from the audited candidate.
+
+This CBOR matrix includes empty records, not empty arrays. The separately recorded [SDK empty-array microbenchmark](../../sdk/README.md) adds one instruction (561 to 562); that case is outside these 23 workloads.
+
+The headline native comparison is supported by the same-actor measurements below. Cells are instructions / allocated bytes; `native` is locked `cbor@4.1.0`.
+
+| Workload | Native | Integrated plugin | Native/plugin instruction ratio |
+|---|---:|---:|---:|
+| 1,024-record encode | 49,934,053 / 2,452,232 | 5,395,241 / 174,160 | 9.26× |
+| 1,024-record decode | 152,527,112 / 11,545,504 | 7,324,274 / 173,128 | 20.82× |
+
+These are end-to-end instruction counts including adapters, successful result extraction, retained assignment, and measurement overhead. They are not wall-clock speedups or isolated parser timings. Allocated bytes measure total allocation during the call, not peak or retained memory. The plugin improvements versus the original baseline are 35.84% for the record-array encoder and 30.76% for its decoder. The additional SDK-only decoder improvement is 0.14%; it must not be presented as another 30.76% improvement over the audited candidate.
+
+Large error paths retain their documented tradeoff. The 256 KiB-key case remains 21,305,590 instructions / 525,624 allocated bytes; the escaped-key case remains 2,209,586 / 75,096. Reserving raw key byte length costs about 1.2% more instructions than the earlier lazy-only experiment on the largest error, while saving another 786,768 allocated bytes. Against the original baseline, that final error still uses 1.25% fewer instructions and 66.62% fewer allocated bytes. The integrated nested-index error is 13,649 / 1,720. No regression or failed sample was omitted.

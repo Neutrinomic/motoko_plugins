@@ -1,0 +1,602 @@
+{
+  "label": "integrated-cbor-edges",
+  "recorded_utc": "2026-10-11T15:28:13.853Z",
+  "wasm_sha256": "fd5e17aa9bce8140a9acc50ae9fb9f09bb4537aaf9a1cdd21e2bfe98a87faf2a",
+  "wasm_bytes": 348812,
+  "trials": 3,
+  "source_sha256": "e87cc4d7c0c8d425ea50a0b5040530c2b232f5c5dee9d61b831c4d3cab64a111",
+  "cases_sha256": "25ac649c966214b85bbc46fc17552832cdf45a80494b1e930255a2a45821bd5e",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "cbor_oracle": {
+    "script_sha256": "9242776fb148237112b2627aec9ee32094ecec46b51755ecf2fdf35cc546e477",
+    "cbor2_version": "6.1.5"
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "delete PocketIC instance after the complete run"
+  },
+  "methodology": "Three fresh-canister trials; same actor for baseline/final. Setup and checks outside timing. All output bytes must equal independently generated cbor2 canonical bytes. Host cbor2 also decodes each encoded result. Decoders consume cbor2 bytes and compare complete typed values outside timing. Successful Result unwrapping and retained assignment are timed; no plugin GC allowed.",
+  "correctness": "Encoder bytes must equal independently generated cbor2 canonical bytes in the actor query and decode to the expected value with host cbor2. Decoder inputs are generated independently by cbor2; the actor query compares the complete retained typed value against independently constructed Motoko data. The two-byte ok reply is not decoded value size.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "cbor-empty-record-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 1784,
+          "allocated_bytes": 352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "c19a797fa1fd590cd2e5b42d1cf5f246e29b91684e2f87404b81dc345c7a56a0"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 1784,
+          "allocated_bytes": 352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "c19a797fa1fd590cd2e5b42d1cf5f246e29b91684e2f87404b81dc345c7a56a0"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 1784,
+          "allocated_bytes": 352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "c19a797fa1fd590cd2e5b42d1cf5f246e29b91684e2f87404b81dc345c7a56a0"
+        }
+      ]
+    },
+    {
+      "name": "cbor-empty-record-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 1757,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 1757,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 1757,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-scalars-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 21896,
+          "allocated_bytes": 1504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 60,
+          "output_sha256": "b6f12288d46c78b17057f9c85ad833232311eead1dd74667a8c6818fb159b141"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 21896,
+          "allocated_bytes": 1504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 60,
+          "output_sha256": "b6f12288d46c78b17057f9c85ad833232311eead1dd74667a8c6818fb159b141"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 21896,
+          "allocated_bytes": 1504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 60,
+          "output_sha256": "b6f12288d46c78b17057f9c85ad833232311eead1dd74667a8c6818fb159b141"
+        }
+      ]
+    },
+    {
+      "name": "cbor-scalars-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_3_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 21476,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 21476,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 21476,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-bools-4096-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_4_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 925162,
+          "allocated_bytes": 21144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4099,
+          "output_sha256": "1113ad1132a4b2ea044ce5faa4418472c26ea2ff951d808d2f0ec46cad93fa86"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 925162,
+          "allocated_bytes": 21144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4099,
+          "output_sha256": "1113ad1132a4b2ea044ce5faa4418472c26ea2ff951d808d2f0ec46cad93fa86"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 925162,
+          "allocated_bytes": 21144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4099,
+          "output_sha256": "1113ad1132a4b2ea044ce5faa4418472c26ea2ff951d808d2f0ec46cad93fa86"
+        }
+      ]
+    },
+    {
+      "name": "cbor-bools-4096-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_5_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 1316666,
+          "allocated_bytes": 33168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 1316666,
+          "allocated_bytes": 33168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 1316666,
+          "allocated_bytes": 33168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-options-256-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_6_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 258697,
+          "allocated_bytes": 6064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1356,
+          "output_sha256": "43bdc205872ab102965634781943a8514ee0a9e066e0b5b4ccaecd060e91a331"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 258697,
+          "allocated_bytes": 6064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1356,
+          "output_sha256": "43bdc205872ab102965634781943a8514ee0a9e066e0b5b4ccaecd060e91a331"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 258697,
+          "allocated_bytes": 6064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1356,
+          "output_sha256": "43bdc205872ab102965634781943a8514ee0a9e066e0b5b4ccaecd060e91a331"
+        }
+      ]
+    },
+    {
+      "name": "cbor-options-256-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_7_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 330839,
+          "allocated_bytes": 5184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 330839,
+          "allocated_bytes": 5184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 330839,
+          "allocated_bytes": 5184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-unicode-256-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_8_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 201648,
+          "allocated_bytes": 11904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3075,
+          "output_sha256": "7ae6f9fb2b46525853a8a9cf782ae54ada7fbd3f639590fe62d99aa16c0a0fa4"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 201648,
+          "allocated_bytes": 11904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3075,
+          "output_sha256": "7ae6f9fb2b46525853a8a9cf782ae54ada7fbd3f639590fe62d99aa16c0a0fa4"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 201648,
+          "allocated_bytes": 11904,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3075,
+          "output_sha256": "7ae6f9fb2b46525853a8a9cf782ae54ada7fbd3f639590fe62d99aa16c0a0fa4"
+        }
+      ]
+    },
+    {
+      "name": "cbor-unicode-256-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_9_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 286618,
+          "allocated_bytes": 12688,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 286618,
+          "allocated_bytes": 12688,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 286618,
+          "allocated_bytes": 12688,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-wide-record-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_10_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 22290,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 145,
+          "output_sha256": "1d3ff501a230910634267a162494b7a00cd2a6261ebe1c35c17dbbae859934eb"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 22290,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 145,
+          "output_sha256": "1d3ff501a230910634267a162494b7a00cd2a6261ebe1c35c17dbbae859934eb"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 22290,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 145,
+          "output_sha256": "1d3ff501a230910634267a162494b7a00cd2a6261ebe1c35c17dbbae859934eb"
+        }
+      ]
+    },
+    {
+      "name": "cbor-wide-record-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_11_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 80529,
+          "allocated_bytes": 1440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 80529,
+          "allocated_bytes": 1440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 80529,
+          "allocated_bytes": 1440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-variant-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_12_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 5932,
+          "allocated_bytes": 552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "9b3d46e6c7f2bf3edd85aff1a258504c2cd6e2106ab1395307d7113f71f28ce2"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 5932,
+          "allocated_bytes": 552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "9b3d46e6c7f2bf3edd85aff1a258504c2cd6e2106ab1395307d7113f71f28ce2"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 5932,
+          "allocated_bytes": 552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "9b3d46e6c7f2bf3edd85aff1a258504c2cd6e2106ab1395307d7113f71f28ce2"
+        }
+      ]
+    },
+    {
+      "name": "cbor-variant-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_13_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 5779,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 5779,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 5779,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

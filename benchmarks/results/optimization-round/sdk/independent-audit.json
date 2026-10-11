@@ -1,0 +1,52 @@
+{
+  "reviewer": "/root/audit_opt_sdk",
+  "candidate_revision": "c320bf90d0b63a058b5de2c41a42c96e8b82243f",
+  "baseline_revision": "f1ccbba5e445df9db03bbc35be557187ade9b436",
+  "verdict": "No blocking correctness, compatibility, or complexity findings in the SDK optimization.",
+  "scope": "Read-only source review, existing evidence inspection, benchmark consistency checks, and 7 independently rerun focused tests. No compiler rebuild or tracked source edits by reviewer; canonical compiler untouched.",
+  "metadata_proof": [
+    "mo_frontend/typing.ml:3591-3642: intrinsic identity is recognized through promoted types; final inference calls specialize (pre-inference alone skips it), validates argument schema and concrete/opaque requirements, and records explicit type arguments. Source interpreter uses the same checked callee, instantiation, argument and result annotations (mo_interpreter/interpret.ml:636-656).",
+    "lowering/desugar.ml:173-194 copies specialization annotations with sequence/parenthesized argument semantics intact. ir/ir.ml:310 maps all three type-bearing fields using map_specialization; erase_typ_field.ml:84 and async.ml:237 use that mapping.",
+    "ir_def/check_ir.ml:757-774 checks argument/result subtyping, every metadata type, fresh specialization success and exact result type equality. pipeline.ml:766,776 checks desugaring and each transformation by default (flags.ml:33); explicit -no-check-ir intentionally opts out of compiler sanity checking.",
+    "compute_plugin.ml retains supplied value arity and matching Local/Returns callback argument/result calling conventions. These are value-dependent checks. Removed result recomputation depends only on already checked static metadata."
+  ],
+  "cursor_proof": [
+    "compile.ml:9717-9739 evaluates length once, allocates with existing size overflow guard, resolves initial array forwarding, initializes all slots before any callback, applies allocation barrier, then writes exactly indices [0,length) with write_with_barrier. Cursor advances one 8-byte element per completed iteration.",
+    "Each invocation uses fresh Wasm locals; nested and recursive callbacks cannot overwrite its cursor. Zero length still initializes a valid empty array; early decoder return leaves every slot valid for later GC.",
+    "Local synchronous callbacks cannot suspend the surrounding frame. Actual GC sites are outer message/export cleanup; allocation may grow Wasm memory without changing linear-memory offsets. ICPerformGC is an internal IR constructor without a source producer. RTS write/allocation barriers mark or forward references and do not move the containing array.",
+    "No bounds, decoding, overflow, or value-dependent checks were removed. Arr.get retains idx bounds checking; Tuple.load_n already uses constant offsets; Object.load_idx_raw retains hash lookup required by record width subtyping."
+  ],
+  "callback_tuple_loader_proof": [
+    "Backend.Call.local checks fully instantiated synchronous local function metadata, evaluates closure then arguments exactly once, dispatches with input/output sequence arities, and boxes multiresults only when providing the managed callback result.",
+    "ComputePlugins.compile validates Tuple n only against normalized known tuple result shape (n=0 or n>=2), preserving opaque values and ordinary stack representation adaptation. Existing tests assert no allocation for direct pair/triple/unit results and managed retention for stored tuples.",
+    "Plugin declarations/API/ABI remain unchanged (ABI 1). Native Dynlink checks compiler interface compatibility; registration validates ABI/names/duplicates; runtime linker validates imports and signatures, shared Wasm64 memory/table, forbidden globals/start functions, and unresolved imports. Packaging tests cover these boundaries."
+  ],
+  "tests": {
+    "independent": "7 tests passed, 2.50898807 seconds; independent-audit-tests.log",
+    "paths": [
+      "run/array-tabulate",
+      "run/callbacks",
+      "run/output-representations",
+      "run-drun/callback-async-value",
+      "run-drun/array-tabulate",
+      "fail/callback-result-arity",
+      "fail/typed-result-abstract"
+    ],
+    "owner_evidence_reviewed": [
+      "45 compute-plugin fixtures plus packaging passed",
+      "full native/JS dune build and dune runtest logs",
+      "nix JS moc and moc_interpreter install checks",
+      "existing early-error/GC retention coverage"
+    ],
+    "specific_coverage": "Nested and reentrant callbacks; allocating record/array results; opaque generic and async values; callback result arity rejection; direct tuple result allocation assertions; about 32 MiB callback allocation with memory growth and forced subsequent GC."
+  },
+  "benchmark_audit": {
+    "consistency": "Independently compared baseline/candidate source, case and runner hashes; zero failed measurements; per-trial output hashes, allocated bytes and reclaimed bytes identical in all 24 measurements. Verification source checks every retained scalar/nested element outside timing. Sizes 0,1,257,4096, three trials each.",
+    "large_array_instruction_change": "4096 scalar -13.1339%; nested -3.7746%; allocation unchanged; Wasm -15 bytes.",
+    "empty_array_cost": "561 to 562 instructions (+1), allocation unchanged.",
+    "interpreter_evidence": "18 fresh-process samples all exited 0; alternating baseline/candidate, 1M opaque identity calls. The report compiler_sha256 mapping matches committed-build provenance.json. Final medians and CPU changes verified against summary.json: source -28.0211%, lowered IR -25.2921%, non-async-lowered IR -25.1089%; startup/typechecking included.",
+    "final_provenance": "Rechecked regenerated committed-build evidence: revision c320bf90d0b63a058b5de2c41a42c96e8b82243f; candidate moc SHA256 d4194a3ce50a4a9f2590777885b953cd4ec8b042ff3d240a89ea27396e62195c; provenance candidate Wasm hash equals candidate.json and actual candidate/main.wasm. All 24 baseline/candidate outputs, allocations and reclamation still match, and IC instruction counts are unchanged."
+  },
+  "resolved_review_note": "Owner clarified plugin_codegen.ml/.mli contract: generator-owned callback state retains managed references; compiler-owned traversal cursors rely on the no-safepoint contract. Final diff reviewed.",
+  "separate_issue": "Actor-local T1 alias failure reproduces with ordinary source and without plugins on pre-plugin snapshot 52113d40c (pre-plugin-alias.log). Cons.session restores counters and pipeline reuses the same filename scope across phases, violating intended constructor freshness when live earlier constructors remain. Deferred as a general identity/session fix; a name prefix or blacklist would not fix the invariant."
+}

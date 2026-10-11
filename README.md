@@ -14,11 +14,11 @@ native libraries for each row.
 
 | Operation | Native Motoko library | Native instructions | Plugin instructions | Native/plugin | Native allocated bytes | Plugin allocated bytes |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| JSON encode, 1,024 records | `json 1.4.0` | 53,258,267 | 7,780,660 | 6.84× | 7,145,616 | 194,208 |
-| JSON decode, 1,024 records | `serde 3.5.0` | 763,222,636 | 23,799,314 | 32.07× | 136,203,896 | 172,848 |
-| CBOR encode, 1,024 records | `cbor 4.1.0` | 49,934,053 | 8,409,156 | 5.94× | 2,452,232 | 174,224 |
-| CBOR decode, 1,024 records | `cbor 4.1.0` | 152,527,112 | 10,577,700 | 14.42× | 11,545,504 | 173,192 |
-| CandidX encode, 1,024 sparse records | CandidX `94c2868` | 88,379,476 | 6,154,646 | 14.36× | 3,578,064 | 22,624 |
+| JSON encode, 1,024 records | `json 1.4.0` | 53,258,267 | 5,081,644 | 10.48× | 7,145,616 | 194,176 |
+| JSON decode, 1,024 records | `serde 3.5.0` | 763,222,636 | 18,251,729 | 41.82× | 136,203,896 | 172,816 |
+| CBOR encode, 1,024 records | `cbor 4.1.0` | 49,934,053 | 5,395,241 | 9.26× | 2,452,232 | 174,160 |
+| CBOR decode, 1,024 records | `cbor 4.1.0` | 152,527,112 | 7,324,274 | 20.82× | 11,545,504 | 173,128 |
+| CandidX encode, 1,024 sparse records | CandidX `94c2868` | 88,379,476 | 6,140,310 | 14.39× | 3,578,064 | 22,624 |
 | SHA-256, 1 MiB | `sha2 0.2.5` | 323,721,060 | 78,124,848 | 4.14× | 1,008 | 56 |
 
 Three trials; medians shown. Counts include conversions between typed values
@@ -29,18 +29,30 @@ Allocated bytes include results and temporary garbage during the measured call;
 they measure allocation pressure, not peak memory or retained live bytes after
 GC. The same library supplies native instruction and allocation counts, chosen
 by instruction cost.
-[Full results](benchmarks/results/codec-comparison/README.md) include
-`serde-core 0.2.1`, small records, large payloads, allocation counts, and
-the serde stack overflows observed when decoding 64 KiB JSON strings.
-[Allocation tables](benchmarks/results/codec-comparison/allocations.md) compare
-every tested native library with the plugins.
+Final-build results: [JSON](benchmarks/results/optimization-round/integrated/json/README.md),
+[CBOR](benchmarks/results/optimization-round/integrated/cbor/README.md), and
+[CandidX/SHA-256](benchmarks/results/optimization-round/integrated/candidx-sha256/README.md).
+They include all three tested native libraries, smaller inputs, large payloads,
+and the observed serde stack overflows on 64 KiB JSON strings.
+The [optimization report](benchmarks/results/optimization-round/README.md)
+compares each plugin and the SDK before/after this round, including independent
+audits, unchanged cases, and allocation tradeoffs.
+The [previous comparison](benchmarks/results/codec-comparison/README.md) remains
+available with its original raw results.
 
 ## Persistent map costs
 
-The complete function comparison is below: **1,000, 10,000, and 100,000
+The complete final function comparison is below: **1,000, 10,000, and 100,000
 entries**, with 37 workload variants at each size covering 27 generic public
 functions and three scalar helpers. All **111 workloads / 720 measurements**
-passed validation; all three trials produced identical counts.
+passed validation; all three trials produced identical counts. The
+[optimization report](benchmarks/results/optimization-round/pure-map/README.md)
+compares these results with the original wrapper using the same actors and inputs.
+These counts were measured with frozen compiler
+`f1ccbba5e445df9db03bbc35be557187ade9b436`. The
+[final compiler audit](benchmarks/results/optimization-round/integrated/pure-map/audit.md)
+confirms unchanged benchmark function bodies and isolates the compiler-version
+initialization and metadata differences; it adds no new measurements.
 
 The baseline is `core 2.5.0` pure Map. Keys are boxed `Nat64` values, with
 the same input order for both implementations. The plugin callback path uses
@@ -52,26 +64,33 @@ The iterator-related APIs tested are `fromIter`, `entriesFrom`, and the other na
 shown below; there is no public `findIter` function.
 
 Core uses fewer instructions for shuffled `fromIter`, cursor creation alone,
-folds, and full-map snapshot creation. Both libraries share unchanged branches. Plugin
-updates copy changed paths and retain payload references; separate GC tests
-verify that updating a map with a 1 MiB payload allocates the same amount as
-with a 5-byte payload. Core adapters are identified below where it lacks a
-matching public operation; these compare complete algorithms and capabilities.
+and full-map snapshot creation. Both folds now use fewer instructions than Core
+and allocate zero bytes. Against the original wrapper, folds improve about 32%
+and full iterator consumption about 8.4%; bounded seek-and-consume workloads also
+improve. Both libraries share unchanged branches. Plugin updates copy changed
+paths and retain payload references; separate GC tests verify that updating a
+map with a 1 MiB payload allocates the same amount as with a 5-byte payload.
+Core adapters are identified below where it lacks a matching public operation;
+these compare complete algorithms and capabilities.
+
+PocketIC 14 runs use fresh canisters and four forced GC increments before each
+phase. Synchronous reclamation is reported separately; none occurred in these
+measurements. End-of-message GC is outside the measured interval.
 
 Three-trial medians, normalized by the number of complete operations in each batch. Both implementations use the same compiler and inputs. Allocated bytes include temporary objects and retained results; they are not peak or live heap size. Core/plugin above 1 means fewer plugin instructions.
 
-Point-function rows are per call. `get` is key lookup; `find` is ordered predicate search. Iterator `create` rows measure cursor creation only; `consume` rows include creation and the entire map traversal; `seek16` rows include creation and 16 entries. Fold, transform, split, and construction rows measure the complete function call. Snapshot creation is per captured root/snapshot. Core adapters are listed below; see [methodology](benchmarks/results/pure-map/functions/README.md) for exact semantics and validation.
+Point-function rows are per call. `get` is key lookup; `find` is ordered predicate search. Iterator `create` rows measure cursor creation only; `consume` rows include creation and the entire map traversal; `seek16` rows include creation and 16 entries. Fold, transform, split, and construction rows measure the complete function call. Snapshot creation is per captured root/snapshot. Core adapters are listed below; see [methodology](benchmarks/results/optimization-round/pure-map/README.md) for exact semantics and validation.
 
 ### Construction
 
 | Public function | Workload | Size | Core instructions/op | Plugin callback/op | Core allocated B/op | Plugin allocated B/op | Core/plugin |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `Map.fromArray` | fromArray-shuffled | 1,000 | 7,606,083.00 | 7,291,101.00 | 1,395,104.00 | 463,216.00 | 1.04× |
-| `Map.fromArray` | fromArray-shuffled | 10,000 | 102,601,814.00 | 100,956,659.00 | 18,838,600.00 | 6,369,896.00 | 1.02× |
-| `Map.fromArray` | fromArray-shuffled | 100,000 | 1,233,077,190.00 | 1,182,852,595.00 | 224,253,736.00 | 73,573,936.00 | 1.04× |
-| `Map.fromIter` | fromIter-shuffled | 1,000 | 7,605,488.00 | 8,364,890.00 | 1,394,952.00 | 487,880.00 | 0.91× |
-| `Map.fromIter` | fromIter-shuffled | 10,000 | 102,601,219.00 | 113,283,772.00 | 18,838,448.00 | 6,712,416.00 | 0.91× |
-| `Map.fromIter` | fromIter-shuffled | 100,000 | 1,233,076,595.00 | 1,297,500,651.00 | 224,253,584.00 | 76,471,536.00 | 0.95× |
+| `Map.fromArray` | fromArray-shuffled | 1,000 | 7,606,083.00 | 7,066,561.00 | 1,395,104.00 | 463,216.00 | 1.08× |
+| `Map.fromArray` | fromArray-shuffled | 10,000 | 102,601,814.00 | 97,527,881.00 | 18,838,600.00 | 6,369,896.00 | 1.05× |
+| `Map.fromArray` | fromArray-shuffled | 100,000 | 1,233,077,190.00 | 1,140,602,747.00 | 224,253,736.00 | 73,573,936.00 | 1.08× |
+| `Map.fromIter` | fromIter-shuffled | 1,000 | 7,605,488.00 | 8,140,350.00 | 1,394,952.00 | 487,880.00 | 0.93× |
+| `Map.fromIter` | fromIter-shuffled | 10,000 | 102,601,219.00 | 109,854,994.00 | 18,838,448.00 | 6,712,416.00 | 0.93× |
+| `Map.fromIter` | fromIter-shuffled | 100,000 | 1,233,076,595.00 | 1,255,250,803.00 | 224,253,584.00 | 76,471,536.00 | 0.98× |
 | `Map.fromIter` | fromIter-sorted | 1,000 | 10,203,874.00 | 1,727,096.00 | 1,831,072.00 | 96,688.00 | 5.91× |
 | `Map.fromIter` | fromIter-sorted | 10,000 | 135,473,401.00 | 18,857,900.00 | 23,988,728.00 | 1,062,544.00 | 7.18× |
 | `Map.fromIter` | fromIter-sorted | 100,000 | 1,694,931,186.00 | 179,953,531.00 | 297,345,304.00 | 10,097,624.00 | 9.42× |
@@ -82,52 +101,52 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `Map.add` | add-insert | 1,000 | 9,952.34 | 6,580.50 | 1,840.50 | 850.50 | 1.51× |
 | `Map.add` | add-insert | 10,000 | 11,554.31 | 8,575.94 | 2,034.50 | 1,107.00 | 1.35× |
-| `Map.add` | add-insert | 100,000 | 14,112.34 | 10,148.97 | 2,524.25 | 1,289.25 | 1.39× |
+| `Map.add` | add-insert | 100,000 | 14,112.34 | 10,148.47 | 2,524.25 | 1,289.25 | 1.39× |
 | `Map.add` | add-overwrite | 1,000 | 8,127.25 | 3,765.75 | 1,395.50 | 677.25 | 2.16× |
 | `Map.add` | add-overwrite | 10,000 | 10,491.78 | 4,985.44 | 1,816.75 | 913.50 | 2.10× |
 | `Map.add` | add-overwrite | 100,000 | 12,817.72 | 6,066.84 | 2,230.50 | 1,143.00 | 2.11× |
 | `Map.alter` | alter-mixed | 1,000 | 11,258.12 | 5,561.62 | 1,647.00 | 822.75 | 2.02× |
 | `Map.alter` | alter-mixed | 10,000 | 13,678.84 | 7,205.69 | 1,944.00 | 1,077.00 | 1.90× |
-| `Map.alter` | alter-mixed | 100,000 | 16,945.25 | 8,522.34 | 2,422.75 | 1,281.75 | 1.99× |
+| `Map.alter` | alter-mixed | 100,000 | 16,945.25 | 8,521.84 | 2,422.75 | 1,281.75 | 1.99× |
 | `Map.containsKey` | containsKey-mixed | 1,000 | 2,183.69 | 1,692.78 | 0.00 | 0.00 | 1.29× |
 | `Map.containsKey` | containsKey-mixed | 10,000 | 2,831.84 | 2,252.47 | 0.00 | 0.00 | 1.26× |
 | `Map.containsKey` | containsKey-mixed | 100,000 | 3,450.09 | 2,663.25 | 0.00 | 0.00 | 1.30× |
 | `Map.delete` | delete-mixed | 1,000 | 10,437.75 | 4,015.50 | 1,987.75 | 357.50 | 2.60× |
 | `Map.delete` | delete-mixed | 10,000 | 14,751.44 | 5,245.69 | 2,885.00 | 467.75 | 2.81× |
 | `Map.delete` | delete-mixed | 100,000 | 17,230.59 | 6,426.88 | 3,373.00 | 596.00 | 2.68× |
-| `Map.entries` | entries-consume | 1,000 | 1,608,622.00 | 1,237,767.00 | 256,176.00 | 40,440.00 | 1.30× |
-| `Map.entries` | entries-consume | 10,000 | 16,219,373.00 | 12,350,986.00 | 2,560,176.00 | 400,472.00 | 1.31× |
-| `Map.entries` | entries-consume | 100,000 | 161,456,649.00 | 123,429,973.00 | 25,600,176.00 | 4,000,504.00 | 1.31× |
-| `Map.entries` | entries-create | 1,000 | 1,072.38 | 5,653.38 | 176.00 | 440.00 | 0.19× |
-| `Map.entries` | entries-create | 10,000 | 1,072.38 | 6,989.38 | 176.00 | 472.00 | 0.15× |
-| `Map.entries` | entries-create | 100,000 | 1,108.75 | 8,781.75 | 176.00 | 504.00 | 0.13× |
-| `Map.entriesFrom` | entriesFrom-seek16 | 1,000 | 794,041.00 | 27,843.50 | 131,432.00 | 1,112.00 | 28.52× |
-| `Map.entriesFrom` | entriesFrom-seek16 | 10,000 | 7,819,157.12 | 29,491.38 | 1,283,656.00 | 1,144.00 | 265.13× |
-| `Map.entriesFrom` | entriesFrom-seek16 | 100,000 | 77,630,138.25 | 31,425.75 | 12,804,424.00 | 1,176.00 | 2470.27× |
-| `Map.entriesInRange` | entriesInRange-seek16 | 1,000 | 798,511.00 | 29,070.88 | 131,584.00 | 1,080.00 | 27.47× |
-| `Map.entriesInRange` | entriesInRange-seek16 | 10,000 | 7,823,627.12 | 31,363.75 | 1,283,808.00 | 1,112.00 | 249.45× |
-| `Map.entriesInRange` | entriesInRange-seek16 | 100,000 | 77,634,608.25 | 33,690.50 | 12,804,576.00 | 1,144.00 | 2304.35× |
-| `Map.filterMap` | filterMap | 1,000 | 4,885,562.00 | 860,708.00 | 829,640.00 | 68,904.00 | 5.68× |
-| `Map.filterMap` | filterMap | 10,000 | 65,605,684.00 | 8,241,842.00 | 11,134,592.00 | 614,448.00 | 7.96× |
-| `Map.filterMap` | filterMap | 100,000 | 825,830,263.00 | 86,873,288.00 | 140,072,896.00 | 7,070,760.00 | 9.51× |
-| `Map.find` | find-first | 1,000 | 11,292.00 | 2,433.00 | 2,224.00 | 112.00 | 4.64× |
-| `Map.find` | find-first | 10,000 | 21,897.00 | 2,939.00 | 4,528.00 | 112.00 | 7.45× |
-| `Map.find` | find-first | 100,000 | 24,253.00 | 3,571.00 | 5,040.00 | 112.00 | 6.79× |
-| `Map.find` | find-last | 1,000 | 1,616,489.00 | 453,355.00 | 256,176.00 | 112.00 | 3.57× |
-| `Map.find` | find-last | 10,000 | 16,299,240.00 | 4,528,043.00 | 2,560,176.00 | 112.00 | 3.60× |
-| `Map.find` | find-last | 100,000 | 162,256,516.00 | 45,205,867.00 | 25,600,176.00 | 112.00 | 3.59× |
-| `Map.find` | find-middle | 1,000 | 817,769.00 | 228,597.00 | 129,968.00 | 112.00 | 3.58× |
-| `Map.find` | find-middle | 10,000 | 8,159,271.00 | 2,269,285.00 | 1,281,200.00 | 112.00 | 3.60× |
-| `Map.find` | find-middle | 100,000 | 81,141,704.00 | 22,607,741.00 | 12,802,224.00 | 112.00 | 3.59× |
-| `Map.find` | find-missing | 1,000 | 1,616,602.00 | 453,304.00 | 256,176.00 | 72.00 | 3.57× |
-| `Map.find` | find-missing | 10,000 | 16,299,353.00 | 4,527,992.00 | 2,560,176.00 | 72.00 | 3.60× |
-| `Map.find` | find-missing | 100,000 | 162,256,629.00 | 45,205,816.00 | 25,600,176.00 | 72.00 | 3.59× |
-| `Map.foldLeft` | foldLeft | 1,000 | 315,007.00 | 461,310.00 | 0.00 | 72.00 | 0.68× |
-| `Map.foldLeft` | foldLeft | 10,000 | 3,204,063.00 | 4,607,998.00 | 0.00 | 72.00 | 0.70× |
-| `Map.foldLeft` | foldLeft | 100,000 | 31,665,567.00 | 46,005,822.00 | 0.00 | 72.00 | 0.69× |
-| `Map.foldRight` | foldRight | 1,000 | 315,007.00 | 461,310.00 | 0.00 | 72.00 | 0.68× |
-| `Map.foldRight` | foldRight | 10,000 | 3,204,063.00 | 4,607,998.00 | 0.00 | 72.00 | 0.70× |
-| `Map.foldRight` | foldRight | 100,000 | 31,665,567.00 | 46,005,822.00 | 0.00 | 72.00 | 0.69× |
+| `Map.entries` | entries-consume | 1,000 | 1,608,622.00 | 1,134,244.00 | 256,176.00 | 40,400.00 | 1.42× |
+| `Map.entries` | entries-consume | 10,000 | 16,219,373.00 | 11,320,184.00 | 2,560,176.00 | 400,432.00 | 1.43× |
+| `Map.entries` | entries-consume | 100,000 | 161,456,649.00 | 113,128,799.00 | 25,600,176.00 | 4,000,464.00 | 1.43× |
+| `Map.entries` | entries-create | 1,000 | 1,072.38 | 2,363.38 | 176.00 | 400.00 | 0.45× |
+| `Map.entries` | entries-create | 10,000 | 1,072.38 | 2,427.38 | 176.00 | 432.00 | 0.44× |
+| `Map.entries` | entries-create | 100,000 | 1,108.75 | 2,519.75 | 176.00 | 464.00 | 0.44× |
+| `Map.entriesFrom` | entriesFrom-seek16 | 1,000 | 794,041.00 | 25,771.38 | 131,432.00 | 1,072.00 | 30.81× |
+| `Map.entriesFrom` | entriesFrom-seek16 | 10,000 | 7,819,157.12 | 27,718.00 | 1,283,656.00 | 1,104.00 | 282.10× |
+| `Map.entriesFrom` | entriesFrom-seek16 | 100,000 | 77,630,138.25 | 28,683.00 | 12,804,424.00 | 1,136.00 | 2706.49× |
+| `Map.entriesInRange` | entriesInRange-seek16 | 1,000 | 798,511.00 | 27,276.12 | 131,584.00 | 1,040.00 | 29.28× |
+| `Map.entriesInRange` | entriesInRange-seek16 | 10,000 | 7,823,627.12 | 30,075.38 | 1,283,808.00 | 1,072.00 | 260.13× |
+| `Map.entriesInRange` | entriesInRange-seek16 | 100,000 | 77,634,608.25 | 31,463.75 | 12,804,576.00 | 1,104.00 | 2467.43× |
+| `Map.filterMap` | filterMap | 1,000 | 4,885,562.00 | 746,683.00 | 829,640.00 | 68,904.00 | 6.54× |
+| `Map.filterMap` | filterMap | 10,000 | 65,605,684.00 | 7,101,817.00 | 11,134,592.00 | 614,448.00 | 9.24× |
+| `Map.filterMap` | filterMap | 100,000 | 825,830,263.00 | 75,473,263.00 | 140,072,896.00 | 7,070,760.00 | 10.94× |
+| `Map.find` | find-first | 1,000 | 11,292.00 | 1,927.00 | 2,224.00 | 112.00 | 5.86× |
+| `Map.find` | find-first | 10,000 | 21,897.00 | 2,253.00 | 4,528.00 | 112.00 | 9.72× |
+| `Map.find` | find-first | 100,000 | 24,253.00 | 2,645.00 | 5,040.00 | 112.00 | 9.17× |
+| `Map.find` | find-last | 1,000 | 1,616,489.00 | 329,393.00 | 256,176.00 | 112.00 | 4.91× |
+| `Map.find` | find-last | 10,000 | 16,299,240.00 | 3,288,081.00 | 2,560,176.00 | 112.00 | 4.96× |
+| `Map.find` | find-last | 100,000 | 162,256,516.00 | 32,805,905.00 | 25,600,176.00 | 112.00 | 4.95× |
+| `Map.find` | find-middle | 1,000 | 817,769.00 | 166,211.00 | 129,968.00 | 112.00 | 4.92× |
+| `Map.find` | find-middle | 10,000 | 8,159,271.00 | 1,648,899.00 | 1,281,200.00 | 112.00 | 4.95× |
+| `Map.find` | find-middle | 100,000 | 81,141,704.00 | 16,407,115.00 | 12,802,224.00 | 112.00 | 4.95× |
+| `Map.find` | find-missing | 1,000 | 1,616,602.00 | 329,278.00 | 256,176.00 | 72.00 | 4.91× |
+| `Map.find` | find-missing | 10,000 | 16,299,353.00 | 3,287,966.00 | 2,560,176.00 | 72.00 | 4.96× |
+| `Map.find` | find-missing | 100,000 | 162,256,629.00 | 32,805,790.00 | 25,600,176.00 | 72.00 | 4.95× |
+| `Map.foldLeft` | foldLeft | 1,000 | 315,007.00 | 312,965.00 | 0.00 | 0.00 | 1.01× |
+| `Map.foldLeft` | foldLeft | 10,000 | 3,204,063.00 | 3,127,653.00 | 0.00 | 0.00 | 1.02× |
+| `Map.foldLeft` | foldLeft | 100,000 | 31,665,567.00 | 31,205,477.00 | 0.00 | 0.00 | 1.01× |
+| `Map.foldRight` | foldRight | 1,000 | 315,007.00 | 312,965.00 | 0.00 | 0.00 | 1.01× |
+| `Map.foldRight` | foldRight | 10,000 | 3,204,063.00 | 3,127,653.00 | 0.00 | 0.00 | 1.02× |
+| `Map.foldRight` | foldRight | 100,000 | 31,665,567.00 | 31,205,477.00 | 0.00 | 0.00 | 1.01× |
 | `Map.get` | get-hit | 1,000 | 2,041.19 | 1,648.41 | 0.00 | 0.00 | 1.24× |
 | `Map.get` | get-hit | 10,000 | 2,736.97 | 2,189.88 | 0.00 | 0.00 | 1.25× |
 | `Map.get` | get-hit | 100,000 | 3,324.09 | 2,600.75 | 0.00 | 0.00 | 1.28× |
@@ -139,31 +158,31 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 | `Map.getEntry` | getEntry-hit | 100,000 | 3,496.09 | 2,738.75 | 40.00 | 40.00 | 1.28× |
 | `Map.insert` | insert-mixed | 1,000 | 9,122.19 | 5,332.62 | 1,607.00 | 782.75 | 1.71× |
 | `Map.insert` | insert-mixed | 10,000 | 11,000.25 | 6,976.69 | 1,904.00 | 1,037.00 | 1.58× |
-| `Map.insert` | insert-mixed | 100,000 | 13,585.41 | 8,292.84 | 2,382.75 | 1,241.75 | 1.64× |
-| `Map.map` | map | 1,000 | 629,222.00 | 618,972.00 | 88,112.00 | 72,072.00 | 1.02× |
-| `Map.map` | map | 10,000 | 6,340,550.00 | 6,183,836.00 | 880,112.00 | 720,072.00 | 1.03× |
-| `Map.map` | map | 100,000 | 63,111,408.00 | 61,842,446.00 | 8,800,112.00 | 7,200,072.00 | 1.02× |
+| `Map.insert` | insert-mixed | 100,000 | 13,585.41 | 8,292.34 | 2,382.75 | 1,241.75 | 1.64× |
+| `Map.map` | map | 1,000 | 629,222.00 | 504,947.00 | 88,112.00 | 72,072.00 | 1.25× |
+| `Map.map` | map | 10,000 | 6,340,550.00 | 5,043,811.00 | 880,112.00 | 720,072.00 | 1.26× |
+| `Map.map` | map | 100,000 | 63,111,408.00 | 50,442,421.00 | 8,800,112.00 | 7,200,072.00 | 1.25× |
 | `Map.rank` | rank | 1,000 | 743,056.50 | 1,906.12 | 129,264.00 | 40.00 | 389.83× |
 | `Map.rank` | rank | 10,000 | 7,449,898.00 | 2,962.38 | 1,281,776.00 | 40.00 | 2514.84× |
 | `Map.rank` | rank | 100,000 | 74,044,883.88 | 3,350.88 | 12,802,192.00 | 40.00 | 22097.18× |
-| `Map.replace` | replace-hit | 1,000 | 9,848.69 | 3,852.75 | 1,355.50 | 677.25 | 2.56× |
+| `Map.replace` | replace-hit | 1,000 | 9,848.69 | 3,851.75 | 1,355.50 | 677.25 | 2.56× |
 | `Map.replace` | replace-hit | 10,000 | 12,804.50 | 5,072.44 | 1,776.75 | 913.50 | 2.52× |
 | `Map.replace` | replace-hit | 100,000 | 15,780.56 | 6,154.34 | 2,190.50 | 1,143.00 | 2.56× |
 | `Map.replace` | replace-miss | 1,000 | 2,533.50 | 2,178.94 | 0.00 | 0.00 | 1.16× |
 | `Map.replace` | replace-miss | 10,000 | 3,238.41 | 2,775.88 | 0.00 | 0.00 | 1.17× |
 | `Map.replace` | replace-miss | 100,000 | 3,815.03 | 3,237.12 | 0.00 | 0.00 | 1.18× |
-| `Map.replay` | replay-consume | 1,000 | 1,608,622.00 | 1,237,547.00 | 256,176.00 | 40,384.00 | 1.30× |
-| `Map.replay` | replay-consume | 10,000 | 16,219,373.00 | 12,350,766.00 | 2,560,176.00 | 400,416.00 | 1.31× |
-| `Map.replay` | replay-consume | 100,000 | 161,456,649.00 | 123,429,753.00 | 25,600,176.00 | 4,000,448.00 | 1.31× |
-| `Map.replay` | replay-create | 1,000 | 1,072.38 | 5,433.38 | 176.00 | 384.00 | 0.20× |
-| `Map.replay` | replay-create | 10,000 | 1,072.38 | 6,769.38 | 176.00 | 416.00 | 0.16× |
-| `Map.replay` | replay-create | 100,000 | 1,108.75 | 8,561.75 | 176.00 | 448.00 | 0.13× |
-| `Map.reverseEntries` | reverseEntries-consume | 1,000 | 1,608,628.00 | 1,238,586.00 | 256,176.00 | 40,440.00 | 1.30× |
-| `Map.reverseEntries` | reverseEntries-consume | 10,000 | 16,219,379.00 | 12,352,421.00 | 2,560,176.00 | 400,472.00 | 1.31× |
-| `Map.reverseEntries` | reverseEntries-consume | 100,000 | 161,456,655.00 | 123,431,394.00 | 25,600,176.00 | 4,000,504.00 | 1.31× |
-| `Map.reverseEntries` | reverseEntries-create | 1,000 | 1,078.38 | 6,801.38 | 176.00 | 440.00 | 0.16× |
-| `Map.reverseEntries` | reverseEntries-create | 10,000 | 1,078.38 | 9,417.38 | 176.00 | 472.00 | 0.11× |
-| `Map.reverseEntries` | reverseEntries-create | 100,000 | 1,114.75 | 10,547.75 | 176.00 | 504.00 | 0.11× |
+| `Map.replay` | replay-consume | 1,000 | 1,608,622.00 | 1,134,024.00 | 256,176.00 | 40,344.00 | 1.42× |
+| `Map.replay` | replay-consume | 10,000 | 16,219,373.00 | 11,319,964.00 | 2,560,176.00 | 400,376.00 | 1.43× |
+| `Map.replay` | replay-consume | 100,000 | 161,456,649.00 | 113,128,579.00 | 25,600,176.00 | 4,000,408.00 | 1.43× |
+| `Map.replay` | replay-create | 1,000 | 1,072.38 | 2,143.38 | 176.00 | 344.00 | 0.50× |
+| `Map.replay` | replay-create | 10,000 | 1,072.38 | 2,207.38 | 176.00 | 376.00 | 0.49× |
+| `Map.replay` | replay-create | 100,000 | 1,108.75 | 2,299.75 | 176.00 | 408.00 | 0.48× |
+| `Map.reverseEntries` | reverseEntries-consume | 1,000 | 1,608,628.00 | 1,134,352.00 | 256,176.00 | 40,400.00 | 1.42× |
+| `Map.reverseEntries` | reverseEntries-consume | 10,000 | 16,219,379.00 | 11,320,292.00 | 2,560,176.00 | 400,432.00 | 1.43× |
+| `Map.reverseEntries` | reverseEntries-consume | 100,000 | 161,456,655.00 | 113,128,907.00 | 25,600,176.00 | 4,000,464.00 | 1.43× |
+| `Map.reverseEntries` | reverseEntries-create | 1,000 | 1,078.38 | 2,471.38 | 176.00 | 400.00 | 0.44× |
+| `Map.reverseEntries` | reverseEntries-create | 10,000 | 1,078.38 | 2,535.38 | 176.00 | 432.00 | 0.43× |
+| `Map.reverseEntries` | reverseEntries-create | 100,000 | 1,114.75 | 2,627.75 | 176.00 | 464.00 | 0.42× |
 | `Map.select` | select | 1,000 | 753,479.12 | 1,069.38 | 129,264.00 | 40.00 | 704.60× |
 | `Map.select` | select | 10,000 | 7,554,302.62 | 1,481.62 | 1,281,776.00 | 40.00 | 5098.66× |
 | `Map.select` | select | 100,000 | 75,094,764.50 | 1,702.38 | 12,802,192.00 | 40.00 | 44111.76× |
@@ -178,10 +197,10 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 | `Map.swap` | swap-hit | 100,000 | 12,734.72 | 6,317.84 | 2,190.50 | 1,183.00 | 2.02× |
 | `Map.take` | take-hit | 1,000 | 10,700.91 | 5,910.31 | 2,060.75 | 717.25 | 1.81× |
 | `Map.take` | take-hit | 10,000 | 15,427.75 | 7,725.25 | 3,014.00 | 931.00 | 2.00× |
-| `Map.take` | take-hit | 100,000 | 17,354.00 | 9,607.88 | 3,402.50 | 1,187.50 | 1.81× |
+| `Map.take` | take-hit | 100,000 | 17,354.00 | 9,607.38 | 3,402.50 | 1,187.50 | 1.81× |
 | `Map.update` | update-mixed | 1,000 | 11,186.12 | 5,514.62 | 1,607.00 | 782.75 | 2.03× |
 | `Map.update` | update-mixed | 10,000 | 13,606.84 | 7,158.69 | 1,904.00 | 1,037.00 | 1.90× |
-| `Map.update` | update-mixed | 100,000 | 16,873.25 | 8,475.34 | 2,382.75 | 1,241.75 | 1.99× |
+| `Map.update` | update-mixed | 100,000 | 16,873.25 | 8,474.84 | 2,382.75 | 1,241.75 | 1.99× |
 
 ### Scalar ordering on the same workloads
 
@@ -191,7 +210,7 @@ The callback path uses the same Motoko comparator as Core. The scalar path order
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `Map.addNat64` | add-insert | 1,000 | 9,952.34 | 6,580.50 | 5,824.16 | 1,840.50 | 850.50 | 850.50 |
 | `Map.addNat64` | add-insert | 10,000 | 11,554.31 | 8,575.94 | 7,575.50 | 2,034.50 | 1,107.00 | 1,107.00 |
-| `Map.addNat64` | add-insert | 100,000 | 14,112.34 | 10,148.97 | 8,919.91 | 2,524.25 | 1,289.25 | 1,289.25 |
+| `Map.addNat64` | add-insert | 100,000 | 14,112.34 | 10,148.47 | 8,919.41 | 2,524.25 | 1,289.25 | 1,289.25 |
 | `Map.addNat64` | add-overwrite | 1,000 | 8,127.25 | 3,765.75 | 3,052.16 | 1,395.50 | 677.25 | 677.25 |
 | `Map.addNat64` | add-overwrite | 10,000 | 10,491.78 | 4,985.44 | 4,031.53 | 1,816.75 | 913.50 | 913.50 |
 | `Map.addNat64` | add-overwrite | 100,000 | 12,817.72 | 6,066.84 | 4,876.94 | 2,230.50 | 1,143.00 | 1,143.00 |
@@ -201,7 +220,7 @@ The callback path uses the same Motoko comparator as Core. The scalar path order
 | `Map.getNat64` | get-miss | 1,000 | 2,237.69 | 1,763.66 | 1,008.31 | 0.00 | 0.00 | 0.00 |
 | `Map.getNat64` | get-miss | 10,000 | 2,942.59 | 2,317.53 | 1,318.09 | 0.00 | 0.00 | 0.00 |
 | `Map.getNat64` | get-miss | 100,000 | 3,518.72 | 2,735.62 | 1,506.56 | 0.00 | 0.00 | 0.00 |
-| `Map.replaceNat64` | replace-hit | 1,000 | 9,848.69 | 3,852.75 | 3,139.16 | 1,355.50 | 677.25 | 677.25 |
+| `Map.replaceNat64` | replace-hit | 1,000 | 9,848.69 | 3,851.75 | 3,139.16 | 1,355.50 | 677.25 | 677.25 |
 | `Map.replaceNat64` | replace-hit | 10,000 | 12,804.50 | 5,072.44 | 4,118.53 | 1,776.75 | 913.50 | 913.50 |
 | `Map.replaceNat64` | replace-hit | 100,000 | 15,780.56 | 6,154.34 | 4,964.44 | 2,190.50 | 1,143.00 | 1,143.00 |
 | `Map.replaceNat64` | replace-miss | 1,000 | 2,533.50 | 2,178.94 | 1,423.59 | 0.00 | 0.00 | 0.00 |
@@ -232,15 +251,22 @@ Explicit adapters are used where Core has no matching public API. Seek, rank, se
 | swap-hit | `swap` | Both return the old optional value; this is put-with-old-value semantics. |
 | update-mixed | `get + callback + add/remove` | Same adapter as alter, returning the original optional value. |
 
-Raw batch totals, allocation/op, reclamation/op, and trial ranges are in [summary.csv](benchmarks/results/pure-map/functions/summary.csv).
+Raw batch totals, allocation/op, reclamation/op, and trial ranges are in [after.csv](benchmarks/results/optimization-round/pure-map/functions/after.csv).
 
-The [full function report](benchmarks/results/pure-map/functions/README.md)
-includes validation, provenance, and reproduction details. The
-[earlier 48-workload report](benchmarks/results/pure-map/README.md) also covers
-`remove`, retained histories, and set operations. It includes another weak
-case: intersecting a 256-entry map with a small map costs **57,509
-instructions / 6,016 allocated bytes** for the Core adapter versus
-**87,555 / 12,184** for the plugin.
+The [before/after tables](benchmarks/results/optimization-round/pure-map/functions/costs.md)
+and [comparison CSV](benchmarks/results/optimization-round/pure-map/functions/comparison.csv)
+retain every measured operation, including losses. The
+[full report](benchmarks/results/optimization-round/pure-map/README.md),
+[validation record](benchmarks/results/optimization-round/pure-map/functions/validation.json),
+and [independent audit](benchmarks/results/optimization-round/pure-map/audit.md)
+provide provenance, reproduction details, and correctness checks.
+The [updated point](benchmarks/results/optimization-round/pure-map/point/costs.md)
+and [bulk tables](benchmarks/results/optimization-round/pure-map/bulk/costs.md)
+also cover `remove`, retained histories, and set operations. Intersecting a
+256-entry map with a small map remains a weak case: **57,509 instructions /
+6,016 allocated bytes** for the Core adapter versus **80,690 / 12,184** for
+the plugin. The [earlier report](benchmarks/results/pure-map/README.md) remains
+available as historical evidence.
 
 ## Plugins
 

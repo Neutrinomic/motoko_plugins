@@ -1,0 +1,155 @@
+; $alloc_146 (f1 WAT; line numbers from the complete disassembly)
+; 41864
+  (func $alloc_146 (type 8)
+; 41865
+    (local $data_segment_blob i64)
+; 41866
+    i64.const 146
+; 41867
+    i64.const 27
+; 41868
+    i64.const 18
+; 41869
+    call $alloc_blob
+; 41870
+    global.get 8
+; 41871
+    if (param i64) (result i64)  ;; label = @1
+; 41872
+      call $allocation_barrier
+; 41873
+    end
+; 41874
+    local.tee $data_segment_blob
+; 41875
+    i64.load offset=9
+; 41876
+    i64.const 25
+; 41877
+    i64.add
+; 41878
+    i32.const 0
+; 41879
+    i32.const 18
+; 41880
+    memory.init 83
+; 41881
+    local.get $data_segment_blob
+; 41882
+    call $set_static_variable)
+; $initialize_root_array (f1 WAT; line numbers from the complete disassembly)
+; 38666
+  (func $initialize_root_array (type 8)
+; 38667
+    i64.const 200
+; 38668
+    call $initialize_static_variables
+; 38813
+    call $alloc_144
+; 38814
+    call $alloc_145
+; 38815
+    call $alloc_146
+; 38816
+    call $alloc_147
+; 38817
+    call $alloc_148
+; $rts_start (f1 WAT; line numbers from the complete disassembly)
+; 42989
+  (func $rts_start (type 8)
+; 42990
+    call $initialize_incremental_gc
+; 42991
+    call $initialize_root_array
+; 42992
+    i64.const 4194304
+; 42993
+    i64.const 0
+; 42994
+    i64.store)
+; $link_start (f1 WAT; line numbers from the complete disassembly)
+; 121814
+  (func $link_start (type 8)
+; 121815
+    call $__wasm_start
+; 121816
+    call $rts_start)
+; $link_start.1 (f1 WAT; line numbers from the complete disassembly)
+; 121817
+  (func $link_start.1 (type 8)
+; 121818
+    call $__wasm_call_ctors
+; 121819
+    call $link_start)
+; $link_start.2 (f1 WAT; line numbers from the complete disassembly)
+; 121820
+  (func $link_start.2 (type 8)
+; 121821
+    i64.const 4194312
+; 121822
+    i32.const 0
+; 121823
+    i32.const 17200
+; 121824
+    memory.init 118
+; 121825
+    call $__wasm_apply_data_relocs
+; 121826
+    call $link_start.1)
+
+[
+  {
+    "target": "$alloc_146",
+    "references": [
+      {
+        "line": 38815,
+        "text": "    call $alloc_146"
+      }
+    ]
+  },
+  {
+    "target": "$initialize_root_array",
+    "references": [
+      {
+        "line": 42991,
+        "text": "    call $initialize_root_array"
+      }
+    ]
+  },
+  {
+    "target": "$rts_start",
+    "references": [
+      {
+        "line": 121816,
+        "text": "    call $rts_start)"
+      }
+    ]
+  },
+  {
+    "target": "$link_start",
+    "references": [
+      {
+        "line": 121819,
+        "text": "    call $link_start)"
+      }
+    ]
+  },
+  {
+    "target": "$link_start.1",
+    "references": [
+      {
+        "line": 121826,
+        "text": "    call $link_start.1)"
+      }
+    ]
+  },
+  {
+    "target": "$link_start.2",
+    "references": [
+      {
+        "line": 121885,
+        "text": "  (start $link_start.2)"
+      }
+    ]
+  }
+]

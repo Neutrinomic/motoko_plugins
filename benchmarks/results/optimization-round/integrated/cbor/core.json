@@ -1,0 +1,886 @@
+{
+  "label": "integrated-cbor-core",
+  "recorded_utc": "2026-10-11T15:28:02.455Z",
+  "wasm_sha256": "c475f061377b2872ded09bd08c8b40b1288013387f1ffb09f13f9a01df9e2e01",
+  "wasm_bytes": 1108818,
+  "trials": 3,
+  "source_sha256": "c133550ad7798a7c9f541bdb950272a8cf941c550b3a3136a88236c3ea980993",
+  "cases_sha256": "2c9de44cc37f7f42e3cf4bb58a5f6363d0c363ac21063324779046efdf4d6833",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "cbor_oracle": {
+    "script_sha256": "9242776fb148237112b2627aec9ee32094ecec46b51755ecf2fdf35cc546e477",
+    "cbor2_version": "6.1.5"
+  },
+  "implementations": {
+    "serde": {
+      "package": "serde",
+      "version": "3.5.0"
+    },
+    "serde_core": {
+      "package": "serde-core",
+      "version": "0.2.1"
+    },
+    "native": {
+      "package": "cbor",
+      "version": "4.1.0"
+    },
+    "plugin": {
+      "package": "plugin/cbor",
+      "version": "ABI 1"
+    }
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "delete PocketIC instance after the complete run"
+  },
+  "methodology": "Same actor and compiler for all implementations; fresh canister per workload/trial. Independently generated wire input and typed inputs prepared outside measurement. Four forced GC increments before each phase. Timed interval includes typed-to-tree/tree-to-typed adapters, to_candid/from_candid when required by serde, successful Result unwrapping, output Blob conversion, and retained output assignment. Native synchronous GC is included; plugin phases require none. Validation, JSON UTF8 reply conversion, and message-end GC are excluded. Records contain Bool and Text fields to use matching wire semantics across libraries.",
+  "correctness": "JSON encoder output is parsed by host JSON.parse; CBOR output by independent Python cbor2. Both are compared semantically to Python-generated data (not byte equality). Decoder input comes from Python json/cbor2, never the encoder being tested. A separate actor query compares the complete retained typed result to an independently constructed Motoko value; its two-byte ok reply is not decoded object size.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "cbor-record-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_0_serde",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_0_serde_core",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_0_native",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 226209,
+          "allocated_bytes": 18032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 269622,
+          "allocated_bytes": 21312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 98350,
+          "allocated_bytes": 4568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a609f5598d744e8d3ebfd08dfa27105a971091144a07bbcbb42aa43a88b2b3bd"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 8638,
+          "allocated_bytes": 760,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a5fbe19ce654fd07db1731d3b04052d906634eaa77cc85b00fa10ea995a02419"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 226209,
+          "allocated_bytes": 18032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 269622,
+          "allocated_bytes": 21312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 98350,
+          "allocated_bytes": 4568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a609f5598d744e8d3ebfd08dfa27105a971091144a07bbcbb42aa43a88b2b3bd"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 8638,
+          "allocated_bytes": 760,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a5fbe19ce654fd07db1731d3b04052d906634eaa77cc85b00fa10ea995a02419"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 226209,
+          "allocated_bytes": 18032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 269622,
+          "allocated_bytes": 21312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "64e504748f9ace74b3e085d25d35215bd9198fe2b77393bce96fa7a1375b9ad6"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 98350,
+          "allocated_bytes": 4568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a609f5598d744e8d3ebfd08dfa27105a971091144a07bbcbb42aa43a88b2b3bd"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 8638,
+          "allocated_bytes": 760,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "a5fbe19ce654fd07db1731d3b04052d906634eaa77cc85b00fa10ea995a02419"
+        }
+      ]
+    },
+    {
+      "name": "cbor-record-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_1_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_1_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_1_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 452201,
+          "allocated_bytes": 49560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 546055,
+          "allocated_bytes": 37384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 188248,
+          "allocated_bytes": 13352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 8797,
+          "allocated_bytes": 1248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 452201,
+          "allocated_bytes": 49560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 546055,
+          "allocated_bytes": 37384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 188248,
+          "allocated_bytes": 13352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 8797,
+          "allocated_bytes": 1248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 452201,
+          "allocated_bytes": 49560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 546055,
+          "allocated_bytes": 37384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 188248,
+          "allocated_bytes": 13352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 8797,
+          "allocated_bytes": 1248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-records-1024-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_2_serde",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_2_serde_core",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_2_native",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 82729674,
+          "allocated_bytes": 6041088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 91466776,
+          "allocated_bytes": 6039896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 49934053,
+          "allocated_bytes": 2452232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "7086e945a30c3bf5c755ca11681f2f4632bdb867200ffe2ec2e8262f48f3e048"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 5395241,
+          "allocated_bytes": 174160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "88f46cdde51af4bf54ebdbae6b266114a9b507467c9276947ddd6c088513dfc1"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 82729674,
+          "allocated_bytes": 6041088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 91466776,
+          "allocated_bytes": 6039896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 49934053,
+          "allocated_bytes": 2452232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "7086e945a30c3bf5c755ca11681f2f4632bdb867200ffe2ec2e8262f48f3e048"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 5395241,
+          "allocated_bytes": 174160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "88f46cdde51af4bf54ebdbae6b266114a9b507467c9276947ddd6c088513dfc1"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 82729674,
+          "allocated_bytes": 6041088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 91466776,
+          "allocated_bytes": 6039896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42359,
+          "output_sha256": "be881b69437b4cae302fdebee32fab7ab786b5471720c1bfac522e73ecb61d4f"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 49934053,
+          "allocated_bytes": 2452232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "7086e945a30c3bf5c755ca11681f2f4632bdb867200ffe2ec2e8262f48f3e048"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 5395241,
+          "allocated_bytes": 174160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42356,
+          "output_sha256": "88f46cdde51af4bf54ebdbae6b266114a9b507467c9276947ddd6c088513dfc1"
+        }
+      ]
+    },
+    {
+      "name": "cbor-records-1024-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_3_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_3_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_3_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_3_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 286327797,
+          "allocated_bytes": 22644936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 309636040,
+          "allocated_bytes": 20164416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 152527112,
+          "allocated_bytes": 11545504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 7324274,
+          "allocated_bytes": 173128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 286327797,
+          "allocated_bytes": 22644936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 309636040,
+          "allocated_bytes": 20164416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 152527112,
+          "allocated_bytes": 11545504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 7324274,
+          "allocated_bytes": 173128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 286327797,
+          "allocated_bytes": 22644936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 309636040,
+          "allocated_bytes": 20164416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 152527112,
+          "allocated_bytes": 11545504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 7324274,
+          "allocated_bytes": 173128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-blob-64k-encode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_4_serde",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_4_serde_core",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_4_native",
+          "kind": "cbor",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_4_plugin",
+          "kind": "cbor",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 119759518,
+          "allocated_bytes": 6598376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 119211844,
+          "allocated_bytes": 6599224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 64977425,
+          "allocated_bytes": 1676112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 133925,
+          "allocated_bytes": 131456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 119759518,
+          "allocated_bytes": 6598376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 119211844,
+          "allocated_bytes": 6599224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 64977425,
+          "allocated_bytes": 1676112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 133925,
+          "allocated_bytes": 131456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 119759518,
+          "allocated_bytes": 6598376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 119211844,
+          "allocated_bytes": 6599224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "459df4f3463ce0e8d252516664c038e53d74726e9cdf8a9b8588f0e918bce09a"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 64977425,
+          "allocated_bytes": 1676112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 133925,
+          "allocated_bytes": 131456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65541,
+          "output_sha256": "255152e5b1f5ad4acd376a579ac37dd3ed99d7aada9a1d518342ad4e205930af"
+        }
+      ]
+    },
+    {
+      "name": "cbor-blob-64k-decode",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_5_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_5_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_5_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_5_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 204734570,
+          "allocated_bytes": 9455408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 223952628,
+          "allocated_bytes": 8142752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 74088272,
+          "allocated_bytes": 1145048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 67115,
+          "allocated_bytes": 65848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 204734570,
+          "allocated_bytes": 9455408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 223952628,
+          "allocated_bytes": 8142752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 74088272,
+          "allocated_bytes": 1145048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 67115,
+          "allocated_bytes": 65848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 204734570,
+          "allocated_bytes": 9455408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 223952628,
+          "allocated_bytes": 8142752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 74088272,
+          "allocated_bytes": 1145048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 67115,
+          "allocated_bytes": 65848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}
