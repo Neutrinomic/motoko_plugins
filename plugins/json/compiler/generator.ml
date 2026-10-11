@@ -33,9 +33,11 @@ module Make (B : Plugin_codegen.Backend) = struct
     action (get ^^ Blob.payload_ptr_unskewed env) (get ^^ Blob.len env)
   let write_byte env c ch = c ^^ num (Char.code ch) ^^ invoke env "write_byte"
   let write_literal env c text = constant_bytes env text (fun ptr len -> c ^^ ptr ^^ len ^^ invoke env "write_raw")
-  let write_key env c label =
-    constant_bytes env label (fun ptr len -> c ^^ ptr ^^ len ^^ invoke env "write_string") ^^
-    write_byte env c ':'
+  (* Field labels are known while specializing the visitor. Escape and combine
+     their punctuation once, rather than invoking the runtime string writer
+     for every object in an array. *)
+  let write_key env c prefix label =
+    write_literal env c (prefix ^ Reference.json_string label ^ ":")
   let key_eq env c label = constant_bytes env label (fun ptr len -> c ^^ ptr ^^ len ^^ invoke env "key_eq")
   let path_field env c label = constant_bytes env label (fun ptr len -> c ^^ ptr ^^ len ^^ invoke env "path_field")
   let scalar env c = c ^^ num 0 ^^ invoke env "scalar_part" ^^ c ^^ num 1 ^^ invoke env "scalar_part"
@@ -54,10 +56,9 @@ module Make (B : Plugin_codegen.Backend) = struct
         let value, c = match args with [v;c] -> v,c | _ -> assert false in
         let child typ value = value ^^ c ^^ encode env typ in
         let fields fs =
-          write_byte env c '{' ^^
+          (if fs = [] then write_byte env c '{' else G.nop) ^^
           G.concat_mapi (fun i f ->
-            (if i = 0 then G.nop else write_byte env c ',') ^^
-            write_key env c f.Type.lab ^^
+            write_key env c (if i = 0 then "{" else ",") f.Type.lab ^^
             path_field env c f.lab ^^
             child f.typ (value ^^ Object.load_idx_raw env f.lab) ^^
             ccall env c "path_pop") fs ^^
@@ -86,9 +87,13 @@ module Make (B : Plugin_codegen.Backend) = struct
             G.i (Convert (Wasm_exts.Values.F64 F64Op.PromoteF32)) ^^ invoke env "write_float"
           | Opt payload ->
             value ^^ Opt.is_some env ^^ E.if0
-              ((if Schema.tagged_option payload then write_literal env c "{\"some\":" else G.nop) ^^
+              ((if Schema.tagged_option payload then
+                  write_literal env c "{\"some\":" ^^ path_field env c "some"
+                else G.nop) ^^
                child payload (value ^^ Opt.project env payload) ^^
-               (if Schema.tagged_option payload then write_byte env c '}' else G.nop))
+               (if Schema.tagged_option payload then
+                  ccall env c "path_pop" ^^ write_byte env c '}'
+                else G.nop))
               (write_literal env c "null")
           | Tup ts -> write_byte env c '[' ^^
             G.concat_mapi (fun i typ ->
@@ -113,7 +118,7 @@ module Make (B : Plugin_codegen.Backend) = struct
           | Variant fs ->
             List.fold_right (fun f rest ->
               value ^^ Variant.test_is env f.Type.lab ^^ E.if0
-                (write_byte env c '{' ^^ write_key env c f.lab ^^
+                (write_key env c "{" f.lab ^^
                  path_field env c f.lab ^^ child f.typ (value ^^ Variant.project env) ^^
                  ccall env c "path_pop" ^^ write_byte env c '}') rest) fs
               (fail env c 2)

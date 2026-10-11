@@ -5,9 +5,35 @@ adds functions to `Prim`, specializes calls during compilation, and links its
 Wasm runtime into the canister. Plugin code reads Motoko values through the
 compiler's memory and GC helpers.
 
+## Instruction costs
+
+PocketIC measurements for the current ABI 1 plugins, using the same compiler
+and typed inputs. Lower is better. For JSON/CBOR, the comparison below uses the
+lowest instruction count among the three tested native libraries for each row.
+
+| Operation | Native Motoko library | Native instructions | Plugin instructions | Native/plugin |
+| --- | --- | ---: | ---: | ---: |
+| JSON encode, 1,024 records | `json 1.4.0` | 53,258,267 | 7,780,660 | 6.84× |
+| JSON decode, 1,024 records | `serde 3.5.0` | 763,222,636 | 23,799,314 | 32.07× |
+| CBOR encode, 1,024 records | `cbor 4.1.0` | 49,934,053 | 8,409,156 | 5.94× |
+| CBOR decode, 1,024 records | `cbor 4.1.0` | 152,527,112 | 10,577,700 | 14.42× |
+| CandidX encode, 1,024 sparse records | CandidX `94c2868` | 88,379,476 | 6,154,646 | 14.36× |
+| SHA-256, 1 MiB | `sha2 0.2.5` | 323,721,060 | 78,124,848 | 4.14× |
+
+Three trials; medians shown. Counts include conversions between typed values
+and each library's representation. Input setup, validation, reply encoding,
+and message-end GC are excluded. These measure complete implementations,
+not the isolated benefit of the plugin boundary or Wasm components.
+[Full results](benchmarks/results/codec-comparison/README.md) include
+`serde-core 0.2.1`, small records, large payloads, allocation counts, and
+the serde stack overflows observed when decoding 64 KiB JSON strings.
+
+## Plugins
+
 | Plugin | Function | Description |
 | --- | --- | --- |
 | [CandidX](plugins/candidx/) | `Prim.to_candid_canonical(...) : { #ok : Blob; #err : Text }` | Canonical Candid encoding from typed Motoko values |
+| [CBOR](plugins/cbor/) | `Prim.to_cbor(value)`, `Prim.from_cbor<T>(bytes)` | Deterministic CBOR encoding and typed decoding with `#ok`/`#err` results |
 | [JSON](plugins/json/) | `Prim.to_json(value)`, `Prim.from_json<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
 | [SHA-256](plugins/sha256/) | `Prim.sha256(Blob) : Blob` | One-shot SHA-256 with direct Blob access |
 
@@ -28,7 +54,8 @@ make -C rts
 ../plugins/scripts/build.sh --motoko "$PWD"
 bin/moc --plugin ../plugins/dist/candidx \
         --plugin ../plugins/dist/sha256 \
-        --plugin ../plugins/dist/json app.mo -o app.wasm
+        --plugin ../plugins/dist/json \
+        --plugin ../plugins/dist/cbor app.mo -o app.wasm
 ```
 
 ```motoko
@@ -40,6 +67,7 @@ switch (Prim.to_candid_canonical({ value = 42 })) {
 };
 type User = { name : Text; age : Nat8 };
 let user = Prim.from_json<User>("{\"name\":\"Ada\",\"age\":37}");
+let binary = Prim.to_cbor({ name = "Ada"; age = 37 : Nat8 });
 ```
 
 The build creates a matching dynamically linked native compiler and independent
@@ -69,6 +97,8 @@ plugins/
     tests/            plugin-specific Motoko tests and fuzz adapter
   json/
     ...
+  cbor/
+    ...
   sha256/
     ...
 scripts/              shared build and test commands
@@ -97,21 +127,15 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-Recorded ABI 2 results: [CandidX versus its native Motoko library](benchmarks/results/typed-results/README.md)
-and [JSON encode/decode instruction costs](benchmarks/results/json/README.md).
+The [JSON optimization report](benchmarks/results/json-optimized/README.md)
+records a 22.8% instruction reduction and 90.6% less allocation when decoding
+1,024 records. Its [independent audit](plugins/json/tests/audit/README.md)
+includes 9,263 syntax cases, 765 scalar/binary/Unicode cases, and regressions
+for error paths, excessive scratch allocation, and GC.
 
-Earlier comparisons against Motoko libraries include:
-
-| Workload | Motoko library instructions | Plugin instructions |
-| --- | ---: | ---: |
-| SHA-256, 1 MiB | 323,721,060 | 78,124,848 |
-| CandidX, 1,024 fixed records | 37,743,426 | 351,914 |
-| CandidX, 1,024 sparse records | 88,379,476 | 5,674,118 |
-
-These are historical ABI 1 PocketIC measurements, not Wasm component comparisons.
-They predate the Result API and JSON plugin.
-Input setup, reply encoding, and later GC are excluded. See the
-[full results and methodology](docs/design.md#native-library-instruction-comparison).
+Earlier [CandidX conformance and fuzz results](benchmarks/results/typed-results/README.md)
+and [historical benchmarks](benchmarks/results/README.md) retain their original
+artifact hashes and ABI labels.
 
 ## Design and licensing
 

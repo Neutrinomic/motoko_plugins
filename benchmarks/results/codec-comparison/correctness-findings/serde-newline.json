@@ -1,0 +1,82 @@
+{
+  "label": "codecs-json-pilot",
+  "recorded_utc": "2026-10-11T13:00:43.510Z",
+  "wasm_sha256": "35081401dac468e26a85e6de6569cbc5d7552e76f174bb165b5da04e027684fc",
+  "wasm_bytes": 1291455,
+  "trials": 1,
+  "source_sha256": "94fda59efc857aa9dcbad1314e86123ffcf2eecc55bfac714cc3692a103626d8",
+  "cases_sha256": "177979ae572368530af83c8fabf98cca863520156f2ec2343328e8e3608a5941",
+  "runner_sha256": "0d01faf2e4e5cc1aa7bcd7995515ff2ba804dc58cbf3574b900cc477a4f78788",
+  "node_version": "v24.18.0",
+  "implementations": {
+    "serde": {
+      "package": "serde",
+      "version": "3.5.0"
+    },
+    "serde_core": {
+      "package": "serde-core",
+      "version": "0.2.1"
+    },
+    "native": {
+      "package": "json",
+      "version": "1.4.0"
+    },
+    "plugin": {
+      "package": "plugin/json",
+      "version": "ABI 1"
+    }
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded"
+  },
+  "methodology": "Same actor and compiler for all implementations; fresh canister per workload/trial. Independently generated wire input and typed inputs prepared outside measurement. Four forced GC increments before each phase. Timed interval includes typed-to-tree/tree-to-typed adapters, to_candid/from_candid when required by serde, successful Result unwrapping, output Blob conversion, and retained output assignment. Native synchronous GC is included; plugin phases require none. Validation, JSON UTF8 reply conversion, and message-end GC are excluded. Records contain Bool and Text fields to use matching wire semantics across libraries.",
+  "correctness": "JSON encoder output is parsed by host JSON.parse; CBOR output by independent Python cbor2. Both are compared semantically to Python-generated data (not byte equality). Decoder input comes from Python json/cbor2, never the encoder being tested. A separate actor query compares the complete retained typed result to an independently constructed Motoko value; its two-byte ok reply is not decoded object size.",
+  "failed_measurements": 1,
+  "cases": [
+    {
+      "name": "json-record-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_0_serde",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_0_serde_core",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_0_native",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 304861,
+          "allocated_bytes": 38976,
+          "reclaimed_bytes": 0,
+          "error": "SyntaxError: Bad control character in string literal in JSON at position 85 (line 1 column 86)"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0",
+  "fatal_error": "SyntaxError: Bad control character in string literal in JSON at position 85 (line 1 column 86)"
+}

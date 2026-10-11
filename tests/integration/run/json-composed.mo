@@ -1,4 +1,4 @@
-//MOC-FLAG --plugin ../../../dist/json --plugin ../../../dist/sha256 --plugin ../../../dist/candidx
+//MOC-FLAG --plugin ../../../dist/json --plugin ../../../dist/sha256 --plugin ../../../dist/candidx --plugin ../../../dist/cbor
 //MOC-FLAG --sanity-checks
 import Prim "mo:⛔";
 
@@ -17,7 +17,11 @@ let input : [Row] = [
 let text = jsonOk(Prim.to_json(input));
 let decoded = jsonOk(Prim.from_json<[Row]>(text));
 assert decoded == input;
-let canonical = candidOk(Prim.to_candid_canonical(decoded));
+let cbor = jsonOk(Prim.to_cbor(decoded));
+let fromCbor = jsonOk(Prim.from_cbor<[Row]>(cbor));
+assert fromCbor == input;
+assert jsonOk(Prim.to_json(fromCbor)) == text;
+let canonical = candidOk(Prim.to_candid_canonical(fromCbor));
 assert canonical == candidOk(Prim.to_candid_canonical(input));
 assert Prim.sha256(canonical) == Prim.sha256(candidOk(Prim.to_candid_canonical(input)));
 assert Prim.sha256(canonical).size() == 32;

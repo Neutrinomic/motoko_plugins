@@ -18,7 +18,8 @@ jobs:
     timeout-minutes: 60
     defaults:
       run:
-        shell: nix develop ./_build/motoko --command bash --noprofile --norc -euo pipefail {0}
+        working-directory: _build/motoko
+        shell: nix develop --command bash --noprofile --norc -euo pipefail {0}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,6 +28,7 @@ jobs:
       - name: Read the compiler pin
         id: compiler
         shell: bash
+        working-directory: .
         run: |
           python3 - <<'PY'
           import json
@@ -54,14 +56,15 @@ jobs:
 
       - name: Build the compiler, RTS, and plugin packages
         run: |
-          make -C _build/motoko/rts
-          scripts/build.sh --motoko "$PWD/_build/motoko"
+          make -C rts
+          ../../scripts/build.sh --motoko "$PWD"
 
       - name: Test kernels, interpreters, Wasm, packages, and GC
-        run: scripts/test.sh --motoko "$PWD/_build/motoko"
+        run: ../../scripts/test.sh --motoko "$PWD"
 
       - name: Validate the archived benchmark summary
         run: |
+          cd ../..
           python3 benchmarks/summarize-comparison.py \
             benchmarks/results/native-comparison/main.json \
             benchmarks/results/native-comparison/static-arrays.json \
@@ -69,3 +72,14 @@ jobs:
             --expected-cases 40 --expected-trials 3 \
             --out _build/archived-summary.csv
           cmp benchmarks/results/native-comparison/summary.csv _build/archived-summary.csv
+          python3 benchmarks/summarize-codecs.py \
+            benchmarks/results/codec-comparison/json/results.json \
+            benchmarks/results/codec-comparison/cbor/results.json \
+            --expected-failures benchmarks/results/codec-comparison/expected-failures.json \
+            --out _build/codec-summary.csv
+          cmp benchmarks/results/codec-comparison/summary.csv _build/codec-summary.csv
+          python3 benchmarks/summarize-comparison.py \
+            benchmarks/results/codec-comparison/candidx-sha/results.json \
+            --expected-cases 7 --expected-trials 3 \
+            --out _build/current-candidx-sha-summary.csv
+          cmp benchmarks/results/codec-comparison/candidx-sha/summary.csv _build/current-candidx-sha-summary.csv

@@ -7,6 +7,7 @@
 extern crate alloc;
 
 use alloc::{
+    borrow::Cow,
     boxed::Box,
     collections::BTreeSet,
     format,
@@ -14,7 +15,7 @@ use alloc::{
     vec,
     vec::Vec,
 };
-use core::fmt::Write;
+use core::cmp::Ordering;
 
 #[cfg(not(test))]
 mod host {
@@ -52,23 +53,151 @@ const MAX_ITEMS: usize = 1_000_000;
 const MAX_DEPTH: usize = 128;
 const MAX_INTEGER_DIGITS: usize = 4096;
 
+// Scan eight bytes at a time until JSON escaping or a closing quote matters.
+// The byte tests work for UTF-8 too; Unicode validity is checked separately.
+#[inline]
+fn string_special(bytes: &[u8], mut at: usize) -> usize {
+    #[inline]
+    fn zero_byte(word: u64) -> bool {
+        word.wrapping_sub(0x0101_0101_0101_0101) & !word & 0x8080_8080_8080_8080 != 0
+    }
+    while bytes.len() - at >= 8 {
+        let word = u64::from_le_bytes(bytes[at..at + 8].try_into().expect("eight bytes"));
+        if zero_byte(word ^ 0x2222_2222_2222_2222)
+            || zero_byte(word ^ 0x5c5c_5c5c_5c5c_5c5c)
+            || zero_byte(word & 0xe0e0_e0e0_e0e0_e0e0)
+        {
+            break;
+        }
+        at += 8;
+    }
+    while at < bytes.len() {
+        let byte = bytes[at];
+        if byte == b'"' || byte == b'\\' || byte < 32 {
+            break;
+        }
+        at += 1;
+    }
+    at
+}
+
 struct Error {
     kind: &'static str,
     message: &'static str,
     offset: usize,
     path: String,
 }
+// Object keys retain validated source ranges, including their escapes. This
+// makes repeated array pre-scans independent of key length in scratch space.
+// Comparing decoded characters also catches differently escaped duplicates.
+#[derive(Clone, Copy)]
+struct Key {
+    text: &'static str,
+    escaped: bool,
+}
+impl Key {
+    fn literal(text: &'static str) -> Self {
+        Self {
+            text,
+            escaped: false,
+        }
+    }
+    fn chars(self) -> KeyChars<'static> {
+        KeyChars {
+            chars: self.text.chars(),
+            escaped: self.escaped,
+        }
+    }
+    fn matches(self, bytes: &[u8]) -> bool {
+        if !self.escaped {
+            self.text.as_bytes() == bytes
+        } else {
+            core::str::from_utf8(bytes).is_ok_and(|text| self.chars().eq(text.chars()))
+        }
+    }
+}
+struct KeyChars<'a> {
+    chars: core::str::Chars<'a>,
+    escaped: bool,
+}
+impl KeyChars<'_> {
+    fn hex4(&mut self) -> u32 {
+        (0..4).fold(0, |n, _| {
+            n * 16
+                + self
+                    .chars
+                    .next()
+                    .and_then(|c| c.to_digit(16))
+                    .expect("validated key escape")
+        })
+    }
+}
+impl Iterator for KeyChars<'_> {
+    type Item = char;
+    fn next(&mut self) -> Option<char> {
+        let ch = self.chars.next()?;
+        if ch != '\\' || !self.escaped {
+            return Some(ch);
+        }
+        Some(match self.chars.next().expect("validated key escape") {
+            '"' => '"',
+            '\\' => '\\',
+            '/' => '/',
+            'b' => '\u{8}',
+            'f' => '\u{c}',
+            'n' => '\n',
+            'r' => '\r',
+            't' => '\t',
+            'u' => {
+                let high = self.hex4();
+                let cp = if (0xd800..=0xdbff).contains(&high) {
+                    self.chars.next(); // validated backslash
+                    self.chars.next(); // validated 'u'
+                    0x10000 + ((high - 0xd800) << 10) + self.hex4() - 0xdc00
+                } else {
+                    high
+                };
+                char::from_u32(cp).expect("validated key scalar")
+            }
+            _ => unreachable!("validated key escape"),
+        })
+    }
+}
+impl PartialEq for Key {
+    fn eq(&self, other: &Self) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+impl Eq for Key {}
+impl PartialOrd for Key {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Key {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if !self.escaped && !other.escaped {
+            self.text.as_bytes().cmp(other.text.as_bytes())
+        } else {
+            self.chars().cmp(other.chars())
+        }
+    }
+}
 struct ObjectFrame {
     first: bool,
-    keys: BTreeSet<Vec<u8>>,
+    key_start: usize,
+    // Small records reuse a shared key stack; large objects switch to a tree
+    // after eight keys so duplicate validation remains bounded O(n log n).
+    wide: Option<BTreeSet<Key>>,
 }
 pub struct Context {
     input: &'static [u8],
     at: usize,
     output: Vec<u8>,
-    scalar: Vec<u8>,
-    key: Vec<u8>,
+    scalar: Cow<'static, [u8]>,
+    key: Key,
     objects: Vec<ObjectFrame>,
+    keys: Vec<Key>,
     path: String,
     path_lengths: Vec<usize>,
     error: Option<Error>,
@@ -82,9 +211,10 @@ impl Context {
             input,
             at: 0,
             output: Vec::new(),
-            scalar: Vec::new(),
-            key: Vec::new(),
+            scalar: Cow::Borrowed(&[]),
+            key: Key::literal(""),
             objects: Vec::new(),
+            keys: Vec::new(),
             path: String::new(),
             path_lengths: Vec::new(),
             error: None,
@@ -174,25 +304,35 @@ impl Context {
         }
         true
     }
-    fn string(&mut self) -> Vec<u8> {
+    fn string(&mut self) -> Cow<'static, [u8]> {
         if self.error.is_some() {
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         if self.peek() != b'"' {
             self.fail("type", "Expected a JSON string");
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         self.at += 1;
-        let mut start = self.at;
+        let beginning = self.at;
+        let mut start = beginning;
         let mut result = Vec::new();
         loop {
+            self.at = string_special(self.input, self.at);
             let Some(&byte) = self.input.get(self.at) else {
                 self.fail("syntax", "Unterminated JSON string");
-                return Vec::new();
+                return Cow::Borrowed(&[]);
             };
             match byte {
                 b'"' => {
-                    result.extend_from_slice(&self.input[start..self.at]);
+                    // The input is rooted for the whole synchronous visitor.
+                    // Unescaped text and keys can borrow it until the caller
+                    // creates the final managed Motoko value.
+                    let result = if start == beginning {
+                        Cow::Borrowed(&self.input[start..self.at])
+                    } else {
+                        result.extend_from_slice(&self.input[start..self.at]);
+                        Cow::Owned(result)
+                    };
                     self.at += 1;
                     if core::str::from_utf8(&result).is_err() {
                         self.fail("syntax", "Invalid UTF-8 string");
@@ -204,7 +344,7 @@ impl Context {
                     self.at += 1;
                     let Some(&escaped) = self.input.get(self.at) else {
                         self.fail("syntax", "Incomplete JSON escape");
-                        return Vec::new();
+                        return Cow::Borrowed(&[]);
                     };
                     self.at += 1;
                     match escaped {
@@ -219,13 +359,13 @@ impl Context {
                             let cp = if (0xd800..=0xdbff).contains(&high) {
                                 if self.input.get(self.at..self.at + 2) != Some(b"\\u") {
                                     self.fail("syntax", "Unpaired Unicode surrogate");
-                                    return Vec::new();
+                                    return Cow::Borrowed(&[]);
                                 }
                                 self.at += 2;
                                 let low = self.hex4();
                                 if !(0xdc00..=0xdfff).contains(&low) {
                                     self.fail("syntax", "Unpaired Unicode surrogate");
-                                    return Vec::new();
+                                    return Cow::Borrowed(&[]);
                                 }
                                 0x10000 + ((high - 0xd800) << 10) + low - 0xdc00
                             } else {
@@ -237,23 +377,23 @@ impl Context {
                                 }
                                 None => {
                                     self.fail("syntax", "Unpaired Unicode surrogate");
-                                    return Vec::new();
+                                    return Cow::Borrowed(&[]);
                                 }
                             }
                         }
                         _ => {
                             self.fail("syntax", "Invalid JSON escape");
-                            return Vec::new();
+                            return Cow::Borrowed(&[]);
                         }
                     }
                     if self.error.is_some() {
-                        return Vec::new();
+                        return Cow::Borrowed(&[]);
                     }
                     start = self.at;
                 }
                 0..=31 => {
                     self.fail("syntax", "Unescaped control character");
-                    return Vec::new();
+                    return Cow::Borrowed(&[]);
                 }
                 _ => self.at += 1,
             }
@@ -274,6 +414,7 @@ impl Context {
         let mut start = self.at;
         let mut invalid_utf8 = false;
         loop {
+            self.at = string_special(self.input, self.at);
             let Some(&byte) = self.input.get(self.at) else {
                 self.fail("syntax", "Unterminated JSON string");
                 return;
@@ -367,9 +508,9 @@ impl Context {
             self.fail("type", "Unexpected JSON literal");
         }
     }
-    fn number(&mut self) -> Vec<u8> {
+    fn number(&mut self) -> Cow<'static, [u8]> {
         if self.error.is_some() {
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         self.ws();
         let start = self.at;
@@ -386,7 +527,7 @@ impl Context {
             }
             _ => {
                 self.fail("type", "Expected a JSON number");
-                return Vec::new();
+                return Cow::Borrowed(&[]);
             }
         }
         if self.input.get(self.at) == Some(&b'.') {
@@ -412,7 +553,7 @@ impl Context {
                 self.fail("syntax", "Invalid JSON number");
             }
         }
-        self.input[start..self.at].to_vec()
+        Cow::Borrowed(&self.input[start..self.at])
     }
     // The same lexical validation as number(), without copying the token.
     fn skip_number(&mut self) {
@@ -460,14 +601,14 @@ impl Context {
             }
         }
     }
-    fn integer(&mut self, signed: bool, quoted: bool) -> Vec<u8> {
+    fn integer(&mut self, signed: bool, quoted: bool) -> Cow<'static, [u8]> {
         let value = if quoted && self.peek() == b'"' {
             self.string()
         } else {
             self.number()
         };
         if self.error.is_some() {
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         let digits = if value.first() == Some(&b'-') && signed {
             &value[1..]
@@ -479,11 +620,11 @@ impl Context {
             || (digits.len() > 1 && digits[0] == b'0')
         {
             self.fail("range", "Expected an exact decimal integer");
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         if digits.len() > MAX_INTEGER_DIGITS {
             self.fail("limit", "JSON integer digit limit exceeded");
-            return Vec::new();
+            return Cow::Borrowed(&[]);
         }
         value
     }
@@ -495,7 +636,8 @@ impl Context {
         self.at += 1;
         self.objects.push(ObjectFrame {
             first: true,
-            keys: BTreeSet::new(),
+            key_start: self.keys.len(),
+            wide: None,
         });
     }
     fn object_next(&mut self) -> bool {
@@ -504,7 +646,9 @@ impl Context {
         }
         if self.peek() == b'}' {
             self.at += 1;
-            self.objects.pop();
+            if let Some(frame) = self.objects.pop() {
+                self.keys.truncate(frame.key_start);
+            }
             return false;
         }
         let first = match self.objects.last() {
@@ -514,13 +658,37 @@ impl Context {
         if !first && !self.expect(b',') {
             return false;
         }
-        let key = self.string();
+        self.ws();
+        let start = self.at;
+        self.skip_string();
         if self.error.is_some() {
             return false;
         }
+        let text =
+            core::str::from_utf8(&self.input[start + 1..self.at - 1]).expect("validated key");
+        let key = Key {
+            text,
+            escaped: text.as_bytes().contains(&b'\\'),
+        };
         let frame = self.objects.last_mut().expect("object frame");
         frame.first = false;
-        if !frame.keys.insert(key.clone()) {
+        let inserted = if let Some(keys) = &mut frame.wide {
+            keys.insert(key)
+        } else {
+            let keys = &self.keys[frame.key_start..];
+            if keys.contains(&key) {
+                false
+            } else if keys.len() < 8 {
+                self.keys.push(key);
+                true
+            } else {
+                let mut wide: BTreeSet<Key> = keys.iter().copied().collect();
+                wide.insert(key);
+                frame.wide = Some(wide);
+                true
+            }
+        };
+        if !inserted {
             self.fail("duplicate", "Duplicate JSON object key");
             return false;
         }
@@ -611,11 +779,9 @@ impl Context {
     }
     fn push_key(&mut self) {
         self.path_lengths.push(self.path.len());
+        self.path.reserve(self.key.text.len() + 1);
         self.path.push('/');
-        for ch in core::str::from_utf8(&self.key)
-            .expect("validated key")
-            .chars()
-        {
+        for ch in self.key.chars() {
             match ch {
                 '~' => self.path.push_str("~0"),
                 '/' => self.path.push_str("~1"),
@@ -625,9 +791,11 @@ impl Context {
     }
     fn push_index(&mut self, index: usize) {
         self.path_lengths.push(self.path.len());
-        // Write into the reused path buffer: one temporary String per array
-        // element otherwise becomes garbage in the ephemeral allocator.
-        write!(&mut self.path, "/{index}").expect("writing to String");
+        self.path.push('/');
+        let mut storage = [0; 20];
+        let digits = decimal_word(index as u64, &mut storage);
+        self.path
+            .push_str(core::str::from_utf8(digits).expect("decimal digits"));
     }
     fn pop_path(&mut self) {
         if let Some(len) = self.path_lengths.pop() {
@@ -640,17 +808,21 @@ impl Context {
         }
         self.append(b"\"");
         let mut start = 0;
-        for (i, &byte) in bytes.iter().enumerate() {
+        loop {
+            let end = string_special(bytes, start);
+            self.append(&bytes[start..end]);
+            if end == bytes.len() {
+                break;
+            }
+            let byte = bytes[end];
             let escape: &[u8] = match byte {
                 b'"' => b"\\\"",
                 b'\\' => b"\\\\",
                 b'\n' => b"\\n",
                 b'\r' => b"\\r",
                 b'\t' => b"\\t",
-                _ if byte < 32 => b"",
-                _ => continue,
+                _ => b"",
             };
-            self.append(&bytes[start..i]);
             if escape.is_empty() {
                 const HEX: &[u8] = b"0123456789abcdef";
                 self.append(&[
@@ -667,9 +839,8 @@ impl Context {
             if self.error.is_some() {
                 return;
             }
-            start = i + 1;
+            start = end + 1;
         }
-        self.append(&bytes[start..]);
         self.append(b"\"");
     }
 }
@@ -819,7 +990,7 @@ pub unsafe extern "C" fn json_object_next(c: usize) -> usize {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn json_key_eq(c: usize, ptr: usize, len: usize) -> usize {
-    (unsafe { ctx(c) }.key == unsafe { bytes(ptr, len) }) as usize
+    unsafe { ctx(c) }.key.matches(unsafe { bytes(ptr, len) }) as usize
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn json_path_key(c: usize) {
@@ -828,8 +999,9 @@ pub unsafe extern "C" fn json_path_key(c: usize) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn json_path_field(c: usize, ptr: usize, len: usize) {
     let c = unsafe { ctx(c) };
-    c.key.clear();
-    c.key.extend_from_slice(unsafe { bytes(ptr, len) });
+    c.key = Key::literal(
+        core::str::from_utf8(unsafe { bytes(ptr, len) }).expect("compiler field name"),
+    );
     c.push_key();
 }
 #[unsafe(no_mangle)]
@@ -884,18 +1056,44 @@ pub unsafe extern "C" fn json_read_word(c: usize, signed: usize, bits: usize) ->
     c.fail("range", "Integer is outside the requested type's range");
     0
 }
+// At most 20 decimal digits represent every u64. Callers add any sign or
+// quotes directly, without creating short-lived formatting strings.
+fn decimal_word(mut value: u64, storage: &mut [u8; 20]) -> &[u8] {
+    let mut start = storage.len();
+    loop {
+        start -= 1;
+        storage[start] = b'0' + (value % 10) as u8;
+        value /= 10;
+        if value == 0 {
+            return &storage[start..];
+        }
+    }
+}
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn json_write_word(c: usize, value: u64, signed: usize, quoted: usize) {
     let c = unsafe { ctx(c) };
-    let text = if signed != 0 {
-        (value as i64).to_string()
-    } else {
-        value.to_string()
-    };
+    if c.error.is_some() {
+        return;
+    }
+    let negative = signed != 0 && (value as i64) < 0;
+    let mut storage = [0; 20];
+    let digits = decimal_word(
+        if negative {
+            value.wrapping_neg()
+        } else {
+            value
+        },
+        &mut storage,
+    );
     if quoted != 0 {
-        c.write_string(text.as_bytes());
-    } else {
-        c.append(text.as_bytes());
+        c.append(b"\"");
+    }
+    if negative {
+        c.append(b"-");
+    }
+    c.append(digits);
+    if quoted != 0 {
+        c.append(b"\"");
     }
 }
 #[unsafe(no_mangle)]
@@ -1068,9 +1266,9 @@ pub unsafe extern "C" fn json_read_bigint(c: usize, signed: usize) {
     let c = unsafe { ctx(c) };
     let text = c.integer(signed != 0, true);
     c.scalar = if c.error.is_some() {
-        vec![0]
+        Cow::Borrowed(&[0])
     } else {
-        decimal_to_leb(&text, signed != 0)
+        Cow::Owned(decimal_to_leb(&text, signed != 0))
     };
 }
 #[unsafe(no_mangle)]
@@ -1132,27 +1330,45 @@ fn unbase64(bytes: &[u8]) -> Option<Vec<u8>> {
     if bytes.len() % 4 != 0 {
         return None;
     }
-    let mut out = Vec::with_capacity(bytes.len() / 4 * 3);
-    for (i, chunk) in bytes.chunks_exact(4).enumerate() {
-        let a = base64_digit(chunk[0])?;
-        let b = base64_digit(chunk[1])?;
-        let last = i + 1 == bytes.len() / 4;
-        out.push((a << 2) | (b >> 4));
-        if chunk[2] == b'=' {
-            if !last || chunk[3] != b'=' || b & 15 != 0 {
+    if bytes.is_empty() {
+        return Some(Vec::new());
+    }
+    let mut out = vec![0; bytes.len() / 4 * 3];
+    let last = bytes.len() - 4;
+    // All but the last group have four ordinary alphabet bytes. Fill the
+    // output at its final size instead of checking Vec capacity per byte.
+    for (src, dst) in bytes[..last].chunks_exact(4).zip(out.chunks_exact_mut(3)) {
+        let a = B64_INVERSE[src[0] as usize];
+        let b = B64_INVERSE[src[1] as usize];
+        let c = B64_INVERSE[src[2] as usize];
+        let d = B64_INVERSE[src[3] as usize];
+        if a | b | c | d == 255 {
+            return None;
+        }
+        dst[0] = (a << 2) | (b >> 4);
+        dst[1] = (b << 4) | (c >> 2);
+        dst[2] = (c << 6) | d;
+    }
+    let src = &bytes[last..];
+    let a = base64_digit(src[0])?;
+    let b = base64_digit(src[1])?;
+    let start = out.len() - 3;
+    out[start] = (a << 2) | (b >> 4);
+    if src[2] == b'=' {
+        if src[3] != b'=' || b & 15 != 0 {
+            return None;
+        }
+        out.truncate(start + 1);
+    } else {
+        let c = base64_digit(src[2])?;
+        out[start + 1] = (b << 4) | (c >> 2);
+        if src[3] == b'=' {
+            if c & 3 != 0 {
                 return None;
             }
+            out.truncate(start + 2);
         } else {
-            let c = base64_digit(chunk[2])?;
-            out.push((b << 4) | (c >> 2));
-            if chunk[3] == b'=' {
-                if !last || c & 3 != 0 {
-                    return None;
-                }
-            } else {
-                let d = base64_digit(chunk[3])?;
-                out.push((c << 6) | d);
-            }
+            out[start + 2] = (c << 6) | base64_digit(src[3])?;
         }
     }
     Some(out)
@@ -1233,7 +1449,7 @@ pub unsafe extern "C" fn json_read_binary(c: usize, principal: usize) {
         unbase64(&text)
     };
     match value {
-        Some(value) => c.scalar = value,
+        Some(value) => c.scalar = Cow::Owned(value),
         None => {
             c.fail(
                 if principal != 0 {
@@ -1247,7 +1463,7 @@ pub unsafe extern "C" fn json_read_binary(c: usize, principal: usize) {
                     "Invalid padded base64 string"
                 },
             );
-            c.scalar.clear();
+            c.scalar = Cow::Borrowed(&[]);
         }
     }
 }
@@ -1434,7 +1650,7 @@ mod tests {
             allocated < 64 * 1024,
             "pre-scans allocated {allocated} bytes"
         );
-        assert_eq!(c.scalar.capacity(), 0);
+        assert!(matches!(c.scalar, Cow::Borrowed(_)));
         assert_eq!(c.output.capacity(), 0);
 
         let input = Box::leak("9".repeat(1024 * 1024).into_boxed_str());
@@ -1442,6 +1658,163 @@ mod tests {
         assert_eq!(allocated_by(|| c.skip_number()), 0);
         assert_eq!(c.at, input.len());
         assert!(c.error.is_none());
+    }
+    #[test]
+    fn bulk_string_scan_matches_byte_validation() {
+        for prefix in 0..24 {
+            for byte in 0..=255u8 {
+                for suffix in 0..16 {
+                    let mut input = vec![b'x'; prefix];
+                    input.push(byte);
+                    input.extend(core::iter::repeat_n(b'y', suffix));
+                    let expected = input
+                        .iter()
+                        .position(|b| *b == b'"' || *b == b'\\' || *b < 32)
+                        .unwrap_or(input.len());
+                    assert_eq!(string_special(&input, 0), expected);
+                }
+            }
+        }
+        for padding in 0..24 {
+            let text = format!(
+                "{}\"\\\n\r\t\0\u{1f}café☃😀{}",
+                "x".repeat(padding),
+                "y".repeat(padding)
+            );
+            let mut writer = context("");
+            writer.write_string(text.as_bytes());
+            let input = Box::leak(writer.output.into_boxed_slice());
+            let mut reader = Context::new(input);
+            assert_eq!(reader.string().as_ref(), text.as_bytes());
+            assert!(reader.error.is_none());
+        }
+    }
+    #[test]
+    fn unescaped_scalars_borrow_the_input() {
+        let mut c = context("\"plain ☃ text\"");
+        let allocated = allocated_by(|| {
+            let value = c.string();
+            assert!(matches!(value, Cow::Borrowed(_)));
+            assert_eq!(value, "plain ☃ text".as_bytes());
+        });
+        assert_eq!(allocated, 0);
+        let mut c = context("12345678901234567890");
+        assert_eq!(
+            allocated_by(|| {
+                assert_eq!(c.integer(false, true).as_ref(), b"12345678901234567890");
+            }),
+            0
+        );
+    }
+    #[test]
+    fn nested_prescans_borrow_escaped_object_keys() {
+        const DEPTH: usize = 64;
+        for suffix in ["", "\\u0078"] {
+            let input = Box::leak(
+                format!(
+                    "{}{{\"{}{suffix}\":null}}{}",
+                    "[".repeat(DEPTH),
+                    "x".repeat(256 * 1024),
+                    "]".repeat(DEPTH)
+                )
+                .into_boxed_str(),
+            );
+            let mut c = context(input);
+            let allocated = allocated_by(|| {
+                for _ in 0..DEPTH {
+                    assert!(c.enter());
+                    assert_eq!(c.array_start(), 1);
+                }
+                c.skip();
+                assert!(c.error.is_none());
+            });
+            assert!(
+                allocated < 1024 * 1024,
+                "key pre-scans allocated {allocated} bytes"
+            );
+        }
+    }
+    #[test]
+    fn borrowed_keys_compare_decoded_unicode() {
+        for input in [
+            r#"{"café/~":1,"caf\u00e9\/~":2}"#,
+            r#"{"😀":1,"\uD83D\uDE00":2}"#,
+            r#"{"\n":1,"\u000a":2}"#,
+            r#"{"\\":1,"\u005c":2}"#,
+            r#"{"\"":1,"\u0022":2}"#,
+        ] {
+            let mut c = context(input);
+            c.skip();
+            assert_eq!(c.error.unwrap().kind, "duplicate", "{input}");
+        }
+        let mut c = context(r#"{"caf\u00e9\/~":0}"#);
+        c.object_start();
+        assert!(c.object_next());
+        assert!(c.key.matches("café/~".as_bytes()));
+        c.push_key();
+        assert_eq!(c.path, "/café~1~0");
+    }
+    #[test]
+    fn small_object_keys_reuse_storage_and_large_objects_detect_duplicates() {
+        let input = Box::leak(
+            format!(
+                "[{}]",
+                core::iter::repeat_n(r#"{"a":0,"b":{"x":0,"y":1},"c":2,"d":3}"#, 1024)
+                    .collect::<Vec<_>>()
+                    .join(",")
+            )
+            .into_boxed_str(),
+        );
+        let mut c = context(input);
+        let allocated = allocated_by(|| c.skip());
+        assert!(c.error.is_none());
+        assert!(
+            allocated < 4096,
+            "small records allocated {allocated} bytes"
+        );
+        assert!(c.keys.is_empty());
+        let fields = (0..100)
+            .map(|i| format!("\"k{i}\":{i}"))
+            .collect::<Vec<_>>()
+            .join(",");
+        for extra in ["", ",\"k0\":0", ",\"k8\":8", ",\"k99\":99"] {
+            let input = Box::leak(format!("{{{fields}{extra}}}").into_boxed_str());
+            let mut c = context(input);
+            c.skip();
+            assert_eq!(c.error.is_some(), !extra.is_empty());
+            if let Some(e) = c.error {
+                assert_eq!(e.kind, "duplicate");
+            }
+        }
+    }
+    #[test]
+    fn decimal_word_boundaries() {
+        for n in [
+            0,
+            1,
+            9,
+            10,
+            99,
+            100,
+            u32::MAX as u64,
+            i64::MAX as u64,
+            u64::MAX,
+        ] {
+            let mut storage = [0; 20];
+            assert_eq!(decimal_word(n, &mut storage), n.to_string().as_bytes());
+        }
+        for n in [i64::MIN, i64::MIN + 1, -1, 0, 1, i64::MAX] {
+            for quoted in [0, 1] {
+                let mut c = context("");
+                unsafe { json_write_word(&mut c as *mut Context as usize, n as u64, 1, quoted) };
+                let expected = if quoted == 0 {
+                    n.to_string()
+                } else {
+                    format!("\"{n}\"")
+                };
+                assert_eq!(c.output, expected.as_bytes());
+            }
+        }
     }
     #[test]
     fn escapes_and_unicode() {
@@ -1542,7 +1915,7 @@ mod tests {
     #[test]
     fn unicode_json_pointer_paths_and_float32_overflow() {
         let mut c = context("");
-        c.key = "café/☃~".as_bytes().to_vec();
+        c.key = Key::literal("café/☃~");
         c.push_key();
         assert_eq!(c.path, "/café~1☃~0");
         c.pop_path();
@@ -1601,6 +1974,13 @@ mod tests {
     }
     #[test]
     fn base64_alphabet_and_block_boundaries() {
+        for byte in 0..=255u8 {
+            for position in 0..4 {
+                let mut input = *b"AAAAAAAA";
+                input[position] = byte;
+                assert_eq!(unbase64(&input).is_some(), B64.contains(&byte));
+            }
+        }
         for byte in 0..=255u8 {
             if !B64.contains(&byte) {
                 assert!(unbase64(&[byte, b'A', b'A', b'A']).is_none());

@@ -30,3 +30,15 @@ assert Prim.rts_total_allocation() < allocated + 8192;
 // Quota failures do not poison subsequent calls.
 assert Prim.from_json<Nat8>("42") == #ok(42 : Nat8);
 assert Prim.to_json([true, false]) == #ok "[true,false]";
+
+// Match the visitor's collection preflight before traversing any elements.
+let tooMany = Prim.Array_tabulate<Null>(1_000_000, func(_) { null });
+let quota = err(Prim.to_json(tooMany));
+assert quota == {kind = "limit"; message = "JSON nesting or item limit exceeded";
+  path = ""; offset = 0};
+assert err(Prim.to_json({items = tooMany})).path == "/items";
+
+// Tagged optional payloads include their actual JSON field in error pointers.
+let huge : Nat = 10 ** 4096;
+assert err(Prim.to_json((??huge : ??Nat))).path == "/some";
+assert err(Prim.to_json({nested = (??huge : ??Nat)})).path == "/nested/some";

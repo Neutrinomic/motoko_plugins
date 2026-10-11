@@ -321,12 +321,16 @@ let rec encode_value s out typ value =
   | Prim Float32, V.Float32 f -> append (float_text (N.Float32.to_float f))
   | Opt _, V.Null -> append "null"
   | Opt typ, V.Opt value ->
-    if Schema.tagged_option typ then append "{\"some\":";
-    encode_value s out typ value;
-    if Schema.tagged_option typ then append "}"
+    if Schema.tagged_option typ then begin
+      append "{\"some\":";
+      at_path s "some" (fun () -> encode_value s out typ value);
+      append "}"
+    end else encode_value s out typ value
   | Tup ts, V.Tup values ->
     append "["; List.iteri (fun i (typ,value) -> if i > 0 then append ","; child (string_of_int i) typ value) (List.combine ts values); append "]"
   | Array typ, V.Array values ->
+    if Array.length values > max_items - s.items then
+      fail s "limit" "JSON nesting or item limit exceeded";
     append "["; Array.iteri (fun i value -> if i > 0 then append ","; child (string_of_int i) typ value) values; append "]"
   | Obj (Object, fs, _), V.Obj values ->
     append "{"; List.iteri (fun i f -> if i > 0 then append ",";

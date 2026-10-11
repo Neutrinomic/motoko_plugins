@@ -10,6 +10,12 @@ native-library comparisons and both complete 500-record fuzz seeds.
 The [JSON report](results/json/README.md) records typed encoding and decoding
 costs for records, arrays, and binary data.
 
+The current [codec/library comparison](results/codec-comparison/README.md)
+measures JSON and CBOR against three native Mops implementations each, plus
+fresh CandidX and SHA-256 comparisons on ABI 1. The
+[JSON optimization report](results/json-optimized/README.md) records instruction
+and allocation reductions independently of those library comparisons.
+
 The recorded [first-pass results](results/README.md) and
 [second-pass results](results/pass2/README.md) include raw reports and artifact
 hashes. The second pass uses the previous optimized implementation as its
@@ -128,6 +134,64 @@ independently constructed Motoko value. Its two-byte `"ok"` response is the
 reported decoder output size; it is not the size of the decoded heap object.
 Validation, UTF-8 reply conversion, and message-end GC are outside the interval.
 These measurements establish plugin costs; they do not compare JSON libraries.
+
+## JSON and CBOR library comparisons
+
+From this repository root inside the pinned compiler's Nix shell, after
+building the plugins, install the saved dependency graph and independent CBOR
+oracle:
+
+```sh
+mkdir -p _build/codec-comparison/deps
+cp benchmarks/results/codec-comparison/dependencies/mops.{toml,lock} \
+  _build/codec-comparison/deps/
+(cd _build/codec-comparison/deps && mops install --no-toolchain --lock ignore)
+python3 -m venv _build/codec-comparison/oracle
+_build/codec-comparison/oracle/bin/pip install cbor2==6.1.5
+```
+
+Mops CLI 1.12.0 incorrectly compares 20 aliases with 18 unique packages during
+its lock integrity check for this graph. `build-codec-comparison.py` verifies
+the complete resolved alias/version set and every locked package file hash
+before compiling, so mismatched dependencies still fail. Both the lockfile
+and this verification are required.
+
+```sh
+for bench_codec in json cbor; do
+  bench_dir="_build/codec-comparison/$bench_codec"
+  _build/codec-comparison/oracle/bin/python \
+    benchmarks/generate-codec-comparison.py --codec "$bench_codec" --out "$bench_dir"
+  python3 benchmarks/build-codec-comparison.py \
+    --motoko "$MOTOKO_ROOT" --deps _build/codec-comparison/deps \
+    --codec "$bench_codec" --out "$bench_dir"
+  bench_status=0
+  node benchmarks/run.mjs --wasm "$bench_dir/main.wasm" \
+    --cases "$bench_dir/cases.json" --out "$bench_dir/results.json" \
+    --label "codecs-$bench_codec" --trials 3 \
+    --cbor-python _build/codec-comparison/oracle/bin/python || bench_status=$?
+  if [ "$bench_codec" = json ]; then
+    test "$bench_status" -eq 1
+  else
+    test "$bench_status" -eq 0
+  fi
+done
+python3 benchmarks/summarize-codecs.py \
+  _build/codec-comparison/json/results.json \
+  _build/codec-comparison/cbor/results.json \
+  --expected-failures benchmarks/results/codec-comparison/expected-failures.json \
+  --out _build/codec-comparison/summary.csv
+```
+
+The JSON run returns 1 because both serde decoders trap on the 64 KiB string.
+The final summary command must succeed: it checks every trial, recognizes only
+those exact failures, and rejects missing or additional failures. If a later
+library fixes them, record a new report and update the declared failures.
+
+The generated actors time complete conversions from/to typed records, arrays,
+and Text/Blob, including each library's required Candid or generic-tree
+adapters. Host JSON/cbor2 checks semantic equivalence; it does not require
+matching whitespace, map order, or serde's self-described CBOR tag. See the
+[full methodology and costs](results/codec-comparison/README.md).
 
 ## Native-library comparison
 

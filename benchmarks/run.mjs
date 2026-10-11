@@ -14,7 +14,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const options = { wasm: null, cases: null, out: null, label: 'local',
   server: 'pocket-ic-server', trials: 3, filter: '.',
   'sdk-package': resolve(root, '../../candidx/ts/package.json'),
-  canonicalizer: resolve(root, '../../candidx/ts/dist/index.js') };
+  canonicalizer: resolve(root, '../../candidx/ts/dist/index.js'),
+  'cbor-python': 'python3' };
 for (let i = 2; i < process.argv.length; i += 2) {
   const key = process.argv[i].replace(/^--/, '');
   if (!(key in options) || process.argv[i + 1] === undefined) throw Error(`Unknown option ${process.argv[i]}`);
@@ -32,7 +33,7 @@ const wasm = new Uint8Array(await readFile(resolve(options.wasm)));
 const installWasm = gzipSync(wasm);
 const manifest = JSON.parse(await readFile(resolve(options.cases), 'utf8'));
 const phaseKinds = new Set(['ordinary_candid', 'canonical_candid', 'sha256',
-  'control', 'json', 'checked_decode']);
+  'control', 'json', 'cbor', 'checked_decode']);
 function phasesFor(spec) {
   const phases = spec.phases;
   if (!Array.isArray(phases) || phases.length === 0) throw Error(`${spec.name}: no phases`);
@@ -53,12 +54,19 @@ function phasesFor(spec) {
       throw Error(`${spec.name}/${phase.label}: missing SHA-256 oracle digest`);
     if (phase.kind === 'json' && !Object.hasOwn(spec, 'expected_json'))
       throw Error(`${spec.name}/${phase.label}: missing JSON oracle value`);
+    if (phase.kind === 'cbor' && !Object.hasOwn(spec, 'expected_cbor'))
+      throw Error(`${spec.name}/${phase.label}: missing CBOR oracle value`);
   }
   return phases;
 }
 const selectedCases = manifest.cases.filter(item => new RegExp(options.filter).test(item.name));
 if (selectedCases.length === 0) throw Error('No workloads match the filter');
 for (const spec of selectedCases) phasesFor(spec);
+const cborOracle = selectedCases.some(spec => phasesFor(spec).some(phase => phase.kind === 'cbor')) ? {
+  script_sha256: sha(await readFile(resolve(root, 'benchmarks/cbor-oracle.py'))),
+  cbor2_version: execFileSync(options['cbor-python'], ['-c',
+    'import importlib.metadata; print(importlib.metadata.version("cbor2"))'], { encoding: 'utf8' }).trim()
+} : undefined;
 const anon = Principal.anonymous();
 const management = Principal.fromUint8Array(new Uint8Array());
 const Measurement = IDL.Record({ instructions: IDL.Nat64, allocated: IDL.Nat,
@@ -123,6 +131,7 @@ const report = {
   cases_sha256: sha(await readFile(resolve(options.cases))),
   runner_sha256: sha(await readFile(fileURLToPath(import.meta.url))),
   node_version: process.version,
+  ...(cborOracle === undefined ? {} : { cbor_oracle: cborOracle }),
   variant_width: manifest.variant_width,
   variant_payload: manifest.variant_payload,
   ...(manifest.implementations === undefined ? {} : { implementations: manifest.implementations }),
@@ -206,6 +215,10 @@ try {
           } else if (phase.kind === 'json') {
             const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
             deepStrictEqual(JSON.parse(text), spec.expected_json, `${spec.name}/${phase.label}: JSON value`);
+          } else if (phase.kind === 'cbor') {
+            const decoded = execFileSync(options['cbor-python'], [resolve(root, 'benchmarks/cbor-oracle.py')],
+              { input: base64(bytes), encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+            deepStrictEqual(JSON.parse(decoded), spec.expected_cbor, `${spec.name}/${phase.label}: CBOR value`);
           } else if (phase.kind === 'checked_decode') {
             // The actor checks every retained typed value against its
             // independently constructed input in this query, outside timing.
