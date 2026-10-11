@@ -1,0 +1,113 @@
+--- baseline/lib.rs
++++ grouped-rounds/lib.rs
+@@ -72,48 +72,27 @@
+-    round!(16, a, b, c, d, e, f, g, h, 0xe49b69c1);
+-    round!(17, h, a, b, c, d, e, f, g, 0xefbe4786);
+-    round!(18, g, h, a, b, c, d, e, f, 0x0fc19dc6);
+-    round!(19, f, g, h, a, b, c, d, e, 0x240ca1cc);
+-    round!(20, e, f, g, h, a, b, c, d, 0x2de92c6f);
+-    round!(21, d, e, f, g, h, a, b, c, 0x4a7484aa);
+-    round!(22, c, d, e, f, g, h, a, b, 0x5cb0a9dc);
+-    round!(23, b, c, d, e, f, g, h, a, 0x76f988da);
+-    round!(24, a, b, c, d, e, f, g, h, 0x983e5152);
+-    round!(25, h, a, b, c, d, e, f, g, 0xa831c66d);
+-    round!(26, g, h, a, b, c, d, e, f, 0xb00327c8);
+-    round!(27, f, g, h, a, b, c, d, e, 0xbf597fc7);
+-    round!(28, e, f, g, h, a, b, c, d, 0xc6e00bf3);
+-    round!(29, d, e, f, g, h, a, b, c, 0xd5a79147);
+-    round!(30, c, d, e, f, g, h, a, b, 0x06ca6351);
+-    round!(31, b, c, d, e, f, g, h, a, 0x14292967);
+-    round!(32, a, b, c, d, e, f, g, h, 0x27b70a85);
+-    round!(33, h, a, b, c, d, e, f, g, 0x2e1b2138);
+-    round!(34, g, h, a, b, c, d, e, f, 0x4d2c6dfc);
+-    round!(35, f, g, h, a, b, c, d, e, 0x53380d13);
+-    round!(36, e, f, g, h, a, b, c, d, 0x650a7354);
+-    round!(37, d, e, f, g, h, a, b, c, 0x766a0abb);
+-    round!(38, c, d, e, f, g, h, a, b, 0x81c2c92e);
+-    round!(39, b, c, d, e, f, g, h, a, 0x92722c85);
+-    round!(40, a, b, c, d, e, f, g, h, 0xa2bfe8a1);
+-    round!(41, h, a, b, c, d, e, f, g, 0xa81a664b);
+-    round!(42, g, h, a, b, c, d, e, f, 0xc24b8b70);
+-    round!(43, f, g, h, a, b, c, d, e, 0xc76c51a3);
+-    round!(44, e, f, g, h, a, b, c, d, 0xd192e819);
+-    round!(45, d, e, f, g, h, a, b, c, 0xd6990624);
+-    round!(46, c, d, e, f, g, h, a, b, 0xf40e3585);
+-    round!(47, b, c, d, e, f, g, h, a, 0x106aa070);
+-    round!(48, a, b, c, d, e, f, g, h, 0x19a4c116);
+-    round!(49, h, a, b, c, d, e, f, g, 0x1e376c08);
+-    round!(50, g, h, a, b, c, d, e, f, 0x2748774c);
+-    round!(51, f, g, h, a, b, c, d, e, 0x34b0bcb5);
+-    round!(52, e, f, g, h, a, b, c, d, 0x391c0cb3);
+-    round!(53, d, e, f, g, h, a, b, c, 0x4ed8aa4a);
+-    round!(54, c, d, e, f, g, h, a, b, 0x5b9cca4f);
+-    round!(55, b, c, d, e, f, g, h, a, 0x682e6ff3);
+-    round!(56, a, b, c, d, e, f, g, h, 0x748f82ee);
+-    round!(57, h, a, b, c, d, e, f, g, 0x78a5636f);
+-    round!(58, g, h, a, b, c, d, e, f, 0x84c87814);
+-    round!(59, f, g, h, a, b, c, d, e, 0x8cc70208);
+-    round!(60, e, f, g, h, a, b, c, d, 0x90befffa);
+-    round!(61, d, e, f, g, h, a, b, c, 0xa4506ceb);
+-    round!(62, c, d, e, f, g, h, a, b, 0xbef9a3f7);
+-    round!(63, b, c, d, e, f, g, h, a, 0xc67178f2);
++
++    const K: [u32; 48] = [
++        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
++        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
++        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
++        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
++        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
++        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
++    ];
++    for k in K.chunks_exact(16) {
++        round!(16, a, b, c, d, e, f, g, h, k[0]);
++        round!(17, h, a, b, c, d, e, f, g, k[1]);
++        round!(18, g, h, a, b, c, d, e, f, k[2]);
++        round!(19, f, g, h, a, b, c, d, e, k[3]);
++        round!(20, e, f, g, h, a, b, c, d, k[4]);
++        round!(21, d, e, f, g, h, a, b, c, k[5]);
++        round!(22, c, d, e, f, g, h, a, b, k[6]);
++        round!(23, b, c, d, e, f, g, h, a, k[7]);
++        round!(24, a, b, c, d, e, f, g, h, k[8]);
++        round!(25, h, a, b, c, d, e, f, g, k[9]);
++        round!(26, g, h, a, b, c, d, e, f, k[10]);
++        round!(27, f, g, h, a, b, c, d, e, k[11]);
++        round!(28, e, f, g, h, a, b, c, d, k[12]);
++        round!(29, d, e, f, g, h, a, b, c, k[13]);
++        round!(30, c, d, e, f, g, h, a, b, k[14]);
++        round!(31, b, c, d, e, f, g, h, a, k[15]);
++    }
+@@ -127 +106 @@
+-fn digest(input: &[u8]) -> [u8; 32] {
++fn digest(input: &[u8], output: &mut [u8; 32]) {
+@@ -143,2 +122,6 @@
+-    let mut result = [0u8; 32];
+-    for (word, bytes) in state.iter().zip(result.chunks_exact_mut(4)) {
++    write_digest(&state, output);
++}
++
++#[inline(always)]
++fn write_digest(state: &[u32; 8], output: &mut [u8; 32]) {
++    for (word, bytes) in state.iter().zip(output.chunks_exact_mut(4)) {
+@@ -147 +129,0 @@
+-    result
+@@ -170,8 +152 @@
+-    for (i, word) in state.iter().enumerate() {
+-        unsafe {
+-            output
+-                .add(i * 4)
+-                .cast::<u32>()
+-                .write_unaligned(word.to_be())
+-        };
+-    }
++    write_digest(&state, unsafe { &mut *output.cast::<[u8; 32]>() });
+@@ -184,2 +159 @@
+-    let hash = digest(bytes);
+-    unsafe { core::ptr::copy_nonoverlapping(hash.as_ptr(), output, hash.len()) };
++    digest(bytes, unsafe { &mut *output.cast::<[u8; 32]>() });
+@@ -226,0 +201,6 @@
++
++    fn digest(input: &[u8]) -> [u8; 32] {
++        let mut output = [0; 32];
++        super::digest(input, &mut output);
++        output
++    }

@@ -1,0 +1,48 @@
+--- baseline/lib.rs
++++ chain/lib.rs
+@@ -127 +127 @@
+-fn digest(input: &[u8]) -> [u8; 32] {
++fn digest(input: &[u8], output: &mut [u8; 32]) {
+@@ -129 +129 @@
+-    let mut blocks = input.chunks_exact(64);
++    let blocks = input.chunks_exact(64);
+@@ -136,5 +136,2 @@
+-    // One compression loop avoids both state spills between calls and
+-    // duplicating the unrolled rounds for the one- and two-block tails.
+-    // ChunksExact is fused, so no Chain exhaustion state is needed.
+-    let mut padding = tail[..padded].chunks_exact(64);
+-    while let Some(block) = blocks.next().or_else(|| padding.next()) {
++    // One loop keeps the state in locals across input and padding blocks.
++    for block in blocks.chain(tail[..padded].chunks_exact(64)) {
+@@ -143,2 +140,6 @@
+-    let mut result = [0u8; 32];
+-    for (word, bytes) in state.iter().zip(result.chunks_exact_mut(4)) {
++    write_digest(&state, output);
++}
++
++#[inline(always)]
++fn write_digest(state: &[u32; 8], output: &mut [u8; 32]) {
++    for (word, bytes) in state.iter().zip(output.chunks_exact_mut(4)) {
+@@ -147 +147,0 @@
+-    result
+@@ -170,8 +170 @@
+-    for (i, word) in state.iter().enumerate() {
+-        unsafe {
+-            output
+-                .add(i * 4)
+-                .cast::<u32>()
+-                .write_unaligned(word.to_be())
+-        };
+-    }
++    write_digest(&state, unsafe { &mut *output.cast::<[u8; 32]>() });
+@@ -184,2 +177 @@
+-    let hash = digest(bytes);
+-    unsafe { core::ptr::copy_nonoverlapping(hash.as_ptr(), output, hash.len()) };
++    digest(bytes, unsafe { &mut *output.cast::<[u8; 32]>() });
+@@ -226,0 +219,6 @@
++
++    fn digest(input: &[u8]) -> [u8; 32] {
++        let mut output = [0; 32];
++        super::digest(input, &mut output);
++        output
++    }

@@ -123,8 +123,10 @@ fn compress(state: &mut [u32; 8], block: &[u8; 64]) {
     }
 }
 
-#[inline(always)]
-fn digest(input: &[u8]) -> [u8; 32] {
+// This leaf kernel keeps the padding buffer off the fixed-size and empty paths.
+#[inline(never)]
+unsafe fn sha256_general(input: *const u8, len: usize, output: *mut u8) {
+    let input = unsafe { core::slice::from_raw_parts(input, len) };
     let mut state = INITIAL;
     let mut blocks = input.chunks_exact(64);
     let remaining = blocks.remainder();
@@ -140,11 +142,16 @@ fn digest(input: &[u8]) -> [u8; 32] {
     while let Some(block) = blocks.next().or_else(|| padding.next()) {
         compress(&mut state, block.try_into().expect("block length"));
     }
-    let mut result = [0u8; 32];
-    for (word, bytes) in state.iter().zip(result.chunks_exact_mut(4)) {
-        bytes.copy_from_slice(&word.to_be_bytes());
+    unsafe { write_digest(&state, output) };
+}
+
+#[inline(always)]
+unsafe fn write_digest(state: &[u32; 8], output: *mut u8) {
+    // Write all bytes without first referencing the uninitialized Blob payload.
+    // Blob payloads need not be aligned to u32.
+    for (i, word) in state.iter().enumerate() {
+        unsafe { output.add(i * 4).cast::<u32>().write_unaligned(word.to_be()) };
     }
-    result
 }
 
 // Common digest and Merkle-parent inputs expose their padding to constant
@@ -153,7 +160,7 @@ fn digest(input: &[u8]) -> [u8; 32] {
 // avoid its stack frame and padding setup.
 #[inline(never)]
 unsafe fn sha256_fixed<const INPUT_LEN: usize>(input: *const u8, output: *mut u8) {
-    assert!(INPUT_LEN == 32 || INPUT_LEN == 64);
+    const { assert!(INPUT_LEN == 32 || INPUT_LEN == 64) };
     let input = unsafe { core::slice::from_raw_parts(input, INPUT_LEN) };
     let mut state = INITIAL;
     let mut tail = [0u8; 64];
@@ -167,22 +174,7 @@ unsafe fn sha256_fixed<const INPUT_LEN: usize>(input: *const u8, output: *mut u8
     tail[remaining.len()] = 0x80;
     tail[56..].copy_from_slice(&(INPUT_LEN as u64 * 8).to_be_bytes());
     compress(&mut state, &tail);
-    for (i, word) in state.iter().enumerate() {
-        unsafe {
-            output
-                .add(i * 4)
-                .cast::<u32>()
-                .write_unaligned(word.to_be())
-        };
-    }
-}
-
-// This leaf kernel keeps the padding buffer off the fixed-size and empty paths.
-#[inline(never)]
-unsafe fn sha256_general(input: *const u8, len: usize, output: *mut u8) {
-    let bytes = unsafe { core::slice::from_raw_parts(input, len) };
-    let hash = digest(bytes);
-    unsafe { core::ptr::copy_nonoverlapping(hash.as_ptr(), output, hash.len()) };
+    unsafe { write_digest(&state, output) };
 }
 
 /// # Safety
@@ -224,6 +216,12 @@ fn panic(_info: &core::panic::PanicInfo<'_>) -> ! {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn digest(input: &[u8]) -> [u8; 32] {
+        let mut output = [0; 32];
+        unsafe { sha256_general(input.as_ptr(), input.len(), output.as_mut_ptr()) };
+        output
+    }
 
     fn check(input: &[u8], expected: &str) {
         let actual: String = digest(input).iter().map(|b| format!("{b:02x}")).collect();
