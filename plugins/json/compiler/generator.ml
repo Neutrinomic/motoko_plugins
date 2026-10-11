@@ -30,7 +30,7 @@ module Make (B : Plugin_codegen.Backend) = struct
   let constant_bytes env text action =
     let set, get = new_local env "json_constant" in
     Text.lit env text ^^ Text.to_blob env ^^ set ^^
-    action (get ^^ Blob.payload_ptr_unskewed env) (get ^^ Blob.len env)
+    action (get ^^ Blob.payload_ptr_unskewed env) (num (String.length text))
   let write_byte env c ch = c ^^ num (Char.code ch) ^^ invoke env "write_byte"
   let write_literal env c text = constant_bytes env text (fun ptr len -> c ^^ ptr ^^ len ^^ invoke env "write_raw")
   (* Field labels are known while specializing the visitor. Escape and combine

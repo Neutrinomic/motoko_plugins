@@ -1,0 +1,639 @@
+{
+  "label": "json-round2-plugin-baseline",
+  "recorded_utc": "2026-10-11T15:54:21.365Z",
+  "wasm_sha256": "9c0d3a47d61328e338ab2d278ace0d9e4b5fcd804bc6a575c3f7f1be8665e7b9",
+  "wasm_bytes": 668504,
+  "trials": 3,
+  "source_sha256": "93d1aa2432beba3bf5be57e05238f29ba3e9caa85447afa52f6d223415239063",
+  "cases_sha256": "8b9fb9a4f61f04210fea0135560ae37fe4eb6ef4f3bf4ad04110c7d4a96ed9e6",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Fresh canister per workload/trial; host-generated JSON and typed inputs prepared outside measurement. Four forced GC increments before each phase. Timed interval includes Result unwrapping and retained output assignment, excludes validation, UTF8 reply conversion and message-end GC. Heap allocations and synchronous reclamation are measured separately.",
+  "correctness": "Encoder output is parsed by host JSON.parse and compared to independent Python-generated expected data. Decoder input is Python-generated JSON; the actor compares every decoded typed value to an independently constructed Motoko input in bytesResult outside the measured interval.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "json-record-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_0",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 8803,
+          "allocated_bytes": 776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "2bec1ec991534fa09ac209a6904ea48353bf1b2b719115ade219a8271a556cc0"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 8803,
+          "allocated_bytes": 776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "2bec1ec991534fa09ac209a6904ea48353bf1b2b719115ade219a8271a556cc0"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 8803,
+          "allocated_bytes": 776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "2bec1ec991534fa09ac209a6904ea48353bf1b2b719115ade219a8271a556cc0"
+        }
+      ]
+    },
+    {
+      "name": "json-record-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_1",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 14861,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 14861,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 14861,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-records-empty-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_2",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 1726,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 1726,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 1726,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      ]
+    },
+    {
+      "name": "json-records-empty-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_3",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 1364,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 1364,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 1364,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-records-one-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_4",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 9711,
+          "allocated_bytes": 896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 73,
+          "output_sha256": "644cc9afd11d19309975a15bd283e54a62f96b7fefc09359131247465f71f349"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 9711,
+          "allocated_bytes": 896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 73,
+          "output_sha256": "644cc9afd11d19309975a15bd283e54a62f96b7fefc09359131247465f71f349"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 9711,
+          "allocated_bytes": 896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 73,
+          "output_sha256": "644cc9afd11d19309975a15bd283e54a62f96b7fefc09359131247465f71f349"
+        }
+      ]
+    },
+    {
+      "name": "json-records-one-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_5",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 22795,
+          "allocated_bytes": 912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 22795,
+          "allocated_bytes": 912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 22795,
+          "allocated_bytes": 912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-nested-records-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_6",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 5045703,
+          "allocated_bytes": 193896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62044,
+          "output_sha256": "4a82745a85157339871d9d52013a7bebdb5348233b40d00755fd57a60f57a8b8"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 5045703,
+          "allocated_bytes": 193896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62044,
+          "output_sha256": "4a82745a85157339871d9d52013a7bebdb5348233b40d00755fd57a60f57a8b8"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 5045703,
+          "allocated_bytes": 193896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62044,
+          "output_sha256": "4a82745a85157339871d9d52013a7bebdb5348233b40d00755fd57a60f57a8b8"
+        }
+      ]
+    },
+    {
+      "name": "json-nested-records-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_7",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 25762380,
+          "allocated_bytes": 130128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 25762380,
+          "allocated_bytes": 130128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 25762380,
+          "allocated_bytes": 130128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-records-1024-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_8",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 5034822,
+          "allocated_bytes": 193832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 61980,
+          "output_sha256": "11b5c82a9b11f662c7bd4ac8aaf5a01621e17ca90e4403d01021245d7e46e4b7"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 5034822,
+          "allocated_bytes": 193832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 61980,
+          "output_sha256": "11b5c82a9b11f662c7bd4ac8aaf5a01621e17ca90e4403d01021245d7e46e4b7"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 5034822,
+          "allocated_bytes": 193832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 61980,
+          "output_sha256": "11b5c82a9b11f662c7bd4ac8aaf5a01621e17ca90e4403d01021245d7e46e4b7"
+        }
+      ]
+    },
+    {
+      "name": "json-records-1024-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_9",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 18293519,
+          "allocated_bytes": 129104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 18293519,
+          "allocated_bytes": 129104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 18293519,
+          "allocated_bytes": 129104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-blob-64k-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "encode",
+          "method": "bench_10",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "encode",
+          "instructions": 3257041,
+          "allocated_bytes": 175136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 87386,
+          "output_sha256": "2b5e82e6ba5c3d8073fe095ea4a93c5fcecd6a50bc6b0ffcdec75d814efc49c2"
+        },
+        {
+          "trial": 1,
+          "phase": "encode",
+          "instructions": 3257041,
+          "allocated_bytes": 175136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 87386,
+          "output_sha256": "2b5e82e6ba5c3d8073fe095ea4a93c5fcecd6a50bc6b0ffcdec75d814efc49c2"
+        },
+        {
+          "trial": 2,
+          "phase": "encode",
+          "instructions": 3257041,
+          "allocated_bytes": 175136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 87386,
+          "output_sha256": "2b5e82e6ba5c3d8073fe095ea4a93c5fcecd6a50bc6b0ffcdec75d814efc49c2"
+        }
+      ]
+    },
+    {
+      "name": "json-blob-64k-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_11",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 3257250,
+          "allocated_bytes": 131432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 3257250,
+          "allocated_bytes": 131432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 3257250,
+          "allocated_bytes": 131432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-error-small",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_12",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 10964,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 10964,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 10964,
+          "allocated_bytes": 1040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-error-escaped-key",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_13",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 19059,
+          "allocated_bytes": 1384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 19059,
+          "allocated_bytes": 1384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 19059,
+          "allocated_bytes": 1384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-error-late-record",
+      "family": "json",
+      "phases": [
+        {
+          "label": "decode",
+          "method": "bench_14",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "decode",
+          "instructions": 18308310,
+          "allocated_bytes": 129440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "decode",
+          "instructions": 18308310,
+          "allocated_bytes": 129440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "decode",
+          "instructions": 18308310,
+          "allocated_bytes": 129440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

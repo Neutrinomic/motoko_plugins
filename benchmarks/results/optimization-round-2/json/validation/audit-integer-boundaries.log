@@ -1,0 +1,15 @@
+Independent JSON bigint audit
+Runtime source SHA-256: fd2b16271238c9f0a01ec46d65ca94bde80439785517ca64c18e8432618c3bfb
+Rust compiler: rustc 1.99.0-nightly (da86f4d07 2026-07-24)
+Generated 678 independent Python integer/LEB vectors; seed 290411, up to 4096 decimal digits.
+
+Commands (inside the compiler Nix development shell, from the plugin checkout):
+python3 benchmarks/results/optimization-round-2/json/validation/audit-integer-boundaries.py plugins/json/runtime/src/lib.rs _build/opt2-json-independent-audit/runtime.rs
+rustc --edition=2024 --test _build/opt2-json-independent-audit/runtime.rs -o _build/opt2-json-independent-audit/tests
+_build/opt2-json-independent-audit/tests independent_integer_audit --nocapture
+
+running 1 test
+test independent_integer_audit::direct_leb_vectors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.26s
+

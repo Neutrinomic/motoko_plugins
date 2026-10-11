@@ -11,7 +11,7 @@ use alloc::{
     boxed::Box,
     collections::BTreeSet,
     format,
-    string::{String, ToString},
+    string::String,
     vec,
     vec::Vec,
 };
@@ -1221,15 +1221,18 @@ fn leb_to_decimal(leb: &[u8], signed: bool) -> Vec<u8> {
             words.pop();
         }
     }
-    let mut result = String::new();
+    let mut result = Vec::with_capacity(chunks.len().max(1) * 9 + usize::from(negative));
+    let mut storage = [0; 20];
     if negative {
-        result.push('-');
+        result.push(b'-');
     }
-    result.push_str(&chunks.pop().unwrap_or(0).to_string());
+    result.extend_from_slice(decimal_word(u64::from(chunks.pop().unwrap_or(0)), &mut storage));
     for chunk in chunks.iter().rev() {
-        result.push_str(&format!("{chunk:09}"));
+        let digits = decimal_word(u64::from(*chunk), &mut storage);
+        result.extend_from_slice(&b"000000000"[..9 - digits.len()]);
+        result.extend_from_slice(digits);
     }
-    result.into_bytes()
+    result
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn json_read_bigint(c: usize, signed: usize) {
@@ -1844,6 +1847,11 @@ mod tests {
             "128",
             "255",
             "256",
+            "999999999",
+            "1000000000",
+            "1000000000000000000",
+            "1000000000000000001",
+            "1000000001000000000",
             "18446744073709551616",
             "999999999999999999999999999999999999999999999999999999999999999999999",
         ] {
