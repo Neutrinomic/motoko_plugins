@@ -48,6 +48,12 @@ struct Error {
     offset: usize,
     path: String,
 }
+enum PathSegment {
+    // Input keys and compiler-emitted field labels remain valid throughout
+    // this GC-free call. No segment borrows a growing output/scratch buffer.
+    Key(&'static [u8]),
+    Index(usize),
+}
 struct ObjectFrame {
     left: usize,
     // Ordinary records avoid a tree allocation for every decoded object.
@@ -78,15 +84,14 @@ pub struct Context {
     borrowed: Option<&'static [u8]>,
     key: &'static [u8],
     objects: Vec<ObjectFrame>,
-    path: String,
-    path_lengths: Vec<usize>,
+    path: Vec<PathSegment>,
     error: Option<Error>,
     depth: usize,
     items: usize,
 }
 impl Context {
     fn new(input: &'static [u8]) -> Self {
-        let mut c = Self {
+        Self {
             input,
             at: 0,
             output: Vec::new(),
@@ -94,16 +99,16 @@ impl Context {
             borrowed: None,
             key: &[],
             objects: Vec::new(),
-            path: String::new(),
-            path_lengths: Vec::new(),
-            error: None,
+            path: Vec::new(),
+            error: (input.len() > MAX_BYTES).then(|| Error {
+                kind: "limit",
+                message: "CBOR byte limit exceeded",
+                offset: 0,
+                path: String::new(),
+            }),
             depth: 0,
             items: 0,
-        };
-        if input.len() > MAX_BYTES {
-            c.fail("limit", "CBOR byte limit exceeded");
         }
-        c
     }
     fn fail(&mut self, kind: &'static str, message: &'static str) {
         if self.error.is_none() {
@@ -111,7 +116,7 @@ impl Context {
                 kind,
                 message,
                 offset: self.at,
-                path: self.path.clone(),
+                path: self.render_path(),
             });
         }
     }
@@ -320,27 +325,35 @@ impl Context {
         true
     }
     fn push_key(&mut self) {
-        self.path_lengths.push(self.path.len());
-        self.path.push('/');
-        for ch in core::str::from_utf8(self.key)
-            .expect("validated key")
-            .chars()
-        {
-            match ch {
-                '~' => self.path.push_str("~0"),
-                '/' => self.path.push_str("~1"),
-                _ => self.path.push(ch),
-            }
-        }
+        self.path.push(PathSegment::Key(self.key));
     }
     fn push_index(&mut self, index: usize) {
-        self.path_lengths.push(self.path.len());
-        write!(&mut self.path, "/{index}").expect("writing to String");
+        self.path.push(PathSegment::Index(index));
     }
     fn pop_path(&mut self) {
-        if let Some(len) = self.path_lengths.pop() {
-            self.path.truncate(len);
+        self.path.pop();
+    }
+    fn render_path(&self) -> String {
+        let mut path = String::new();
+        for segment in &self.path {
+            path.push('/');
+            match segment {
+                PathSegment::Key(key) => {
+                    path.reserve(key.len());
+                    for ch in core::str::from_utf8(key).expect("validated key").chars() {
+                        match ch {
+                            '~' => path.push_str("~0"),
+                            '/' => path.push_str("~1"),
+                            _ => path.push(ch),
+                        }
+                    }
+                }
+                PathSegment::Index(index) => {
+                    write!(&mut path, "{index}").expect("writing to String");
+                }
+            }
         }
+        path
     }
     fn read_integer(&mut self) -> Option<(bool, Integer)> {
         let (major, _, n) = self.head()?;

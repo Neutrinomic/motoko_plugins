@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "name": "cbor-long-key-error",
+      "index": 0,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-escaped-key-error",
+      "index": 1,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    },
+    {
+      "name": "cbor-nested-index-error",
+      "index": 2,
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ]
+    }
+  ],
+  "methodology": "Three fresh-canister trials; same actor for baseline/final. Inputs, expected paths and validation are outside timing. Failed typed decoding, diagnostic construction, Result unwrapping and retained error assignment are timed; no plugin GC allowed.",
+  "correctness": "Malformed inputs are constructed independently and rejected by cbor2 at generation. Each actor query checks the complete typed error kind, message, path, and offset outside measurement."
+}

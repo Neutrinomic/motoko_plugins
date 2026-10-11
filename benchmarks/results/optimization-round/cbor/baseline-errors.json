@@ -1,0 +1,147 @@
+{
+  "label": "baseline-errors",
+  "recorded_utc": "2026-10-11T15:12:09.278Z",
+  "wasm_sha256": "869c847e9a1cd11f3892edfeb7b4a9c2ac798e2ba1f7ac2a99f3daafdbd3c0cc",
+  "wasm_bytes": 574150,
+  "trials": 3,
+  "source_sha256": "b62d021387a353b3e7f6fe7346117563cb8d6b417337541b2627ac9811098e53",
+  "cases_sha256": "c0130dce7aeea42a0394d22f26efd2e21611b2e0de89cb6c80ab7cb09adbaaca",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "delete PocketIC instance after the complete run"
+  },
+  "methodology": "Three fresh-canister trials; same actor for baseline/final. Inputs, expected paths and validation are outside timing. Failed typed decoding, diagnostic construction, Result unwrapping and retained error assignment are timed; no plugin GC allowed.",
+  "correctness": "Malformed inputs are constructed independently and rejected by cbor2 at generation. Each actor query checks the complete typed error kind, message, path, and offset outside measurement.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "cbor-long-key-error",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 21576255,
+          "allocated_bytes": 1574560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 21576255,
+          "allocated_bytes": 1574560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 21576255,
+          "allocated_bytes": 1574560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-escaped-key-error",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 2227472,
+          "allocated_bytes": 116288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 2227472,
+          "allocated_bytes": 116288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 2227472,
+          "allocated_bytes": 116288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "cbor-nested-index-error",
+      "family": "cbor",
+      "phases": [
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 22146,
+          "allocated_bytes": 1744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 22146,
+          "allocated_bytes": 1744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 22146,
+          "allocated_bytes": 1744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

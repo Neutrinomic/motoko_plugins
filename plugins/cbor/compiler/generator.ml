@@ -28,9 +28,8 @@ module Make (B : Plugin_codegen.Backend) = struct
   let ccall env c name = c ^^ invoke env name
   let fail env c code = c ^^ num code ^^ invoke env "fail"
   let constant_bytes env text action =
-    let set, get = new_local env "cbor_constant" in
-    Text.lit env text ^^ Text.to_blob env ^^ set ^^
-    action (get ^^ Blob.payload_ptr_unskewed env) (get ^^ Blob.len env)
+    action (Text.lit env text ^^ Text.to_blob env ^^ Blob.payload_ptr_unskewed env)
+      (num (String.length text))
   let write_byte env c ch = c ^^ num ch ^^ invoke env "write_byte"
   let write_head env c major length = c ^^ num major ^^ length ^^ invoke env "write_head"
   let write_key env c label =
