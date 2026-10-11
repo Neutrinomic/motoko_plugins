@@ -1,0 +1,858 @@
+{
+  "label": "json-native-final",
+  "recorded_utc": "2026-10-11T15:10:57.237Z",
+  "wasm_sha256": "55dcab785f17fa0a9b68dd326b5d6f54b4eca934ce31755431920ae83b6b98b5",
+  "wasm_bytes": 1281837,
+  "trials": 3,
+  "source_sha256": "e1c2513d982f924d0672a1952e1d81c2ae0c095c110af1751452f30f43477acb",
+  "cases_sha256": "680a8d5edce7168260babc0777797503504a25f509890fe2f0f46396369e47f5",
+  "runner_sha256": "bc8f0819def1c6d9e54e48ff0d854688a1a99a9609724535a2404c2a8c04266e",
+  "node_version": "v24.18.0",
+  "implementations": {
+    "serde": {
+      "package": "serde",
+      "version": "3.5.0"
+    },
+    "serde_core": {
+      "package": "serde-core",
+      "version": "0.2.1"
+    },
+    "native": {
+      "package": "json",
+      "version": "1.4.0"
+    },
+    "plugin": {
+      "package": "plugin/json",
+      "version": "ABI 1"
+    }
+  },
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed trial"
+  },
+  "methodology": "Same actor and compiler for all implementations; fresh canister per workload/trial. Independently generated wire input and typed inputs prepared outside measurement. Four forced GC increments before each phase. Timed interval includes typed-to-tree/tree-to-typed adapters, to_candid/from_candid when required by serde, successful Result unwrapping, output Blob conversion, and retained output assignment. Native synchronous GC is included; plugin phases require none. Validation, JSON UTF8 reply conversion, and message-end GC are excluded. Records contain Bool and Text fields to use matching wire semantics across libraries.",
+  "correctness": "JSON encoder output is parsed by host JSON.parse; CBOR output by independent Python cbor2. Both are compared semantically to Python-generated data (not byte equality). Decoder input comes from Python json/cbor2, never the encoder being tested. A separate actor query compares the complete retained typed result to an independently constructed Motoko value; its two-byte ok reply is not decoded object size.",
+  "failed_measurements": 6,
+  "cases": [
+    {
+      "name": "json-record-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_0_serde",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_0_serde_core",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_0_native",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_0_plugin",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 299736,
+          "allocated_bytes": 38304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 1683837,
+          "allocated_bytes": 217280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 79183,
+          "allocated_bytes": 8472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 9553,
+          "allocated_bytes": 976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 299736,
+          "allocated_bytes": 38304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 1683837,
+          "allocated_bytes": 217280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 79183,
+          "allocated_bytes": 8472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 9553,
+          "allocated_bytes": 976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 299736,
+          "allocated_bytes": 38304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 1683837,
+          "allocated_bytes": 217280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 89,
+          "output_sha256": "7fd4f8465b6de218ed70c8f7f9712faa43d9b9db3394e4b67b0ca23445cb9935"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 79183,
+          "allocated_bytes": 8472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 9553,
+          "allocated_bytes": 976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "4258cefe141c217f381eee52d47fff5ad4533bf48535820088ed0a1e19a0c1f3"
+        }
+      ]
+    },
+    {
+      "name": "json-record-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_1_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_1_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_1_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_1_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 1060911,
+          "allocated_bytes": 185312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 1191909,
+          "allocated_bytes": 184072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 266644,
+          "allocated_bytes": 25312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 14128,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 1060911,
+          "allocated_bytes": 185312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 1191909,
+          "allocated_bytes": 184072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 266644,
+          "allocated_bytes": 25312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 14128,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 1060911,
+          "allocated_bytes": 185312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 1191909,
+          "allocated_bytes": 184072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 266644,
+          "allocated_bytes": 25312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 14128,
+          "allocated_bytes": 1008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-records-1024-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_2_serde",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_2_serde_core",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_2_native",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_2_plugin",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 172565661,
+          "allocated_bytes": 17766800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 800867778,
+          "allocated_bytes": 100570736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 53258267,
+          "allocated_bytes": 7145616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 5081644,
+          "allocated_bytes": 194176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 172565661,
+          "allocated_bytes": 17766800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 800867778,
+          "allocated_bytes": 100570736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 53258267,
+          "allocated_bytes": 7145616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 5081644,
+          "allocated_bytes": 194176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 172565661,
+          "allocated_bytes": 17766800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 800867778,
+          "allocated_bytes": 100570736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70513,
+          "output_sha256": "51fcd7af8bb13bc6de62621080ba38f15ca8971e39b307943fd3378bc99d4902"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 53258267,
+          "allocated_bytes": 7145616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 5081644,
+          "allocated_bytes": 194176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62322,
+          "output_sha256": "75c64274b56744a610176b0756b2a754820fddc448732ec32a23aa9aff3f24f5"
+        }
+      ]
+    },
+    {
+      "name": "json-records-1024-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_3_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_3_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_3_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_3_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 763222636,
+          "allocated_bytes": 136203896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 822340588,
+          "allocated_bytes": 144797768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 30305226309,
+          "allocated_bytes": 764303144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 18261968,
+          "allocated_bytes": 172816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 763222636,
+          "allocated_bytes": 136203896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 822340588,
+          "allocated_bytes": 144797768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 30305226309,
+          "allocated_bytes": 764303144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 18261968,
+          "allocated_bytes": 172816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 763222636,
+          "allocated_bytes": 136203896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 822340588,
+          "allocated_bytes": 144797768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 30305226309,
+          "allocated_bytes": 764303144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 18261968,
+          "allocated_bytes": 172816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "json-text-64k-encode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_4_serde",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_4_serde_core",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_4_native",
+          "kind": "json",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_4_plugin",
+          "kind": "json",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "instructions": 331656428,
+          "allocated_bytes": 43260064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "instructions": 2462535428,
+          "allocated_bytes": 321688880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 89974425,
+          "allocated_bytes": 5244360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 765024,
+          "allocated_bytes": 262576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "instructions": 331656428,
+          "allocated_bytes": 43260064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "instructions": 2462535428,
+          "allocated_bytes": 321688880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 89974425,
+          "allocated_bytes": 5244360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 765024,
+          "allocated_bytes": 262576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "instructions": 331656428,
+          "allocated_bytes": 43260064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "instructions": 2462535428,
+          "allocated_bytes": 321688880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 89974425,
+          "allocated_bytes": 5244360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 765024,
+          "allocated_bytes": 262576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65538,
+          "output_sha256": "a05374cc1f58f92a3a6c7a1fa5596fe9f1d518db0acf6726ee1d086abbe83ab5"
+        }
+      ]
+    },
+    {
+      "name": "json-text-64k-decode",
+      "family": "json",
+      "phases": [
+        {
+          "label": "serde",
+          "method": "bench_5_serde",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "serde_core",
+          "method": "bench_5_serde_core",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "native",
+          "method": "bench_5_native",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "plugin",
+          "method": "bench_5_plugin",
+          "kind": "checked_decode",
+          "require_no_gc": true
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "serde",
+          "error": "Error: bench_5_serde: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister k2x5k-bx777-77777-aaahq-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "serde_core",
+          "error": "Error: bench_5_serde_core: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister k2x5k-bx777-77777-aaahq-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "native",
+          "instructions": 161941413,
+          "allocated_bytes": 8043472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "plugin",
+          "instructions": 739230,
+          "allocated_bytes": 65864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "serde",
+          "error": "Error: bench_5_serde: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ihktc-s7777-77777-aaaia-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "serde_core",
+          "error": "Error: bench_5_serde_core: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ihktc-s7777-77777-aaaia-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "native",
+          "instructions": 161941413,
+          "allocated_bytes": 8043472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "plugin",
+          "instructions": 739230,
+          "allocated_bytes": 65864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "serde",
+          "error": "Error: bench_5_serde: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ialvw-7h777-77777-aaaiq-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "serde_core",
+          "error": "Error: bench_5_serde_core: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ialvw-7h777-77777-aaaiq-cai: Canister trapped: stack overflow\\nCanister Backtrace:\\nalloc_words\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-209.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n@anon-func-67.9\\n@anon-func-19.9\\n@anon-func-19.9\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped\",\"error_code\":\"CanisterTrapped\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "native",
+          "instructions": 161941413,
+          "allocated_bytes": 8043472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "plugin",
+          "instructions": 739230,
+          "allocated_bytes": 65864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 14.0.0"
+}

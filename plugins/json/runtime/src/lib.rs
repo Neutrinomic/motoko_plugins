@@ -190,6 +190,12 @@ struct ObjectFrame {
     // after eight keys so duplicate validation remains bounded O(n log n).
     wide: Option<BTreeSet<Key>>,
 }
+// Borrow input keys or compiler literals until the first error needs a pointer.
+// Successful visits only push/pop components; they never format path text.
+enum PathComponent {
+    Key(Key),
+    Index(usize),
+}
 pub struct Context {
     input: &'static [u8],
     at: usize,
@@ -198,8 +204,7 @@ pub struct Context {
     key: Key,
     objects: Vec<ObjectFrame>,
     keys: Vec<Key>,
-    path: String,
-    path_lengths: Vec<usize>,
+    path: Vec<PathComponent>,
     error: Option<Error>,
     depth: usize,
     items: usize,
@@ -207,7 +212,7 @@ pub struct Context {
 
 impl Context {
     fn new(input: &'static [u8]) -> Self {
-        let mut c = Self {
+        Self {
             input,
             at: 0,
             output: Vec::new(),
@@ -215,16 +220,16 @@ impl Context {
             key: Key::literal(""),
             objects: Vec::new(),
             keys: Vec::new(),
-            path: String::new(),
-            path_lengths: Vec::new(),
-            error: None,
+            path: Vec::new(),
+            error: (input.len() > MAX_BYTES).then(|| Error {
+                kind: "limit",
+                message: "JSON byte limit exceeded",
+                offset: 0,
+                path: String::new(),
+            }),
             depth: 0,
             items: 0,
-        };
-        if input.len() > MAX_BYTES {
-            c.fail("limit", "JSON byte limit exceeded");
         }
-        c
     }
     fn fail(&mut self, kind: &'static str, message: &'static str) {
         if self.error.is_none() {
@@ -232,7 +237,7 @@ impl Context {
                 kind,
                 message,
                 offset: self.at,
-                path: self.path.clone(),
+                path: self.error_path(),
             });
         }
     }
@@ -555,51 +560,8 @@ impl Context {
         }
         Cow::Borrowed(&self.input[start..self.at])
     }
-    // The same lexical validation as number(), without copying the token.
     fn skip_number(&mut self) {
-        if self.error.is_some() {
-            return;
-        }
-        self.ws();
-        if self.input.get(self.at) == Some(&b'-') {
-            self.at += 1;
-        }
-        match self.input.get(self.at) {
-            Some(b'0') => self.at += 1,
-            Some(b'1'..=b'9') => {
-                self.at += 1;
-                while matches!(self.input.get(self.at), Some(b'0'..=b'9')) {
-                    self.at += 1;
-                }
-            }
-            _ => {
-                self.fail("type", "Expected a JSON number");
-                return;
-            }
-        }
-        if self.input.get(self.at) == Some(&b'.') {
-            self.at += 1;
-            let digits = self.at;
-            while matches!(self.input.get(self.at), Some(b'0'..=b'9')) {
-                self.at += 1;
-            }
-            if self.at == digits {
-                self.fail("syntax", "Invalid JSON number");
-            }
-        }
-        if matches!(self.input.get(self.at), Some(b'e' | b'E')) {
-            self.at += 1;
-            if matches!(self.input.get(self.at), Some(b'+' | b'-')) {
-                self.at += 1;
-            }
-            let digits = self.at;
-            while matches!(self.input.get(self.at), Some(b'0'..=b'9')) {
-                self.at += 1;
-            }
-            if self.at == digits {
-                self.fail("syntax", "Invalid JSON number");
-            }
-        }
+        self.number();
     }
     fn integer(&mut self, signed: bool, quoted: bool) -> Cow<'static, [u8]> {
         let value = if quoted && self.peek() == b'"' {
@@ -777,30 +739,38 @@ impl Context {
         self.items = items;
         count
     }
-    fn push_key(&mut self) {
-        self.path_lengths.push(self.path.len());
-        self.path.reserve(self.key.text.len() + 1);
-        self.path.push('/');
-        for ch in self.key.chars() {
-            match ch {
-                '~' => self.path.push_str("~0"),
-                '/' => self.path.push_str("~1"),
-                _ => self.path.push(ch),
+    fn error_path(&self) -> String {
+        let mut path = String::new();
+        for component in &self.path {
+            path.push('/');
+            match component {
+                PathComponent::Key(key) => {
+                    path.reserve(key.text.len());
+                    for ch in key.chars() {
+                        match ch {
+                            '~' => path.push_str("~0"),
+                            '/' => path.push_str("~1"),
+                            _ => path.push(ch),
+                        }
+                    }
+                }
+                PathComponent::Index(index) => {
+                    let mut storage = [0; 20];
+                    let digits = decimal_word(*index as u64, &mut storage);
+                    path.push_str(core::str::from_utf8(digits).expect("decimal digits"));
+                }
             }
         }
+        path
+    }
+    fn push_key(&mut self) {
+        self.path.push(PathComponent::Key(self.key));
     }
     fn push_index(&mut self, index: usize) {
-        self.path_lengths.push(self.path.len());
-        self.path.push('/');
-        let mut storage = [0; 20];
-        let digits = decimal_word(index as u64, &mut storage);
-        self.path
-            .push_str(core::str::from_utf8(digits).expect("decimal digits"));
+        self.path.push(PathComponent::Index(index));
     }
     fn pop_path(&mut self) {
-        if let Some(len) = self.path_lengths.pop() {
-            self.path.truncate(len);
-        }
+        self.path.pop();
     }
     fn write_string(&mut self, bytes: &[u8]) {
         if !self.check_string(bytes.len()) {
@@ -1735,6 +1705,23 @@ mod tests {
         }
     }
     #[test]
+    fn large_error_paths_reserve_borrowed_keys() {
+        for suffix in ["", "\\u0078"] {
+            let input = Box::leak(
+                format!("{{\"{}{suffix}\":truX}}", "x".repeat(256 * 1024)).into_boxed_str(),
+            );
+            let mut c = context(input);
+            let allocated = allocated_by(|| c.skip());
+            let error = c.error.unwrap();
+            assert_eq!(error.kind, "type");
+            assert_eq!(
+                error.path,
+                format!("/{}{}", "x".repeat(256 * 1024), if suffix.is_empty() { "" } else { "x" })
+            );
+            assert!(allocated < input.len() * 2, "error path allocated {allocated} bytes");
+        }
+    }
+    #[test]
     fn borrowed_keys_compare_decoded_unicode() {
         for input in [
             r#"{"café/~":1,"caf\u00e9\/~":2}"#,
@@ -1752,7 +1739,7 @@ mod tests {
         assert!(c.object_next());
         assert!(c.key.matches("café/~".as_bytes()));
         c.push_key();
-        assert_eq!(c.path, "/café~1~0");
+        assert_eq!(c.error_path(), "/café~1~0");
     }
     #[test]
     fn small_object_keys_reuse_storage_and_large_objects_detect_duplicates() {
@@ -1917,9 +1904,9 @@ mod tests {
         let mut c = context("");
         c.key = Key::literal("café/☃~");
         c.push_key();
-        assert_eq!(c.path, "/café~1☃~0");
+        assert_eq!(c.error_path(), "/café~1☃~0");
         c.pop_path();
-        assert_eq!(c.path, "");
+        assert_eq!(c.error_path(), "");
         for (input, valid) in [("1e39", false), ("1e38", true), ("\"Infinity\"", true)] {
             let mut c = context(input);
             unsafe { json_read_float(&mut c as *mut Context as usize, 32) };

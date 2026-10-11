@@ -59,6 +59,13 @@ assert error(Prim.from_json<(Nat, Nat)>("[1]")) == {
 // Field names containing a slash/tilde use JSON Pointer escaping in errors.
 assert error(Prim.from_json<{}>("{\"a/b~\":[{\"x\":1,\"x\":2}]}")).path == "/a~1b~0/0";
 
+// Path components must retain earlier escaped keys as nested visitors replace
+// the current key and unwind through arrays, numeric keys, and empty keys.
+assert error(Prim.from_json<{}>("{\"caf\\u00e9\\/~\":{\"0\":[null,{\"\": [1, truX]}]}}")) == {
+  kind = "type"; message = "Unexpected JSON literal";
+  path = "/café~1~0/0/1//1"; offset = 36;
+};
+
 // Decimal integers remain exact at both signs and fixed-width boundaries.
 assert Prim.from_json<Int>("\"-18446744073709551617000000000000000000\"") ==
   #ok (-18446744073709551617000000000000000000 : Int);
