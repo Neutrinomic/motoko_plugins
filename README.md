@@ -14,11 +14,11 @@ native libraries for each row.
 
 | Operation | Native Motoko library | Native instructions | Plugin instructions | Native/plugin | Native allocated bytes | Plugin allocated bytes |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| JSON encode, 1,024 records | `json 1.4.0` | 53,258,267 | 5,081,644 | 10.48× | 7,145,616 | 194,176 |
-| JSON decode, 1,024 records | `serde 3.5.0` | 763,222,636 | 18,251,729 | 41.82× | 136,203,896 | 172,816 |
+| JSON encode, 1,024 records | `json 1.4.0` | 53,258,267 | 5,044,780 | 10.56× | 7,145,616 | 194,176 |
+| JSON decode, 1,024 records | `serde 3.5.0` | 763,222,636 | 18,210,769 | 41.91× | 136,203,896 | 172,816 |
 | CBOR encode, 1,024 records | `cbor 4.1.0` | 49,934,053 | 5,395,241 | 9.26× | 2,452,232 | 174,160 |
 | CBOR decode, 1,024 records | `cbor 4.1.0` | 152,527,112 | 7,324,274 | 20.82× | 11,545,504 | 173,128 |
-| CandidX encode, 1,024 sparse records | CandidX `94c2868` | 88,379,476 | 6,140,310 | 14.39× | 3,578,064 | 22,624 |
+| CandidX encode, 1,024 sparse records | CandidX `94c2868` | 88,379,476 | 6,057,260 | 14.59× | 3,578,064 | 22,600 |
 | SHA-256, 1 MiB | `sha2 0.2.5` | 323,721,060 | 78,124,848 | 4.14× | 1,008 | 56 |
 
 Three trials; medians shown. Counts include conversions between typed values
@@ -29,47 +29,67 @@ Allocated bytes include results and temporary garbage during the measured call;
 they measure allocation pressure, not peak memory or retained live bytes after
 GC. The same library supplies native instruction and allocation counts, chosen
 by instruction cost.
-Final-build results: [JSON](benchmarks/results/optimization-round/integrated/json/README.md),
-[CBOR](benchmarks/results/optimization-round/integrated/cbor/README.md), and
-[CandidX/SHA-256](benchmarks/results/optimization-round/integrated/candidx-sha256/README.md).
-They include all three tested native libraries, smaller inputs, large payloads,
-and the observed serde stack overflows on 64 KiB JSON strings.
-The [optimization report](benchmarks/results/optimization-round/README.md)
-compares each plugin and the SDK before/after this round, including independent
-audits, unchanged cases, and allocation tradeoffs.
-The [previous comparison](benchmarks/results/codec-comparison/README.md) remains
-available with its original raw results.
+Measured results: [JSON](benchmarks/results/optimization-round-2/json/README.md),
+[CBOR](benchmarks/results/optimization-round-2/cbor/README.md),
+[CandidX](benchmarks/results/optimization-round-2/candidx/README.md), and
+[SHA-256](benchmarks/results/optimization-round-2/sha256/README.md).
+They include smaller inputs, large payloads, and the observed serde stack
+overflows on 64 KiB JSON strings.
+The [second optimization report](benchmarks/results/optimization-round-2/README.md)
+compares each plugin and the SDK before/after, with independent audits and
+tradeoffs. Large-integer JSON encoding uses 40.75% fewer instructions and 46.84%
+less allocation; CBOR Nat/Int array decoding uses about 20% fewer instructions
+and 79% fewer allocated bytes.
+These are different workloads from the record comparison above. Repeated-variant
+CandidX encoding uses about 38% fewer instructions and 94% fewer allocated bytes,
+while three sparse 4,096-case variant workloads use 4–14% more instructions. SHA-256 is unchanged after rejecting
+slower alternatives.
+The [first optimization report](benchmarks/results/optimization-round/README.md)
+and [original library comparison](benchmarks/results/codec-comparison/README.md)
+retain their original measurements.
 
 ## Persistent map costs
 
-The complete final function comparison is below: **1,000, 10,000, and 100,000
-entries**, with 37 workload variants at each size covering 27 generic public
-functions and three scalar helpers. All **111 workloads / 720 measurements**
-passed validation; all three trials produced identical counts. The
-[optimization report](benchmarks/results/optimization-round/pure-map/README.md)
-compares these results with the original wrapper using the same actors and inputs.
-These counts were measured with frozen compiler
-`f1ccbba5e445df9db03bbc35be557187ade9b436`. The
-[final compiler audit](benchmarks/results/optimization-round/integrated/pure-map/audit.md)
-confirms unchanged benchmark function bodies and isolates the compiler-version
-initialization and metadata differences; it adds no new measurements.
+The complete matrix below covers **111 workloads** at **1,000, 10,000, and
+100,000 entries**: 37 variants per size across 27 generic public functions and
+three scalar helpers. Each reported count is the median of three identical trials.
+
+The [second optimization round](benchmarks/results/optimization-round-2/pure-map/README.md)
+refreshed 30 workloads: `get-hit/miss`, `getEntry-hit`, `containsKey-mixed`, all
+construction rows, `add-overwrite`, `find-missing`, and `foldLeft` at each size.
+These rows use compiler `c320bf90d0b63a058b5de2c41a42c96e8b82243f` and include
+207 measurements per version. The remaining 81 workloads retain the
+[previous full comparison](benchmarks/results/optimization-round/pure-map/README.md),
+measured with compiler `f1ccbba5e445df9db03bbc35be557187ade9b436`.
+Its [compiler audit](benchmarks/results/optimization-round/integrated/pure-map/audit.md)
+confirms unchanged benchmark function bodies under `c320bf90d`; it adds no new
+measurements. The original full run validated all 720 measurements.
 
 The baseline is `core 2.5.0` pure Map. Keys are boxed `Nat64` values, with
 the same input order for both implementations. The plugin callback path uses
 the same ordinary Motoko comparator as Core; scalar ordering is shown separately.
 Input setup is outside timing, and construction is measured separately from
-operations on populated maps. `add` is put; `swap` also returns the previous
+operations on populated maps. Sorted input arrives in ascending key order;
+shuffled input contains the same entries in a deterministic randomized order.
+The plugin builds directly from sorted input, avoiding the sorting step needed
+for shuffled input. `add` is put; `swap` also returns the previous
 value. `find` is tested at the first, middle, last, and absent positions.
 The iterator-related APIs tested are `fromIter`, `entriesFrom`, and the other names
 shown below; there is no public `findIter` function.
 
-Core uses fewer instructions for shuffled `fromIter`, cursor creation alone,
-and full-map snapshot creation. Both folds now use fewer instructions than Core
-and allocate zero bytes. Against the original wrapper, folds improve about 32%
-and full iterator consumption about 8.4%; bounded seek-and-consume workloads also
-improve. Both libraries share unchanged branches. Plugin updates copy changed
-paths and retain payload references; separate GC tests verify that updating a
-map with a 1 MiB payload allocates the same amount as with a 5-byte payload.
+This round reduces callback lookup instructions by 2.5–3.1%, scalar Nat64 lookup
+by 4.7–5.7%, and shuffled construction by 3.4–4.5%, with allocation unchanged.
+At 100,000 entries, shuffled `fromIter` now uses 2.34% fewer instructions and
+65.9% fewer allocated bytes than Core. It still uses 3.38% more instructions at
+1,000 entries and 2.92% more at 10,000. Core also uses fewer instructions for
+cursor creation alone and full-map snapshot creation.
+
+Both folds use fewer instructions than Core and allocate zero bytes. The prior
+wrapper optimization reduced fold instructions by about 32% and full iterator
+consumption by about 8.4%; bounded seek-and-consume workloads also improved.
+Both libraries share unchanged branches. Plugin updates copy changed paths and
+retain payload references; separate GC tests verify that updating a map with a
+1 MiB payload allocates the same amount as with a 5-byte payload.
 Core adapters are identified below where it lacks a matching public operation;
 these compare complete algorithms and capabilities.
 
@@ -85,12 +105,12 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 
 | Public function | Workload | Size | Core instructions/op | Plugin callback/op | Core allocated B/op | Plugin allocated B/op | Core/plugin |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `Map.fromArray` | fromArray-shuffled | 1,000 | 7,606,083.00 | 7,066,561.00 | 1,395,104.00 | 463,216.00 | 1.08× |
-| `Map.fromArray` | fromArray-shuffled | 10,000 | 102,601,814.00 | 97,527,881.00 | 18,838,600.00 | 6,369,896.00 | 1.05× |
-| `Map.fromArray` | fromArray-shuffled | 100,000 | 1,233,077,190.00 | 1,140,602,747.00 | 224,253,736.00 | 73,573,936.00 | 1.08× |
-| `Map.fromIter` | fromIter-shuffled | 1,000 | 7,605,488.00 | 8,140,350.00 | 1,394,952.00 | 487,880.00 | 0.93× |
-| `Map.fromIter` | fromIter-shuffled | 10,000 | 102,601,219.00 | 109,854,994.00 | 18,838,448.00 | 6,712,416.00 | 0.93× |
-| `Map.fromIter` | fromIter-shuffled | 100,000 | 1,233,076,595.00 | 1,255,250,803.00 | 224,253,584.00 | 76,471,536.00 | 0.98× |
+| `Map.fromArray` | fromArray-shuffled | 1,000 | 7,606,083.00 | 6,788,543.00 | 1,395,104.00 | 463,216.00 | 1.12× |
+| `Map.fromArray` | fromArray-shuffled | 10,000 | 102,601,814.00 | 93,269,585.00 | 18,838,600.00 | 6,369,896.00 | 1.10× |
+| `Map.fromArray` | fromArray-shuffled | 100,000 | 1,233,077,190.00 | 1,089,625,017.00 | 224,253,736.00 | 73,573,936.00 | 1.13× |
+| `Map.fromIter` | fromIter-shuffled | 1,000 | 7,605,488.00 | 7,862,332.00 | 1,394,952.00 | 487,880.00 | 0.97× |
+| `Map.fromIter` | fromIter-shuffled | 10,000 | 102,601,219.00 | 105,596,698.00 | 18,838,448.00 | 6,712,416.00 | 0.97× |
+| `Map.fromIter` | fromIter-shuffled | 100,000 | 1,233,076,595.00 | 1,204,273,073.00 | 224,253,584.00 | 76,471,536.00 | 1.02× |
 | `Map.fromIter` | fromIter-sorted | 1,000 | 10,203,874.00 | 1,727,096.00 | 1,831,072.00 | 96,688.00 | 5.91× |
 | `Map.fromIter` | fromIter-sorted | 10,000 | 135,473,401.00 | 18,857,900.00 | 23,988,728.00 | 1,062,544.00 | 7.18× |
 | `Map.fromIter` | fromIter-sorted | 100,000 | 1,694,931,186.00 | 179,953,531.00 | 297,345,304.00 | 10,097,624.00 | 9.42× |
@@ -108,9 +128,9 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 | `Map.alter` | alter-mixed | 1,000 | 11,258.12 | 5,561.62 | 1,647.00 | 822.75 | 2.02× |
 | `Map.alter` | alter-mixed | 10,000 | 13,678.84 | 7,205.69 | 1,944.00 | 1,077.00 | 1.90× |
 | `Map.alter` | alter-mixed | 100,000 | 16,945.25 | 8,521.84 | 2,422.75 | 1,281.75 | 1.99× |
-| `Map.containsKey` | containsKey-mixed | 1,000 | 2,183.69 | 1,692.78 | 0.00 | 0.00 | 1.29× |
-| `Map.containsKey` | containsKey-mixed | 10,000 | 2,831.84 | 2,252.47 | 0.00 | 0.00 | 1.26× |
-| `Map.containsKey` | containsKey-mixed | 100,000 | 3,450.09 | 2,663.25 | 0.00 | 0.00 | 1.30× |
+| `Map.containsKey` | containsKey-mixed | 1,000 | 2,183.69 | 1,644.38 | 0.00 | 0.00 | 1.33× |
+| `Map.containsKey` | containsKey-mixed | 10,000 | 2,831.84 | 2,187.19 | 0.00 | 0.00 | 1.29× |
+| `Map.containsKey` | containsKey-mixed | 100,000 | 3,450.09 | 2,581.88 | 0.00 | 0.00 | 1.34× |
 | `Map.delete` | delete-mixed | 1,000 | 10,437.75 | 4,015.50 | 1,987.75 | 357.50 | 2.60× |
 | `Map.delete` | delete-mixed | 10,000 | 14,751.44 | 5,245.69 | 2,885.00 | 467.75 | 2.81× |
 | `Map.delete` | delete-mixed | 100,000 | 17,230.59 | 6,426.88 | 3,373.00 | 596.00 | 2.68× |
@@ -147,15 +167,15 @@ Point-function rows are per call. `get` is key lookup; `find` is ordered predica
 | `Map.foldRight` | foldRight | 1,000 | 315,007.00 | 312,965.00 | 0.00 | 0.00 | 1.01× |
 | `Map.foldRight` | foldRight | 10,000 | 3,204,063.00 | 3,127,653.00 | 0.00 | 0.00 | 1.02× |
 | `Map.foldRight` | foldRight | 100,000 | 31,665,567.00 | 31,205,477.00 | 0.00 | 0.00 | 1.01× |
-| `Map.get` | get-hit | 1,000 | 2,041.19 | 1,648.41 | 0.00 | 0.00 | 1.24× |
-| `Map.get` | get-hit | 10,000 | 2,736.97 | 2,189.88 | 0.00 | 0.00 | 1.25× |
-| `Map.get` | get-hit | 100,000 | 3,324.09 | 2,600.75 | 0.00 | 0.00 | 1.28× |
-| `Map.get` | get-miss | 1,000 | 2,237.69 | 1,763.66 | 0.00 | 0.00 | 1.27× |
-| `Map.get` | get-miss | 10,000 | 2,942.59 | 2,317.53 | 0.00 | 0.00 | 1.27× |
-| `Map.get` | get-miss | 100,000 | 3,518.72 | 2,735.62 | 0.00 | 0.00 | 1.29× |
-| `Map.getEntry` | getEntry-hit | 1,000 | 2,213.19 | 1,786.41 | 40.00 | 40.00 | 1.24× |
-| `Map.getEntry` | getEntry-hit | 10,000 | 2,908.97 | 2,327.88 | 40.00 | 40.00 | 1.25× |
-| `Map.getEntry` | getEntry-hit | 100,000 | 3,496.09 | 2,738.75 | 40.00 | 40.00 | 1.28× |
+| `Map.get` | get-hit | 1,000 | 2,041.19 | 1,604.38 | 0.00 | 0.00 | 1.27× |
+| `Map.get` | get-hit | 10,000 | 2,736.97 | 2,129.44 | 0.00 | 0.00 | 1.29× |
+| `Map.get` | get-hit | 100,000 | 3,324.09 | 2,524.38 | 0.00 | 0.00 | 1.32× |
+| `Map.get` | get-miss | 1,000 | 2,237.69 | 1,710.88 | 0.00 | 0.00 | 1.31× |
+| `Map.get` | get-miss | 10,000 | 2,942.59 | 2,248.19 | 0.00 | 0.00 | 1.31× |
+| `Map.get` | get-miss | 100,000 | 3,518.72 | 2,649.88 | 0.00 | 0.00 | 1.33× |
+| `Map.getEntry` | getEntry-hit | 1,000 | 2,213.19 | 1,742.38 | 40.00 | 40.00 | 1.27× |
+| `Map.getEntry` | getEntry-hit | 10,000 | 2,908.97 | 2,267.44 | 40.00 | 40.00 | 1.28× |
+| `Map.getEntry` | getEntry-hit | 100,000 | 3,496.09 | 2,662.38 | 40.00 | 40.00 | 1.31× |
 | `Map.insert` | insert-mixed | 1,000 | 9,122.19 | 5,332.62 | 1,607.00 | 782.75 | 1.71× |
 | `Map.insert` | insert-mixed | 10,000 | 11,000.25 | 6,976.69 | 1,904.00 | 1,037.00 | 1.58× |
 | `Map.insert` | insert-mixed | 100,000 | 13,585.41 | 8,292.34 | 2,382.75 | 1,241.75 | 1.64× |
@@ -214,12 +234,12 @@ The callback path uses the same Motoko comparator as Core. The scalar path order
 | `Map.addNat64` | add-overwrite | 1,000 | 8,127.25 | 3,765.75 | 3,052.16 | 1,395.50 | 677.25 | 677.25 |
 | `Map.addNat64` | add-overwrite | 10,000 | 10,491.78 | 4,985.44 | 4,031.53 | 1,816.75 | 913.50 | 913.50 |
 | `Map.addNat64` | add-overwrite | 100,000 | 12,817.72 | 6,066.84 | 4,876.94 | 2,230.50 | 1,143.00 | 1,143.00 |
-| `Map.getNat64` | get-hit | 1,000 | 2,041.19 | 1,648.41 | 935.81 | 0.00 | 0.00 | 0.00 |
-| `Map.getNat64` | get-hit | 10,000 | 2,736.97 | 2,189.88 | 1,234.97 | 0.00 | 0.00 | 0.00 |
-| `Map.getNat64` | get-hit | 100,000 | 3,324.09 | 2,600.75 | 1,421.56 | 0.00 | 0.00 | 0.00 |
-| `Map.getNat64` | get-miss | 1,000 | 2,237.69 | 1,763.66 | 1,008.31 | 0.00 | 0.00 | 0.00 |
-| `Map.getNat64` | get-miss | 10,000 | 2,942.59 | 2,317.53 | 1,318.09 | 0.00 | 0.00 | 0.00 |
-| `Map.getNat64` | get-miss | 100,000 | 3,518.72 | 2,735.62 | 1,506.56 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-hit | 1,000 | 2,041.19 | 1,604.38 | 891.78 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-hit | 10,000 | 2,736.97 | 2,129.44 | 1,174.53 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-hit | 100,000 | 3,324.09 | 2,524.38 | 1,345.19 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-miss | 1,000 | 2,237.69 | 1,710.88 | 955.53 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-miss | 10,000 | 2,942.59 | 2,248.19 | 1,248.75 | 0.00 | 0.00 | 0.00 |
+| `Map.getNat64` | get-miss | 100,000 | 3,518.72 | 2,649.88 | 1,420.81 | 0.00 | 0.00 | 0.00 |
 | `Map.replaceNat64` | replace-hit | 1,000 | 9,848.69 | 3,851.75 | 3,139.16 | 1,355.50 | 677.25 | 677.25 |
 | `Map.replaceNat64` | replace-hit | 10,000 | 12,804.50 | 5,072.44 | 4,118.53 | 1,776.75 | 913.50 | 913.50 |
 | `Map.replaceNat64` | replace-hit | 100,000 | 15,780.56 | 6,154.34 | 4,964.44 | 2,190.50 | 1,143.00 | 1,143.00 |
@@ -251,15 +271,17 @@ Explicit adapters are used where Core has no matching public API. Seek, rank, se
 | swap-hit | `swap` | Both return the old optional value; this is put-with-old-value semantics. |
 | update-mixed | `get + callback + add/remove` | Same adapter as alter, returning the original optional value. |
 
-Raw batch totals, allocation/op, reclamation/op, and trial ranges are in [after.csv](benchmarks/results/optimization-round/pure-map/functions/after.csv).
+Raw batch totals, allocation/op, reclamation/op, and trial ranges are in the
+[round 2 CSV](benchmarks/results/optimization-round-2/pure-map/functions/after.csv)
+and the [prior full CSV](benchmarks/results/optimization-round/pure-map/functions/after.csv)
+for rows not remeasured this round.
 
-The [before/after tables](benchmarks/results/optimization-round/pure-map/functions/costs.md)
-and [comparison CSV](benchmarks/results/optimization-round/pure-map/functions/comparison.csv)
-retain every measured operation, including losses. The
-[full report](benchmarks/results/optimization-round/pure-map/README.md),
-[validation record](benchmarks/results/optimization-round/pure-map/functions/validation.json),
-and [independent audit](benchmarks/results/optimization-round/pure-map/audit.md)
-provide provenance, reproduction details, and correctness checks.
+The [new before/after tables](benchmarks/results/optimization-round-2/pure-map/functions/costs.md),
+[validation record](benchmarks/results/optimization-round-2/pure-map/functions/validation.json),
+and [independent audit](benchmarks/results/optimization-round-2/pure-map/audit.md)
+provide the current changes, including empty and small lookup checks. The
+[prior full comparison](benchmarks/results/optimization-round/pure-map/functions/costs.md)
+retains every original measurement, including losses.
 The [updated point](benchmarks/results/optimization-round/pure-map/point/costs.md)
 and [bulk tables](benchmarks/results/optimization-round/pure-map/bulk/costs.md)
 also cover `remove`, retained histories, and set operations. Intersecting a

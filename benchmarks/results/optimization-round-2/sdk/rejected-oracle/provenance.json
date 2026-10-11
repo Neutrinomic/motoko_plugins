@@ -1,0 +1,24 @@
+{
+  "source": "11281b54b962369628e7a29d02bebdf22622251c03ef064fddb164d6b0b4b81c",
+  "fixture_source": "e067786fbca3d680f4bfa91aeff394a7414768792a25943403ce99a6d4115b5c",
+  "compilers": {
+    "baseline": {
+      "revision": "c320bf90d0b63a058b5de2c41a42c96e8b82243f",
+      "diff": "",
+      "moc": "722ba089cc3f6fb7710423363c3adc55d0af9f841eaa5a283e97eb08f3c8335c",
+      "release_rts": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+      "debug_rts": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+      "fixture": "d394fccea202e411503b417353b1e8aa9dd4eb4b4c719a46b47f9ba3f7abd8d3",
+      "wasm": "07609787c0a1cc0600599adf937d1c4a6a9a570ee75cf717330c97f376480eba"
+    },
+    "candidate": {
+      "revision": "c320bf90d0b63a058b5de2c41a42c96e8b82243f",
+      "diff": "diff --git a/src/codegen/compile.ml b/src/codegen/compile.ml\nindex 046d2fb51..39f536435 100644\n--- a/src/codegen/compile.ml\n+++ b/src/codegen/compile.ml\n@@ -9691,11 +9691,10 @@ module ComputePlugins = struct\n           let unbox, signed = match prim with\n             | Type.Nat64 -> BoxedWord64.unbox env prim, false\n             | Type.Int64 -> BoxedWord64.unbox env prim, true\n-            | Type.Int8 | Type.Int16 | Type.Int32 ->\n-              TaggedSmallWord.lsb_adjust prim, true\n-            | Type.Nat8 | Type.Nat16 | Type.Nat32 ->\n-              TaggedSmallWord.lsb_adjust prim, false\n-            | Type.Char -> TaggedSmallWord.lsb_adjust_codepoint env, false\n+            (* Same-type small scalars have identical low tags and ordered\n+               high payloads, so comparisons need no representation shift. *)\n+            | Type.Int8 | Type.Int16 | Type.Int32 -> G.nop, true\n+            | Type.Nat8 | Type.Nat16 | Type.Nat32 | Type.Char -> G.nop, false\n             | Type.Bool -> Bool.from_int64, false\n             | _ -> G.nop, false\n           in\n",
+      "moc": "ed7eeda9a6415c35e7c20d2995cb76aefa7c2e52281f3e4047ab280a8d53a0df",
+      "release_rts": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+      "debug_rts": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+      "fixture": "d394fccea202e411503b417353b1e8aa9dd4eb4b4c719a46b47f9ba3f7abd8d3",
+      "wasm": "dfc1a428ff9c9ec333768f5f506f82819fe7630957890932e19bdacc3294527d"
+    }
+  }
+}

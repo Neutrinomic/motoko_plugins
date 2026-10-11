@@ -14,6 +14,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "benchmarks/results/optimization-round"
+ROUND2 = ROOT / "benchmarks/results/optimization-round-2"
 
 
 def read_json(path):
@@ -24,8 +25,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_sdk():
-    folder = ARCHIVE / "sdk"
+def check_sdk(folder):
     manifest = read_json(folder / "artifact-manifest.json")
     names = manifest["archive_files"]
     assert len(names) == len(set(names))
@@ -105,26 +105,38 @@ def check_sha256():
 
 
 def main():
-    check_sdk()
+    check_sdk(ARCHIVE / "sdk")
+    check_sdk(ROUND2 / "sdk")
     check_sha256()
     # The component scripts regenerate summaries in place. Preserve the archive.
     with tempfile.TemporaryDirectory(prefix="optimization-archives-") as temporary:
         copied = shutil.copytree(ARCHIVE, Path(temporary) / "optimization-round")
+        copied2 = shutil.copytree(ROUND2, Path(temporary) / "optimization-round-2")
         for component, script in (("candidx", "verify-summary.py"),
                                   ("json", "summarize.py"), ("cbor", "summarize.py")):
             subprocess.run([sys.executable, str(copied / component / script)], check=True)
             assert ((copied / component / "summary.csv").read_bytes() ==
                     (ARCHIVE / component / "summary.csv").read_bytes()), component
-        for suite in ("functions", "bulk", "point"):
-            saved = ARCHIVE / "pure-map" / suite
-            generated = Path(temporary) / "map" / suite
-            subprocess.run([
-                sys.executable, str(ROOT / "benchmarks/compare-map-optimization.py"),
-                "--before", str(saved / "before"), "--after", str(saved / "after"),
-                "--out", str(generated),
-            ], check=True)
-            for name in ("before.csv", "after.csv", "comparison.csv", "costs.md", "validation.json"):
-                assert (generated / name).read_bytes() == (saved / name).read_bytes(), (suite, name)
+        for archive, script, suites in (
+            (ARCHIVE, ROOT / "benchmarks/compare-map-optimization.py", ("functions", "bulk", "point")),
+            (ROUND2, ROUND2 / "pure-map/harness/compare-map-optimization.py", ("functions", "small", "empty")),
+        ):
+            for suite in suites:
+                saved = archive / "pure-map" / suite
+                generated = Path(temporary) / archive.name / "generated-map" / suite
+                subprocess.run([
+                    sys.executable, str(script),
+                    "--before", str(saved / "before"), "--after", str(saved / "after"),
+                    "--out", str(generated),
+                ], check=True)
+                for name in ("before.csv", "after.csv", "comparison.csv", "costs.md", "validation.json"):
+                    assert (generated / name).read_bytes() == (saved / name).read_bytes(), (saved, name)
+        for component, script in (("candidx", "verify-summary.py"), ("json", "summarize.py"),
+                                  ("cbor", "summarize.py"), ("sdk", "summarize.py")):
+            subprocess.run([sys.executable, str(copied2 / component / script)], check=True)
+            assert ((copied2 / component / "summary.csv").read_bytes() ==
+                    (ROUND2 / component / "summary.csv").read_bytes()), component
+        subprocess.run([sys.executable, str(copied2 / "sha256/verify.py")], check=True)
         for component in ("json", "cbor"):
             relative = Path("integrated") / component
             subprocess.run([sys.executable, str(copied / relative / "summarize.py")], check=True)
