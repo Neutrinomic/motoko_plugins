@@ -31,3 +31,16 @@ while (doubling < 20) {
 let texts = Prim.Array_tabulate<Text>(33, func(_) { text });
 assert Prim.to_candid_canonical(texts) == #err("output byte limit");
 assert Prim.to_candid_canonical(null) == #ok("DIDL\00\01\7f");
+
+// An optional array uses the dynamic shape path. Each fixed record charges
+// four visits even though its three null fields require no payload bytes.
+let row = { _0_ = null; _1_ = null; _2_ = null };
+let withinVisits = Prim.Array_tabulate(499_999, func(_) { row });
+switch (Prim.to_candid_canonical(?withinVisits)) {
+  case (#ok _) {};
+  case (#err _) assert false;
+};
+let tooManyVisits = Prim.Array_tabulate(500_000, func(_) { row });
+assert Prim.to_candid_canonical(?tooManyVisits) == #err("value traversal limit");
+assert Prim.to_candid_canonical(?[row]) ==
+  #ok("DIDL\03\6e\01\6d\02\6c\03\00\7f\01\7f\02\7f\01\00\01\01");

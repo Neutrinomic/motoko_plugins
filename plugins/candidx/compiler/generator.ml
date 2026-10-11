@@ -99,6 +99,27 @@ module Make (B : Plugin_codegen.Backend) = struct
     in
     visit typ
 
+  (* A record made only of primitives and records has the same shape and
+     visit count for every value. Bound the analysis as well as the emitted
+     length product; recursive or larger types keep the general traversal. *)
+  let fixed_shape_visits typ =
+    let open Type in
+    let exception Dynamic_shape in
+    let count = ref 0 in
+    let rec visit depth typ =
+      incr count;
+      if depth > 256 || !count > 2_000_000 then raise Dynamic_shape;
+      let typ = normalize typ in
+      match canonical_primitive typ with
+      | Some op when op <> -17L -> ()
+      | _ -> match typ with
+        | Tup ts -> List.iter (visit (depth + 1)) ts
+        | Obj ((Object | Memory), fs, _) ->
+          List.iter (fun f -> visit (depth + 1) f.typ) fs
+        | _ -> raise Dynamic_shape
+    in
+    try visit 0 typ; Some !count with Dynamic_shape -> None
+
   let rec canonical_shape env t = checked env (canonical_shape_raw env t)
 
   and canonical_shape_raw env t =
@@ -183,8 +204,9 @@ module Make (B : Plugin_codegen.Backend) = struct
             get_length ^^ compile_unboxed_const 2_000_000L ^^
             compile_comparison I64Op.GtU ^^
             then_fail env "collection length limit" ^^
-            begin match canonical_primitive (normalize typ), normalize typ with
-            | Some op, _ when op <> -17L ->
+            begin match canonical_primitive (normalize typ),
+                fixed_shape_visits typ, normalize typ with
+            | Some op, _, _ when op <> -17L ->
               get_length ^^ compile_eq_const 0L ^^
               E.if0 G.nop
                 (visit (get_depth ^^ compile_add_const 1L) get_length) ^^
@@ -192,7 +214,21 @@ module Make (B : Plugin_codegen.Backend) = struct
                 get_length ^^ compile_eq_const 0L ^^
                 E.if1 I64Type (compile_unboxed_const (-17L))
                   (compile_unboxed_const op))
-            | _, Variant fs when List.for_all (fun f ->
+            | _, Some visits, _ ->
+              (* The first element establishes the shape and checks its full
+                 depth before charging the remaining elements. Their count
+                 is at most 2,000,000 squared, so the i64 product cannot wrap. *)
+              unary (-19L) (
+                get_length ^^ compile_eq_const 0L ^^
+                E.if1 I64Type (compile_unboxed_const (-17L))
+                  (child (get_x ^^ compile_unboxed_zero ^^
+                     Arr.unsafe_idx env ^^ load_ptr) typ ^^
+                   get_length ^^ compile_eq_const 1L ^^
+                   E.if0 G.nop
+                     (visit (get_depth ^^ compile_add_const 1L)
+                       (get_length ^^ compile_add_const (-1L) ^^
+                        compile_mul_const (Int64.of_int visits)))))
+            | _, _, Variant fs when List.for_all (fun f ->
                 match canonical_primitive (normalize f.typ) with
                 | Some op -> op <> -17L
                 | None -> false) fs ->
@@ -224,7 +260,7 @@ module Make (B : Plugin_codegen.Backend) = struct
                                 "unsupported source type")
                       ) ^^
                       get_context ^^ canonical_call env "variants_end")))
-            | _, _ when not (joins_fields typ) ->
+            | _, _, _ when not (joins_fields typ) ->
               let set_joined, get_joined = new_local env "joined_type" in
               compile_unboxed_const (-17L) ^^ set_joined ^^
               Arr.for_each env get_x get_length (fun value ->
@@ -359,6 +395,7 @@ module Make (B : Plugin_codegen.Backend) = struct
           else bytes 1L
         in
         let child ?(share = false) value typ wire =
+          let static = static || fixed_shape_visits typ <> None in
           match emit, canonical_fixed_size typ with
           | false, Some n -> bytes n
           | _ ->
@@ -375,16 +412,13 @@ module Make (B : Plugin_codegen.Backend) = struct
           if static then compile_unboxed_const (-5L) else
             get_context ^^ get_wire ^^ canonical_call env "child" in
         let fields fs = G.concat_map (fun (id, typ, value) ->
-          if static then child value typ G.nop else
-          match canonical_primitive (normalize typ) with
-          | Some op when op <> -17L ->
-            child value typ (compile_unboxed_const op)
-          | _ ->
-            let set_field, get_field = new_local env "field_type" in
-            get_context ^^ get_wire ^^ compile_unboxed_const id ^^
-            canonical_call env "field_type" ^^ set_field ^^
-            get_field ^^ compile_eq_const Int64.min_int ^^
-            E.if0 G.nop (child value typ get_field)
+          if static || fixed_shape_visits typ <> None then
+            child value typ G.nop else
+          let set_field, get_field = new_local env "field_type" in
+          get_context ^^ get_wire ^^ compile_unboxed_const id ^^
+          canonical_call env "field_type" ^^ set_field ^^
+          get_field ^^ compile_eq_const Int64.min_int ^^
+          E.if0 G.nop (child value typ get_field)
         ) fs in
         let fixed n code = if emit then code else bytes n in
         let raw_bytes size write =
@@ -494,7 +528,9 @@ module Make (B : Plugin_codegen.Backend) = struct
           begin match emit, canonical_fixed_size typ with
           | false, Some width -> advance (get_length ^^ compile_mul_const width)
           | true, Some 0L -> G.nop
-          | _ -> unary_child ^^ set_child ^^
+          | _ ->
+            (if static || fixed_shape_visits typ <> None then G.nop else
+              unary_child ^^ set_child) ^^
             Arr.for_each env get_x get_length (fun value ->
               child value typ get_child)
           end

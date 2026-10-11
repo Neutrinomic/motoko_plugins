@@ -343,7 +343,7 @@ let encode_values types values =
         fail "function and service values are excluded"
       | T.Obj (_, fields, _), V.Obj values ->
         if List.length fields > max_items - !steps then
-          fail "collection length limit";
+          fail "value traversal limit";
         let fields = sorted_fields fields in
         Record (List.filter_map (fun f ->
           match V.Env.find_opt f.T.lab values with

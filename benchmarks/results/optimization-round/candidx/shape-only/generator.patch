@@ -1,0 +1,74 @@
+--- a/plugins/candidx/compiler/generator.ml
++++ b/plugins/candidx/compiler/generator.ml
+@@ -98,6 +98,27 @@
+       end
+     in
+     visit typ
++
++  (* A record made only of primitives and records has the same shape and
++     visit count for every value. Bound the analysis as well as the emitted
++     length product; recursive or larger types keep the general traversal. *)
++  let fixed_shape_visits typ =
++    let open Type in
++    let exception Dynamic_shape in
++    let count = ref 0 in
++    let rec visit depth typ =
++      incr count;
++      if depth > 256 || !count > 2_000_000 then raise Dynamic_shape;
++      let typ = normalize typ in
++      match canonical_primitive typ with
++      | Some op when op <> -17L -> ()
++      | _ -> match typ with
++        | Tup ts -> List.iter (visit (depth + 1)) ts
++        | Obj ((Object | Memory), fs, _) ->
++          List.iter (fun f -> visit (depth + 1) f.typ) fs
++        | _ -> raise Dynamic_shape
++    in
++    try visit 0 typ; Some !count with Dynamic_shape -> None
+ 
+   let rec canonical_shape env t = checked env (canonical_shape_raw env t)
+ 
+@@ -183,8 +204,9 @@
+             get_length ^^ compile_unboxed_const 2_000_000L ^^
+             compile_comparison I64Op.GtU ^^
+             then_fail env "collection length limit" ^^
+-            begin match canonical_primitive (normalize typ), normalize typ with
+-            | Some op, _ when op <> -17L ->
++            begin match canonical_primitive (normalize typ),
++                fixed_shape_visits typ, normalize typ with
++            | Some op, _, _ when op <> -17L ->
+               get_length ^^ compile_eq_const 0L ^^
+               E.if0 G.nop
+                 (visit (get_depth ^^ compile_add_const 1L) get_length) ^^
+@@ -192,7 +214,21 @@
+                 get_length ^^ compile_eq_const 0L ^^
+                 E.if1 I64Type (compile_unboxed_const (-17L))
+                   (compile_unboxed_const op))
+-            | _, Variant fs when List.for_all (fun f ->
++            | _, Some visits, _ ->
++              (* The first element establishes the shape and checks its full
++                 depth before charging the remaining elements. Their count
++                 is at most 2,000,000 squared, so the i64 product cannot wrap. *)
++              unary (-19L) (
++                get_length ^^ compile_eq_const 0L ^^
++                E.if1 I64Type (compile_unboxed_const (-17L))
++                  (child (get_x ^^ compile_unboxed_zero ^^
++                     Arr.unsafe_idx env ^^ load_ptr) typ ^^
++                   get_length ^^ compile_eq_const 1L ^^
++                   E.if0 G.nop
++                     (visit (get_depth ^^ compile_add_const 1L)
++                       (get_length ^^ compile_add_const (-1L) ^^
++                        compile_mul_const (Int64.of_int visits)))))
++            | _, _, Variant fs when List.for_all (fun f ->
+                 match canonical_primitive (normalize f.typ) with
+                 | Some op -> op <> -17L
+                 | None -> false) fs ->
+@@ -224,7 +260,7 @@
+                                 "unsupported source type")
+                       ) ^^
+                       get_context ^^ canonical_call env "variants_end")))
+-            | _, _ when not (joins_fields typ) ->
++            | _, _, _ when not (joins_fields typ) ->
+               let set_joined, get_joined = new_local env "joined_type" in
+               compile_unboxed_const (-17L) ^^ set_joined ^^
+               Arr.for_each env get_x get_length (fun value ->
