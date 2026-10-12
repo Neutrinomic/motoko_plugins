@@ -1,0 +1,104 @@
+{
+  "stage": "blake3-keyed-corrected",
+  "recorded_utc": "2026-10-12T11:46:00.717Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "cc8dad45d6c1035b2ee5e53284947e611ff62e0a60d36345b8049747812406a8",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "blake3-keyed-1024",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "blake3"
+      ],
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "",
+      "source": "cases/blake3-keyed-1024/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "cd573de68fc0d28558320e10b4c0fa7615db1a0d039e908fa32f75d5a592a78e",
+      "wasm": "blake3-keyed-1024/native/main.wasm",
+      "wasm_sha256": "24905df21b182762b7b78f0bf502609337ffa6c28ec2e275b0dcc072b543de98",
+      "wasm_bytes": 276866,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 36175,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 36175,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 36175,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "blake3-keyed-1024",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "",
+      "source": "cases/blake3-keyed-1024/mops-blake3/main.mo",
+      "returncode": 0,
+      "source_sha256": "4c38822923bcb04b79cb22791e28c3171025cc582a376b7044e0850db160ac2e",
+      "wasm": "blake3-keyed-1024/mops-blake3/main.wasm",
+      "wasm_sha256": "52eaefdbd9423eac665e268a6a490a9e69d42ec3458be3bde252440789fa8471",
+      "wasm_bytes": 300413,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3492129,
+          "allocated_bytes": 135944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3492129,
+          "allocated_bytes": 135944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3492129,
+          "allocated_bytes": 135944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c7331cadb442bfaacfca8e55fa72425816e45561697c369a746dcacbed6cb1e0",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

@@ -1,0 +1,679 @@
+{
+  "api_rows": [
+    {
+      "id": "HMAC.sha256",
+      "module": "HMAC",
+      "function": "sha256",
+      "workload": "authenticate one message",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "hmac-sha256-1024",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "hmac-sha256-1024",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Direct Mops Hmac construction, write and one consuming sum implement this one-shot operation."
+    },
+    {
+      "id": "HMAC.SHA256",
+      "module": "HMAC",
+      "function": "SHA256",
+      "workload": "constructor",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha256-constructor",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-constructor",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA256.write",
+      "module": "HMAC",
+      "function": "SHA256.write",
+      "workload": "write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-write",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-write",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA256.sum",
+      "module": "HMAC",
+      "function": "SHA256.sum",
+      "workload": "sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-sum",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-sum",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA256.reset",
+      "module": "HMAC",
+      "function": "SHA256.reset",
+      "workload": "reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-reset",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-reset",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256",
+      "module": "HMAC",
+      "function": "prepareSha256",
+      "workload": "prepare",
+      "size": "32-byte key",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepare",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepare",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256.digest",
+      "module": "HMAC",
+      "function": "prepareSha256.digest",
+      "workload": "prepared digest",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-digest",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-digest",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256.stream",
+      "module": "HMAC",
+      "function": "prepareSha256.stream",
+      "workload": "prepared stream",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-stream",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-stream",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.write",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.write",
+      "workload": "prepared write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-write",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-write",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.sum",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.sum",
+      "workload": "prepared sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-sum",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-sum",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.reset",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.reset",
+      "workload": "prepared reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-reset",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-reset",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.sha512",
+      "module": "HMAC",
+      "function": "sha512",
+      "workload": "authenticate one message",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "hmac-sha512-1024",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "hmac-sha512-1024",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Direct Mops Hmac construction, write and one consuming sum implement this one-shot operation."
+    },
+    {
+      "id": "HMAC.SHA512",
+      "module": "HMAC",
+      "function": "SHA512",
+      "workload": "constructor",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha512-constructor",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-constructor",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA512.write",
+      "module": "HMAC",
+      "function": "SHA512.write",
+      "workload": "write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-write",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-write",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA512.sum",
+      "module": "HMAC",
+      "function": "SHA512.sum",
+      "workload": "sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-sum",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-sum",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.SHA512.reset",
+      "module": "HMAC",
+      "function": "SHA512.reset",
+      "workload": "reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-reset",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-reset",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512",
+      "module": "HMAC",
+      "function": "prepareSha512",
+      "workload": "prepare",
+      "size": "32-byte key",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepare",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepare",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512.digest",
+      "module": "HMAC",
+      "function": "prepareSha512.digest",
+      "workload": "prepared digest",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-digest",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-digest",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512.stream",
+      "module": "HMAC",
+      "function": "prepareSha512.stream",
+      "workload": "prepared stream",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-stream",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-stream",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.write",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.write",
+      "workload": "prepared write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-write",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-write",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.sum",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.sum",
+      "workload": "prepared sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-sum",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-sum",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.reset",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.reset",
+      "workload": "prepared reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-reset",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-reset",
+        "implementation": "mops-sha2-composed"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing."
+    },
+    {
+      "id": "BLAKE3.digest",
+      "module": "BLAKE3",
+      "function": "digest",
+      "workload": "unkeyed digest",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "blake3-1024",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "blake3-1024",
+        "implementation": "mops-blake3"
+      },
+      "notes": ""
+    },
+    {
+      "id": "BLAKE3.keyedHash",
+      "module": "BLAKE3",
+      "function": "keyedHash",
+      "workload": "keyed digest",
+      "size": "32-byte key; 1024 bytes",
+      "plugin_case": {
+        "name": "blake3-keyed-1024",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "blake3-keyed-1024",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Valid 32-byte key. Plugin returns a checked Result; Mops accepts valid key directly."
+    },
+    {
+      "id": "BLAKE3.deriveKey",
+      "module": "BLAKE3",
+      "function": "deriveKey",
+      "workload": "isolated deriveKey",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-derivekey",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart: Mops blake3 0.1.2 ignores the derivation context."
+    },
+    {
+      "id": "BLAKE3.xof",
+      "module": "BLAKE3",
+      "function": "xof",
+      "workload": "isolated xof",
+      "size": "1024-byte input; seek 13; output 100 bytes",
+      "plugin_case": {
+        "name": "api-blake3-xof",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart for this 100-byte seek: Mops blake3 0.1.2 truncates output at the first 64-byte block boundary."
+    },
+    {
+      "id": "BLAKE3.new",
+      "module": "BLAKE3",
+      "function": "new",
+      "workload": "isolated new",
+      "size": "empty state",
+      "plugin_case": {
+        "name": "api-blake3-new",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-new",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state."
+    },
+    {
+      "id": "BLAKE3.newKeyed",
+      "module": "BLAKE3",
+      "function": "newKeyed",
+      "workload": "isolated newKeyed",
+      "size": "32-byte key; empty state",
+      "plugin_case": {
+        "name": "api-blake3-newkeyed",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-newkeyed",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state."
+    },
+    {
+      "id": "BLAKE3.newDeriveKey",
+      "module": "BLAKE3",
+      "function": "newDeriveKey",
+      "workload": "isolated newDeriveKey",
+      "size": "empty state",
+      "plugin_case": {
+        "name": "api-blake3-newderivekey",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart: Mops blake3 0.1.2 ignores the derivation context."
+    },
+    {
+      "id": "BLAKE3.update",
+      "module": "BLAKE3",
+      "function": "update",
+      "workload": "isolated update",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-update",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-update",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state."
+    },
+    {
+      "id": "BLAKE3.finalize",
+      "module": "BLAKE3",
+      "function": "finalize",
+      "workload": "isolated finalize",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalize",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-finalize",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state."
+    },
+    {
+      "id": "BLAKE3.finalizeXof",
+      "module": "BLAKE3",
+      "function": "finalizeXof",
+      "workload": "isolated finalizeXof",
+      "size": "1024-byte input; seek 13; output 100 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalizexof",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart for this 100-byte seek: Mops blake3 0.1.2 truncates output at the first 64-byte block boundary."
+    },
+    {
+      "id": "Base58.encode",
+      "module": "Base58",
+      "function": "encode",
+      "workload": "Bitcoin Base58 encode",
+      "size": "82 bytes",
+      "plugin_case": {
+        "name": "base58-encode-82",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "base58-encode-82",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Valid alphabet, leading-zero preservation, Blob/array representation conversions included."
+    },
+    {
+      "id": "Bech32.encode",
+      "module": "Bech32",
+      "function": "encode",
+      "workload": "Bech32m encode",
+      "size": "2-byte HRP; 53 groups",
+      "plugin_case": {
+        "name": "bech32m-encode-53",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "bech32m-encode-53",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Valid lowercase BIP350 checksummed payload; both APIs validate checksum on decode."
+    },
+    {
+      "id": "Base58.decode",
+      "module": "Base58",
+      "function": "decode",
+      "workload": "Bitcoin Base58 decode",
+      "size": "82 bytes",
+      "plugin_case": {
+        "name": "base58-decode-82",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "base58-decode-82",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Valid alphabet, leading-zero preservation, Blob/array representation conversions included."
+    },
+    {
+      "id": "Bech32.decode",
+      "module": "Bech32",
+      "function": "decode",
+      "workload": "Bech32m decode",
+      "size": "2-byte HRP; 53 groups",
+      "plugin_case": {
+        "name": "bech32m-decode-53",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "bech32m-decode-53",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Valid lowercase BIP350 checksummed payload; both APIs validate checksum on decode."
+    },
+    {
+      "id": "Base58Check.encode",
+      "module": "Base58Check",
+      "function": "encode",
+      "workload": "checksummed Bitcoin extended-key sized payload",
+      "size": "78-byte payload; 4-byte checksum",
+      "plugin_case": {
+        "name": "api-base58check-encode-78",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-base58check-encode-78",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Both paths generate the four-byte checksum. Valid input avoids unrelated malformed-character error-policy differences."
+    },
+    {
+      "id": "Base58Check.decode",
+      "module": "Base58Check",
+      "function": "decode",
+      "workload": "checksummed Bitcoin extended-key sized payload",
+      "size": "78-byte payload; 4-byte checksum",
+      "plugin_case": {
+        "name": "api-base58check-decode-78",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-base58check-decode-78",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Both paths check the four-byte checksum. Valid input avoids unrelated malformed-character error-policy differences."
+    },
+    {
+      "id": "Segwit.encode",
+      "module": "Segwit",
+      "function": "encode",
+      "workload": "Taproot v1 witness program encode",
+      "size": "32-byte program; 62-character address",
+      "plugin_case": {
+        "name": "bech32-segwit-encode-v1-program32",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "bech32-segwit-encode-v1-program32",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Native Mops encoder additionally checks its output by decoding it. Both decoders validate every field; output query retains HRP, version and program."
+    },
+    {
+      "id": "Segwit.decode",
+      "module": "Segwit",
+      "function": "decode",
+      "workload": "Taproot v1 witness program decode",
+      "size": "32-byte program; 62-character address",
+      "plugin_case": {
+        "name": "bech32-segwit-decode-v1-program32",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "bech32-segwit-decode-v1-program32",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Native Mops encoder additionally checks its output by decoding it. Both decoders validate every field; output query retains HRP, version and program."
+    },
+    {
+      "id": "Bech32.convertBits",
+      "module": "Bech32",
+      "function": "convertBits",
+      "workload": "8-bit to padded 5-bit groups",
+      "size": "32 input bytes; 52 output groups",
+      "plugin_case": {
+        "name": "bech32-convert-8to5-n32",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Pinned bitcoin Segwit bit conversion is private; no independently callable native counterpart is exposed."
+    },
+    {
+      "id": "BLAKE3.xof:seek13:length32",
+      "module": "BLAKE3",
+      "function": "xof",
+      "workload": "short seeked XOF within one output block",
+      "size": "1024-byte input; seek 13; output 32 bytes",
+      "plugin_case": {
+        "name": "api-blake3-xof-seek13-length32",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-xof-seek13-length32",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Closest correct published counterpart: immutable Mops Hasher API. One-shot xof includes init/update/finalize; finalizeXof prepares state outside measurement. Does not establish correctness for multi-block XOF.",
+      "representative": true
+    },
+    {
+      "id": "BLAKE3.finalizeXof:seek13:length32",
+      "module": "BLAKE3",
+      "function": "finalizeXof",
+      "workload": "short seeked XOF within one output block",
+      "size": "1024-byte input; seek 13; output 32 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalizexof-seek13-length32",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-blake3-finalizexof-seek13-length32",
+        "implementation": "mops-blake3"
+      },
+      "notes": "Closest correct published counterpart: immutable Mops Hasher API. One-shot xof includes init/update/finalize; finalizeXof prepares state outside measurement. Does not establish correctness for multi-block XOF.",
+      "representative": true
+    }
+  ]
+}

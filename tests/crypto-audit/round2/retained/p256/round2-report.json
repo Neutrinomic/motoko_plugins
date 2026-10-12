@@ -1,0 +1,1235 @@
+{
+  "schema": 1,
+  "plugin": "p256",
+  "recommendation": "promote combined fixed-base comb, public-input NAF verification and DER72 managed-buffer reuse",
+  "production_modified": false,
+  "candidate_root": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/p256-combined",
+  "baseline_root": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/baseline",
+  "promotion_files": [
+    {
+      "path": "plugins/p256/README.md",
+      "action": "replace",
+      "baseline_sha256": "85ef4c37805ff76271491125d48bf2ec4ce4bbfe91884e2c863b6e97861d9753",
+      "candidate_sha256": "f982ce73ddcc41588d1237e246829f557ecfbe543f4d91aa11c22978bc915f5c"
+    },
+    {
+      "path": "plugins/p256/compiler/register.ml",
+      "action": "replace",
+      "baseline_sha256": "b0405e0261743e0d917c748cee0b58e889ca3c2f443532e2587d470e70c5c029",
+      "candidate_sha256": "369d3b99f0c8d00e497728baf872d5b2f4817dafc6a6f22c741e1521c3ca7f8c"
+    },
+    {
+      "path": "plugins/p256/runtime/src/lib.rs",
+      "action": "replace",
+      "baseline_sha256": "004d15370901351ee1537c815b9e792ace7e3910f5b27f695b402b23452edc6b",
+      "candidate_sha256": "af64ec5dc9e5c109e4127aa92b9fcbbdf33700f043689e6945b253219e81ef16"
+    },
+    {
+      "path": "plugins/p256/tests/vectors/README.md",
+      "action": "replace",
+      "baseline_sha256": "ae5f5e2781f311374441722308e671969c103113e256f3a226b3bd73f19e4068",
+      "candidate_sha256": "49bf30829a5cc7ece48e5b85e566611bf26c682e7bd1ba9930a79c097c399f79"
+    },
+    {
+      "path": "plugins/p256/tests/vectors/generate-p256-comb.py",
+      "action": "add",
+      "baseline_sha256": null,
+      "candidate_sha256": "34d1a8fd563506f1fc43854b6e732052194db1ca98c13f2e2fdad1b330933f21"
+    },
+    {
+      "path": "plugins/p256/tests/vectors/p256-comb-proof.json",
+      "action": "add",
+      "baseline_sha256": null,
+      "candidate_sha256": "ee343c0787519c5f164f33172d76ad84fabcf025fee7151042a911c7a141f378"
+    },
+    {
+      "path": "packages/fast/tests/ash/P256.mo",
+      "action": "replace",
+      "baseline_sha256": "e53eaeeb50c3227bd06f0b93e7c19aafb31f4d7ba73617697658dcb248d111c1",
+      "candidate_sha256": "60bfcaae308c5ed7d40049016744b8e08a0c5ba2e5ee7bb0dcf0aee7a8f6c491"
+    },
+    {
+      "path": "packages/fast/tests/ash/P256.ash.json",
+      "action": "replace",
+      "baseline_sha256": "5c9f24291ce877b997dd2f3b391ff54259e33d04bef8054905fad7dcfcc7fec4",
+      "candidate_sha256": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64"
+    },
+    {
+      "path": "packages/fast/tests/ash/coverage/P256.md",
+      "action": "replace",
+      "baseline_sha256": "2a36bc11576d681be2f0ba49aededc87900d72e6a5b62cc952f165dc19fe0007",
+      "candidate_sha256": "da262908d9cd94dccb0f01ed0beb2e1c512755b76c35ac30b053d4b4c889cf9b"
+    }
+  ],
+  "patch": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/p256-round2.patch",
+  "patch_sha256": "7ed89a96b3c0122346bf427e2881a35c10bd75553d4b343f586acf900908707a",
+  "current_artifact_sha256": {
+    "plugin.cmxs": "e08b0987cb80beb26448900fe6c7c75a8e6a7b6e4153ea09e02f3f652c9a1c74",
+    "runtime.wasm": "83803f3d2462cb866e730fad94d73073cffdb574333a48301917e52c529c1c84",
+    "build.json": "a4ec86861cbef59cb1973067cf5463654cd6b98547b5a8b43d97631c25ab9084"
+  },
+  "current_runtime_source_sha256": "af64ec5dc9e5c109e4127aa92b9fcbbdf33700f043689e6945b253219e81ef16",
+  "changes": [
+    "Fixed-base secret-scalar comb with fixed 64 iterations and full masked selection across all 15 entries; independently checked table; explicit scalar and byte zeroization.",
+    "Public-input-only width-5 nonadjacent form simultaneous ECDSA multiplication, preserving all SEC1, digest, signature and high-S validation and single affine normalization.",
+    "Return managed 72-byte DER scratch directly only when exact output length is 72; preserve exact-length copy for shorter encodings.",
+    "Reproducible independent table proof, upstream arithmetic differential tests and retained DER72 output/GC Ash regression."
+  ],
+  "unchanged": [
+    "Public P256 module and API",
+    "Cargo dependencies and lock",
+    "RFC6979 signing algorithm including bits2octets reduction",
+    "Portable OCaml semantics and loading independence",
+    "Native ABI, typed errors and validation precedence"
+  ],
+  "measurements": {
+    "comparison_path": "/srv/shared/code/motoko_experiments/plugins/benchmarks/crypto/round2/comparisons/p256-combined.json",
+    "trials_per_case": 3,
+    "case_count": 25,
+    "all_exact_outputs_passed": true,
+    "rows": [
+      {
+        "name": "r2-p256-convert-compressed-to-compressed",
+        "before": {
+          "instructions": 581673,
+          "instructions_range": [
+            581673,
+            581673
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331297
+        },
+        "after": {
+          "instructions": 581720,
+          "instructions_range": [
+            581720,
+            581720
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336065
+        },
+        "instruction_reduction_percent": -0.008080141247734929,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-convert-compressed-to-uncompressed",
+        "before": {
+          "instructions": 581887,
+          "instructions_range": [
+            581887,
+            581887
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331453
+        },
+        "after": {
+          "instructions": 581934,
+          "instructions_range": [
+            581934,
+            581934
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336221
+        },
+        "instruction_reduction_percent": -0.008077169622278113,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-convert-uncompressed-to-compressed",
+        "before": {
+          "instructions": 19267,
+          "instructions_range": [
+            19267,
+            19267
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331453
+        },
+        "after": {
+          "instructions": 19321,
+          "instructions_range": [
+            19321,
+            19321
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336221
+        },
+        "instruction_reduction_percent": -0.28027196761302164,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-convert-uncompressed-to-uncompressed",
+        "before": {
+          "instructions": 19481,
+          "instructions_range": [
+            19481,
+            19481
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331331
+        },
+        "after": {
+          "instructions": 19535,
+          "instructions_range": [
+            19535,
+            19535
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336099
+        },
+        "instruction_reduction_percent": -0.27719316256866744,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-public-key-uncompressed",
+        "before": {
+          "instructions": 11201778,
+          "instructions_range": [
+            11201778,
+            11201778
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331452
+        },
+        "after": {
+          "instructions": 5207302,
+          "instructions_range": [
+            5207302,
+            5207302
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336220
+        },
+        "instruction_reduction_percent": 53.513611856974855,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-compressed-low-s",
+        "before": {
+          "instructions": 22609314,
+          "instructions_range": [
+            22609314,
+            22609314
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12873707,
+          "instructions_range": [
+            12873707,
+            12873707
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 43.06016095844394,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-compressed-high-s",
+        "before": {
+          "instructions": 22611336,
+          "instructions_range": [
+            22611336,
+            22611336
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12909287,
+          "instructions_range": [
+            12909287,
+            12909287
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 42.9078980560901,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-compressed-invalid-equation",
+        "before": {
+          "instructions": 22609314,
+          "instructions_range": [
+            22609314,
+            22609314
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12942119,
+          "instructions_range": [
+            12942119,
+            12942119
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 42.75757769563464,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-uncompressed-low-s",
+        "before": {
+          "instructions": 22046908,
+          "instructions_range": [
+            22046908,
+            22046908
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331837
+        },
+        "after": {
+          "instructions": 12311308,
+          "instructions_range": [
+            12311308,
+            12311308
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336605
+        },
+        "instruction_reduction_percent": 44.15857316590608,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-uncompressed-high-s",
+        "before": {
+          "instructions": 22048930,
+          "instructions_range": [
+            22048930,
+            22048930
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331837
+        },
+        "after": {
+          "instructions": 12346888,
+          "instructions_range": [
+            12346888,
+            12346888
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336605
+        },
+        "instruction_reduction_percent": 44.00232573644163,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-uncompressed-invalid-equation",
+        "before": {
+          "instructions": 22046908,
+          "instructions_range": [
+            22046908,
+            22046908
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331837
+        },
+        "after": {
+          "instructions": 12379720,
+          "instructions_range": [
+            12379720,
+            12379720
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336605
+        },
+        "instruction_reduction_percent": 43.848271149859194,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-digest-zero",
+        "before": {
+          "instructions": 22605030,
+          "instructions_range": [
+            22605030,
+            22605030
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 11435108,
+          "instructions_range": [
+            11435108,
+            11435108
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 49.413435859187096,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-digest-order",
+        "before": {
+          "instructions": 22605030,
+          "instructions_range": [
+            22605030,
+            22605030
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 11435108,
+          "instructions_range": [
+            11435108,
+            11435108
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 49.413435859187096,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-digest-all-ff",
+        "before": {
+          "instructions": 22604951,
+          "instructions_range": [
+            22604951,
+            22604951
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12764474,
+          "instructions_range": [
+            12764474,
+            12764474
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 43.53239695144661,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-key-generator",
+        "before": {
+          "instructions": 22612635,
+          "instructions_range": [
+            22612635,
+            22612635
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12911396,
+          "instructions_range": [
+            12911396,
+            12911396
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 42.90185111111553,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-verify-key-negated-generator",
+        "before": {
+          "instructions": 22608528,
+          "instructions_range": [
+            22608528,
+            22608528
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331803
+        },
+        "after": {
+          "instructions": 12906302,
+          "instructions_range": [
+            12906302,
+            12906302
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336571
+        },
+        "instruction_reduction_percent": 42.91401014696755,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-der-encode-ordinary",
+        "before": {
+          "instructions": 6294,
+          "instructions_range": [
+            6294,
+            6294
+          ],
+          "allocated_bytes": 224,
+          "allocated_bytes_range": [
+            224,
+            224
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331542
+        },
+        "after": {
+          "instructions": 6299,
+          "instructions_range": [
+            6299,
+            6299
+          ],
+          "allocated_bytes": 224,
+          "allocated_bytes_range": [
+            224,
+            224
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336322
+        },
+        "instruction_reduction_percent": -0.07944073721004585,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4780
+      },
+      {
+        "name": "r2-p256-der-decode-ordinary",
+        "before": {
+          "instructions": 4196,
+          "instructions_range": [
+            4196,
+            4196
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331442
+        },
+        "after": {
+          "instructions": 4196,
+          "instructions_range": [
+            4196,
+            4196
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336210
+        },
+        "instruction_reduction_percent": 0.0,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-der-encode-both-integers-padded",
+        "before": {
+          "instructions": 6404,
+          "instructions_range": [
+            6404,
+            6404
+          ],
+          "allocated_bytes": 224,
+          "allocated_bytes_range": [
+            224,
+            224
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331544
+        },
+        "after": {
+          "instructions": 6077,
+          "instructions_range": [
+            6077,
+            6077
+          ],
+          "allocated_bytes": 128,
+          "allocated_bytes_range": [
+            128,
+            128
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336324
+        },
+        "instruction_reduction_percent": 5.106183635227978,
+        "allocation_delta_bytes": -96,
+        "wasm_delta_bytes": 4780
+      },
+      {
+        "name": "r2-p256-der-decode-both-integers-padded",
+        "before": {
+          "instructions": 4216,
+          "instructions_range": [
+            4216,
+            4216
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331444
+        },
+        "after": {
+          "instructions": 4216,
+          "instructions_range": [
+            4216,
+            4216
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336212
+        },
+        "instruction_reduction_percent": 0.0,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-normalize-low-s",
+        "before": {
+          "instructions": 1973,
+          "instructions_range": [
+            1973,
+            1973
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331281
+        },
+        "after": {
+          "instructions": 1973,
+          "instructions_range": [
+            1973,
+            1973
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336049
+        },
+        "instruction_reduction_percent": 0.0,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "r2-p256-normalize-high-s",
+        "before": {
+          "instructions": 2138,
+          "instructions_range": [
+            2138,
+            2138
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331436
+        },
+        "after": {
+          "instructions": 2138,
+          "instructions_range": [
+            2138,
+            2138
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336204
+        },
+        "instruction_reduction_percent": 0.0,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "p256_public_key_ecdsa_fast",
+        "before": {
+          "instructions": 11201615,
+          "instructions_range": [
+            11201615,
+            11201615
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331232
+        },
+        "after": {
+          "instructions": 5207139,
+          "instructions_range": [
+            5207139,
+            5207139
+          ],
+          "allocated_bytes": 96,
+          "allocated_bytes_range": [
+            96,
+            96
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336000
+        },
+        "instruction_reduction_percent": 53.51439055886138,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "p256_verify_ecdsa_fast",
+        "before": {
+          "instructions": 22609363,
+          "instructions_range": [
+            22609363,
+            22609363
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331624
+        },
+        "after": {
+          "instructions": 12873756,
+          "instructions_range": [
+            12873756,
+            12873756
+          ],
+          "allocated_bytes": 32,
+          "allocated_bytes_range": [
+            32,
+            32
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336392
+        },
+        "instruction_reduction_percent": 43.06006763658047,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      },
+      {
+        "name": "p256_sign_rfc6979_fast",
+        "before": {
+          "instructions": 13457023,
+          "instructions_range": [
+            13457023,
+            13457023
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 331388
+        },
+        "after": {
+          "instructions": 13458880,
+          "instructions_range": [
+            13458880,
+            13458880
+          ],
+          "allocated_bytes": 120,
+          "allocated_bytes_range": [
+            120,
+            120
+          ],
+          "reclaimed_bytes": 0,
+          "reclaimed_bytes_range": [
+            0,
+            0
+          ],
+          "wasm_bytes": 336156
+        },
+        "instruction_reduction_percent": -0.013799485963583713,
+        "allocation_delta_bytes": 0,
+        "wasm_delta_bytes": 4768
+      }
+    ]
+  },
+  "validation": {
+    "native_plugin_tests": 7,
+    "independent_comb_differential_cases": 1284,
+    "independent_verification_lincomb_cases": 147,
+    "independent_audit_native_tests_total_including_secp_baseline": 17,
+    "independent_audit_all_engines_passed": true,
+    "p256_wycheproof_cases_each_engine": 484,
+    "p256_independent_python_rfc6979_boundary_cases_each_engine": 18,
+    "engines": [
+      "source interpreter",
+      "IR interpreter",
+      "lowered interpreter",
+      "Wasmtime"
+    ],
+    "invalid_abi_lengths_per_export": 14,
+    "ash_methods_passed": 15,
+    "ash_force_gc_and_sanity_checks": true,
+    "der72_retained_with_reclaimed_bytes_greater_than": 4194304,
+    "independent_naf_recoding_cases": 135938,
+    "comb_table_points_independently_checked": 15,
+    "source_and_compiled_secret_comb_review": "no findings; fixed public loop bounds/addresses and masked secret selection",
+    "limitations": [
+      "Targeted compiled-loop review is not a formal constant-time proof or complete stack/register erasure guarantee.",
+      "The independent audit copied findings.json has historical outcome counts; cite the fresh evidence.json and its logs, which report the combined audit."
+    ]
+  },
+  "post_validation_source_changes": {
+    "measured_runtime_source_sha256": "62d91a66f36452d67dba91e93092aceb3ec83368816a60e42fbf333d138cb664",
+    "current_runtime_source_sha256": "af64ec5dc9e5c109e4127aa92b9fcbbdf33700f043689e6945b253219e81ef16",
+    "description": "Only two runtime comment lines changed after execution validation to distinguish signing arithmetic from public-key comb. Final documentation was updated and build metadata regenerated. Runtime and compiler plugin artifacts remain byte-identical to the benchmark, all-engine audit and Ash validated artifacts.",
+    "executable_artifacts_byte_identical": true
+  },
+  "rejected_candidates": [
+    {
+      "name": "4-bit window simultaneous verification, affine once",
+      "reason": "Correct and measured 37.15% reduction, but width-5 NAF provides larger 43.06% reduction with modest extra code."
+    }
+  ],
+  "costs": {
+    "runtime_wasm_bytes_before": 86985,
+    "runtime_wasm_bytes_after": 91872,
+    "canister_wasm_growth_bytes": [
+      4768,
+      4780
+    ],
+    "minor_regressions": "Signing +1,857 instructions (0.014%); ordinary DER +5 instructions; SEC1 conversions +47\u201354 (0.01\u20130.28%). Allocation unchanged except DER72 saves96B."
+  },
+  "evidence": [
+    {
+      "path": "benchmarks/crypto/round2/comparisons/p256-combined.json",
+      "sha256": "f9cb7ec6ce85107e0972bd88f97c579e46540fdc8ee2457a3fa25e084715b229"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-combined/tests/crypto-audit/curves/evidence.json",
+      "sha256": "7069ac07ebb4f92f31909b6f51a1932fb323313e76d8532be0f90109de6b5401"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-combined/_build/crypto-audit/curves/native.log",
+      "sha256": "5a8029cc15b9b6073161a07db58c0944e495bf90b8f5f959c19a25a71aacfca4"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-combined/_build/crypto-audit/curves/motoko.log",
+      "sha256": "08e855fd58aba9aa0379cac441cc625ab5d9670b37d5ab8a4f5440a777c02a7d"
+    },
+    {
+      "path": "_build/p256-ash-round2/ash.log",
+      "sha256": "35238a0fef969a61c4fa6fbbc4559f867fb39395adc0c7267baad41f2ae4ff68"
+    },
+    {
+      "path": "_build/p256-ash-round2/P256.ash.json",
+      "sha256": "c8e278a467ef79090b9576276e40032f74b9e4be2651b44a523ff86ce46fb083"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-review-comb/combined-review.json",
+      "sha256": "6c1dbdb41734395fb1af98b43cdbf50b3c62cdfb2030d1adf7bf72585bad7790"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-review-codegen-combined/review.json",
+      "sha256": "b903b11499ff7a72d57e5fa5b554c2fa585857a3de60a5a838de6c76e13d361c"
+    },
+    {
+      "path": "_build/crypto-optimization-round2/p256-review-naf/recoding-results.json",
+      "sha256": "70da35c02dde0235e959641e90771cecd013c8ed62160c8d25ea163145893228"
+    }
+  ],
+  "promotion_notes": [
+    "Copy only promotion_files or apply patch; do not copy staged Cargo files, scripts, dist, shared audit findings or OCaml helper materializations.",
+    "Rebuild production P256 after promotion; verify runtime.wasm and plugin.cmxs match the validated executable artifacts when toolchain/path-sensitive metadata permits.",
+    "Benchmark fixtures and results are centrally owned and already exist under benchmarks/crypto; no additional benchmark files are part of this plugin patch."
+  ],
+  "promotion_patch_check": "git apply --check passed against still-frozen production",
+  "independent_final_review": "No functional promotion blocker; all 75 measurements, audit log hashes and executable artifact equality independently rechecked."
+}

@@ -1,0 +1,39 @@
+{
+  "status": "No correctness defect found in reviewed composition code and exercised cases.",
+  "oracle": "Unmodified Bitcoin Core v29.0 functional test helpers; exact source fingerprints in oracle-provenance.json.",
+  "reviewed_modules": [
+    "Bitcoin/Hash.mo",
+    "Bitcoin/Address.mo",
+    "Bitcoin/Bip32.mo",
+    "Bitcoin/Transaction.mo",
+    "Bitcoin/Script.mo"
+  ],
+  "executed_fixtures": [
+    "oracle.mo",
+    "negative.mo",
+    "wallet.mo"
+  ],
+  "checks": [
+    "660 legacy sighashes: all normal flags, unknown base modes, arbitrary 32-bit hash types, out-of-range indices, missing SINGLE outputs and opcode-boundary CODESEPARATOR removal.",
+    "495 BIP143 sighashes: all branches, empty output sets, compact-length boundary scripts, prepared and one-shot APIs.",
+    "636 BIP341/BIP342 sighashes: all seven allowed modes, all input indices, no/one/253-byte annex, key and script paths, three codesep positions, prepared and one-shot APIs.",
+    "15 additional Core private Taproot tweak/signature expectations across both internal parities, group-order-minus-one secret, null/zero/pattern roots, nonzero auxiliary randomness.",
+    "8 valid and 15 invalid BIP350 witness addresses through network checking and scriptPubKey construction.",
+    "CompactSize huge counts; unsupported witness flags; empty witness elements; transaction uint32/uint64 wire bounds; pushData lengths75/76/255/256/65535/65536; witness version/length matrices.",
+    "BIP32 static review: compressed-point validation, 78-byte payload/version, master metadata, exact-index invalid-child behavior, chain/fingerprint widths, max depth and hardened-index exclusion."
+  ],
+  "contract_notes": [
+    "Legacy malformed script pushes return null intentionally; existing-script FindAndDelete remains caller responsibility as documented.",
+    "Script.tapLeafHash is commitment-only: accepts even0x50 mathematically, though BIP341 says0x50 is unusable as a spendable leaf version due annex ambiguity. Raised as documentation note, not a hash discrepancy.",
+    "Transaction parsing/encoding deliberately does not enforce monetary ranges, duplicate inputs, script execution or UTXO rules.",
+    "BIP32 invalid-child rare HMAC values were reviewed statically; normal and invalid official BIP32 fixtures are also independently covered by the separate BIP32 reviewer."
+  ],
+  "sources": [
+    "https://github.com/bitcoin/bitcoin/blob/v29.0/test/functional/test_framework/script.py",
+    "https://github.com/bitcoin/bitcoin/blob/v29.0/test/functional/test_framework/key.py",
+    "https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki",
+    "https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki",
+    "https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki",
+    "https://github.com/bitcoin/bips/blob/master/bip-0350.mediawiki"
+  ]
+}

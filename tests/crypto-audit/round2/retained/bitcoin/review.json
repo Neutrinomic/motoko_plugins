@@ -1,0 +1,82 @@
+{
+  "reviewer": "bitcoin_round2_review",
+  "scope": "Independent static review of five frozen Bitcoin Motoko module optimization diffs; production and candidate source unchanged.",
+  "baseline": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/baseline/packages/fast/src/Bitcoin",
+  "candidate": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bitcoin-copy-v3/packages/fast/src/Bitcoin",
+  "result": "pass",
+  "findings": [],
+  "source_hashes": {
+    "Hash.mo": {
+      "baseline": "f8a46962783af5879013b7f36edc1d03656086f97ba181e441ad87c861927717",
+      "candidate": "20602cc02a2cd23c592121dcd3055c8c3c02cbad7931c9519cb8a34b55650fda"
+    },
+    "Address.mo": {
+      "baseline": "25115cda1ffb0cb0c39cff121eea11b536e2c00fe0e430a150e777457cc8cc69",
+      "candidate": "37a6dbb022ab69d1a1e014e234c67511484f9ed59fa0084c4de05fd102cc1df6"
+    },
+    "Bip32.mo": {
+      "baseline": "16c67fe5fbdda1579185a9d66ddc1e57ae375aaa25a8b1c6e2c7a2ecc459cfd0",
+      "candidate": "74d02626c9ce51be25f502be934b07399c5cdab318f6bd7f0e6abb867a8c2abb"
+    },
+    "Script.mo": {
+      "baseline": "a95bedf634e942d4e292d98c17b63da91717f310491143b156b7cee3f4203c06",
+      "candidate": "12f1f8b80b8c313b196a485723dde5ad9f7fa07ebb3062538d564089829d250d"
+    },
+    "Transaction.mo": {
+      "baseline": "aba0bd08935c5008f98e3cb77efd0c8d11c602cb44ae07315a6e72d17d774ef9",
+      "candidate": "ce396f0a6b0cd18fa6020ff5d7540cc3bca39a927da3154b383daa1a3d09ae47"
+    }
+  },
+  "checks": [
+    {
+      "area": "fixed-width wire encoders",
+      "result": "pass",
+      "details": "Every replaced value is already Nat32 or Nat64. Byte masks and shifts preserve all bits, including maximal values and SINGLE sentinel outputs. CompactSize and bounded Nat input-index encoders retain their previous implementation."
+    },
+    {
+      "area": "reader and parser",
+      "result": "pass",
+      "details": "Reader.le call graph only supplies widths 1, 2, 4, or 8; the maximum shift evaluated is 56. Bounds are checked before indexing. Input/output/witness preallocations are bounded by remaining byte counts, and all slots are populated before conversion to immutable arrays. Truncation, canonical CompactSize, trailing-data, and witness checks are preserved."
+    },
+    {
+      "area": "CODESEPARATOR",
+      "result": "pass",
+      "details": "The lazy bitmap changes allocation only. Opcode parsing still covers the complete script before the zero-separator fast path; malformed pushes still reject and pushed 0xab bytes remain intact."
+    },
+    {
+      "area": "Script preimages and copy loops",
+      "result": "pass",
+      "details": "TapLeaf allocates exactly 64 tag bytes plus leaf version, CompactSize, and script. TapBranch allocates exactly 64 tag bytes plus two ordered 32-byte children. Hash, Address, Bip32, and Script loop offsets cover the same immutable source ranges as the former iterators."
+    },
+    {
+      "area": "parsePath",
+      "result": "pass",
+      "details": "Leading m/M roots and empty/trailing segments preserve behavior. Counting ASCII slash bytes first retains maximumDepth precedence. UTF-8 continuation bytes cannot masquerade as ASCII slash or digits. The scanner rejects the first non-ASCII byte at the same segment position as the previous character parser; numeric hardenedChild rejection still precedes later invalid characters."
+    }
+  ],
+  "independent_oracles": {
+    "method": "Python standard-library hashlib and integer little-endian encodings; checks source constants and arithmetic equivalence, not a replacement for Motoko execution tests.",
+    "tag_digests": {
+      "TapLeaf": "aeea8fdc4208983105734b58081d1e2638d35f1cb54008d4d357ca03be78e9ee",
+      "TapBranch": "1941a1f2e56eb95fa2a9f194be5c01f7216f33ed82b091463490d05bf516a015"
+    },
+    "tag_literals_verified": true,
+    "fixed_width_values_checked": {
+      "Nat32": 10094,
+      "Nat64": 10190
+    },
+    "integer_case_seed": "0xB143341",
+    "integer_cases": "Zero, one, maximum, all power-of-two boundaries and adjacent values, plus 10000 seeded random values per width."
+  },
+  "existing_validation_reviewed": {
+    "source_hashes_match_candidate_audit_json": true,
+    "candidate_audit_json": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bitcoin-copy-v3/audit.json",
+    "core_sighash_cases": 1791,
+    "core_source_and_wasm_status": "pass per source-hashed audit.json; not rerun by this reviewer",
+    "wallet_and_negative_status": "pass per source-hashed audit.json; not rerun by this reviewer",
+    "official_fixture_log": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bitcoin-copy-v3-test.log",
+    "official_fixture_result": "4 tests passed per existing log; not rerun by this reviewer",
+    "parsePath_differential": "1894 source executions reported by implementation owner; fixture inspected, no rerun"
+  },
+  "required_changes": []
+}

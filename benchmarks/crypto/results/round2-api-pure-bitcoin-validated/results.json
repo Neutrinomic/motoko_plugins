@@ -1,0 +1,768 @@
+{
+  "stage": "round2-api-pure-bitcoin-validated",
+  "expected_case_count": 16,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:13:52.733Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "f6a5941375e44a03be584a3d531cb773f66b5625cacea67d3fb3786c909bb426",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-bitcoin-bip32-frompublickey-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-frompublickey",
+      "public_api": "Bitcoin/Bip32.fromPublicKey",
+      "plugins": [],
+      "expected_hex": "787075623636314d794d77417152626346573331594577706b4d756335544879325053743562444d736b745751634646387379416d52556170534347753845443957366f444d536776365a7a3869646f633461366d723842447a544a5934374c4a686b4a3855423757454775647542",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured canonical SEC1 decoding and normalization; fromPublicKey also checks chain-code length. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-frompublickey-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "b777b77dbecd078cd8f9b5ffc47db5788b30477e15e6930bf66d3a4fde126f64",
+      "wasm": "api-bitcoin-bip32-frompublickey-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "a5f5d7eac9a48760fc5e7b0536537e82e3373bae7e17b2cbcaf1ed45ff307eb9",
+      "wasm_bytes": 791124,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 24740381,
+          "allocated_bytes": 975720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 24740381,
+          "allocated_bytes": 975720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 24740381,
+          "allocated_bytes": 975720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-fingerprint-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-fingerprint",
+      "public_api": "Bitcoin/Bip32.fingerprint",
+      "plugins": [],
+      "expected_hex": "bd16bee5",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured canonical SEC1 decoding and normalization; fromPublicKey also checks chain-code length. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-fingerprint-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "101c830625cdca04cfe72ca8beac6de602aa80b89ac658bb5deae0c70a9c1ecb",
+      "wasm": "api-bitcoin-bip32-fingerprint-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "7ec0dc8d4ccf0c02ff419a03e427bcccc6982b2e009a84bb4ed2c8d9bc7e27c1",
+      "wasm_bytes": 555879,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 24822041,
+          "allocated_bytes": 980408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 24822041,
+          "allocated_bytes": 980408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 24822041,
+          "allocated_bytes": 980408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivechild-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-derivechild",
+      "public_api": "Bitcoin/Bip32.deriveChild",
+      "plugins": [],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivechild-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "e73632e66d2fb9f79c129a317f4bf072a6b1576130d2720383e2f8dc9ef2f8a4",
+      "wasm": "api-bitcoin-bip32-derivechild-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "04294b330cfeb0f1160bc9fe2da108adb162313ea4b32dcf2d5d9c4a9d976566",
+      "wasm_bytes": 806603,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 171779710,
+          "allocated_bytes": 7319408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 171779710,
+          "allocated_bytes": 7319408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 171779710,
+          "allocated_bytes": 7319408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivepath-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-derivepath",
+      "public_api": "Bitcoin/Bip32.derivePath",
+      "plugins": [],
+      "expected_hex": "78707562364153415667654e3231587266676d7a747164563871316735666d6b3435614d554c41414b4e5554687072574d385734524a3548626b635561543658444c485033727a4133504856675a366242703771466d4c6337466f487a6e366d4e4e6a35747a45316d656359717556",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivepath-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "19181d5e912c40c238f83d50a7f14c40d2d89cc3b5a459b1f954057378dd515c",
+      "wasm": "api-bitcoin-bip32-derivepath-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "43246c1e75575e5535a69ccce4d2cab3eb3b59a0ab1b23cdf82db164f8214610",
+      "wasm_bytes": 806309,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 321348873,
+          "allocated_bytes": 13764984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 321348873,
+          "allocated_bytes": 13764984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 321348873,
+          "allocated_bytes": 13764984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivetextpath-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-derivetextpath",
+      "public_api": "Bitcoin/Bip32.deriveTextPath",
+      "plugins": [],
+      "expected_hex": "78707562364153415667654e3231587266676d7a747164563871316735666d6b3435614d554c41414b4e5554687072574d385734524a3548626b635561543658444c485033727a4133504856675a366242703771466d4c6337466f487a6e366d4e4e6a35747a45316d656359717556",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivetextpath-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "21a1ac34ce3cc45ebcaf2dbf0da125d7b663f30db21d19d788f5c01e13f3dc70",
+      "wasm": "api-bitcoin-bip32-derivetextpath-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "7f2747d9dbddef5c7d6f6007cc447d76991cdca8c59d0793a63f27e7a918ff4d",
+      "wasm_bytes": 808180,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 321409635,
+          "allocated_bytes": 13771120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 321409635,
+          "allocated_bytes": 13771120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 321409635,
+          "allocated_bytes": 13771120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-serialize-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-serialize",
+      "public_api": "Bitcoin/Bip32.serialize",
+      "plugins": [],
+      "expected_hex": "787075623636314d794d77417152626346573331594577706b4d756335544879325053743562444d736b745751634646387379416d52556170534347753845443957366f444d536776365a7a3869646f633461366d723842447a544a5934374c4a686b4a3855423757454775647542",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-serialize-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "96803550f6c546d9eb24dad561982d0204d7216ee542d4607c0ee2dab1ceaeb7",
+      "wasm": "api-bitcoin-bip32-serialize-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "7113ee38dce2cf97af56964838557d8384396b13750637475facb217047d685d",
+      "wasm_bytes": 805802,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 25120503,
+          "allocated_bytes": 988384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 25120503,
+          "allocated_bytes": 988384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 25120503,
+          "allocated_bytes": 988384,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-parsepath-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-bip32-parsepath",
+      "public_api": "Bitcoin/Bip32.parsePath",
+      "plugins": [],
+      "expected_hex": "0000000001000000",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter enforces strict nonhardened syntax, at most 255 path components and the same 2^31 index bound before returning package-parsed indices. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-parsepath-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "7fa20546abc68646294f07e050e0afed59ae5100dd092d9634f3c8e354a05b66",
+      "wasm": "api-bitcoin-bip32-parsepath-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "32d0e2a6a997a84cbf145a9b7c12a33a35a9eebb992b6ce4642832565964f75c",
+      "wasm_bytes": 264797,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 59842,
+          "allocated_bytes": 5944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 59842,
+          "allocated_bytes": 5944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 59842,
+          "allocated_bytes": 5944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-pushdata-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-pushdata",
+      "public_api": "Bitcoin/Script.pushData",
+      "plugins": [],
+      "expected_hex": "4c50000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-pushdata-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "81eb5e6801f51fdeb071fbf2db8b68e0771c19357dca1564215d2647a81a9540",
+      "wasm": "api-bitcoin-script-pushdata-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "3014c585445958d282d4b18dacea98cdbc5ffc8080af3bf48ba04de3371d2c8d",
+      "wasm_bytes": 290603,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 115933,
+          "allocated_bytes": 3936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 115933,
+          "allocated_bytes": 3936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 115933,
+          "allocated_bytes": 3936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2pkh-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-p2pkh",
+      "public_api": "Bitcoin/Script.p2pkh",
+      "plugins": [],
+      "expected_hex": "76a914ddd62bc6c257005bdb3bf48aec6184d52334249b88ac",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2pkh-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "69b9d0a823f05a30e0fbccdc61acf5f862adfe07898bac66a32f38c6c38b80fb",
+      "wasm": "api-bitcoin-script-p2pkh-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "19286fb386bcb9675f4a607ecc5f004280f642d2612088c9885a6d4edfabebd5",
+      "wasm_bytes": 285995,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 47742,
+          "allocated_bytes": 1952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 47742,
+          "allocated_bytes": 1952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 47742,
+          "allocated_bytes": 1952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2sh-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-p2sh",
+      "public_api": "Bitcoin/Script.p2sh",
+      "plugins": [],
+      "expected_hex": "a914ddd62bc6c257005bdb3bf48aec6184d52334249b87",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2sh-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "6eb01dea52b1547f242800c4a99800b37af40ab807609c3b2cdcddc549ea30c0",
+      "wasm": "api-bitcoin-script-p2sh-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "92a757f24dc493ffd00ab5e7516277256aa3ee2c5be9308e515e9fa6ebfcfc6f",
+      "wasm_bytes": 285509,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 43840,
+          "allocated_bytes": 1848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 43840,
+          "allocated_bytes": 1848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 43840,
+          "allocated_bytes": 1848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-witnessprogram-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-witnessprogram",
+      "public_api": "Bitcoin/Script.witnessProgram",
+      "plugins": [],
+      "expected_hex": "5220e57bf04d66bd0a446f3f55d7a0f1ae84e99e747c0541726824f3b4153e27d0e0",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-witnessprogram-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "a2b9b8c7a6f31116091e288028dcc0056400f8a95906d8cc5010f94347427c45",
+      "wasm": "api-bitcoin-script-witnessprogram-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "1dce317512462dc96a9af122ac7b0d579a087a394054603de26e447d797896e1",
+      "wasm_bytes": 288211,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 59673,
+          "allocated_bytes": 2424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 59673,
+          "allocated_bytes": 2424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 59673,
+          "allocated_bytes": 2424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2wpkh-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-p2wpkh",
+      "public_api": "Bitcoin/Script.p2wpkh",
+      "plugins": [],
+      "expected_hex": "0014ddd62bc6c257005bdb3bf48aec6184d52334249b",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2wpkh-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "4deb188625e6bedbb3d2211591d09b68a25b8abbef433393e1e3b843065c31d2",
+      "wasm": "api-bitcoin-script-p2wpkh-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "351de209d60a9f7d45e6a5fd5f1dae27e411bda1cb94cc124d6d3e02406dddef",
+      "wasm_bytes": 285271,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 41761,
+          "allocated_bytes": 1824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 41761,
+          "allocated_bytes": 1824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 41761,
+          "allocated_bytes": 1824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2wsh-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-p2wsh",
+      "public_api": "Bitcoin/Script.p2wsh",
+      "plugins": [],
+      "expected_hex": "0020e57bf04d66bd0a446f3f55d7a0f1ae84e99e747c0541726824f3b4153e27d0e0",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2wsh-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "c759d58622d1bbb36059899a87a790b12d3f364e44c81546d97c8decc55174ec",
+      "wasm": "api-bitcoin-script-p2wsh-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "9af54b25a8edd42114a09f446b224a6551565c0b9399284f8e624a431e60be8f",
+      "wasm_bytes": 285283,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 59351,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 59351,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 59351,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2tr-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-p2tr",
+      "public_api": "Bitcoin/Script.p2tr",
+      "plugins": [],
+      "expected_hex": "5120d9e40f82c148b28294bfc7f328b7b3b5a76a083aaa313dec7b88c1ffde5e5448",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2tr-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "db505cef9cbb47f3454dd87a684bc2e711414fe250a831be02314fa30a081c3d",
+      "wasm": "api-bitcoin-script-p2tr-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "cbb8c23261e7c04c389f11d0c7718eea961e80b7c52f009c6f92fe881fb28805",
+      "wasm_bytes": 285283,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 59396,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 59396,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 59396,
+          "allocated_bytes": 2392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-tapleafhash-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-tapleafhash",
+      "public_api": "Bitcoin/Script.tapLeafHash",
+      "plugins": [],
+      "expected_hex": "f57d5a6d1700a76c02b1322a5966e4d8e94eaf0c9a8ebaa9c3d1731ae7c0c529",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter validates raw-script length and even leaf version, then composes package CompactSize and tagged-hash APIs on raw script bytes. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-tapleafhash-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "8e97dc020380cd7f35a964ada3adb5f9e4680791ddc997eb1d0128597d00a66a",
+      "wasm": "api-bitcoin-script-tapleafhash-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "ae95d954cc2e03c8242070f51b7d5d7235fadc2bc762e0aa9f068872a97b63bb",
+      "wasm_bytes": 497373,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 137278,
+          "allocated_bytes": 9864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 137278,
+          "allocated_bytes": 9864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 137278,
+          "allocated_bytes": 9864,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-tapbranchhash-validated",
+      "family": "bitcoin",
+      "implementation": "mops-bitcoin",
+      "comparison": "api-bitcoin-script-tapbranchhash",
+      "public_api": "Bitcoin/Script.tapBranchHash",
+      "plugins": [],
+      "expected_hex": "cf5a26bd3bd1fe7813b164e2dde20d05fcbb142fe5261cbd5f5df8746461253e",
+      "notes": "Pure Motoko adapter uses published package primitives. Measured adapter validates both 32-byte child commitments before lexicographic sorting and package tagged hashing. Distinct validated case identity; output encoding remains outside timing.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-tapbranchhash-validated/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "ef65a828694fbc99848d4eb3da8351c9e8ae3f581921685c32a3d4f94041cd00",
+      "wasm": "api-bitcoin-script-tapbranchhash-validated/mops-bitcoin/main.wasm",
+      "wasm_sha256": "f0a8056d799f1748e7db834853712abdd6ad9f3f8dad1b629bbbc788724487bc",
+      "wasm_bytes": 495978,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 160077,
+          "allocated_bytes": 10376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 160077,
+          "allocated_bytes": 10376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 160077,
+          "allocated_bytes": 10376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

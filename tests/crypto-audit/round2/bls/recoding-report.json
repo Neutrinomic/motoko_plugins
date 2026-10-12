@@ -1,0 +1,60 @@
+{
+  "status": "pass",
+  "scope": "Independent integer-model audit and static source review; compiled-runtime differential tests are reported separately.",
+  "script_sha256": "7698ab2112fd0daaaec0b2c47cff2f5fab25bc0835a1bf0b3f393db801c92e7a",
+  "candidate_source_sha256": "c7dff4e213b7d2faaf1934c6f67060339a28d53732f1e91a4d8a88cc513a78f0",
+  "baseline_source_sha256": "db6eaf197f4f71a67385e2aaa627b81c5a954ea64bff06854b51b27221eb1059",
+  "scalar_modulus_hex": "73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001",
+  "case_counts": {
+    "exhaustive_u16": 65536,
+    "boundary_and_pattern": 17969,
+    "deterministic_full_width_random": 8192
+  },
+  "unique_scalar_cases": 91697,
+  "reconstructions": 458485,
+  "scalar_corpus_sha256": "587e4aed1ba3ca6720cd35e639a3762a503b6c3901106072ed71464853c7e267",
+  "recoding_transcript_sha256": "b620f4bebcd5ce2d5f2fbfbbaa489526f83bb212db0c1e7d20084e6189d262c8",
+  "wnaf": {
+    "width": 4,
+    "max_byte_index": 32,
+    "max_table_index": 3,
+    "bit255_carry_cases": 10876,
+    "residual_oracle_comparisons": 91697
+  },
+  "booth": {
+    "3": {
+      "max_byte_index": 32,
+      "min_digit": -4,
+      "max_digit": 4,
+      "top_window_nonzero": 13733
+    },
+    "4": {
+      "max_byte_index": 32,
+      "min_digit": -8,
+      "max_digit": 8,
+      "top_window_nonzero": 17865
+    },
+    "5": {
+      "max_byte_index": 32,
+      "min_digit": -16,
+      "max_digit": 16,
+      "top_window_nonzero": 13733
+    },
+    "6": {
+      "max_byte_index": 32,
+      "min_digit": -32,
+      "max_digit": 32,
+      "top_window_nonzero": 17865
+    }
+  },
+  "review": {
+    "canonical_scalars_validated_before_recoding": true,
+    "single_scalar_dispatch_unchanged": true,
+    "msm_public_variable_time_contract_documented": true,
+    "scalar_dependent_table_indexes_confined_to_msm": true,
+    "bounds": "33-byte padded scalar; wNAF digits[0..255] and odd-multiple table[0..3]; Booth bucket magnitudes <=32, fitting [0..32].",
+    "booth_proof": "d_k = u_k - B*h_k + h_(k-1), where h_k is u_k's high bit, h_-1=0. Summing d_k*B^k telescopes to n because the padded top h_k is zero.",
+    "timing_limit": "This is a source-level contract check, not a formal or empirical constant-time proof of the dependency or compiler output. Public point decoding shortcuts do not branch on secret scalar data."
+  },
+  "findings": []
+}

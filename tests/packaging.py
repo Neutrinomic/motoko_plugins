@@ -22,10 +22,11 @@ PACKAGES = ROOT / "dist"
 MOC = MOTOKO_ROOT / "bin/moc"
 
 
-def compile_program(source, output, packages=(), error=None):
+def compile_program(source, output, packages=(), error=None, arguments=()):
     command = [str(MOC), "-wasi-system-api"]
     for package in packages:
         command.extend(["--plugin", str(package)])
+    command.extend(str(argument) for argument in arguments)
     command.extend([str(source), "-o", str(output)])
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     if error is None:
@@ -117,6 +118,43 @@ def check_compatibility(work, source):
     assert "unsupported compute plugin" not in diagnostic, diagnostic
 
 
+def check_crypto_packages(work):
+    # Each public primitive must load independently, and its interpreter must
+    # remain usable without the canister's Wasm kernel being present.
+    probes = {
+        "blake3": ("BLAKE3", 'assert Crypto.digest("").size() == 32;'),
+        "sha512": ("SHA512", 'assert Crypto.digest("").size() == 64;'),
+        "ripemd160": ("RIPEMD160", 'assert Crypto.digest("").size() == 20;'),
+        "hmac-sha2": ("HMAC", 'assert Crypto.sha256("key", "").size() == 32;'),
+        "secp256k1": ("Secp256k1", 'assert Crypto.derivePublicKey("") == #err(#invalidSecretKey);'),
+        "p256": ("P256", 'assert Crypto.derivePublicKey("") == #err(#invalidSecretKey);'),
+        "base58": ("Base58", 'assert Crypto.encode("\\00") == "1";'),
+        "bech32": ("Bech32", 'assert Crypto.encode("a", "", #bech32) == #ok("a12uel5l");'),
+        "bls12-381": ("BLS12381", 'assert Crypto.validateG1(Crypto.g1Generator) == #ok(Crypto.g1Generator);'),
+    }
+    arguments = ["--package", "fast", ROOT / "packages/fast/src"]
+    for name, (module, expression) in probes.items():
+        source = work / f"{name}-public.mo"
+        source.write_text(f'import Crypto "mo:fast/{module}";\n{expression}\n')
+        package = work / f"{name}-standalone"
+        package.mkdir()
+        shutil.copyfile(PACKAGES / name / "plugin.cmxs", package / "plugin.cmxs")
+        for mode in [["--check"], ["-r"], ["-r", "-iR"]]:
+            result = subprocess.run(
+                [str(MOC), "--plugin", str(package), *map(str, arguments),
+                 *mode, str(source)], cwd=ROOT, capture_output=True, text=True,
+            )
+            assert result.returncode == 0, (name, mode, result.stderr)
+        compile_program(source, work / f"{name}-missing.wasm", [package],
+                        arguments=arguments, error="compute plugin")
+        shutil.copyfile(PACKAGES / name / "runtime.wasm", package / "runtime.wasm")
+        directory = compile_program(source, work / f"{name}-directory.wasm", [package],
+                                    arguments=arguments)
+        component = compile_program(source, work / f"{name}-component.wasm",
+                                    [package / "plugin.cmxs"], arguments=arguments)
+        assert directory == component, f"{name}: directory and component loading differ"
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="motoko-compute-packages-") as work:
         work = Path(work)
@@ -126,10 +164,11 @@ def main():
         used = work / "used.mo"
         used.write_text('import Prim "mo:⛔"; ignore Prim.sha256("abc");\n')
         plain = compile_program(empty, work / "plain.wasm")
-        packages = [PACKAGES / manifest.parent.name
-                    for manifest in sorted((ROOT / "plugins").glob("*/plugin.json"))]
+        manifests = sorted((ROOT / "plugins").glob("*/plugin.json"))
+        packages = [PACKAGES / manifest.parent.name for manifest in manifests]
         loaded = compile_program(empty, work / "loaded.wasm", packages)
         assert plain == loaded, "unused plugins changed the output module"
+        check_crypto_packages(work)
 
         # Typechecking and interpretation can load a compiler component alone.
         # An unused runtime is never opened; a used missing runtime is an error.

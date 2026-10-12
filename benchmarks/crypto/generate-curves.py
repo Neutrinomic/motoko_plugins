@@ -1,0 +1,503 @@
+#!/usr/bin/env python3
+"""Generate reproducible curve benchmarks with independent affine-Python fixtures.
+
+All cryptographic fixture arithmetic below uses Python integer modular arithmetic,
+independently of both native Rust implementations and the Motoko baselines.
+Generated canisters separate configure/run/bytesResult, so input preparation and
+output checks do not contaminate measured instructions or allocation.
+"""
+import argparse
+import hashlib
+import hmac
+import json
+from pathlib import Path
+
+
+SECRET = int('2a513914cd57984308a5bd998df04d3637128e6ea6f4906db67faec8f168abe2', 16)
+NONCE = int('145b46574475c9bd898c9a05e2ab6a5ceea7e0868b06b5d02192f5c7f6e19a2f', 16)
+MESSAGE = b'Motoko native crypto benchmark: independently checked full-width scalars.'
+DIGEST = hashlib.sha256(MESSAGE).digest()
+CURVES = {
+    'secp256k1': {
+        'p': 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f,
+        'a': 0, 'b': 7,
+        'n': 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141,
+        'g': (0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
+              0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8),
+        'module': 'Secp256k1', 'kind': 'secp256k1',
+    },
+    'p256': {
+        'p': 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff,
+        'a': -3,
+        'b': 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b,
+        'n': 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551,
+        'g': (0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296,
+              0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5),
+        'module': 'P256', 'kind': 'prime256v1',
+    },
+}
+BLS_P = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
+BLS_R = 52435875175126190479447740508185965837690552500527637822603658699938581184513
+G1 = (
+    3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507,
+    1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569,
+)
+G2 = (
+    (352701069587466618187139116011060144890029952792775240219908644239793785735715026873347600343865175952761926303160,
+     3059144344244213709971259814753781636986470325476647558659373206291635324768958432433509563104347017837885763365758),
+    (1985150602287291935568054521177171638300868978215655730859378665066344726373823718423869104263333984641494340347905,
+     927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582),
+)
+
+
+def ec_add(left, right, p, a=0):
+    if left is None:
+        return right
+    if right is None:
+        return left
+    x, y = left
+    u, v = right
+    if x == u and (y + v) % p == 0:
+        return None
+    slope = ((3*x*x+a) * pow(2*y, -1, p) if left == right
+             else (v-y) * pow(u-x, -1, p)) % p
+    xx = (slope*slope-x-u) % p
+    return xx, (slope*(x-xx)-y) % p
+
+
+def multiply(point, scalar, add):
+    result = None
+    while scalar:
+        if scalar & 1:
+            result = add(result, point)
+        point = add(point, point)
+        scalar >>= 1
+    return result
+
+
+def fp2_add(a, b):
+    return ((a[0]+b[0]) % BLS_P, (a[1]+b[1]) % BLS_P)
+
+
+def fp2_neg(a):
+    return (-a[0] % BLS_P, -a[1] % BLS_P)
+
+
+def fp2_mul(a, b):
+    return ((a[0]*b[0]-a[1]*b[1]) % BLS_P, (a[0]*b[1]+a[1]*b[0]) % BLS_P)
+
+
+def fp2_inv(a):
+    denominator = pow(a[0]*a[0]+a[1]*a[1], -1, BLS_P)
+    return (a[0]*denominator % BLS_P, -a[1]*denominator % BLS_P)
+
+
+def g2_add(left, right):
+    if left is None:
+        return right
+    if right is None:
+        return left
+    x, y = left
+    u, v = right
+    if x == u and fp2_add(y, v) == (0, 0):
+        return None
+    numerator, denominator = ((fp2_mul((3, 0), fp2_mul(x, x)), fp2_mul((2, 0), y))
+                              if left == right else (fp2_add(v, fp2_neg(y)), fp2_add(u, fp2_neg(x))))
+    slope = fp2_mul(numerator, fp2_inv(denominator))
+    xx = fp2_add(fp2_add(fp2_mul(slope, slope), fp2_neg(x)), fp2_neg(u))
+    return xx, fp2_add(fp2_mul(slope, fp2_add(x, fp2_neg(xx))), fp2_neg(y))
+
+
+def compressed(point, group=1):
+    if point is None:
+        return bytes([0xc0]) + bytes(47 if group == 1 else 95)
+    x, y = point
+    if group == 1:
+        raw = bytearray(x.to_bytes(48, 'big'))
+        sign = y > BLS_P//2
+    else:
+        raw = bytearray(x[1].to_bytes(48, 'big') + x[0].to_bytes(48, 'big'))
+        sign = y[1] > BLS_P//2 or (y[1] == 0 and y[0] > BLS_P//2)
+    raw[0] |= 0x80 | (0x20 if sign else 0)
+    return bytes(raw)
+
+
+def blob(data):
+    return '"' + ''.join('\\%02x' % x for x in data) + '"'
+
+
+def actor(imports, declarations, configure, operation, result, expected, helpers=''):
+    return f'''// Generated by benchmarks/crypto/generate-curves.py. Do not edit.
+import Prim "mo:prim";
+{imports}
+persistent actor {{
+  {helpers}
+  {declarations}
+  public func configure() : async () {{ {configure} }};
+  public func run() : async {{instructions : Nat64; allocated : Nat; reclaimed : Nat; outputSize : Nat}} {{
+    let allocation = Prim.rts_total_allocation();
+    let reclaimedBefore = Prim.rts_reclaimed();
+    let start = Prim.performanceCounter(0);
+    {operation}
+    let instructions = Prim.performanceCounter(0) - start;
+    let allocated = Prim.rts_total_allocation() - allocation;
+    let reclaimed = Prim.rts_reclaimed() - reclaimedBefore;
+    {{instructions; allocated; reclaimed; outputSize = {len(expected)}}}
+  }};
+  public query func bytesResult() : async Blob {{
+    let actual : Blob = {result};
+    assert actual == {blob(expected)};
+    actual
+  }};
+}}
+'''
+
+
+def curve_fixtures(curve):
+    p, a, n, g = (curve[key] for key in ('p', 'a', 'n', 'g'))
+    add = lambda x, y: ec_add(x, y, p, a)
+    public = multiply(g, SECRET, add)
+    assert (public[1]**2-public[0]**3-a*public[0]-curve['b']) % p == 0
+    r = multiply(g, NONCE, add)[0] % n
+    s = (int.from_bytes(DIGEST, 'big')+r*SECRET)*pow(NONCE, -1, n) % n
+    s = min(s, n-s)
+    w = pow(s, -1, n)
+    check = add(multiply(g, int.from_bytes(DIGEST, 'big')*w % n, add), multiply(public, r*w % n, add))
+    assert check[0] % n == r
+    encoded = bytes([2 | (public[1] & 1)]) + public[0].to_bytes(32, 'big')
+    return public, encoded, r, s
+
+
+def curve_cases():
+    for family, curve in CURVES.items():
+        public, encoded, r, s = curve_fixtures(curve)
+        signature = r.to_bytes(32, 'big') + s.to_bytes(32, 'big')
+        sec = blob(SECRET.to_bytes(32, 'big'))
+        digest, pk, sig = map(blob, (DIGEST, encoded, signature))
+        common = f'transient let secret : Blob = {sec}; transient let digest : Blob = {digest}; transient let publicKey : Blob = {pk}; transient let signature : Blob = {sig};'
+        fast_import = f'import C "mo:fast/{curve["module"]}";'
+        for baseline in (('ecdsa', 'bitcoin') if family == 'secp256k1' else ('ecdsa',)):
+            for op in ('public_key', 'verify'):
+                comparison = f'{family}_{op}_{baseline}'
+                notes = ('Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; '
+                         'baseline key/curve setup and SEC1 output encoding are outside measurement.' if op == 'public_key' else
+                         'Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; '
+                         'baseline key/signature decoding is outside measurement.')
+                if baseline == 'bitcoin' and op == 'verify':
+                    notes += ' Both sides include SHA-256 prehashing of the same message.'
+                fast_op = ('let #ok(value) = C.publicKey(secret, true) else Prim.trap("native public key"); output := value;'
+                           if op == 'public_key' else
+                           'let #ok(value) = C.verifyPrehash(publicKey, '+('SHA256.digest(message)' if baseline == 'bitcoin' else 'digest')+', signature) else Prim.trap("native verify"); output := value;')
+                imports = fast_import + ('\nimport SHA256 "mo:fast/SHA256";' if baseline == 'bitcoin' and op == 'verify' else '')
+                decls = common + (f' transient let message : Blob = {blob(MESSAGE)};' if baseline == 'bitcoin' and op == 'verify' else '')
+                decls += ' transient var output : '+('Blob = "";' if op == 'public_key' else 'Bool = false;')
+                expected = encoded if op == 'public_key' else b'\x01'
+                result = 'output' if op == 'public_key' else 'if (output) "\\01" else "\\00"'
+                yield dict(name=comparison+'_fast', family=family, implementation='fast', comparison=comparison,
+                           plugins=[family]+(['sha256'] if baseline == 'bitcoin' and op == 'verify' else []),
+                           source_text=actor(imports, decls, '', fast_op, result, expected), expected_hex=expected.hex(), notes=notes)
+                if baseline == 'ecdsa':
+                    imports = 'import E "mo:ecdsa";'
+                    decls = f'transient var curve = E.Curve(#{curve["kind"]}); transient var privateKey = E.PrivateKey({SECRET}, curve); transient var publicKey = E.PublicKey({public[0]}, {public[1]}, curve); transient var signature = E.Signature({r}, {s}, curve); transient let digest : Blob = {digest};'
+                    configure = f'curve := E.Curve(#{curve["kind"]}); privateKey := E.PrivateKey({SECRET}, curve); publicKey := E.PublicKey({public[0]}, {public[1]}, curve); signature := E.Signature({r}, {s}, curve);'
+                    decls += ' transient var output'+(' : E.PublicKey = publicKey;' if op == 'public_key' else ' : Bool = false;')
+                    operation = 'output := privateKey.getPublicKey();' if op == 'public_key' else 'output := publicKey.verifyHashed(digest.vals(), signature);'
+                    result = 'Prim.arrayToBlob(output.toBytes(#compressed))' if op == 'public_key' else 'if (output) "\\01" else "\\00"'
+                elif op == 'public_key':
+                    imports = 'import J "mo:bitcoin/ec/Jacobi"; import Curves "mo:bitcoin/ec/Curves";'
+                    decls = f'transient let scalar : Nat = {SECRET}; transient var output = J.mulBase(0, Curves.secp256k1);'
+                    configure, operation, result = '', 'output := J.mulBase(scalar, Curves.secp256k1);', 'Prim.arrayToBlob(J.toBytes(output, true))'
+                else:
+                    imports = 'import E "mo:bitcoin/ecdsa/Ecdsa"; import PK "mo:bitcoin/ecdsa/Publickey"; import Curves "mo:bitcoin/ec/Curves";'
+                    decls = f'transient let signature = {{r : Nat = {r}; s : Nat = {s}}}; transient let message = Prim.blobToArray({blob(MESSAGE)}); transient var publicKey : ?E.PublicKey = null; transient var output = false;'
+                    configure = f'let #ok(key) = PK.decode(#sec1(Prim.blobToArray({pk}), Curves.secp256k1)) else Prim.trap("baseline key"); publicKey := ?key;'
+                    operation = 'let ?key = publicKey else Prim.trap("configure first"); output := E.verify(signature, key, message);'
+                    result = 'if (output) "\\01" else "\\00"'
+                yield dict(name=comparison+'_'+baseline, family=family, implementation=baseline, comparison=comparison,
+                           plugins=[], source_text=actor(imports, decls, configure, operation, result, expected), expected_hex=expected.hex(), notes=notes)
+
+
+def rfc6979_nonce(secret, digest, order):
+    """RFC 6979 section 3.2, SHA-256 and a 256-bit group order."""
+    material = secret.to_bytes(32, 'big') + (int.from_bytes(digest, 'big') % order).to_bytes(32, 'big')
+    key, value = bytes(32), bytes([1])*32
+    mac = lambda k, data: hmac.new(k, data, hashlib.sha256).digest()
+    key = mac(key, value+b'\x00'+material)
+    value = mac(key, value)
+    key = mac(key, value+b'\x01'+material)
+    value = mac(key, value)
+    while True:
+        value = mac(key, value)
+        candidate = int.from_bytes(value, 'big')
+        if 0 < candidate < order:
+            return candidate
+        key = mac(key, value+b'\x00')
+        value = mac(key, value)
+
+
+def signing_cases():
+    for family, curve in CURVES.items():
+        n = curve['n']
+        nonce = rfc6979_nonce(SECRET, DIGEST, n)
+        add = lambda x, y: ec_add(x, y, curve['p'], curve['a'])
+        r = multiply(curve['g'], nonce, add)[0] % n
+        s = (int.from_bytes(DIGEST, 'big')+r*SECRET)*pow(nonce, -1, n) % n
+        if family == 'secp256k1':
+            s = min(s, n-s)
+        expected = r.to_bytes(32, 'big')+s.to_bytes(32, 'big')
+        imports = f'import C "mo:fast/{curve["module"]}";'
+        decls = f'transient let secret : Blob = {blob(SECRET.to_bytes(32, "big"))}; transient let digest : Blob = {blob(DIGEST)}; transient var output : Blob = "";'
+        operation = 'let #ok(value) = C.signPrehash(secret, digest) else Prim.trap("native sign"); output := value;'
+        yield dict(name=family+'_sign_rfc6979_fast', family=family, implementation='fast', comparison=family+'_sign_rfc6979', plugins=[family],
+                   source_text=actor(imports, decls, '', operation, 'output', expected), expected_hex=expected.hex(), benchmark_kind='absolute-only',
+                   notes='Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.')
+    # Official BIP340 test vector 1 uses full-width key, nonce and message.
+    # https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv
+    secret = bytes.fromhex('b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef')
+    public = bytes.fromhex('dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659')
+    aux = bytes(31)+b'\x01'
+    message = bytes.fromhex('243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89')
+    signature = bytes.fromhex('6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a')
+    curve = CURVES['secp256k1']
+    add = lambda x, y: ec_add(x, y, curve['p'])
+    point = multiply(curve['g'], int.from_bytes(secret, 'big'), add)
+    assert point[0].to_bytes(32, 'big') == public
+    if point[1] & 1:
+        point = point[0], -point[1] % curve['p']
+    tag = hashlib.sha256(b'BIP0340/challenge').digest()
+    challenge = int.from_bytes(hashlib.sha256(tag+tag+signature[:32]+public+message).digest(), 'big') % curve['n']
+    recovered = add(multiply(curve['g'], int.from_bytes(signature[32:], 'big'), add), multiply(point, (-challenge) % curve['n'], add))
+    assert recovered[0].to_bytes(32, 'big') == signature[:32] and recovered[1] % 2 == 0
+    decls = f'transient let secret : Blob = {blob(secret)}; transient let publicKey : Blob = {blob(public)}; transient let aux : Blob = {blob(aux)}; transient let message : Blob = {blob(message)}; transient let signature : Blob = {blob(signature)};'
+    for op in ('sign', 'verify'):
+        expected = signature if op == 'sign' else b'\x01'
+        operation = ('let #ok(value) = C.schnorrSign(secret, message, aux) else Prim.trap("native Schnorr"); output := value;' if op == 'sign' else
+                     'let #ok(value) = C.schnorrVerify(publicKey, message, signature) else Prim.trap("native Schnorr"); output := value;')
+        extra = 'transient var output : Blob = "";' if op == 'sign' else 'transient var output : Bool = false;'
+        result = 'output' if op == 'sign' else 'if (output) "\\01" else "\\00"'
+        yield dict(name='secp256k1_schnorr_'+op+'_fast', family='secp256k1', implementation='fast', comparison='secp256k1_schnorr_'+op,
+                   plugins=['secp256k1'], source_text=actor('import C "mo:fast/Secp256k1";', decls+extra, '', operation, result, expected),
+                   expected_hex=expected.hex(), benchmark_kind='absolute-only',
+                   fixture_provenance='Official BIP340 test vector 1: https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv',
+                   notes='Absolute-only BIP340 Schnorr; bitcoin 0.2.1 does not implement Schnorr. Full-width official secret key and message; explicit auxiliary randomness.')
+
+
+def bls_profile_cases():
+    # Published independent vectors, copied as immutable benchmark fixtures.
+    fixtures = {
+        'IC': (
+            '814c0e6ec71fab583b08bd81373c255c3c371b2e84863c98a4f1e08b74235d14fb5d9c0cd546d9685f913a0c0b2cc5341583bf4b4392e467db96d65b9bb4cb717112f8472e0d5a4d14505ffd7484b01291091c5f87b98883463f98091a0baaae',
+            '0d69632d73746174652d726f6f74e6c01e909b4923345ce5970962bcfe3004bfd8474a21dae28f50692502f46d90',
+            'ace9fcdd9bc977e05d6328f889dc4e7c99114c737a494653cb27a1f55c06f4555e0f160980af5ead098acc195010b2f7',
+            'ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs'),
+        'Ethereum': (
+            'b53d21a4cfd562c469cc81514d4ce5a6b577d8403d32a394dc265dd190b47fa9f829fdd7963afdf972e5e77854051f6f',
+            'abababababababababababababababababababababababababababababababab',
+            'ae82747ddeefe4fd64cf9cedb9b04ae3e8a43420cd255e3c7cd06a8d88b7c7f8638543719981c5d16fa3527c468c25f0026704a6951bde891360c7e8d12ddee0559004ccdbe6046b55bae1b257ee97f7cdb955773d7cf29adf3ccbb9975e4eb9',
+            'Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2'),
+    }
+    for profile, (key_hex, message_hex, signature_hex, provenance) in fixtures.items():
+        key, message, signature = map(bytes.fromhex, (key_hex, message_hex, signature_hex))
+        for valid in (True, False):
+            msg = message if valid else bytes([message[0] ^ 1])+message[1:]
+            name = 'bls12_381_verify_'+profile.lower()+('_valid' if valid else '_wrong_message')
+            decls = f'transient let publicKey : Blob = {blob(key)}; transient let message : Blob = {blob(msg)}; transient let signature : Blob = {blob(signature)}; transient var output : Bool = false;'
+            operation = f'let #ok(value) = B.verify{profile}(publicKey, message, signature) else Prim.trap("native BLS profile"); output := value;'
+            expected = b'\x01' if valid else b'\x00'
+            yield dict(name=name+'_fast', family='bls12-381', implementation='fast', comparison=name, plugins=['bls12-381'],
+                       source_text=actor('import B "mo:fast/BLS12381";', decls, '', operation, 'if (output) "\\01" else "\\00"', expected),
+                       expected_hex=expected.hex(), benchmark_kind='absolute-only', fixture_provenance=provenance,
+                       notes=f'Absolute-only {profile} BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.'+(' Message first byte flipped from the valid fixture.' if not valid else ''))
+
+
+BLS_HELPERS = '''
+  func fieldBytes(n : Nat) : [Nat8] {
+    Prim.Array_tabulate<Nat8>(48, func(i) { Prim.natToNat8((n / (256 ** (47-i))) % 256) })
+  };
+  func encodeG1(point : B.G1Point) : Blob {
+    if (B.g1_is_inf(point)) return Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(48, func(i) { if (i == 0) 0xc0 else 0 }));
+    let (x, y) = B.g1_to_affine(point); let bytes = fieldBytes(x);
+    Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(48, func(i) { if (i == 0) bytes[i] | 0x80 | (if (y > B.P / 2) 0x20 else 0) else bytes[i] }))
+  };
+  func encodeG2(point : B.G2Point) : Blob {
+    if (B.g2_is_inf(point)) return Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(96, func(i) { if (i == 0) 0xc0 else 0 }));
+    let (x, y) = B.g2_to_affine(point); let hi = fieldBytes(x.1); let lo = fieldBytes(x.0);
+    let sign = y.1 > B.P / 2 or (y.1 == 0 and y.0 > B.P / 2);
+    Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(96, func(i) { if (i == 0) hi[i] | 0x80 | (if (sign) 0x20 else 0) else if (i < 48) hi[i] else lo[i-48] }))
+  };
+'''
+
+
+def bls_cases():
+    scalar = SECRET % BLS_R
+    for group, generator in ((1, G1), (2, G2)):
+        add = (lambda x, y: ec_add(x, y, BLS_P)) if group == 1 else g2_add
+        for operation in ('add', 'mul', 'msm_8'):
+            comparison = f'bls12_381_g{group}_{operation}'
+            multiplier = 2 if operation == 'add' else scalar if operation == 'mul' else sum(scalar+i for i in range(8)) % BLS_R
+            expected = compressed(multiply(generator, multiplier, add), group)
+            point = compressed(generator, group)
+            scalars = b''.join((scalar+i).to_bytes(32, 'big') for i in range(8))
+            native_args = ((blob(point)+', '+blob(point)) if operation == 'add' else
+                           (blob(point)+', '+blob(scalar.to_bytes(32, 'big'))) if operation == 'mul' else
+                           (blob(point*8)+', '+blob(scalars)))
+            function = 'Add' if operation == 'add' else 'Mul' if operation == 'mul' else 'Msm'
+            notes = ('Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). '
+                     'Native compressed public API includes point decoding, subgroup validation and encoding. '
+                     'Baseline operates on prepared trusted points and normalizes output outside measurement; '
+                     'therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.')
+            imports = 'import B "mo:fast/BLS12381";'
+            # Arguments are literal immutable blobs, instantiated before the timed call.
+            arg1, arg2 = native_args.split(', ')
+            decls = f'transient let input : Blob = {arg1}; transient let operand : Blob = {arg2}; transient var output : Blob = "";'
+            op = f'let #ok(value) = B.g{group}{function}(input, operand) else Prim.trap("native BLS"); output := value;'
+            yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison,
+                       plugins=['bls12-381'], source_text=actor(imports, decls, '', op, 'output', expected), expected_hex=expected.hex(), notes=notes)
+            imports = 'import B "mo:bls12-381";'
+            decls = f'transient let point = B.G{group}_GEN; transient let scalar : Nat = {scalar}; transient let points = Prim.Array_tabulate<B.G{group}Point>(8, func(_) {{ B.G{group}_GEN }}); transient let scalars = Prim.Array_tabulate<Nat>(8, func(i) {{ scalar+i }}); transient var output = B.G{group}_INF;'
+            call = f'B.g{group}_'+('add(point, point)' if operation == 'add' else 'mul(point, scalar)' if operation == 'mul' else 'msm(points, scalars)')
+            yield dict(name=comparison+'_bls12_381', family='bls12-381', implementation='bls12-381', comparison=comparison,
+                       plugins=[], source_text=actor(imports, decls, '', f'output := {call};', f'encodeG{group}(output)', expected, BLS_HELPERS), expected_hex=expected.hex(), notes=notes)
+    for valid in (True, False):
+        comparison = 'bls12_381_pairing_'+('identity' if valid else 'nonidentity')
+        pair1 = compressed(G1) + compressed(G2, 2)
+        negative = (G1[0], -G1[1] % BLS_P)
+        packed = pair1 + (compressed(negative) + compressed(G2, 2) if valid else b'')
+        expected = b'\x01' if valid else b'\x00'
+        notes = ('Pairing product e(G1,G2)*e(-G1,G2)=1.' if valid else 'Nondegenerate generator pairing e(G1,G2)!=1.')
+        notes += ' Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.'
+        decls = f'transient let pairs : Blob = {blob(packed)}; transient var output : Bool = false;'
+        operation = 'let #ok(value) = B.pairingCheck(pairs) else Prim.trap("native pairing"); output := value;'
+        result = 'if (output) "\\01" else "\\00"'
+        yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison, plugins=['bls12-381'],
+                   source_text=actor('import B "mo:fast/BLS12381";', decls, '', operation, result, expected), expected_hex=expected.hex(), notes=notes)
+        decls = 'transient let pairs = [(B.G1_GEN, B.G2_GEN)'+(', (B.g1_neg(B.G1_GEN), B.G2_GEN)' if valid else '')+']; transient var output : Bool = false;'
+        yield dict(name=comparison+'_bls12_381', family='bls12-381', implementation='bls12-381', comparison=comparison, plugins=[],
+                   source_text=actor('import B "mo:bls12-381";', decls, '', 'output := B.pairing_check(pairs);', result, expected), expected_hex=expected.hex(), notes=notes)
+
+
+def motoko_point(point, group):
+    x, y = point
+    if group == 1:
+        return f'{{x : Nat = {x}; y : Nat = {y}; z : Nat = 1}}'
+    return f'{{x : (Nat, Nat) = ({x[0]}, {x[1]}); y : (Nat, Nat) = ({y[0]}, {y[1]}); z : (Nat, Nat) = (1, 0)}}'
+
+
+def bls_distinct_msm_cases():
+    for group, generator in ((1, G1), (2, G2)):
+        add = (lambda x, y: ec_add(x, y, BLS_P)) if group == 1 else g2_add
+        for size in (4, 16, 64, 128):
+            comparison = f'bls12_381_g{group}_msm_distinct_{size}'
+            points = [multiply(generator, i+1, add) for i in range(size)]
+            scalars = [int.from_bytes(hashlib.sha256(f'crypto benchmark MSM scalar {i}'.encode()).digest(), 'big') % BLS_R for i in range(size)]
+            multiplier = sum((i+1)*value for i, value in enumerate(scalars)) % BLS_R
+            expected = compressed(multiply(generator, multiplier, add), group)
+            packed_points = b''.join(compressed(point, group) for point in points)
+            packed_scalars = b''.join(scalar.to_bytes(32, 'big') for scalar in scalars)
+            notes = (f'MSM of {size} distinct points (i+1)G and independently SHA256-derived canonical scalars. '
+                     'Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.')
+            decls = f'transient let points : Blob = {blob(packed_points)}; transient let scalars : Blob = {blob(packed_scalars)}; transient var output : Blob = "";'
+            operation = f'let #ok(value) = B.g{group}Msm(points, scalars) else Prim.trap("native MSM"); output := value;'
+            yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison, plugins=['bls12-381'],
+                       source_text=actor('import B "mo:fast/BLS12381";', decls, '', operation, 'output', expected), expected_hex=expected.hex(),
+                       benchmark_kind='paired', notes=notes)
+            decls = f'transient let points : [B.G{group}Point] = ['+', '.join(motoko_point(point, group) for point in points)+'];'
+            decls += ' transient let scalars : [Nat] = ['+', '.join(map(str, scalars))+f']; transient var output = B.G{group}_INF;'
+            operation = f'output := B.g{group}_msm(points, scalars);'
+            yield dict(name=comparison+'_bls12_381', family='bls12-381', implementation='bls12-381', comparison=comparison, plugins=[],
+                       source_text=actor('import B "mo:bls12-381";', decls, '', operation, f'encodeG{group}(output)', expected, BLS_HELPERS),
+                       expected_hex=expected.hex(), notes=notes, benchmark_kind='paired')
+
+
+def bls_validated_add_cases():
+    for group, generator in ((1, G1), (2, G2)):
+        add = (lambda x, y: ec_add(x, y, BLS_P)) if group == 1 else g2_add
+        comparison = f'bls12_381_g{group}_add_validated'
+        expected = compressed(add(generator, generator), group)
+        point = compressed(generator, group)
+        decls = f'transient let input : Blob = {blob(point)}; transient var output : Blob = "";'
+        op = f'let #ok(value) = B.g{group}Add(input, input) else Prim.trap("native add"); output := value;'
+        notes = 'Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement.'
+        if group == 2:
+            notes += ' Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.'
+        yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison, plugins=['bls12-381'],
+                   source_text=actor('import B "mo:fast/BLS12381";', decls, '', op, 'output', expected), expected_hex=expected.hex(), notes=notes)
+        if group == 1:
+            data = point
+            decode = 'let ?p = B.decompress_g1(input) else Prim.trap("baseline point"); assert B.g1_subgroup_check(p); p'
+        else:
+            # EIP2537 coordinates are c0||c1, 64-byte big-endian field elements.
+            data = b''.join(component.to_bytes(64, 'big') for coordinate in generator for component in coordinate)
+            decode = 'let ?p = B.decode_g2(input, 0) else Prim.trap("baseline point"); p'
+        decls = f'transient let input = Prim.blobToArray({blob(data)}); transient var output : Blob = "";'
+        helpers = BLS_HELPERS+f'\n func decode() : B.G{group}Point {{ {decode} }};'
+        op = f'let left = decode(); let right = decode(); output := encodeG{group}(B.g{group}_add(left, right));'
+        yield dict(name=comparison+'_bls12_381', family='bls12-381', implementation='bls12-381', comparison=comparison, plugins=[],
+                   source_text=actor('import B "mo:bls12-381";', decls, '', op, 'output', expected, helpers), expected_hex=expected.hex(), notes=notes)
+
+
+def bls_map_hash_cases():
+    fixtures = json.loads((Path(__file__).parent/'curve-cases/rfc9380-fields.json').read_text())
+    cofactors = {1: 0xd201000000010001,
+                 2: 0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551}
+    for group in (1, 2):
+        data = fixtures[str(group)]
+        vector = data['vector']
+        def field(value):
+            return int(value, 16) if group == 1 else tuple(int(part, 16) for part in value.split(','))
+        def point(value):
+            return field(value['x']), field(value['y'])
+        add = (lambda x, y: ec_add(x, y, BLS_P)) if group == 1 else g2_add
+        # The published P independently validates both field parsing and h_eff.
+        assert multiply(add(point(vector['Q0']), point(vector['Q1'])), cofactors[group], add) == point(vector['P'])
+        expected_map = compressed(multiply(point(vector['Q0']), cofactors[group], add), group)
+        u = field(vector['u'][0])
+        encoded_u = u.to_bytes(48, 'big') if group == 1 else b''.join(part.to_bytes(48, 'big') for part in u)
+        comparison = f'bls12_381_map_to_g{group}'
+        notes = 'Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.'
+        provenance = ('RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; '
+                      'h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 '+data['source_sha256'])
+        decls = f'transient let input : Blob = {blob(encoded_u)}; transient var output : Blob = "";'
+        op = f'let #ok(value) = B.mapToG{group}(input) else Prim.trap("native map"); output := value;'
+        yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison, plugins=['bls12-381'],
+                   source_text=actor('import B "mo:fast/BLS12381";', decls, '', op, 'output', expected_map), expected_hex=expected_map.hex(), notes=notes, fixture_provenance=provenance)
+        literal = str(u) if group == 1 else f'({u[0]}, {u[1]})'
+        decls = f'transient let input : '+('Nat' if group == 1 else '(Nat, Nat)')+f' = {literal}; transient var output = B.G{group}_INF;'
+        op = f'output := B.map_fp'+('' if group == 1 else '2')+f'_to_g{group}(input);'
+        yield dict(name=comparison+'_bls12_381', family='bls12-381', implementation='bls12-381', comparison=comparison, plugins=[],
+                   source_text=actor('import B "mo:bls12-381";', decls, '', op, f'encodeG{group}(output)', expected_map, BLS_HELPERS), expected_hex=expected_map.hex(), notes=notes, fixture_provenance=provenance)
+        expected_hash = compressed(point(vector['P']), group)
+        comparison = f'bls12_381_hash_to_g{group}'
+        decls = f'transient let message : Blob = {blob(vector["msg"].encode())}; transient let dst : Blob = {blob(data["dst"].encode())}; transient var output : Blob = "";'
+        op = f'let #ok(value) = B.hashToG{group}(message, dst) else Prim.trap("native hash-to-curve"); output := value;'
+        yield dict(name=comparison+'_fast', family='bls12-381', implementation='fast', comparison=comparison, plugins=['bls12-381'], benchmark_kind='absolute-only',
+                   source_text=actor('import B "mo:fast/BLS12381";', decls, '', op, 'output', expected_hash), expected_hex=expected_hash.hex(),
+                   notes='Absolute-only complete RFC9380 hash-to-curve for message abc, official test DST; Mops package has no whole-message hash-to-curve entry point.', fixture_provenance=provenance)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out', type=Path, default=Path(__file__).parent/'curve-cases')
+    args = parser.parse_args()
+    cases = []
+    assert (G1[1]**2-G1[0]**3-4) % BLS_P == 0
+    assert fp2_mul(G2[1], G2[1]) == fp2_add(fp2_mul(fp2_mul(G2[0], G2[0]), G2[0]), (4, 4))
+    assert multiply(G1, BLS_R, lambda x, y: ec_add(x, y, BLS_P)) is None
+    assert multiply(G2, BLS_R, g2_add) is None
+    for case in [*curve_cases(), *bls_cases(), *signing_cases(), *bls_profile_cases(), *bls_distinct_msm_cases(), *bls_validated_add_cases(), *bls_map_hash_cases()]:
+        directory = args.out/case['name']
+        directory.mkdir(parents=True, exist_ok=True)
+        source = directory/'main.mo'
+        source.write_text(case.pop('source_text'))
+        case['source'] = str(source.relative_to(args.out.parent))
+        case['operations_per_sample'] = 1
+        case.setdefault('fixture_provenance', 'generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.')
+        case['dependency_lock'] = 'dependencies/mops.lock'
+        cases.append(case)
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out/'cases.json').write_text(json.dumps(cases, indent=2)+'\n')
+    print(f'Generated {len(cases)} curve cases in {args.out}')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,95 @@
+{
+  "status": "passed_no_unresolved_findings",
+  "scope": [
+    "native Rust byte ABI",
+    "portable Num OCaml reference",
+    "compiler code generation and result tagging",
+    "mo:fast/BLS12381 IC and Ethereum profiles"
+  ],
+  "verified_counts": {
+    "independent_native_primitive_cases": 206,
+    "public_motoko_primitive_assertions": 206,
+    "public_motoko_profile_assertions": 24,
+    "execution_paths": [
+      "native",
+      "moc interpreter",
+      "compiled validated memory64 Wasm"
+    ],
+    "public_motoko_total_assertions_per_backend": 230
+  },
+  "evidence": "logs/all-evidence.json",
+  "findings": [
+    {
+      "id": "BLS-AUDIT-001",
+      "severity": "low",
+      "status": "resolved",
+      "detected_by": "independent audit",
+      "issue": "MSM API documentation claimed all points and scalars were validated before computation; native implementation validates and computes sequentially.",
+      "resolution": "Documentation now states packed sizes are checked before computation. Invalid inputs still return a typed error and leave ABI output unchanged.",
+      "verification": "source review and guarded error-output corpus"
+    },
+    {
+      "id": "BLS-AUDIT-002",
+      "severity": "medium",
+      "status": "resolved",
+      "detected_by": "implementation runtime agent, independently verified here",
+      "issue": "Upstream zkcrypto 0.8.0 maps Fp2(0,0) to infinity instead of the RFC9380 image.",
+      "resolution": "A shared internal G2 mapping helper handles exact field zero with the independently derived pre-cofactor curve constant; both mapToG2 and hashToG2 use the helper and apply the standard cofactor clearing. Caller-supplied points continue using checked decoding.",
+      "verification": "py_ecc8 zero/unit/edge-map expectations plus all10 independently fetched RFC9380 hash vectors pass native, interpreter, and compiled Wasm"
+    },
+    {
+      "id": "BLS-AUDIT-003",
+      "severity": "low",
+      "status": "resolved",
+      "detected_by": "implementation reference audit, independently verified here",
+      "issue": "Initial portable reference differed from native result error precedence for malformed MSM terms and infinity keys paired with malformed signatures.",
+      "resolution": "Reference now follows native left-to-right point/scalar parsing and validates signature encoding before rejecting identity.",
+      "verification": "msm-precedence-g1/g2 and infinity-key-malformed-sig-ic/eth fixtures pass all three execution paths"
+    },
+    {
+      "id": "BLS-AUDIT-004",
+      "severity": "low",
+      "status": "resolved",
+      "detected_by": "implementation reference audit, independently verified here",
+      "issue": "A zero-length caller DST conflicts with RFC9380 section3.1.",
+      "resolution": "Both public hash-to-curve primitives return invalidArgument for empty DST; oversized tags normalize with SHA256.",
+      "verification": "empty-dst-g1/g2 and oversize-dst-g1/g2 fixtures pass all three execution paths"
+    },
+    {
+      "id": "BLS-AUDIT-005",
+      "severity": "medium",
+      "status": "resolved",
+      "detected_by": "implementation integration, independently verified here",
+      "issue": "The compiler host does not export additional Zarith primitives required by the initial reference plugin.",
+      "resolution": "A private Num.Big_int arithmetic adapter uses the host already-linked primitives. No subprocess/native crypto bridge or host compiler changes are required.",
+      "verification": "actual moc -r execution of all160 primitive and24 profile assertions"
+    },
+    {
+      "id": "BLS-AUDIT-006",
+      "severity": "informational",
+      "status": "resolved",
+      "detected_by": "independent optimization audit",
+      "issue": "Pippenger MSM uses scalar-dependent bucket indices and branches, unlike the original straightforward kernel. It adds a bounded decoded-input vector and fixed32-bucket stack array.",
+      "resolution": "Final promoted API and runtime headers explicitly document variable-time MSM for public scalars and bounded decoded-input scratch. Count is capped128 and input point/scalar errors preserve left-to-right ordering.",
+      "verification": "46 independently generated py_ecc fixtures pass final native, actual moc interpreter, and compiled validated Wasm across3/4/5,15/16/17,63/64/65,127/128 with full-width scalars and identity/repeated/inverse/distinct points. Final shared build provenance matches all28 recorded plugin source entries and both artifacts."
+    }
+  ],
+  "inspection": {
+    "canonical_decoding": "Native G1/G2 from_compressed and portable decoder enforce compressed flags, canonical coordinates, curve membership, and prime-order subgroups; canonical infinity is accepted only by group operations.",
+    "scalars_and_fields": "Big-endian scalar < r and field components < p; scalar0 valid in raw group multiplication; Fp2 map bytes real then imaginary while compressed G2 encodes imaginary x then real.",
+    "ciphersuites": {
+      "IC": "BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_",
+      "Ethereum": "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_",
+      "Ethereum_PoP": "BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_"
+    },
+    "aggregate_safety": "IC rejects duplicate messages. Ethereum aggregate methods verify each key proof on every call; wrong domains, mismatched proofs, and a concrete rogue-key attack are rejected. All batch lengths must match, raw cap128, general aggregate cap127.",
+    "memory_and_codegen": "No retained input pointer or native cryptographic state found. All input references are borrowed only within a synchronous call. Scratch allocations use compiler-owned managed blobs without a GC safepoint. Output allocations have fixed48/96/1-byte sizes; status mapping covers codes1..10 and typed boolean/blob results. Native guard bytes and error-output immutability pass, while compiled maximum batches execute successfully.",
+    "argument_evaluation": "Compiler getters read already evaluated arguments; a side-effecting public g1Add call confirms each argument is evaluated once.",
+    "msm_optimization": "Reviewed 2/3/4/5-bit Pippenger windows, max32 buckets, 33-byte little-endian scalar padding, and canonical255-bit scalar bound. The highest scalar read is padded index32; digits remain within the active bucket slice. Scratch contains owned decoded points and scalars and does not retain input pointers. Raw MSM is variable-time and intended only for public scalars."
+  },
+  "limits": [
+    "Finite regression corpus and source review, not formal verification or third-party security certification.",
+    "Raw unsafe ABI assumes compiler-supplied valid pointers and advertised buffer sizes; malformed byte contents are tested, arbitrary invalid host pointers are outside that contract.",
+    "Audit does not claim exhaustive timing analysis or cover unavailable BLS signing/threshold protocols; this implementation exposes group primitives and verification profiles."
+  ]
+}

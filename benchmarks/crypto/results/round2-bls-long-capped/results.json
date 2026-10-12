@@ -1,0 +1,166 @@
+{
+  "stage": "round2-bls-long-capped",
+  "expected_case_count": 3,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:18:46.374Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "312c01cb498e75c3588b7ba6c1f8716af03114cc68e1d5851f7866155c199e3e",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "api_function": "aggregateVerifyEthereum",
+      "benchmark_kind": "absolute-only",
+      "comparison": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes4096",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "Ethereum py_ecc 8.0.0 SkToPk/PopProve/PopVerify/Sign/Aggregate/AggregateVerify. Deterministic key seeds, proofs, signatures, message recipe and SHA256 digests retained in round2/api-curves/bls-long-message/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes4096_fast",
+      "notes": "16 distinct full-width-scalar keys and valid PoPs; each message is 4096 bytes. Messages share the first 4095 bytes and differ only in the final byte (two-byte big-endian index suffix). configure builds all messages outside timing. Complete aggregateVerifyEthereum, including PoPs, message scanning/hash-to-curve and pairing, is measured.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-long-message/cases/api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes4096_fast/main.mo",
+      "returncode": 0,
+      "source_sha256": "1c42998054983a44c88c9e52b8f6499b3bf57b429d450358f1fbd14a80fc4986",
+      "wasm": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes4096_fast/fast/main.wasm",
+      "wasm_sha256": "9ecaf855441ee7d8680779863bc652c452ea7b5784e615ea83611cdf115ce0dc",
+      "wasm_bytes": 812722,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7220929687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7220929687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7220929687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "api_function": "aggregateVerifyEthereum",
+      "benchmark_kind": "absolute-only",
+      "comparison": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes65536",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "Ethereum py_ecc 8.0.0 SkToPk/PopProve/PopVerify/Sign/Aggregate/AggregateVerify. Deterministic key seeds, proofs, signatures, message recipe and SHA256 digests retained in round2/api-curves/bls-long-message/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes65536_fast",
+      "notes": "16 distinct full-width-scalar keys and valid PoPs; each message is 65536 bytes. Messages share the first 65535 bytes and differ only in the final byte (two-byte big-endian index suffix). configure builds all messages outside timing. Complete aggregateVerifyEthereum, including PoPs, message scanning/hash-to-curve and pairing, is measured.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-long-message/cases/api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes65536_fast/main.mo",
+      "returncode": 0,
+      "source_sha256": "6f2f4daa4e4aaa02f7e00cba1ad6fb1979f6fe3040ee1e74d5614071144511ca",
+      "wasm": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes65536_fast/fast/main.wasm",
+      "wasm_sha256": "add899a5ab5d2c1a4bfbd9bd75cbd44dc0198b2fc63d34f429fa8205a38a7b18",
+      "wasm_bytes": 812722,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7295425687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7295425687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7295425687,
+          "allocated_bytes": 998912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "api_function": "aggregateVerifyEthereum",
+      "benchmark_kind": "absolute-only",
+      "comparison": "api_bls12_381_aggregate_ethereum_long_repeated_n16_bytes65536",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "Ethereum py_ecc 8.0.0 SkToPk/PopProve/PopVerify/Sign/Aggregate/AggregateVerify. Deterministic key seeds, proofs, signatures, message recipe and SHA256 digests retained in round2/api-curves/bls-long-message/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_aggregate_ethereum_long_repeated_n16_bytes65536_fast",
+      "notes": "16 distinct full-width-scalar keys and valid PoPs; each message is 65536 bytes. All 16 separately allocated messages have identical content. configure builds all messages outside timing. Complete aggregateVerifyEthereum, including PoPs, message scanning/hash-to-curve and pairing, is measured.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-long-message/cases/api_bls12_381_aggregate_ethereum_long_repeated_n16_bytes65536_fast/main.mo",
+      "returncode": 0,
+      "source_sha256": "112943f0e1d2bfcfb3c9693a84ae8a6b935a2ef48209cf2ba128b03ef0e06815",
+      "wasm": "api_bls12_381_aggregate_ethereum_long_repeated_n16_bytes65536_fast/fast/main.wasm",
+      "wasm_sha256": "e34d201f9da398f1f3b0a93fd591ab45f0801de1594774dab7360278abcdcb68",
+      "wasm_bytes": 812685,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6747644547,
+          "allocated_bytes": 704072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6747644547,
+          "allocated_bytes": 704072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6747644547,
+          "allocated_bytes": 704072,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

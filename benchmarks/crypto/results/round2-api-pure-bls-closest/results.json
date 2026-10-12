@@ -1,0 +1,114 @@
+{
+  "stage": "round2-api-pure-bls-closest",
+  "expected_case_count": 2,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:26:57.797Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "5fb62aa27755426964c284f2851fb2e1252e5542be6b4f1756556caf932f5149",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "api_function": "validateG2",
+      "benchmark_kind": "closest-different-wire",
+      "comparison": "round2_bls12_381_validate_g2_valid",
+      "expected_hex": "0095190c6b7bd37da5764c81e43aa0986aa2514fe39e089239789e6cd8c515cc785d6110c8656080c40a73555c559ac20f12bbdb441b0001211e36f12f6e585b4bc7775341f3c9b845ec4dcd314bd444feb94c9cbf57dfadec91e439b02c77211b",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 independently decodes selected compressed points, checks subgroup/recompression, converts affine coordinates to EIP-2537 form and checks the same aggregate result. Retained inputs/provenance in round2/api-curves/closest/.",
+      "implementation": "mops",
+      "matching_plugin_case": "round2_bls12_381_validate_g2_valid",
+      "name": "closest_bls12_381_validate_g2_mops",
+      "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+      "operations_per_sample": 1,
+      "plugins": [],
+      "source": "round2/api-curves/closest/cases/closest_bls12_381_validate_g2_mops/main.mo",
+      "returncode": 0,
+      "source_sha256": "152c99237513ed7277fda871346154221e9f003c22b5dcf7230481289ce70640",
+      "wasm": "closest_bls12_381_validate_g2_mops/mops/main.wasm",
+      "wasm_sha256": "9d1f0462de1ad9c6f99d70aa47a697887e6543919e5072d0f36faf6dad27fe4d",
+      "wasm_bytes": 259097,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 82316657,
+          "allocated_bytes": 3492640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "7b565e52f9c8383f548fa1d8038c8fe4adf1c5d50235404fae0015091430b010",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 82316657,
+          "allocated_bytes": 3492640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "7b565e52f9c8383f548fa1d8038c8fe4adf1c5d50235404fae0015091430b010",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 82316657,
+          "allocated_bytes": 3492640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "7b565e52f9c8383f548fa1d8038c8fe4adf1c5d50235404fae0015091430b010",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "api_function": "g2Aggregate",
+      "benchmark_kind": "closest-different-wire",
+      "comparison": "api_bls12_381_g2_aggregate_n4",
+      "expected_hex": "00a6e5b7ab41f60bf501763e34cb890ef206aa542db65df6f83288ae78af1e611b88a3e5649251092ee0299538151be1f20534e02efd679b70f2b94cfb3f44e94e70fe914d9676ae63c98f5d19653ffe1b36d293784e017c25b1d12a3966853e30",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 independently decodes selected compressed points, checks subgroup/recompression, converts affine coordinates to EIP-2537 form and checks the same aggregate result. Retained inputs/provenance in round2/api-curves/closest/.",
+      "implementation": "mops",
+      "matching_plugin_case": "api_bls12_381_g2_aggregate_n4_fast",
+      "name": "closest_bls12_381_g2_aggregate_n4_mops",
+      "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+      "operations_per_sample": 1,
+      "plugins": [],
+      "source": "round2/api-curves/closest/cases/closest_bls12_381_g2_aggregate_n4_mops/main.mo",
+      "returncode": 0,
+      "source_sha256": "d9ecf4475368925231647d9be05d841ceb596a50e954fcefbf1dc2e3b8492595",
+      "wasm": "closest_bls12_381_g2_aggregate_n4_mops/mops/main.wasm",
+      "wasm_sha256": "d0da48007458ca0bf72f6b1bf6b0689cd6ce3ef270245f7b10cd5703f4137e43",
+      "wasm_bytes": 260254,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 329778612,
+          "allocated_bytes": 14141336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "076dfda99f92d0303f5b7d813f819ecfa2a9079b70e7b836acad0bdabc5e521c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 329778612,
+          "allocated_bytes": 14141336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "076dfda99f92d0303f5b7d813f819ecfa2a9079b70e7b836acad0bdabc5e521c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 329778612,
+          "allocated_bytes": 14141336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "076dfda99f92d0303f5b7d813f819ecfa2a9079b70e7b836acad0bdabc5e521c",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

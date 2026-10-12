@@ -1,0 +1,2524 @@
+{
+  "stage": "round2-bech32-baseline",
+  "expected_case_count": 48,
+  "complete": true,
+  "recorded_utc": "2026-10-12T12:45:18.848Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "53792e138be63e104ccc4f133ac852b446ebbd1d97f013aa9984ee0efb5dc39b",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bech32-generic-bech32-encode-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-empty/main.mo",
+      "expected_hex": "61313275656c356c",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "empty",
+      "encoding": "bech32",
+      "hrp_chars": 1,
+      "data_groups": 0,
+      "address_chars": 8,
+      "returncode": 0,
+      "source_sha256": "d3b3b7fced6b150eea2a0ff81d8113928c2fdadde1c774f5b7cf299d88ceec29",
+      "wasm": "bech32-generic-bech32-encode-empty/native/main.wasm",
+      "wasm_sha256": "e1a5841b5dd2964d2dd95d82d63c8b3aaf0462fa3d1f81bdbcae486f30eb2ce1",
+      "wasm_bytes": 251042,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "6b9694e651b679ab0bfc6f4d150376141b497b15956724f7db410be5ed1a75f2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "6b9694e651b679ab0bfc6f4d150376141b497b15956724f7db410be5ed1a75f2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "6b9694e651b679ab0bfc6f4d150376141b497b15956724f7db410be5ed1a75f2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-empty/main.mo",
+      "expected_hex": "610000",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "empty",
+      "encoding": "bech32",
+      "hrp_chars": 1,
+      "data_groups": 0,
+      "address_chars": 8,
+      "returncode": 0,
+      "source_sha256": "57181511838da14c1233cb2fa035f8d327fdb91d6fd0401ec3ce93bf0b61a591",
+      "wasm": "bech32-generic-bech32-decode-empty/native/main.wasm",
+      "wasm_sha256": "5f8cdd5f5950524bf462abc50c82bc87c6aa27666e7ce07366c83b1a326b758d",
+      "wasm_bytes": 253498,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3099,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "ea6fde9e840d240a4f5df3d85b5ad6183060057bd18dff9c453ba4061117f83b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3099,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "ea6fde9e840d240a4f5df3d85b5ad6183060057bd18dff9c453ba4061117f83b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3099,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "ea6fde9e840d240a4f5df3d85b5ad6183060057bd18dff9c453ba4061117f83b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-small3",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-small3/main.mo",
+      "expected_hex": "62633171706c64777666756c",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "small3",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 3,
+      "address_chars": 12,
+      "returncode": 0,
+      "source_sha256": "0dc40e625c4bca4fbfc2eb9036ad35c5ee9d260a167cbfed0857ac4453dbb4da",
+      "wasm": "bech32-generic-bech32-encode-small3/native/main.wasm",
+      "wasm_sha256": "01bcefd956a1d49c8106b629b54455d443cc7434e6e6a2d9c9d8450f77448644",
+      "wasm_bytes": 251135,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "468ed2d932b3948bb6e782d8eb7cba01f691328ce67781570ad426386d0ef9b6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "468ed2d932b3948bb6e782d8eb7cba01f691328ce67781570ad426386d0ef9b6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "468ed2d932b3948bb6e782d8eb7cba01f691328ce67781570ad426386d0ef9b6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-small3",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-small3/main.mo",
+      "expected_hex": "6263000000011f",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "small3",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 3,
+      "address_chars": 12,
+      "returncode": 0,
+      "source_sha256": "5af22cc8bceec13cbcaafe095e56163ba2a7c4fdbbcfcd509f1142e4e974f5a9",
+      "wasm": "bech32-generic-bech32-decode-small3/native/main.wasm",
+      "wasm_sha256": "8a0297c6bbe8186635b49d9dcb68e5bbff0f5b8ffa5f6a5b2afbe310b1079ba7",
+      "wasm_bytes": 253502,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3850,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "1ddb57b8f9ba5bcd680a3edaa97b979c08f095a94c1d279a0b930ab780d92f12",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3850,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "1ddb57b8f9ba5bcd680a3edaa97b979c08f095a94c1d279a0b930ab780d92f12",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3850,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "1ddb57b8f9ba5bcd680a3edaa97b979c08f095a94c1d279a0b930ab780d92f12",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-normal33",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-normal33/main.mo",
+      "expected_hex": "62633171707a7279397838676632747664773073336a6e35346b686365366d7561376c71653374703065",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "normal33",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 33,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "91a41cfaae889b44c3c9c9973858c06a45ef9b42597c987a98d521f6696383ef",
+      "wasm": "bech32-generic-bech32-encode-normal33/native/main.wasm",
+      "wasm_sha256": "e36dc19512d71a4e8e9d78241d2040bc0429dab7001b155fcbfefb1063a44149",
+      "wasm_bytes": 251165,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "504d8746e6225f72314b37cd3675ef42b91abdc93bf19ffc6db9c1562d4ce310",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "504d8746e6225f72314b37cd3675ef42b91abdc93bf19ffc6db9c1562d4ce310",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "504d8746e6225f72314b37cd3675ef42b91abdc93bf19ffc6db9c1562d4ce310",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-normal33",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-normal33/main.mo",
+      "expected_hex": "62630000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f00",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "normal33",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 33,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "4cafd229bc63755b6bc70e786bb1c3f3c5dbccd57e0c437e62432dce0cfbf97f",
+      "wasm": "bech32-generic-bech32-decode-normal33/native/main.wasm",
+      "wasm_sha256": "17dcf7d6d70b5443101b52b5e4bdb1469ca329f011ec0e1202ed2752d87a20a4",
+      "wasm_bytes": 253532,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8920,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "eaabc82dec34cf7eb400524768b2bd5f6adf4eef8eb27ef1f4917e49216c926f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8920,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "eaabc82dec34cf7eb400524768b2bd5f6adf4eef8eb27ef1f4917e49216c926f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8920,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "eaabc82dec34cf7eb400524768b2bd5f6adf4eef8eb27ef1f4917e49216c926f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-normal53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-normal53/main.mo",
+      "expected_hex": "626331723233636c7864356d7a6673683739766e367067306b6179746a657138773475723233636c7864356d7a6673683739766e36706730747539713067",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "normal53",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 53,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "34fc837fd7f762199b42c53d4a0aff662c584c310c1e2ad7e573b043b80c1e52",
+      "wasm": "bech32-generic-bech32-encode-normal53/native/main.wasm",
+      "wasm_sha256": "702ab2d0b24de3f15915ed591790401f93231f44815f41e4c0244f30a0fc1fd0",
+      "wasm_bytes": 251185,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "3794c031fb9bda4ca65adf844918aa9f1b8c0315f1a162eff4ade59e769ae36c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "3794c031fb9bda4ca65adf844918aa9f1b8c0315f1a162eff4ade59e769ae36c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "3794c031fb9bda4ca65adf844918aa9f1b8c0315f1a162eff4ade59e769ae36c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-normal53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-normal53/main.mo",
+      "expected_hex": "62630000030a11181f060d141b020910171e050c131a01080f161d040b121900070e151c030a11181f060d141b020910171e050c131a01080f",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "normal53",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 53,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "c9851aa4bd6c7c5f2f19c75d78b926e0d4b62068f7e040d86ac9fea39b5a631b",
+      "wasm": "bech32-generic-bech32-decode-normal53/native/main.wasm",
+      "wasm_sha256": "2dbeb8109272bb6f452b7ebf136a5b5ea34eaa576231f2d043f5b70afd72eb01",
+      "wasm_bytes": 253552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12300,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "eeae6186ea24324e3d7706dcdc296d16d652743d27baf2fb148514faf26d2afc",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12300,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "eeae6186ea24324e3d7706dcdc296d16d652743d27baf2fb148514faf26d2afc",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12300,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "eeae6186ea24324e3d7706dcdc296d16d652743d27baf2fb148514faf26d2afc",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-max90",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-max90/main.mo",
+      "expected_hex": "62633139736d783375386a61676e3766356c323471746b7076687a646372776579303639736d783375386a61676e3766356c323471746b7076687a646372776579303639736d783375386a61676e3766356c3234303568706e76",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "max90",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 81,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "4c754da15c92899c750ac1e53c7d8dcdc268a4321f6165111201d3a3258a5ad4",
+      "wasm": "bech32-generic-bech32-encode-max90/native/main.wasm",
+      "wasm_sha256": "20d4a25bacf97d09fcf9133622a4a612b145898605f513e8c49e67fbe44183a3",
+      "wasm_bytes": 251215,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "5f27ed37cf7db2d1ff80dad9984ceefba16a37f70592b2eab081cefc4db4a896",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "5f27ed37cf7db2d1ff80dad9984ceefba16a37f70592b2eab081cefc4db4a896",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "5f27ed37cf7db2d1ff80dad9984ceefba16a37f70592b2eab081cefc4db4a896",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-max90",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-max90/main.mo",
+      "expected_hex": "6263000005101b06111c07121d08131e09141f0a15000b16010c17020d18030e19040f1a05101b06111c07121d08131e09141f0a15000b16010c17020d18030e19040f1a05101b06111c07121d08131e09141f0a15",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "max90",
+      "encoding": "bech32",
+      "hrp_chars": 2,
+      "data_groups": 81,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "6cfe9fa8cac0be437c45484725ed93e7427814ddc8e34e1e12d2411a829f49a5",
+      "wasm": "bech32-generic-bech32-decode-max90/native/main.wasm",
+      "wasm_sha256": "ec860d5403f19bfeec74c78b546fe136691d30e69b0d5880b62a251c4e4567ce",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 17032,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "341785fa4f5bbe277284aa35d7b55301982b0410920c595c04aa4dadc4ac72ae",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 17032,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "341785fa4f5bbe277284aa35d7b55301982b0410920c595c04aa4dadc4ac72ae",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 17032,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "341785fa4f5bbe277284aa35d7b55301982b0410920c595c04aa4dadc4ac72ae",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-hrp83-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-hrp83-empty/main.mo",
+      "expected_hex": "616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616131377668666430",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "hrp83-empty",
+      "encoding": "bech32",
+      "hrp_chars": 83,
+      "data_groups": 0,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "8b1aac7b34be59f6120d042aee45e1f4c022ed4d3fe16895a8e1203f945cd1d0",
+      "wasm": "bech32-generic-bech32-encode-hrp83-empty/native/main.wasm",
+      "wasm_sha256": "a597edc05cb66c08a9254f2dae6931f4c151c13e6d07473f16d025dada446f5b",
+      "wasm_bytes": 251126,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "1153c00c561e1ee4f49ea11070085adf27ec435a9d1a578d5d1164bc17009b5f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "1153c00c561e1ee4f49ea11070085adf27ec435a9d1a578d5d1164bc17009b5f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "1153c00c561e1ee4f49ea11070085adf27ec435a9d1a578d5d1164bc17009b5f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-hrp83-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-hrp83-empty/main.mo",
+      "expected_hex": "61616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161610000",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "hrp83-empty",
+      "encoding": "bech32",
+      "hrp_chars": 83,
+      "data_groups": 0,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "3571a58ac830cf266e5cc9fb7df98209fd909c06089e3e24daa509cc5bc4756a",
+      "wasm": "bech32-generic-bech32-decode-hrp83-empty/native/main.wasm",
+      "wasm_sha256": "1284036558ff620e3c6887f7a28d0764ca36b4722cbcf811033035c009e20858",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 21077,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "dfadc922c285ca84e6c2455cdf0ed68af7482a52dbdcced2f8ebaf06295795b2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 21077,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "dfadc922c285ca84e6c2455cdf0ed68af7482a52dbdcced2f8ebaf06295795b2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 21077,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "dfadc922c285ca84e6c2455cdf0ed68af7482a52dbdcced2f8ebaf06295795b2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-encode-hrp1-groups82",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-encode-hrp1-groups82/main.mo",
+      "expected_hex": "613170776d67347a3075666b72736132687933377463396a6c7665786e716436383570776d67347a3075666b72736132687933377463396a6c7665786e716436383570776d67347a3075666b7273613268793337363035787378",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "hrp1-groups82",
+      "encoding": "bech32",
+      "hrp_chars": 1,
+      "data_groups": 82,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "447400cc01fca9e8fe04c64e3319b4b02a39df3d6368cb4fefe64221a67b0c82",
+      "wasm": "bech32-generic-bech32-encode-hrp1-groups82/native/main.wasm",
+      "wasm_sha256": "0a35599d2b626c7366485bcbdee4601d43801811789a9d6c4a212d4583222e8d",
+      "wasm_bytes": 251215,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "28c764bac0ea5b1859eb3baa829127e0f8140ce7e74b4104a801433ba5be6415",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "28c764bac0ea5b1859eb3baa829127e0f8140ce7e74b4104a801433ba5be6415",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "28c764bac0ea5b1859eb3baa829127e0f8140ce7e74b4104a801433ba5be6415",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32-decode-hrp1-groups82",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32-decode-hrp1-groups82/main.mo",
+      "expected_hex": "610000010e1b0815020f1c091603101d0a1704111e0b1805121f0c190613000d1a0714010e1b0815020f1c091603101d0a1704111e0b1805121f0c190613000d1a0714010e1b0815020f1c091603101d0a1704111e",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "hrp1-groups82",
+      "encoding": "bech32",
+      "hrp_chars": 1,
+      "data_groups": 82,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "fc18ad8950d3f005f950b74cb44dde4813780b88dfade1d834844746b49fb4a8",
+      "wasm": "bech32-generic-bech32-decode-hrp1-groups82/native/main.wasm",
+      "wasm_sha256": "ce13fbb2c7b94a6ee12e554e4cac3f3872a7831564fc1a7b6f7cb1bad5ca2dfc",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16957,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "62e4f81846e75b18c5cea4c86bdc48bd803c19e9350897af51e04fc6bf38f9e7",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 16957,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "62e4f81846e75b18c5cea4c86bdc48bd803c19e9350897af51e04fc6bf38f9e7",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 16957,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "62e4f81846e75b18c5cea4c86bdc48bd803c19e9350897af51e04fc6bf38f9e7",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-empty/main.mo",
+      "expected_hex": "61316c71666e3361",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "empty",
+      "encoding": "bech32m",
+      "hrp_chars": 1,
+      "data_groups": 0,
+      "address_chars": 8,
+      "returncode": 0,
+      "source_sha256": "ec1b2b0a839a5d9eacd14b0fdda9af7510a2f1dc51df95f1f39dc2584d139abc",
+      "wasm": "bech32-generic-bech32m-encode-empty/native/main.wasm",
+      "wasm_sha256": "36931382ba2de8fd8934b578f64120ccd142c582aacfc2491f2a52a4dcd34e7f",
+      "wasm_bytes": 251035,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "acd10bc61998885b38225c0863df7965b4504923e21ed5fd12c8f3c83d4cdf0c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "acd10bc61998885b38225c0863df7965b4504923e21ed5fd12c8f3c83d4cdf0c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1839,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "acd10bc61998885b38225c0863df7965b4504923e21ed5fd12c8f3c83d4cdf0c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-empty/main.mo",
+      "expected_hex": "610001",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "empty",
+      "encoding": "bech32m",
+      "hrp_chars": 1,
+      "data_groups": 0,
+      "address_chars": 8,
+      "returncode": 0,
+      "source_sha256": "e9e51f7a3109df09c89987c9dfcfb06919d1bf71aad7d4bfbf4e656f8ca7d3ca",
+      "wasm": "bech32-generic-bech32m-decode-empty/native/main.wasm",
+      "wasm_sha256": "e5723e5755c2b338cc4c41cef8720ee1d7a374166adf54bf5b0f144785fe16cd",
+      "wasm_bytes": 253498,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3102,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "b32fda8337e9a70666eb44a0e9bd3e5639aae28459d5f6b472cdd7a479b46c7a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3102,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "b32fda8337e9a70666eb44a0e9bd3e5639aae28459d5f6b472cdd7a479b46c7a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3102,
+          "allocated_bytes": 288,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "b32fda8337e9a70666eb44a0e9bd3e5639aae28459d5f6b472cdd7a479b46c7a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-small3",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-small3/main.mo",
+      "expected_hex": "62633171706c636a75396561",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "small3",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 3,
+      "address_chars": 12,
+      "returncode": 0,
+      "source_sha256": "aaeabd76b25257573177b4a8be215c6e064b7207a329668aae4a59a6666838ad",
+      "wasm": "bech32-generic-bech32m-encode-small3/native/main.wasm",
+      "wasm_sha256": "5316963b3678ef4c91c6624dd41110e4b7951cfa985a4ce06a85a48af27af3f7",
+      "wasm_bytes": 251128,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "c94d3d41af75b6e059b3219feb74c5e43e08f04c6e56f091def85d03bc6b233f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "c94d3d41af75b6e059b3219feb74c5e43e08f04c6e56f091def85d03bc6b233f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2426,
+          "allocated_bytes": 192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "c94d3d41af75b6e059b3219feb74c5e43e08f04c6e56f091def85d03bc6b233f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-small3",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-small3/main.mo",
+      "expected_hex": "6263000100011f",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "small3",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 3,
+      "address_chars": 12,
+      "returncode": 0,
+      "source_sha256": "776c6c90f1c5e19fe1bac883080262c6f9d4a665d923fa802ea002dc91fa0889",
+      "wasm": "bech32-generic-bech32m-decode-small3/native/main.wasm",
+      "wasm_sha256": "ef686ada3ea926e2197180960353e34b312c49e59c23a3308819c75940004daa",
+      "wasm_bytes": 253502,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3853,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "bcbc89030ac1a0d793a4d08dd1214967b8e2de00d380bc71dfb0265bbd28e288",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3853,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "bcbc89030ac1a0d793a4d08dd1214967b8e2de00d380bc71dfb0265bbd28e288",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3853,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 7,
+          "output_sha256": "bcbc89030ac1a0d793a4d08dd1214967b8e2de00d380bc71dfb0265bbd28e288",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-normal33",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-normal33/main.mo",
+      "expected_hex": "62633171707a7279397838676632747664773073336a6e35346b686365366d7561376c7176646d64326d",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "normal33",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 33,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "47df85b4d8dafd67d8dd7c772e14d29f6eeccba50056bffed2aa49fed96a669e",
+      "wasm": "bech32-generic-bech32m-encode-normal33/native/main.wasm",
+      "wasm_sha256": "d7173fa352b289b1f3afcc50a742cd85eff4cf7a4462e56b8ed2cc1cd684cbc6",
+      "wasm_bytes": 251158,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "b223872e914b509bb5b71711491979d24885338ec28117e7c71924deaa159304",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "b223872e914b509bb5b71711491979d24885338ec28117e7c71924deaa159304",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5846,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "b223872e914b509bb5b71711491979d24885338ec28117e7c71924deaa159304",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-normal33",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-normal33/main.mo",
+      "expected_hex": "62630001000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f00",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "normal33",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 33,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "fec025dde0a97d6594cf352d81d1e8002a3980b1e61054ba545afa6739497bc5",
+      "wasm": "bech32-generic-bech32m-decode-normal33/native/main.wasm",
+      "wasm_sha256": "48c7358d10b926758e2c7861864a317be8a3330bb7694f3092ffaf10ed572502",
+      "wasm_bytes": 253532,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8923,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "73a6d306d460cd5dca560cbf3e2133b5fbb47f593684a0b637aa8e8a9c32f9b2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8923,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "73a6d306d460cd5dca560cbf3e2133b5fbb47f593684a0b637aa8e8a9c32f9b2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8923,
+          "allocated_bytes": 328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 37,
+          "output_sha256": "73a6d306d460cd5dca560cbf3e2133b5fbb47f593684a0b637aa8e8a9c32f9b2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-normal53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-normal53/main.mo",
+      "expected_hex": "626331723233636c7864356d7a6673683739766e367067306b6179746a657138773475723233636c7864356d7a6673683739766e36706730377134763232",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "normal53",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 53,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "a2f3569a134949254a74d0b031a76712b81d39852e2420b1b85ea57d8184bdfe",
+      "wasm": "bech32-generic-bech32m-encode-normal53/native/main.wasm",
+      "wasm_sha256": "8f9674fd0fb7daaf5f900afde161fcf167a991d92c0c5f25fdca035fc0862b5f",
+      "wasm_bytes": 251178,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "8d75368aa749808c15351b6bfc7d56a4d5e9021e96813406ffad3fb39f31b145",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "8d75368aa749808c15351b6bfc7d56a4d5e9021e96813406ffad3fb39f31b145",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8126,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "8d75368aa749808c15351b6bfc7d56a4d5e9021e96813406ffad3fb39f31b145",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-normal53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-normal53/main.mo",
+      "expected_hex": "62630001030a11181f060d141b020910171e050c131a01080f161d040b121900070e151c030a11181f060d141b020910171e050c131a01080f",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "normal53",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 53,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "5e50c7ca496cbfc86e54d1fc847bb7757f2c6d29f20e2ebef197d815dec71192",
+      "wasm": "bech32-generic-bech32m-decode-normal53/native/main.wasm",
+      "wasm_sha256": "fbb10dabb2c43510a9951baba287298281e1f1d8462d1f7c8feb94bbd2d6dcc0",
+      "wasm_bytes": 253552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12303,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "396e1b999b0e0217ba932ef3481176df71f662ba920622eefb6eb9ae9aa6f5d8",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12303,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "396e1b999b0e0217ba932ef3481176df71f662ba920622eefb6eb9ae9aa6f5d8",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12303,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 57,
+          "output_sha256": "396e1b999b0e0217ba932ef3481176df71f662ba920622eefb6eb9ae9aa6f5d8",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-max90",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-max90/main.mo",
+      "expected_hex": "62633139736d783375386a61676e3766356c323471746b7076687a646372776579303639736d783375386a61676e3766356c323471746b7076687a646372776579303639736d783375386a61676e3766356c3234366738646b77",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "max90",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 81,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "f2919e62feea32fccd3df9060e965590f314c8becc454dbc51e7cfd236995e62",
+      "wasm": "bech32-generic-bech32m-encode-max90/native/main.wasm",
+      "wasm_sha256": "64b903e1cb1f92568f3b10d4d7426b22f5a97538f27dc2bdaf6fcac9fea22e57",
+      "wasm_bytes": 251208,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "4aa5d253a8818f7814f4dc7e2e8039311ede1bb55d7e45a93c52816e357380d0",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "4aa5d253a8818f7814f4dc7e2e8039311ede1bb55d7e45a93c52816e357380d0",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11318,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "4aa5d253a8818f7814f4dc7e2e8039311ede1bb55d7e45a93c52816e357380d0",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-max90",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-max90/main.mo",
+      "expected_hex": "6263000105101b06111c07121d08131e09141f0a15000b16010c17020d18030e19040f1a05101b06111c07121d08131e09141f0a15000b16010c17020d18030e19040f1a05101b06111c07121d08131e09141f0a15",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "max90",
+      "encoding": "bech32m",
+      "hrp_chars": 2,
+      "data_groups": 81,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "29c5cba78951401db7246a6d5b249864303eb3c849855ee71c3060cfdde927a4",
+      "wasm": "bech32-generic-bech32m-decode-max90/native/main.wasm",
+      "wasm_sha256": "d4f520f8f7ec95245d4f24bc4cb89508cce60eb3cee5079a957ae0ca1b1557aa",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 17035,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "d495dce6f3a72a11eb328112ce3ef915481c452352abdc76d421e3ab1c2f9661",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 17035,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "d495dce6f3a72a11eb328112ce3ef915481c452352abdc76d421e3ab1c2f9661",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 17035,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "d495dce6f3a72a11eb328112ce3ef915481c452352abdc76d421e3ab1c2f9661",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-hrp83-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-hrp83-empty/main.mo",
+      "expected_hex": "616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616131747338396764",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "hrp83-empty",
+      "encoding": "bech32m",
+      "hrp_chars": 83,
+      "data_groups": 0,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "c7358e0d561f2d8f538b2e9dbedc112c34bdfc45d85348bf6841f43fe2ae5db8",
+      "wasm": "bech32-generic-bech32m-encode-hrp83-empty/native/main.wasm",
+      "wasm_sha256": "02c868659b5f3a82ec35dbcd2c300c6b206618a8b57b0b88475816bb46a0cd6d",
+      "wasm_bytes": 251119,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "6d609fca990fcecb050bab525ccc95b592882f9e65b7f0bd287648be186a2917",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "6d609fca990fcecb050bab525ccc95b592882f9e65b7f0bd287648be186a2917",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19893,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "6d609fca990fcecb050bab525ccc95b592882f9e65b7f0bd287648be186a2917",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-hrp83-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-hrp83-empty/main.mo",
+      "expected_hex": "61616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161610001",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "hrp83-empty",
+      "encoding": "bech32m",
+      "hrp_chars": 83,
+      "data_groups": 0,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "30a2c2e8a61d718c4f692f6baa09245410f3d9abc4a5f6394e51831b68eac154",
+      "wasm": "bech32-generic-bech32m-decode-hrp83-empty/native/main.wasm",
+      "wasm_sha256": "6e7f1b25496df69b52b3dda625ec7eb1687f0b694088376e1e081ba84eb873ad",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 21080,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "9cd8a98ba4e6100816401fbd5683894b2fae7a6a07316d2846b7e713f277d53b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 21080,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "9cd8a98ba4e6100816401fbd5683894b2fae7a6a07316d2846b7e713f277d53b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 21080,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "9cd8a98ba4e6100816401fbd5683894b2fae7a6a07316d2846b7e713f277d53b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-encode-hrp1-groups82",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-encode-hrp1-groups82/main.mo",
+      "expected_hex": "613170776d67347a3075666b72736132687933377463396a6c7665786e716436383570776d67347a3075666b72736132687933377463396a6c7665786e716436383570776d67347a3075666b7273613268793337306e79323479",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "encode",
+      "shape": "hrp1-groups82",
+      "encoding": "bech32m",
+      "hrp_chars": 1,
+      "data_groups": 82,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "0745865ab2db7edb636922260e99f58c5df9859c079be00a628910ed7a4bf8af",
+      "wasm": "bech32-generic-bech32m-encode-hrp1-groups82/native/main.wasm",
+      "wasm_sha256": "2b5b684238a6c37956071ba5a006b0c08a9361718cb5203f0953082f30f4bec2",
+      "wasm_bytes": 251208,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "9471436b540524c7f28df2fb2f0d7e024009a03ffbc695a11036e49d5a6f0bac",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "9471436b540524c7f28df2fb2f0d7e024009a03ffbc695a11036e49d5a6f0bac",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11193,
+          "allocated_bytes": 272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 90,
+          "output_sha256": "9471436b540524c7f28df2fb2f0d7e024009a03ffbc695a11036e49d5a6f0bac",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-generic-bech32m-decode-hrp1-groups82",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-generic-bech32m-decode-hrp1-groups82/main.mo",
+      "expected_hex": "610001010e1b0815020f1c091603101d0a1704111e0b1805121f0c190613000d1a0714010e1b0815020f1c091603101d0a1704111e0b1805121f0c190613000d1a0714010e1b0815020f1c091603101d0a1704111e",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "decode",
+      "shape": "hrp1-groups82",
+      "encoding": "bech32m",
+      "hrp_chars": 1,
+      "data_groups": 82,
+      "address_chars": 90,
+      "returncode": 0,
+      "source_sha256": "56910771f170fe3e454063e320b1674bcba8882ff11c1599535077f0c32a1f40",
+      "wasm": "bech32-generic-bech32m-decode-hrp1-groups82/native/main.wasm",
+      "wasm_sha256": "1f9cddee30af6ecbfe98798c427f992034e2cbeb1c6cc28270ded0a7b43f7699",
+      "wasm_bytes": 253582,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16960,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "7d0a828a430bc6ab29633ede8838d90e2ba814d44f3afc8a2053563cd2b01847",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 16960,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "7d0a828a430bc6ab29633ede8838d90e2ba814d44f3afc8a2053563cd2b01847",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 16960,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 85,
+          "output_sha256": "7d0a828a430bc6ab29633ede8838d90e2ba814d44f3afc8a2053563cd2b01847",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-n20",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-n20/main.mo",
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c14",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-n20",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 20,
+      "output_groups": 32,
+      "returncode": 0,
+      "source_sha256": "0ea864a063f2bc0f1bb4aabb61d40847607ae1afd34875e6bfec91f80059a58e",
+      "wasm": "bech32-convert-8to5-n20/native/main.wasm",
+      "wasm_sha256": "cd145fb817b82407f2a5cc71f63dda0e9210854d6e9a88fc192d2b9089338fda",
+      "wasm_bytes": 250780,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2592,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "b8abb5afdd5f56564505defb63e1cd9fb8b5f3a307a8e28b40f764723f87b1f9",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2592,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "b8abb5afdd5f56564505defb63e1cd9fb8b5f3a307a8e28b40f764723f87b1f9",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2592,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "b8abb5afdd5f56564505defb63e1cd9fb8b5f3a307a8e28b40f764723f87b1f9",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to8-program20",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to8-program20/main.mo",
+      "expected_hex": "2972bb044d96df2871ba034c95de2770b9024b94",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to8-program20",
+      "from_bits": 5,
+      "to_bits": 8,
+      "pad": false,
+      "input_groups": 32,
+      "output_groups": 20,
+      "returncode": 0,
+      "source_sha256": "09980c5bca5e67febe62e6f9ec1f3733bae88812d62c68afcdeb2de14d5086b0",
+      "wasm": "bech32-convert-5to8-program20/native/main.wasm",
+      "wasm_sha256": "d64089581ce67e64d233eee38320b95801df64dddd4b41d8eeeca287ccab478b",
+      "wasm_bytes": 250792,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2896,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ac73e6efc40abb36c31eccda288304f1d141932e22823e766474748b4fddf0ba",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2896,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ac73e6efc40abb36c31eccda288304f1d141932e22823e766474748b4fddf0ba",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2896,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ac73e6efc40abb36c31eccda288304f1d141932e22823e766474748b4fddf0ba",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-n32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-n32/main.mo",
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c0000",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-n32",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 32,
+      "output_groups": 52,
+      "returncode": 0,
+      "source_sha256": "3641e501b1375561b0fc34b8e88dc76985c4805c02875b1ba3905c2741da7014",
+      "wasm": "bech32-convert-8to5-n32/native/main.wasm",
+      "wasm_sha256": "40d9b2b9b89ae322578e39db7e91085631f485bdf391658e90876ece9eaa1322",
+      "wasm_bytes": 250792,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3735,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3735,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3735,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to8-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to8-program32/main.mo",
+      "expected_hex": "2972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb700",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to8-program32",
+      "from_bits": 5,
+      "to_bits": 8,
+      "pad": false,
+      "input_groups": 52,
+      "output_groups": 32,
+      "returncode": 0,
+      "source_sha256": "1a4890eeb20ade06cad7ed4f0e42d972b2e7cb2f1c367270a9d5323dbccc1d56",
+      "wasm": "bech32-convert-5to8-program32/native/main.wasm",
+      "wasm_sha256": "c715a13b076f1eb7dbce6e82ce946f47cd68418c04bf8021b39d816ac926ca8b",
+      "wasm_bytes": 250812,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4262,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "45e77869e8a1a7aeac10c212a5d07c91d00235d1e5aec3a6c65fcee903ecffb7",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4262,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "45e77869e8a1a7aeac10c212a5d07c91d00235d1e5aec3a6c65fcee903ecffb7",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4262,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "45e77869e8a1a7aeac10c212a5d07c91d00235d1e5aec3a6c65fcee903ecffb7",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-n40",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-n40/main.mo",
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c00041304161b0411161b0d1f1a08",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-n40",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 40,
+      "output_groups": 64,
+      "returncode": 0,
+      "source_sha256": "f994713c710710c63b8975fd6c8bf7d7d0b8c794585a42a5fdde0e76797c83c9",
+      "wasm": "bech32-convert-8to5-n40/native/main.wasm",
+      "wasm_sha256": "e831821cde702137616afe7c310a465430049ed5a792f3d778f769c2e8c9d160",
+      "wasm_bytes": 250800,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4484,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0d5e1c2168b92d601462b4c708a2b0e5f035cea1cc1aa2ba5705e01c94286866",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4484,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0d5e1c2168b92d601462b4c708a2b0e5f035cea1cc1aa2ba5705e01c94286866",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4484,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0d5e1c2168b92d601462b4c708a2b0e5f035cea1cc1aa2ba5705e01c94286866",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to8-program40",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to8-program40/main.mo",
+      "expected_hex": "2972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff48",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to8-program40",
+      "from_bits": 5,
+      "to_bits": 8,
+      "pad": false,
+      "input_groups": 64,
+      "output_groups": 40,
+      "returncode": 0,
+      "source_sha256": "8ed62e26768ccd1aa06a3bf13c826ec985930f57155f60471806989dd637f48d",
+      "wasm": "bech32-convert-5to8-program40/native/main.wasm",
+      "wasm_sha256": "887a974e442254b733b246f7017cb7ce2602296cf7b783fda9733da223514b1b",
+      "wasm_bytes": 250826,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5076,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bfecfc740ebcd3b5bfaeb6e011a739f10ad8c330dea096f6a08610cc8c39953b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5076,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bfecfc740ebcd3b5bfaeb6e011a739f10ad8c330dea096f6a08610cc8c39953b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5076,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bfecfc740ebcd3b5bfaeb6e011a739f10ad8c330dea096f6a08610cc8c39953b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-n4096",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-n4096/main.mo",
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c00041304161b0411161b0d1f1a0812070d02061b05151f190319011609020d0e1a0f1a11140f1b001016150c1f1c0816070d0e080309160b1d1409030e16031d140b031e120311130a111c191d101f0501081715001d0c1a171f10100c0a1a0c0e060b0b17170802041d04061b0415171b031f0206110309111a191d091e101f08011218150b1e101e180d1318180c06150f060f040519180b16010a0f12070e020c1a05121f1503181315001e0c02150f0a0f1c0119100b051108170d061d1c1c08031210130b12121e1c0d1c00190409051709070d06191f1c10040a1a140f16030a1f160702010c1a051a19140f1703001e1605011d0819171911080e0a1e100e120c131b181006150d071f0806051d0c06030215131b1313001e0e02010d0a091b19110f0f03001014141c1c1c1417070f1000090a0a0d1e080b0b16171c04050306170305111a1b1c011a1013071102161d051d001907191118090a0e0e1e000a1314171c001417050e180409160b0d1e0a03111708011419050e1e041d180b1200120b12130e120c1b1d1800050509071701050d1a1b1000120c121b0c12061b0d171f0902081d14081b0c16171f040f0406190409151b091f0a06111f0c02021a15131f1102181d1519000d06190f1611040d1a180f16110c0f1a080e060d0a07130716031c1405021e140315130a1f1e0201110b091118190d0e1e1d00081314101b0c12161f0c0f1c081a040d06070b0715071a031d00060b02150f1a031b01160f0301101a151c191c101707010e1805091e081d18091308160b1e140f020e140319100a151d091f100706010c1605021d141b171311000e0a020d0e0a0b1b11171003041104161d041d141b071f1200110b0a111e180d0b1e181c08051308170b06111e1c0c031a1814071503061f060501190b1a011a09120f0f02001a15141f1d0018171510180c0a160f0e0e0c03191808051509070f06051d1c0c02021213131312121c1d1e00010509091719010d0e1a1f1010140c1a1c0c16070b0f10070a020c1e040a1b14171403041f0607010509191b18010a0e121f1002121c151b001106190d1719080e061d00061304151b181317010e0802090e0a0d1a09130f1700001415041e1c0415170b0e000209120b0d12081b0d161f1d0409031611030d121a1f1c111c101b041106170d071d081a071d10080b0a160f1e040b0316170401141b051e1a0411170b011e1a05111f0901181915081e0c1e180f1210140b1a100e160d0b1f180806050d06070305151b1b1401020e12030d120a1b1d111f1103081114181d0c1e141f080f1400190c0a151f080f0c06191c0c06030a17130712021c1c051b00150719031701060d02190f1a111c091a100f06010a1715071e001c18051218140b16130e1e0e04011908091519090f0e061e000c1204121b141316130c1f1e0802050d0a071b01150f1b031100160d021d0c1a071b11100f0b02101e140c1b1c181407050f08070906091d1c08030a16131f1403021e160301110a191d1919100f0701001615041d1c1817171110080a0a0e0e0e0a0b13171800041505061f0405151b0b1e020211130b1112181d0d1e001d08091318110b0e121e100c131c181c041507070f0005091a0b1e000a0b12170c02041b05161f0501181b14001a0c12170f020e1c051900090519091709060d1e1c00021214131b1012161d0d18000906090d1609030d161b1f1411040e1a040d160b0b1f120712030c12041a1d141f1503081f1601010d0a191f18110c0e1a1c1006130c171b0812061d0c071b0816071d04070306150319131b011e0a02110f0a011a19150f1f0100181514181c0c16170f0e1004091a080d16090b0f16071e040d0206130315131a131d011e100305110a171d011d101b071110180d0a1e0c1e080b1310170c02141f040e1c0419140b051f0a0711070a011c18050a1e141f18031300160b02110e1a0d1b191810070501061705051d181b18011208120b0e120e1a0d131f1900081515081f0c06151f0c0e040219140b1513081f0e06011d0c0a031a11130f1302101c151d001d0419071711000d0a1a0f1e100c0b1a180c06050b07170706011c1c04021a14131713021e1e0601010909191919090e0e1f00001214141b1c1016170d0f18080a060d0e060b03151718031501060f02050d1a0b1a01120f13031012141c1d1c001507090f1801090e0a1d1008130c161b1c1407030e100309120a1d1c091b10170401041705061d0419171b10000a0a120f0e020a1b151700010419051619040d161b0f1e1204111b081116190d0f1e081e080d1208130b16131e140d031e180405150b071f0205111b0b12001a0d121f0d02081b15101f0d02181f14101c0c1a140f060f0c0719080a051d08070b06151f1c04030216130311121a1d1d1a00110709011619050d1e181f181114081a0c0e160f0a0f14071a000c16050a1f140716030c1e060301150b191319010e0e021d100a131c111b101306110c171d081e041d08071300150b1a131f000e0c02190c0a051b09170f0702001c14041a1c141717030f00060902090d1a091b09160f1f0401021615031d101a171d1118100b06110e160d031d1818071511080f0a060d1e0c0a03121714031413041e1e0401150b091f1a01110f0b011018150c1e1c1c18071310100b0a120e1e0c0b1b18180405050707070505191b1c00020a12130f12021a1d151f010108191518190c0e161f000e1404191c081517090f0806091e0c0e020a1313171002141d051f000505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c00041304161b0411161b0d1f1a0812070d02061b05151f190319011609020d0e1a0f1a11140f1b001016150c1f1c0816070d0e080309160b1d1409030e16031d140b031e120311130a111c191d101f0501081715001d0c1a171f10100c0a1a0c0e060b0b17170802041d04061b0415171b031f0206110309111a191d091e101f08011218150b1e101e180d1318180c06150f060f040519180b16010a0f12070e020c1a05121f1503181315001e0c02150f0a0f1c0119100b051108170d061d1c1c08031210130b12121e1c0d1c00190409051709070d06191f1c10040a1a140f16030a1f160702010c1a051a19140f1703001e1605011d0819171911080e0a1e100e120c131b181006150d071f0806051d0c06030215131b1313001e0e02010d0a091b19110f0f03001014141c1c1c1417070f1000090a0a0d1e080b0b16171c04050306170305111a1b1c011a1013071102161d051d001907191118090a0e0e1e000a1314171c001417050e180409160b0d1e0a03111708011419050e1e041d180b1200120b12130e120c1b1d1800050509071701050d1a1b1000120c121b0c12061b0d171f0902081d14081b0c16171f040f0406190409151b091f0a06111f0c02021a15131f1102181d1519000d06190f1611040d1a180f16110c0f1a080e060d0a07130716031c1405021e140315130a1f1e0201110b091118190d0e1e1d00081314101b0c12161f0c0f1c081a040d06070b0715071a031d00060b02150f1a031b01160f0301101a151c191c101707010e1805091e081d18091308160b1e140f020e140319100a151d091f100706010c1605021d141b171311000e0a020d0e0a0b1b11171003041104161d041d141b071f1200110b0a111e180d0b1e181c08051308170b06111e1c0c031a1814071503061f060501190b1a011a09120f0f02001a15141f1d0018171510180c0a160f0e0e0c03191808051509070f06051d1c0c02021213131312121c1d1e00010509091719010d0e1a1f1010140c1a1c0c16070b0f10070a020c1e040a1b14171403041f0607010509191b18010a0e121f1002121c151b001106190d1719080e061d00061304151b181317010e0802090e0a0d1a09130f1700001415041e1c0415170b0e000209120b0d12081b0d161f1d0409031611030d121a1f1c111c101b041106170d071d081a071d10080b0a160f1e040b0316170401141b051e1a0411170b011e1a05111f0901181915081e0c1e180f1210140b1a100e160d0b1f180806050d06070305151b1b1401020e12030d120a1b1d111f1103081114181d0c1e141f080f1400190c0a151f080f0c06191c0c06030a17130712021c1c051b00150719031701060d02190f1a111c091a100f06010a1715071e001c18051218140b16130e1e0e04011908091519090f0e061e000c1204121b141316130c1f1e0802050d0a071b01150f1b031100160d021d0c1a071b11100f0b02101e140c1b1c181407050f08070906091d1c08030a16131f1403021e160301110a191d1919100f0701001615041d1c1817171110080a0a0e0e0e0a0b13171800041505061f0405151b0b1e020211130b1112181d0d1e001d08091318110b0e121e100c131c181c041507070f0005091a0b1e000a0b12170c02041b05161f0501181b14001a0c12170f020e1c051900090519091709060d1e1c00021214131b1012161d0d18000906090d1609030d161b1f1411040e1a040d160b0b1f120712030c12041a1d141f1503081f1601010d0a191f18110c0e1a1c1006130c171b0812061d0c071b0816071d04070306150319131b011e0a02110f0a011a19150f1f0100181514181c0c16170f0e1004091a080d16090b0f16071e040d0206130315131a131d011e100305110a171d011d101b071110180d0a1e0c1e080b1310170c02141f040e1c0419140b051f0a0711070a011c18050a1e141f18031300160b02110e1a0d1b191810070501061705051d181b18011208120b0e120e1a0d131f1900081515081f0c06151f0c0e040219140b1513081f0e06011d0c0a031a11130f1302101c151d001d0419071711000d0a1a0f1e100c0b1a180c06050b07170706011c1c04021a14131713021e1e0601010909191919090e0e1f00001214141b1c1016170d0f18080a060d0e060b03151718031501060f02050d1a0b1a01120f13031012141c1d1c001507090f1801090e0a1d1008130c161b1c1407030e100309120a1d1c091b10170401041705061d0419171b10000a0a120f0e020a1b151700010419051619040d161b0f1e1204111b081116190d0f1e081e080d1208130b16131e140d031e180405150b071f0205111b0b12001a0d121f0d02081b15101f0d02181f14101c0c1a140f060f0c0719080a051d08070b06151f1c04030216130311121a1d1d1a00110709011619050d1e181f181114081a0c0e160f0a0f14071a000c16050a1f140716030c1e060301150b191319010e0e021d100a131c111b101306110c171d081e041d08071300150b1a131f000e0c02190c0a051b09170f0702001c14041a1c141717030f00060902090d1a091b09160f1f0401021615031d101a171d1118100b06110e160d031d1818071511080f0a060d1e0c0a03121714031413041e1e0401150b091f1a01110f0b011018150c1e1c1c18071310100b0a120e1e0c0b1b18180405050707070505191b1c00020a12130f12021a1d151f010108191518190c0e161f000e1404191c081517090f0806091e0c0e020a1313171002141d051f000505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c00041304161b0411161b0d1f1a0812070d02061b05151f190319011609020d0e1a0f1a11140f1b001016150c1f1c0816070d0e080309160b1d1409030e16031d140b031e120311130a111c191d101f0501081715001d0c1a171f10100c0a1a0c0e060b0b17170802041d04061b0415171b031f0206110309111a191d091e101f08011218150b1e101e180d1318180c06150f060f040519180b16010a0f12070e020c1a05121f1503181315001e0c02150f0a0f1c0119100b051108170d061d1c1c08031210130b12121e1c0d1c00190409051709070d06191f1c10040a1a140f16030a1f160702010c1a051a19140f1703001e1605011d0819171911080e0a1e100e120c131b181006150d071f0806051d0c06030215131b1313001e0e02010d0a091b19110f0f03001014141c1c1c1417070f1000090a0a0d1e080b0b16171c04050306170305111a1b1c011a1013071102161d051d001907191118090a0e0e1e000a1314171c001417050e180409160b0d1e0a03111708011419050e1e041d180b1200120b12130e120c1b1d1800050509071701050d1a1b1000120c121b0c12061b0d171f0902081d14081b0c16171f040f0406190409151b091f0a06111f0c02021a15131f1102181d1519000d06190f1611040d1a180f16110c0f1a080e060d0a07130716031c1405021e140315130a1f1e0201110b091118190d0e1e1d00081314101b0c12161f0c0f1c081a040d06070b0715071a031d00060b02150f1a031b01160f0301101a151c191c101707010e1805091e081d18091308160b1e140f020e140319100a151d091f100706010c1605021d141b171311000e0a020d0e0a0b1b11171003041104161d041d141b071f1200110b0a111e180d0b1e181c08051308170b06111e1c0c031a1814071503061f060501190b1a011a09120f0f02001a15141f1d0018171510180c0a160f0e0e0c03191808051509070f06051d1c0c02021213131312121c1d1e00010509091719010d0e1a1f1010140c1a1c0c16070b0f10070a020c1e040a1b14171403041f0607010509191b18010a0e121f1002121c151b001106190d1719080e061d00061304151b181317010e0802090e0a0d1a09130f1700001415041e1c0415170b0e000209120b0d12081b0d161f1d0409031611030d121a1f1c111c101b041106170d071d081a071d10080b0a160f1e040b0316170401141b051e1a0411170b011e1a05111f0901181915081e0c1e180f1210140b1a100e160d0b1f180806050d06070305151b1b1401020e12030d120a1b1d111f1103081114181d0c1e141f080f1400190c0a151f080f0c06191c0c06030a17130712021c1c051b00150719031701060d02190f1a111c091a100f06010a1715071e001c18051218140b16130e1e0e04011908091519090f0e061e000c1204121b141316130c1f1e0802050d0a071b01150f1b031100160d021d0c1a071b11100f0b02101e140c1b1c181407050f08070906091d1c08030a16131f1403021e160301110a191d1919100f0701001615041d1c1817171110080a0a0e0e0e0a0b13171800041505061f0405151b0b1e020211130b1112181d0d1e001d08091318110b0e121e100c131c181c041507070f0005091a0b1e000a0b12170c02041b05161f0501181b14001a0c12170f020e1c051900090519091709060d1e1c00021214131b1012161d0d18000906090d1609030d161b1f1411040e1a040d160b0b1f120712030c12041a1d141f1503081f1601010d0a191f18110c0e1a1c1006130c171b0812061d0c071b0816071d04070306150319131b011e0a02110f0a011a19150f1f0100181514181c0c16170f0e1004091a080d16090b0f16071e040d0206130315131a131d011e100305110a171d011d101b071110180d0a1e0c1e080b1310170c02141f040e1c0419140b051f0a0711070a011c18050a1e141f18031300160b02110e1a0d1b191810070501061705051d181b18011208120b0e120e1a0d131f1900081515081f0c06151f0c0e040219140b1513081f0e06011d0c0a031a11130f1302101c151d001d0419071711000d0a1a0f1e100c0b1a180c06050b07170706011c1c04021a14131713021e1e0601010909191919090e0e1f00001214141b1c1016170d0f18080a060d0e060b03151718031501060f02050d1a0b1a01120f13031012141c1d1c001507090f1801090e0a1d1008130c161b1c1407030e100309120a1d1c091b10170401041705061d0419171b10000a0a120f0e020a1b151700010419051619040d161b0f1e1204111b081116190d0f1e081e080d1208130b16131e140d031e180405150b071f0205111b0b12001a0d121f0d02081b15101f0d02181f14101c0c1a140f060f0c0719080a051d08070b06151f1c04030216130311121a1d1d1a00110709011619050d1e181f181114081a0c0e160f0a0f14071a000c16050a1f140716030c1e060301150b191319010e0e021d100a131c111b101306110c171d081e041d08071300150b1a131f000e0c02190c0a051b09170f0702001c14041a1c141717030f00060902090d1a091b09160f1f0401021615031d101a171d1118100b06110e160d031d1818071511080f0a060d1e0c0a03121714031413041e1e0401150b091f1a01110f0b011018150c1e1c1c18071310100b0a120e1e0c0b1b18180405050707070505191b1c00020a12130f12021a1d151f010108191518190c0e161f000e1404191c081517090f0806091e0c0e020a1313171002141d051f000505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c00041304161b0411161b0d1f1a0812070d02061b05151f190319011609020d0e1a0f1a11140f1b001016150c1f1c0816070d0e080309160b1d1409030e16031d140b031e120311130a111c191d101f0501081715001d0c1a171f10100c0a1a0c0e060b0b17170802041d04061b0415171b031f0206110309111a191d091e101f08011218150b1e101e180d1318180c06150f060f040519180b16010a0f12070e020c1a05121f1503181315001e0c02150f0a0f1c0119100b051108170d061d1c1c08031210130b12121e1c0d1c00190409051709070d06191f1c10040a1a140f16030a1f160702010c1a051a19140f1703001e1605011d0819171911080e0a1e100e120c131b181006150d071f0806051d0c06030215131b1313001e0e02010d0a091b19110f0f03001014141c1c1c1417070f1000090a0a0d1e080b0b16171c04050306170305111a1b1c011a1013071102161d051d001907191118090a0e0e1e000a1314171c00",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-n4096",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 4096,
+      "output_groups": 6554,
+      "returncode": 0,
+      "source_sha256": "5d85f44e4c39f09339c3407197a17044f148a0ddec9f56cbe9611033eb6e4094",
+      "wasm": "bech32-convert-8to5-n4096/native/main.wasm",
+      "wasm_sha256": "e6e6d34927c17a6b0ecf67ab99a9a7da7f677f48b0d5cb3c754ec29c875dca6f",
+      "wasm_bytes": 254859,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 388179,
+          "allocated_bytes": 6616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6554,
+          "output_sha256": "7038377ac5af8ba059d229b5fe0e0f66cc5384a309d9707224061b9ed721d434",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 388179,
+          "allocated_bytes": 6616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6554,
+          "output_sha256": "7038377ac5af8ba059d229b5fe0e0f66cc5384a309d9707224061b9ed721d434",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 388179,
+          "allocated_bytes": 6616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6554,
+          "output_sha256": "7038377ac5af8ba059d229b5fe0e0f66cc5384a309d9707224061b9ed721d434",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to8-program4096",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to8-program4096/main.mo",
+      "expected_hex": "2972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e02972bb044d96df2871ba034c95de2770b9024b94dd266fb8014a93dc256eb7004992db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861aaf33c85ce1760a9f23b84cd165fa8f13a83cc155ea7f03982cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079c20b549de62f78c10a539ce52e77c009529be42d76bf08519ae32c75be075099e22b74bd064f98e12a73bc054e97e0",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to8-program4096",
+      "from_bits": 5,
+      "to_bits": 8,
+      "pad": false,
+      "input_groups": 6554,
+      "output_groups": 4096,
+      "returncode": 0,
+      "source_sha256": "09c01432fc4ed42e368f5422c2eb19d84a0e173cf864a75d5dee138da2933031",
+      "wasm": "bech32-convert-5to8-program4096/native/main.wasm",
+      "wasm_sha256": "e8b0620a61da56cc24c132f78457ae7c58218d9125ca20c3aed3c7e89caafb0a",
+      "wasm_bytes": 257317,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 447218,
+          "allocated_bytes": 4152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4096,
+          "output_sha256": "a9f5ac277f48bca4d032c4d8c3f1aec97e563f3b3cc400a03f4c5be7b0f39a1e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 447218,
+          "allocated_bytes": 4152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4096,
+          "output_sha256": "a9f5ac277f48bca4d032c4d8c3f1aec97e563f3b3cc400a03f4c5be7b0f39a1e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 447218,
+          "allocated_bytes": 4152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4096,
+          "output_sha256": "a9f5ac277f48bca4d032c4d8c3f1aec97e563f3b3cc400a03f4c5be7b0f39a1e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-7to3-n19",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-7to3-n19/main.mo",
+      "expected_hex": "000405020100070603000102040404010700040001020001070703060706040700070305050306020300030304",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "7to3-n19",
+      "from_bits": 7,
+      "to_bits": 3,
+      "pad": true,
+      "input_groups": 19,
+      "output_groups": 45,
+      "returncode": 0,
+      "source_sha256": "d9196d5bc965ea9e975de4d57392c39a2c08cbf3c5323497d6fdf455f54323e8",
+      "wasm": "bech32-convert-7to3-n19/native/main.wasm",
+      "wasm_sha256": "662f232f9e7104b85877f3422555292f8ce155f492e90c3531810222b5d73757",
+      "wasm_bytes": 250779,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2864,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 45,
+          "output_sha256": "546ff181cdc1781946fe679b90f4dfbc8f1b696865f3908edd4994e4efedcc9d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2864,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 45,
+          "output_sha256": "546ff181cdc1781946fe679b90f4dfbc8f1b696865f3908edd4994e4efedcc9d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2864,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 45,
+          "output_sha256": "546ff181cdc1781946fe679b90f4dfbc8f1b696865f3908edd4994e4efedcc9d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to5-n41",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to5-n41/main.mo",
+      "expected_hex": "0714010e1b0815020f1c091603101d0a1704111e0b1805121f0c190613000d1a0714010e1b0815020f",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to5-n41",
+      "from_bits": 5,
+      "to_bits": 5,
+      "pad": false,
+      "input_groups": 41,
+      "output_groups": 41,
+      "returncode": 0,
+      "source_sha256": "e16faa30499efbb032cd82d4f2ee6669c0f3867b65bec74b8b350e6eb008c680",
+      "wasm": "bech32-convert-5to5-n41/native/main.wasm",
+      "wasm_sha256": "8f00f337c9c4944820dd5f489d2fee5f2c9df523bbd532c3807ea3529aa5bdc8",
+      "wasm_bytes": 250801,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3955,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 41,
+          "output_sha256": "d6d3a35b1edd7a6dda222f0f5941d34969fb944e7927f66396832b8098835be4",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3955,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 41,
+          "output_sha256": "d6d3a35b1edd7a6dda222f0f5941d34969fb944e7927f66396832b8098835be4",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3955,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 41,
+          "output_sha256": "d6d3a35b1edd7a6dda222f0f5941d34969fb944e7927f66396832b8098835be4",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-empty/main.mo",
+      "expected_hex": "",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-empty",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 0,
+      "output_groups": 0,
+      "returncode": 0,
+      "source_sha256": "1222668d2d0473f0ecac4f895c549fc5879612c2b9510fa6dd380424a2d7cb72",
+      "wasm": "bech32-convert-8to5-empty/native/main.wasm",
+      "wasm_sha256": "be7103bb22596f86b8a42f01915622a99fd65fb010d9aeef5cfe696e2fc5ca8b",
+      "wasm_bytes": 250671,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 664,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 664,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 664,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-5to8-empty",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-5to8-empty/main.mo",
+      "expected_hex": "",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "5to8-empty",
+      "from_bits": 5,
+      "to_bits": 8,
+      "pad": false,
+      "input_groups": 0,
+      "output_groups": 0,
+      "returncode": 0,
+      "source_sha256": "b9137cfec4560c80265cf5c0520209f18e59f97dca17c7076080bb19e52ce808",
+      "wasm": "bech32-convert-5to8-empty/native/main.wasm",
+      "wasm_sha256": "83b48ebe0327b22de65d3b1c1356f46144f621996cbaeef0373c93f692d6ab0a",
+      "wasm_bytes": 250671,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 685,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 685,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 685,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-encode-v0-program20",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-encode-v0-program20/main.mo",
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-encode",
+      "shape": "v0-program20",
+      "witness_version": 0,
+      "hrp": "bc",
+      "program_bytes": 20,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "b0a4ee379ba5c4ad65b48b3a80de30981d151789356ead4ede36c714e74c94ea",
+      "wasm": "bech32-segwit-encode-v0-program20/native/main.wasm",
+      "wasm_sha256": "9dcbe67271f5ca1c36af62262b1afe0e3f069ab11ec5d68963c3ceb5e6448d65",
+      "wasm_bytes": 255422,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 17636,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 17636,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 17636,
+          "allocated_bytes": 1032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-decode-v0-program20",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-decode-v0-program20/main.mo",
+      "expected_hex": "62630000751e76e8199196d454941c45d1b3a323f1433bd6",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-decode",
+      "shape": "v0-program20",
+      "witness_version": 0,
+      "hrp": "bc",
+      "program_bytes": 20,
+      "address_chars": 42,
+      "returncode": 0,
+      "source_sha256": "bb9964664d421ef82fb23aa18d649356e78ce4c92ef75eb3f2b972d20ddf2548",
+      "wasm": "bech32-segwit-decode-v0-program20/native/main.wasm",
+      "wasm_sha256": "437ac7e5c298cf0a4c9da46b4c9def1b0cf7216d51e3122ac003b1239f65ff4d",
+      "wasm_bytes": 257630,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19828,
+          "allocated_bytes": 1192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "2d89948b930b14625c39be7aba7ce28bd939946b1bc227f349f5d90b0c96fa4b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19828,
+          "allocated_bytes": 1192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "2d89948b930b14625c39be7aba7ce28bd939946b1bc227f349f5d90b0c96fa4b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19828,
+          "allocated_bytes": 1192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "2d89948b930b14625c39be7aba7ce28bd939946b1bc227f349f5d90b0c96fa4b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-encode-v0-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-encode-v0-program32/main.mo",
+      "expected_hex": "74623171727033336730713563357478737039617279737278346b367a646b6673346e636534786a3067646363636566767079737866337130736c356b37",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-encode",
+      "shape": "v0-program32",
+      "witness_version": 0,
+      "hrp": "tb",
+      "program_bytes": 32,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "925145f991deaeed3665f5ce44c901885cd46cbd4107fdad07a7713d373ac117",
+      "wasm": "bech32-segwit-encode-v0-program32/native/main.wasm",
+      "wasm_sha256": "245bc9885b631601a2b383d4445a562549bd22ec1e3882bc26bdf91065cdb38d",
+      "wasm_bytes": 255434,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 26199,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "e1412cce9e86a2e686583249332a1126f73a9183e59527d95ffdc682153b715f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 26199,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "e1412cce9e86a2e686583249332a1126f73a9183e59527d95ffdc682153b715f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 26199,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "e1412cce9e86a2e686583249332a1126f73a9183e59527d95ffdc682153b715f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-decode-v0-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-decode-v0-program32/main.mo",
+      "expected_hex": "746200001863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-decode",
+      "shape": "v0-program32",
+      "witness_version": 0,
+      "hrp": "tb",
+      "program_bytes": 32,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "845679feb5d294712b12a4d416bc9a265a24e7a3b800d93adaffec8a2328def9",
+      "wasm": "bech32-segwit-decode-v0-program32/native/main.wasm",
+      "wasm_sha256": "ae612fc2c6b33b52dc4b2e3ab9628c8730bd0f7465cd545b22147dbd02a3f0b0",
+      "wasm_bytes": 257650,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 28694,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "112b7e36f2afe17d717549211f00560e8d35d65ae6cec742730d62bb5e2f479b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 28694,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "112b7e36f2afe17d717549211f00560e8d35d65ae6cec742730d62bb5e2f479b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 28694,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "112b7e36f2afe17d717549211f00560e8d35d65ae6cec742730d62bb5e2f479b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-encode-v1-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-encode-v1-program32/main.mo",
+      "expected_hex": "6263317030786c78766c68656d6a613663346471763232756170637471757066686c786d3968387a336b3265373271346b3968637a3776717a6b356a6a30",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-encode",
+      "shape": "v1-program32",
+      "witness_version": 1,
+      "hrp": "bc",
+      "program_bytes": 32,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "df1574120cb140d8c67eaff129d8f930e6ce757904f36fb453dcab3a10882b93",
+      "wasm": "bech32-segwit-encode-v1-program32/native/main.wasm",
+      "wasm_sha256": "91f650a4619bcf55b714a14da6e308735f1ae915ae795bacf1b541cf90856014",
+      "wasm_bytes": 255435,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 26166,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "67fd685eca7e75b229d724cb78aa0deaa42a6fad5eb89077593571035b8ae89c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 26166,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "67fd685eca7e75b229d724cb78aa0deaa42a6fad5eb89077593571035b8ae89c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 26166,
+          "allocated_bytes": 1408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "67fd685eca7e75b229d724cb78aa0deaa42a6fad5eb89077593571035b8ae89c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-decode-v1-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-decode-v1-program32/main.mo",
+      "expected_hex": "6263000179be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-decode",
+      "shape": "v1-program32",
+      "witness_version": 1,
+      "hrp": "bc",
+      "program_bytes": 32,
+      "address_chars": 62,
+      "returncode": 0,
+      "source_sha256": "e74951f17e9eec323b0ce0024857fc8b39f8234a3c19ab753d4963d1f2e30077",
+      "wasm": "bech32-segwit-decode-v1-program32/native/main.wasm",
+      "wasm_sha256": "3607ca9004817413a75f2b981c43c04c7becd9fa6900e7a43f0d7803fb21df7e",
+      "wasm_bytes": 257650,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 28685,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "bafbae857bef470a38e853dffd6ea0a7a2748c21c008e0f44ba1de050a66f6fa",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 28685,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "bafbae857bef470a38e853dffd6ea0a7a2748c21c008e0f44ba1de050a66f6fa",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 28685,
+          "allocated_bytes": 1560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 36,
+          "output_sha256": "bafbae857bef470a38e853dffd6ea0a7a2748c21c008e0f44ba1de050a66f6fa",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-encode-v16-program2",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-encode-v16-program2/main.mo",
+      "expected_hex": "626331737735307167647a32356a",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-encode",
+      "shape": "v16-program2",
+      "witness_version": 16,
+      "hrp": "bc",
+      "program_bytes": 2,
+      "address_chars": 14,
+      "returncode": 0,
+      "source_sha256": "9c6e11bcd7d6e47a3bde672b7f7634bd04befd16e22d81b523e3563e5149dfe4",
+      "wasm": "bech32-segwit-encode-v16-program2/native/main.wasm",
+      "wasm_sha256": "dd1a2bf780dde4075ff147d9a930f1a9a7c662221c0fb4392ccea989c2c9f6f3",
+      "wasm_bytes": 255405,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5568,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 14,
+          "output_sha256": "e97259257491b0a8aaf3dbf3cf4475b972e6183f1b3ceb508b46ea025a7d1969",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5568,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 14,
+          "output_sha256": "e97259257491b0a8aaf3dbf3cf4475b972e6183f1b3ceb508b46ea025a7d1969",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5568,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 14,
+          "output_sha256": "e97259257491b0a8aaf3dbf3cf4475b972e6183f1b3ceb508b46ea025a7d1969",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-segwit-decode-v16-program2",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-decode-v16-program2/main.mo",
+      "expected_hex": "62630010751e",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-decode",
+      "shape": "v16-program2",
+      "witness_version": 16,
+      "hrp": "bc",
+      "program_bytes": 2,
+      "address_chars": 14,
+      "returncode": 0,
+      "source_sha256": "a26893024e1f0203230870f244df0350cfafa1344d06578a097fd888adad6104",
+      "wasm": "bech32-segwit-decode-v16-program2/native/main.wasm",
+      "wasm_sha256": "dbd4b2b79780e2f6592d5dd2e0bd6432f9adbb5c4d21642fddf53feceac5cc9d",
+      "wasm_bytes": 257602,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7463,
+          "allocated_bytes": 672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "59c2aa400a46f942ac702d7c86dbe8d785510ff2055a1fe6ac780187eed7b00f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7463,
+          "allocated_bytes": 672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "59c2aa400a46f942ac702d7c86dbe8d785510ff2055a1fe6ac780187eed7b00f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7463,
+          "allocated_bytes": 672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6,
+          "output_sha256": "59c2aa400a46f942ac702d7c86dbe8d785510ff2055a1fe6ac780187eed7b00f",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

@@ -1,0 +1,102 @@
+{
+  "stage": "bitcoin-baseline-corrected",
+  "recorded_utc": "2026-10-12T11:49:53.496Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "c41a2aff4621c4d90bfe0b29da9bd4a3f8212a103bcd9804664a6ca634a55926",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Baseline does not validate key; valid vector is equivalent output.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "aa7c7e687083e5d0da9bea654dd78676eb32bdff40268912f92526484c60ab3c",
+      "wasm": "bitcoin-p2pkh/mops-bitcoin/main.wasm",
+      "wasm_sha256": "0f26390ac10b8e0db45bbc4f81ecce748758d707f87c6fba59591f41db690b92",
+      "wasm_bytes": 556668,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 204488,
+          "allocated_bytes": 14544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 204488,
+          "allocated_bytes": 14544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 204488,
+          "allocated_bytes": 14544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip86-receive-address",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "62633170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a7775647078716b6564726372",
+      "notes": "Equivalent empty-tree BIP86 composition using public taggedHash + tweakPublicKey because tweakFromKeyAndHash rejects empty roots. Scalar-order guard explicitly matches BIP341.",
+      "source": "bitcoin-cases/bitcoin-bip86-receive-address/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "b1a3ede798ad7f1ea1af2d01c7eb1435aca65b2b7ce87334977dcf6dd7d3a6f3",
+      "wasm": "bitcoin-bip86-receive-address/mops-bitcoin/main.wasm",
+      "wasm_sha256": "4e9ff302e52c8a8c26e1202ad54fcfc7c366458853b4d40a23be4dc877fa7a91",
+      "wasm_bytes": 829347,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 469787471,
+          "allocated_bytes": 20282256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 469787471,
+          "allocated_bytes": 20282256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 469787471,
+          "allocated_bytes": 20282256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

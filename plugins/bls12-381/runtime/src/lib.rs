@@ -1,0 +1,508 @@
+//! BLS12-381 kernels using canonical IETF compressed point encodings.
+//!
+//! No borrowed input pointer survives the call. Pairing precomputation uses
+//! bounded ephemeral managed scratch (at most 128 terms), as does MSM. MSM is
+//! variable time and intended for public scalars. Other kernels use fixed
+//! stack storage. Every point decoder checks the prime-order
+//! subgroup. Scalars and map-to-curve field elements are canonical big endian.
+#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(test), feature(alloc_error_handler))]
+
+extern crate alloc;
+
+use alloc::vec::Vec;
+use bls12_381::{
+    G1Affine, G1Projective, G2Affine, G2Prepared, G2Projective, Gt, Scalar,
+    hash_to_curve::{ExpandMsgXmd, HashToCurve, HashToField, MapToCurve},
+    multi_miller_loop,
+};
+// bls12_381 0.8 exposes generic-array 0.14 in its hash-to-field interface.
+#[allow(deprecated)]
+use generic_array::GenericArray;
+use sha2::Sha256;
+
+#[cfg(not(test))]
+mod host {
+    use core::alloc::{GlobalAlloc, Layout};
+
+    #[link(wasm_import_module = "env")]
+    unsafe extern "C" {
+        fn compute_plugin_alloc(size: usize, align: usize) -> *mut u8;
+        fn compute_plugin_trap(ptr: *const u8, len: usize) -> !;
+    }
+
+    struct Ephemeral;
+    unsafe impl GlobalAlloc for Ephemeral {
+        unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+            unsafe { compute_plugin_alloc(layout.size(), layout.align()) }
+        }
+        unsafe fn dealloc(&self, _: *mut u8, _: Layout) {}
+    }
+
+    #[global_allocator]
+    static ALLOCATOR: Ephemeral = Ephemeral;
+
+    #[alloc_error_handler]
+    fn allocation_failed(_: Layout) -> ! {
+        fail()
+    }
+
+    #[panic_handler]
+    fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
+        fail()
+    }
+
+    fn fail() -> ! {
+        let message = b"BLS12-381 plugin: allocation or invariant failure";
+        unsafe { compute_plugin_trap(message.as_ptr(), message.len()) }
+    }
+}
+
+const MAX_BATCH: usize = 128;
+const INVALID_LENGTH: u32 = 1;
+const INVALID_POINT: u32 = 2;
+const INVALID_SCALAR: u32 = 3;
+const INVALID_FIELD: u32 = 4;
+const TOO_MANY_ITEMS: u32 = 5;
+const IDENTITY: u32 = 7;
+const INVALID_ARGUMENT: u32 = 10;
+
+const IC_DST: &[u8] = b"BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_";
+const ETH_DST: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+const ETH_POP_DST: &[u8] = b"BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+
+// BLS12-381's base field modulus in canonical big-endian order.
+const FP_MODULUS: [u8; 48] = [
+    0x1a, 0x01, 0x11, 0xea, 0x39, 0x7f, 0xe6, 0x9a, 0x4b, 0x1b, 0xa7, 0xb6, 0x43, 0x4b, 0xac, 0xd7,
+    0x64, 0x77, 0x4b, 0x84, 0xf3, 0x85, 0x12, 0xbf, 0x67, 0x30, 0xd2, 0xa0, 0xf6, 0xb0, 0xf6, 0x24,
+    0x1e, 0xab, 0xff, 0xfe, 0xb1, 0x53, 0xff, 0xff, 0xb9, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xaa, 0xab,
+];
+
+fn g1(bytes: &[u8]) -> Result<G1Affine, u32> {
+    let bytes: &[u8; 48] = bytes.try_into().map_err(|_| INVALID_LENGTH)?;
+    // Only this one complete, canonical encoding bypasses the costly curve
+    // decoder. The identity is on the curve and in the prime-order subgroup.
+    if bytes[0] == 0xc0 && bytes[1..].iter().all(|b| *b == 0) {
+        return Ok(G1Affine::identity());
+    }
+    Option::from(G1Affine::from_compressed(bytes)).ok_or(INVALID_POINT)
+}
+
+fn g2(bytes: &[u8]) -> Result<G2Affine, u32> {
+    let bytes: &[u8; 96] = bytes.try_into().map_err(|_| INVALID_LENGTH)?;
+    if bytes[0] == 0xc0 && bytes[1..].iter().all(|b| *b == 0) {
+        return Ok(G2Affine::identity());
+    }
+    Option::from(G2Affine::from_compressed(bytes)).ok_or(INVALID_POINT)
+}
+
+fn scalar(bytes: &[u8]) -> Result<Scalar, u32> {
+    let mut bytes: [u8; 32] = bytes.try_into().map_err(|_| INVALID_LENGTH)?;
+    bytes.reverse();
+    Option::from(Scalar::from_bytes(&bytes)).ok_or(INVALID_SCALAR)
+}
+
+fn field(bytes: &[u8]) -> Result<&[u8; 48], u32> {
+    let bytes: &[u8; 48] = bytes.try_into().map_err(|_| INVALID_LENGTH)?;
+    if bytes >= &FP_MODULUS {
+        return Err(INVALID_FIELD);
+    }
+    Ok(bytes)
+}
+
+fn batch_len(bytes: &[u8], width: usize) -> Result<usize, u32> {
+    if bytes.len() % width != 0 {
+        return Err(INVALID_LENGTH);
+    }
+    let count = bytes.len() / width;
+    if count > MAX_BATCH {
+        return Err(TOO_MANY_ITEMS);
+    }
+    Ok(count)
+}
+
+fn hash_g1(message: &[u8], dst: &[u8]) -> G1Projective {
+    <G1Projective as HashToCurve<ExpandMsgXmd<Sha256>>>::hash_to_curve(message, dst)
+}
+
+fn hash_g2(message: &[u8], dst: &[u8]) -> G2Projective {
+    let mut fields = [<G2Projective as MapToCurve>::Field::default(); 2];
+    <G2Projective as MapToCurve>::Field::hash_to_field::<ExpandMsgXmd<Sha256>>(
+        message,
+        dst,
+        &mut fields,
+    );
+    (map_g2_field(&fields[0]) + map_g2_field(&fields[1])).clear_h()
+}
+
+fn map_g2_field(value: &<G2Projective as MapToCurve>::Field) -> G2Projective {
+    if value == &<G2Projective as MapToCurve>::Field::default() {
+        // bls12_381 0.8.0 (and 0.9.0) map_g2.rs overwrites the valid x0/y0
+        // solution at u=0: every alternate eta candidate becomes zero and
+        // its equality check spuriously succeeds. Use the fixed RFC 9380
+        // SSWU+isogeny image for this single exceptional input. This constant
+        // is BEFORE cofactor clearing; it was independently computed using
+        // py_ecc 8.0.0 and the OCaml RFC implementation. See vectors/README.md.
+        // Both field mapping and hash-to-curve use this helper, including
+        // the theoretical case where a hash-to-field element is zero.
+        const ZERO_IMAGE: [u8; 96] = [
+            0x88, 0x69, 0x82, 0x26, 0x66, 0xfe, 0x85, 0x0c, 0xb9, 0x3d, 0xfd, 0x4f, 0xa6, 0x4e,
+            0xbd, 0x9e, 0xf7, 0x7b, 0xa6, 0x2b, 0x5c, 0x12, 0x05, 0x5e, 0xad, 0xb6, 0xe7, 0xcc,
+            0x89, 0x72, 0xf6, 0x4e, 0x01, 0xc4, 0x57, 0x7d, 0x3d, 0x52, 0x45, 0x6c, 0x26, 0x86,
+            0x76, 0x47, 0xf5, 0x36, 0x65, 0x19, 0x0c, 0xdf, 0xcc, 0x95, 0x23, 0x30, 0x5c, 0x43,
+            0xef, 0x59, 0xa4, 0xe3, 0x47, 0xcb, 0x3f, 0xc7, 0x66, 0x88, 0xc6, 0x0b, 0x05, 0xba,
+            0xfe, 0xbd, 0x44, 0x5a, 0x65, 0x90, 0x1b, 0x5d, 0xd4, 0x06, 0x44, 0xe2, 0x1d, 0x35,
+            0xdc, 0xbe, 0x50, 0xa9, 0x59, 0x55, 0xe4, 0xf8, 0xe2, 0x4f, 0xbe, 0x6f,
+        ];
+        // This fixed pre-cofactor point is on the curve, but intentionally
+        // not yet in the subgroup. All caller-supplied points use checked
+        // deserialization; only this implementation constant is unchecked.
+        G2Projective::from(G2Affine::from_compressed_unchecked(&ZERO_IMAGE).unwrap())
+    } else {
+        G2Projective::map_to_curve(value)
+    }
+}
+
+#[allow(deprecated)]
+fn map_g1(bytes: &[u8]) -> Result<G1Projective, u32> {
+    let mut padded = [0u8; 64];
+    padded[16..].copy_from_slice(field(bytes)?);
+    let value = <<G1Projective as MapToCurve>::Field as HashToField>::from_okm(
+        GenericArray::from_slice(&padded),
+    );
+    Ok(G1Projective::map_to_curve(&value).clear_h())
+}
+
+#[allow(deprecated)]
+fn map_g2(bytes: &[u8]) -> Result<G2Projective, u32> {
+    if bytes.len() != 96 {
+        return Err(INVALID_LENGTH);
+    }
+    let mut padded = [0u8; 128];
+    // HashToField Fp2 consumes the real component before the imaginary one.
+    padded[16..64].copy_from_slice(field(&bytes[..48])?);
+    padded[80..128].copy_from_slice(field(&bytes[48..])?);
+    let value = <<G2Projective as MapToCurve>::Field as HashToField>::from_okm(
+        GenericArray::from_slice(&padded),
+    );
+    Ok(map_g2_field(&value).clear_h())
+}
+
+fn pair_equal(a: G1Affine, b: G2Affine, c: G1Affine, d: G2Affine) -> bool {
+    let b = G2Prepared::from(b);
+    let d = G2Prepared::from(d);
+    multi_miller_loop(&[(&a, &b), (&-c, &d)]).final_exponentiation() == Gt::identity()
+}
+
+fn verify_ic(pk: &[u8], message: &[u8], signature: &[u8]) -> Result<bool, u32> {
+    let pk = g2(pk)?;
+    let signature = g1(signature)?;
+    if bool::from(pk.is_identity()) || bool::from(signature.is_identity()) {
+        return Err(IDENTITY);
+    }
+    Ok(pair_equal(
+        signature,
+        G2Affine::generator(),
+        G1Affine::from(hash_g1(message, IC_DST)),
+        pk,
+    ))
+}
+
+fn verify_eth(pk: &[u8], message: &[u8], signature: &[u8], dst: &[u8]) -> Result<bool, u32> {
+    let pk = g1(pk)?;
+    let signature = g2(signature)?;
+    if bool::from(pk.is_identity()) || bool::from(signature.is_identity()) {
+        return Err(IDENTITY);
+    }
+    Ok(pair_equal(
+        pk,
+        G2Affine::from(hash_g2(message, dst)),
+        G1Affine::generator(),
+        signature,
+    ))
+}
+
+fn pairing_check(bytes: &[u8]) -> Result<bool, u32> {
+    let count = batch_len(bytes, 144)?;
+    // Decode every point before allocating the larger Miller precomputations.
+    let mut points = Vec::with_capacity(count);
+    for pair in bytes.chunks_exact(144) {
+        let p = g1(&pair[..48])?;
+        let q = g2(&pair[48..])?;
+        // Validate both operands before dropping a neutral pairing term.
+        if !bool::from(p.is_identity()) && !bool::from(q.is_identity()) {
+            points.push((p, q));
+        }
+    }
+    // Pairing is bilinear: terms sharing Q can add their P operands before
+    // Miller preparation. All original encodings were checked above, even
+    // terms that cancel. Keep unique P affine to avoid unnecessary inversions.
+    for i in 0..points.len() {
+        let (before, after) = points.split_at_mut(i + 1);
+        let (p, q) = &mut before[i];
+        if bool::from(p.is_identity()) {
+            continue;
+        }
+        let mut combined = None;
+        for (other_p, other_q) in after {
+            if !bool::from(other_p.is_identity()) && q == other_q {
+                combined = Some(combined.unwrap_or_else(|| G1Projective::from(*p)) + *other_p);
+                *other_p = G1Affine::identity();
+            }
+        }
+        if let Some(sum) = combined {
+            *p = G1Affine::from(sum);
+        }
+    }
+    points.retain(|(p, _)| !bool::from(p.is_identity()));
+    if points.is_empty() {
+        return Ok(true);
+    }
+    let prepared: Vec<_> = points.iter().map(|(_, q)| G2Prepared::from(*q)).collect();
+    let terms: Vec<_> = points
+        .iter()
+        .zip(&prepared)
+        .map(|((p, _), q)| (p, q))
+        .collect();
+    Ok(multi_miller_loop(&terms).final_exponentiation() == Gt::identity())
+}
+
+// Width-four non-adjacent form for a canonical public scalar. A carry may
+// create bit 255 even though canonical scalar encodings have only 255 bits.
+fn public_wnaf(scalar: &[u8; 33]) -> [i8; 256] {
+    let mut digits = [0; 256];
+    let mut bit = 0;
+    let mut carry = 0u16;
+    while bit < 256 {
+        let byte = bit / 8;
+        let word = (scalar[byte] as u16) | ((scalar[byte + 1] as u16) << 8);
+        let value = ((word >> (bit % 8)) & 15) + carry;
+        if value & 1 == 0 {
+            bit += 1;
+        } else {
+            carry = u16::from(value >= 8);
+            digits[bit] = (value as i16 - (carry as i16 * 16)) as i8;
+            bit += 4;
+        }
+    }
+    digits
+}
+
+// Bounded public-scalar MSM: small batches share doublings using Straus;
+// larger batches use signed Pippenger buckets. All scalar-dependent choices
+// here are variable time. Single multiplication retains its constant-time path.
+macro_rules! define_msm {
+    ($name:ident, $point:ident, $decode:ident, $width:literal) => {
+        fn $name(points: &[u8], scalars: &[u8]) -> Result<$point, u32> {
+            let count = batch_len(points, $width)?;
+            if batch_len(scalars, 32)? != count {
+                return Err(INVALID_LENGTH);
+            }
+            if count < 2 {
+                let mut sum = $point::identity();
+                for (p, s) in points.chunks_exact($width).zip(scalars.chunks_exact(32)) {
+                    sum += $decode(p)? * scalar(s)?;
+                }
+                return Ok(sum);
+            }
+            let mut inputs = Vec::with_capacity(count);
+            for (p, s) in points.chunks_exact($width).zip(scalars.chunks_exact(32)) {
+                let point = $decode(p)?;
+                scalar(s)?;
+                let mut little = [0u8; 33];
+                for (a, b) in little[..32].iter_mut().zip(s.iter().rev()) {
+                    *a = *b;
+                }
+                inputs.push((point, little));
+            }
+            if count < 4 {
+                let mut tables = [[$point::identity(); 4]; 3];
+                let mut digits = [[0i8; 256]; 3];
+                for (i, (point, scalar)) in inputs.iter().enumerate() {
+                    digits[i] = public_wnaf(scalar);
+                    tables[i][0] = $point::from(*point);
+                    let twice = tables[i][0].double();
+                    for j in 1..4 {
+                        tables[i][j] = tables[i][j - 1] + twice;
+                    }
+                }
+                let mut result = $point::identity();
+                for bit in (0..256).rev() {
+                    result = result.double();
+                    for i in 0..count {
+                        let digit = digits[i][bit];
+                        if digit > 0 {
+                            result += tables[i][digit as usize / 2];
+                        } else if digit < 0 {
+                            result -= tables[i][(-digit) as usize / 2];
+                        }
+                    }
+                }
+                return Ok(result);
+            }
+            let window = match count {
+                0..=4 => 3,
+                5..=16 => 4,
+                17..=64 => 5,
+                _ => 6,
+            };
+            let half = 1usize << (window - 1);
+            let mut buckets = [$point::identity(); 33];
+            let mut result = $point::identity();
+            // The extra top bit accounts for a negative digit at bit 254.
+            for k in (0..256usize.div_ceil(window)).rev() {
+                for _ in 0..window {
+                    result = result.double();
+                }
+                buckets[..=half].fill($point::identity());
+                let bit = k * window;
+                let byte = bit / 8;
+                for (point, scalar) in &inputs {
+                    let word = (scalar[byte] as usize) | ((scalar[byte + 1] as usize) << 8);
+                    let raw = (word >> (bit % 8)) & ((half << 1) - 1);
+                    let previous = if bit == 0 { 0 } else {
+                        ((scalar[(bit - 1) / 8] >> ((bit - 1) % 8)) & 1) as usize
+                    };
+                    // Overlapping signed radix digits (Booth recoding):
+                    // lower half + preceding bit - the signed upper bit.
+                    let digit = (raw & (half - 1)) as isize + previous as isize
+                        - (raw & half) as isize;
+                    if digit > 0 {
+                        buckets[digit as usize] += point;
+                    } else if digit < 0 {
+                        buckets[(-digit) as usize] -= point;
+                    }
+                }
+                let mut running = $point::identity();
+                for bucket in buckets[1..=half].iter().rev() {
+                    running += bucket;
+                    result += running;
+                }
+            }
+            Ok(result)
+        }
+    };
+}
+define_msm!(msm_g1, G1Projective, g1, 48);
+define_msm!(msm_g2, G2Projective, g2, 96);
+
+const G1_IDENTITY_BYTES: [u8; 48] = { let mut bytes = [0; 48]; bytes[0] = 0xc0; bytes };
+const G2_IDENTITY_BYTES: [u8; 96] = { let mut bytes = [0; 96]; bytes[0] = 0xc0; bytes };
+
+enum Output {
+    G1([u8; 48]),
+    G2([u8; 96]),
+    Bool(bool),
+}
+
+fn execute(op: u32, a: &[u8], b: &[u8], c: &[u8]) -> Result<Output, u32> {
+    match op {
+        1 => Ok(Output::G1(g1(a)?.to_compressed())),
+        2 => Ok(Output::G2(g2(a)?.to_compressed())),
+        3 => Ok(Output::G1(
+            G1Affine::from(G1Projective::from(g1(a)?) + g1(b)?).to_compressed(),
+        )),
+        4 => Ok(Output::G2(
+            G2Affine::from(G2Projective::from(g2(a)?) + g2(b)?).to_compressed(),
+        )),
+        5 => Ok(Output::G1(
+            G1Affine::from(g1(a)? * scalar(b)?).to_compressed(),
+        )),
+        6 => Ok(Output::G2(
+            G2Affine::from(g2(a)? * scalar(b)?).to_compressed(),
+        )),
+        7 => {
+            let sum = msm_g1(a, b)?;
+            // Preserve the full batch/scalar error contract before the empty
+            // shortcut; avoid an unnecessary projective identity inversion.
+            Ok(Output::G1(if a.is_empty() { G1_IDENTITY_BYTES }
+                else { G1Affine::from(sum).to_compressed() }))
+        }
+        8 => {
+            let sum = msm_g2(a, b)?;
+            Ok(Output::G2(if a.is_empty() { G2_IDENTITY_BYTES }
+                else { G2Affine::from(sum).to_compressed() }))
+        }
+        9 => Ok(Output::G1(G1Affine::from(map_g1(a)?).to_compressed())),
+        10 => Ok(Output::G2(G2Affine::from(map_g2(a)?).to_compressed())),
+        11 | 12 => {
+            if b.is_empty() {
+                return Err(INVALID_ARGUMENT);
+            }
+            if op == 11 {
+                Ok(Output::G1(G1Affine::from(hash_g1(a, b)).to_compressed()))
+            } else {
+                Ok(Output::G2(G2Affine::from(hash_g2(a, b)).to_compressed()))
+            }
+        }
+        13 => Ok(Output::Bool(pairing_check(a)?)),
+        14 => Ok(Output::Bool(verify_ic(a, b, c)?)),
+        15 => Ok(Output::Bool(verify_eth(a, b, c, ETH_DST)?)),
+        16 => Ok(Output::Bool(verify_eth(a, a, b, ETH_POP_DST)?)),
+        17 => {
+            batch_len(a, 48)?;
+            if a.is_empty() { return Ok(Output::G1(G1_IDENTITY_BYTES)); }
+            let mut sum = G1Projective::identity();
+            for p in a.chunks_exact(48) {
+                sum += g1(p)?;
+            }
+            Ok(Output::G1(G1Affine::from(sum).to_compressed()))
+        }
+        18 => {
+            batch_len(a, 96)?;
+            if a.is_empty() { return Ok(Output::G2(G2_IDENTITY_BYTES)); }
+            let mut sum = G2Projective::identity();
+            for p in a.chunks_exact(96) {
+                sum += g2(p)?;
+            }
+            Ok(Output::G2(G2Affine::from(sum).to_compressed()))
+        }
+        _ => Err(INVALID_ARGUMENT),
+    }
+}
+
+/// Uniform ABI: ops 1/3/5/7/9/11/17 write 48 bytes; 2/4/6/8/10/12/18
+/// write 96 bytes; 13/14/15/16 write one boolean byte. A nonzero status leaves
+/// the output unchanged. Unused inputs may be empty.
+///
+/// # Safety
+/// Each input denotes the stated number of readable bytes, no larger than
+/// isize::MAX. Null pointers are accepted only for zero length. Output denotes
+/// the complete writable result size and does not overlap any input. No GC
+/// safepoint occurs during the call. Allocated scratch is reclaimed by the
+/// host after the synchronous frame, not by this kernel.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn bls_call(
+    op: u32,
+    p1: *const u8,
+    n1: usize,
+    p2: *const u8,
+    n2: usize,
+    p3: *const u8,
+    n3: usize,
+    out: *mut u8,
+) -> u32 {
+    unsafe fn input<'a>(ptr: *const u8, len: usize) -> &'a [u8] {
+        if len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(ptr, len) }
+        }
+    }
+    let result = execute(
+        op,
+        unsafe { input(p1, n1) },
+        unsafe { input(p2, n2) },
+        unsafe { input(p3, n3) },
+    );
+    match result {
+        Ok(Output::G1(bytes)) => unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), out, 48) },
+        Ok(Output::G2(bytes)) => unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), out, 96) },
+        Ok(Output::Bool(value)) => unsafe { out.write(u8::from(value)) },
+        Err(code) => return code,
+    }
+    0
+}
+
+#[cfg(test)]
+mod tests;

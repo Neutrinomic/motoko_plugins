@@ -174,9 +174,15 @@ def runtimes(manifests, motoko, env):
         "-Zjson-target-spec", "-Zbuild-std=core,alloc",
     ]
     for manifest in manifests:
-        command += ["--package", manifest["runtime_crate"]]
-    run(command, env=runtime_env, label="Building Wasm runtimes")
-    for manifest in manifests:
+        # Cargo unifies dependency features across packages in one invocation.
+        # These runtimes are independent libraries: e.g. BLS enables group/alloc,
+        # while P256 and secp256k1 deliberately have no global allocator. Build
+        # each package separately so its feature set matches a standalone build,
+        # retaining the shared target directory to reuse compatible dependencies.
+        run(
+            [*command, "--package", manifest["runtime_crate"]], env=runtime_env,
+            label=f"[{manifest['name']}] building Wasm runtime",
+        )
         wasm = cargo_target / target.stem / "release" / (
             manifest["runtime_crate"].replace("-", "_") + ".wasm"
         )

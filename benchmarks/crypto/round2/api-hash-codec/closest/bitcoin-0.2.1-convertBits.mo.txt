@@ -1,0 +1,45 @@
+  func convertBits(
+    data : [Nat8],
+    start : Nat,
+    from : Nat32,
+    to : Nat32,
+    pad : Bool,
+  ) : Result<[Nat8], Text> {
+
+    var acc : Nat32 = 0;
+    var bits : Nat32 = 0;
+    let maxv : Nat32 = (1 << to) - 1;
+    let dataSize = data.size();
+    let output = VarArray.repeat<Nat8>(0, (dataSize - start) * from.toNat() / to.toNat() + 1);
+    var outputLen : Nat = 0;
+
+    var pos = start;
+    while (pos < dataSize) {
+      let v : Nat32 = data[pos].toNat16().toNat32();
+
+      if ((v >> from) != 0) {
+        return #err("Invalid input value: " # data[pos].toNat().toText());
+      };
+
+      acc := (acc << from) | v;
+      bits += from;
+
+      while (bits >= to) {
+        bits -= to;
+        output[outputLen] := ((acc >> bits) & maxv).toNat16().toNat8();
+        outputLen += 1;
+      };
+      pos += 1;
+    };
+
+    if (pad) {
+      if (bits > 0) {
+        output[outputLen] := ((acc << (to - bits)) & maxv).toNat16().toNat8();
+        outputLen += 1;
+      };
+    } else if (bits >= from or ((acc << (to - bits)) & maxv) != 0) {
+      return #err("Invalid Padding");
+    };
+
+    #ok(Array.tabulate<Nat8>(outputLen, func(i) = output[i]));
+  };

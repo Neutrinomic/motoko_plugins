@@ -1,0 +1,63 @@
+{
+  "status": "passed",
+  "findings": [],
+  "scope": "Independent read-only semantic and provenance review of selected RIPEMD160, SHA512 and HMAC round2 candidates; narrow independent HMAC ABI differential execution.",
+  "provenance": "provenance.json",
+  "review": {
+    "ripemd160": [
+      "Length, header, reserved bytes, count cap, unused tail and pre-first-block IV validate before offsets or short update fast path.",
+      "Short update condition is strictly input length <64-used, so exact block completion enters compression; checked total precedes return.",
+      "Pinned public CoreProxy/Buffer APIs preserve total/64 core counter and total%64 pending bytes without transmuting Rust layouts.",
+      "Immediate init stores cover all104bytes, use unaligned portable little-endian stores and preserve the IV."
+    ],
+    "sha512": [
+      "Pinned generic-array representation permits alignment1 immutable complete-block views. len/128 bounds multiplication and references do not escape.",
+      "Word-tail scan includes every remainder byte; length<2^125 prevents bit-count overflow; zero writes still validate.",
+      "Direct state serialization covers0..216 and digest writes exactly48/64bytes with portable big-endian words.",
+      "Padding at111/112 and127/128 follows baseline; partial-tail invariant remains zero beyond count%128."
+    ],
+    "hmac": [
+      "Short-circuit word-tail validation rejects any nonzero full word or remainder byte without overread.",
+      "Key ipad construction and repeated-byte xor to opad preserve short and hashed-long-key behavior.",
+      "Full-block batching uses pinned GenericArray representation/size/alignment; immutable slices cannot escape.",
+      "Direct-state stores cover0..136 and0..272 exactly; count byte temporary lives through copy; input-state fields are owned before output writes.",
+      "Counter limits and canonical unused tails retained; new/decode/update preserve zeros."
+    ],
+    "wrappers": [
+      "All three compiler generators and public modules hash-identical to baseline.",
+      "Fresh managed Blob allocation precedes payload pointer extraction, with no further allocation/safepoint before synchronous kernel callback."
+    ]
+  },
+  "own_execution": {
+    "command": "cargo test --manifest-path _build/crypto-optimization-round2/central-audit/hash-state/hmac-output/Cargo.toml --offline",
+    "exit_code": 0,
+    "tests_passed": 11,
+    "inherited_baseline_tests": 4,
+    "inherited_candidate_tests": 5,
+    "new_tests": 2,
+    "abi_comparisons": 34144,
+    "coverage": [
+      "All16 alignment residues",
+      "Both136/272-byte states",
+      "All64/128 tail occupancies",
+      "Zero-length, exact-block±1 and1024-byte updates",
+      "Differently poisoned whole-output comparisons against baseline",
+      "Guard canaries and immutable input/state checks"
+    ],
+    "log": "hmac-output/native.log",
+    "source_adaptation": "Private copies remove only no_mangle export annotations to coexist. No shared implementation edits.",
+    "dependency_lock": "hmac-output/Cargo.lock"
+  },
+  "reviewed_supporting_evidence": {
+    "sha512": "_build/crypto-optimization-round2/sha512-audit/combined-v1/report.json",
+    "ripemd160": "_build/crypto-optimization-round2/ripemd160-state-v2/audit.json",
+    "ripemd160_public": "_build/crypto-optimization-round2/ripemd160-state-v2/_build/crypto-audit/hash-codec/run-0dm45itr/report.json",
+    "hmac": "_build/crypto-optimization-round2/hmac-audit/findings.json",
+    "hmac_public": "_build/crypto-optimization-round2/hmac-audit/hmac-directout/_build/crypto-audit/hash-codec/run-uvlfcl14/report.json"
+  },
+  "limitations": [
+    "Did not repeat broad SHA512/RIPEMD native suites; reviewed exact-source reports and independently inspected implementation.",
+    "Own canaries detect overwritten bounds, not protected-page overreads; other independent auditors cover sanitizer/guard-page tests.",
+    "Benchmark methodology and final combined build belong to parent audit/orchestrator."
+  ]
+}

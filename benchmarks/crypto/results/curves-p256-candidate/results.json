@@ -1,0 +1,162 @@
+{
+  "stage": "curves-p256-candidate",
+  "recorded_utc": "2026-10-12T11:48:35.660Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "bd3f28e8e40b2a9d27f9f5897dd83fefa2c24078d6cbad9d9008948ffa4bf5b8",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "p256_public_key_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_public_key_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/p256_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "41f862537e72e1aa3d1d6771f9a4ce925307a2301566357cca07842256e44100",
+      "wasm": "p256_public_key_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "e062f0dc25ef5a50d3edc2aa91ce6a978ed00cce102ca9f894788a5dcaeab57c",
+      "wasm_bytes": 331232,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11201615,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11201615,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11201615,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_verify_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_verify_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/p256_verify_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "ce8806d6fa6c74c5b7f29c3c8d2776de1998fbc706849434dc7bdba788316839",
+      "wasm": "p256_verify_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "779178a5b3db0a8f2f7f40c68bf7781f3ce1da6fa6bc4c7c0f4b873eb4aef7c0",
+      "wasm_bytes": 331624,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 22609363,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 22609363,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 22609363,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_sign_rfc6979_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_sign_rfc6979",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "4304eef8b664375abd59a86fbe10e682b1e30276fe1f9efa71a9001d8a8e3da37d33976a24a49d93115167b94823a227beefb2755c3fe023492e8ff387041a86",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "curve-cases/p256_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "065c48041f72b15beecbf421ffe47f61ff4c0a43d088390a3713bccbe2dd00c3",
+      "wasm": "p256_sign_rfc6979_fast/fast/main.wasm",
+      "wasm_sha256": "33ac690b2b1d9e760cdd3aaf7924fe713b4cc5b7f28c8fc60243c3ab3cd5c6fc",
+      "wasm_bytes": 331388,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 13457023,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 13457023,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 13457023,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

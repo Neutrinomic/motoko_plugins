@@ -1,0 +1,374 @@
+{
+  "stage": "hmac-prepared-initial",
+  "recorded_utc": "2026-10-12T11:47:14.838Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "4eb947b23c468ed174c1601c67e4648c662791d4dfd59089e5ab7ef41fe7b879",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "hmac-sha256-prepared-64",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "173206781c3b828a0dc2a716fe0ddb5e6e56ec171170952ff6b3f4de44fa18d7",
+      "notes": "Prepared key reuse: precompress key pads outside measured interval; each trial uses a fresh canister and fresh message.",
+      "source": "cases/hmac-sha256-prepared-64/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f37b4d9aefe0e51687294bda5e711763ed3d6af9aef904bf914dc8b12b57efea",
+      "wasm": "hmac-sha256-prepared-64/native/main.wasm",
+      "wasm_sha256": "f97c49a02f20c2284bf3d06ec2f94546a98fbee79dc28b412e0a8ca45ebb2b2e",
+      "wasm_bytes": 284632,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 17812,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 17812,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 17812,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha256-prepared-64",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [],
+      "expected_hex": "173206781c3b828a0dc2a716fe0ddb5e6e56ec171170952ff6b3f4de44fa18d7",
+      "notes": "Hmac constructor performs reusable key preparation outside interval. Blob input conversion included.",
+      "source": "cases/hmac-sha256-prepared-64/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "f45083a7f175b85a08cf92a70e83769014932e464435b5cc2bde226bb4db2e66",
+      "wasm": "hmac-sha256-prepared-64/mops-bitcoin/main.wasm",
+      "wasm_sha256": "585df57f737668f2b8727a9666bc179f7f758076dd1349c3df761db3311260c3",
+      "wasm_bytes": 496462,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 72916,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 72916,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 72916,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "9d6e3057cb73f2c16ef5dd846a230279879dd090750f7a3efecb5a9fca7ddf00",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha512-prepared-64",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "2592ee5d893826f1be2d666a5a1a7e1c7f8aa2ba275ad3151bfdf182659b64a5a277c2b501164bfddc5d236e29c3e6304a1907c68ffea24b44f54819d9ca5c45",
+      "notes": "Prepared key reuse: precompress key pads outside measured interval; each trial uses a fresh canister and fresh message.",
+      "source": "cases/hmac-sha512-prepared-64/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "2cf49b6ba86c989520fdd9f616b576ec881f3836b0c5535766d78b11bfb733da",
+      "wasm": "hmac-sha512-prepared-64/native/main.wasm",
+      "wasm_sha256": "2616aa1083c9d74eaa9b61a0ff9b0451022b3768a755ff0a1b31aa06a8163649",
+      "wasm_bytes": 284634,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19620,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19620,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19620,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha512-prepared-64",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [],
+      "expected_hex": "2592ee5d893826f1be2d666a5a1a7e1c7f8aa2ba275ad3151bfdf182659b64a5a277c2b501164bfddc5d236e29c3e6304a1907c68ffea24b44f54819d9ca5c45",
+      "notes": "Hmac constructor performs reusable key preparation outside interval. Blob input conversion included.",
+      "source": "cases/hmac-sha512-prepared-64/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "8e0661cd51b8bac03e314511ad919c3df11a69cd7a5c0fd8114150d86d521198",
+      "wasm": "hmac-sha512-prepared-64/mops-bitcoin/main.wasm",
+      "wasm_sha256": "85e5f0d92c67656536a3a17a672c11b878a9b797650e16e5ceadeb94028e6d86",
+      "wasm_bytes": 444622,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 59322,
+          "allocated_bytes": 4000,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 59322,
+          "allocated_bytes": 4000,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 59322,
+          "allocated_bytes": 4000,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "a145f38282bfeda5ea8093309f91391e45d3e3c723f9dbf1e50b12b6c959ce86",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha256-prepared-1024",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "Prepared key reuse: precompress key pads outside measured interval; each trial uses a fresh canister and fresh message.",
+      "source": "cases/hmac-sha256-prepared-1024/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "3351b16eb9fbbb84be06a655c367d629cd7b5e6836f38effa741d6e616ed2f4f",
+      "wasm": "hmac-sha256-prepared-1024/native/main.wasm",
+      "wasm_sha256": "c909e5c930afa65a8cb80ac786a46e057dc73cf722ff5d514e3a8013218cc3ca",
+      "wasm_bytes": 284632,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 91927,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 91927,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 91927,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha256-prepared-1024",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [],
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "Hmac constructor performs reusable key preparation outside interval. Blob input conversion included.",
+      "source": "cases/hmac-sha256-prepared-1024/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "4a72196b528e4dd1eae582dc46ce01e562ba13945d0b69d94ec91660a999aee9",
+      "wasm": "hmac-sha256-prepared-1024/mops-bitcoin/main.wasm",
+      "wasm_sha256": "3ae395ba18ec9633c31859f68a972bff9690ad6fccbd7f55c81599a65613fe2e",
+      "wasm_bytes": 496462,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 405121,
+          "allocated_bytes": 9248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 405121,
+          "allocated_bytes": 9248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 405121,
+          "allocated_bytes": 9248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "268d3276cf2875f53f1de3579fef88d87a217cf1e4fb51721ea0d809c98621c2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha512-prepared-1024",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "Prepared key reuse: precompress key pads outside measured interval; each trial uses a fresh canister and fresh message.",
+      "source": "cases/hmac-sha512-prepared-1024/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "0ce3937e2a33f4eb0202f9006b72677893c87386a7bd00b861cc30786b1b074b",
+      "wasm": "hmac-sha512-prepared-1024/native/main.wasm",
+      "wasm_sha256": "b341f44e1815b9ff42191bc9899d89345189f890d80fd88746e41baf0e1b4d89",
+      "wasm_bytes": 284634,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 73071,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 73071,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 73071,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "hmac-sha512-prepared-1024",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "prepared-key-blob-api",
+      "plugins": [],
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "Hmac constructor performs reusable key preparation outside interval. Blob input conversion included.",
+      "source": "cases/hmac-sha512-prepared-1024/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "52491c5f603984311ea3a786eaa0428fa7cd11f53e39cd61369982dd1babb42f",
+      "wasm": "hmac-sha512-prepared-1024/mops-bitcoin/main.wasm",
+      "wasm_sha256": "b125acbf63d27e9e0dde6e0b39d21473665229bc159de328fba2d8739abedc40",
+      "wasm_bytes": 444622,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 240766,
+          "allocated_bytes": 11584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 240766,
+          "allocated_bytes": 11584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 240766,
+          "allocated_bytes": 11584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "ee591c1b99501c27e23065f0ca3bcff29faeb1d737487d8a10b6166944acf333",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

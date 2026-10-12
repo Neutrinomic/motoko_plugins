@@ -1,0 +1,98 @@
+{
+  "families": [
+    {
+      "family": "sha256",
+      "stages": [
+        "round2-sha256-final",
+        "round2-sha256-final-extra"
+      ],
+      "change": "Fixed 32/33-byte padding path",
+      "representative": "sha256-33"
+    },
+    {
+      "family": "blake3",
+      "stages": [
+        "round2-blake3-c"
+      ],
+      "change": "Direct output and borrowed streaming state",
+      "representative": "blake3-stream-1024-chunks256"
+    },
+    {
+      "family": "sha512",
+      "stages": [
+        "round2-sha512-combined-v1"
+      ],
+      "change": "Batched upstream compression and state copies",
+      "representative": "sha512-stream-64-chunks1"
+    },
+    {
+      "family": "ripemd160",
+      "stages": [
+        "round2-ripemd160-state-v2"
+      ],
+      "change": "Canonical state validation and short updates",
+      "representative": "ripemd160-stream-64-chunks1"
+    },
+    {
+      "family": "hmac-sha2",
+      "stages": [
+        "round2-hmac-directout"
+      ],
+      "change": "Pad/context reuse and direct state output",
+      "representative": "hmac-sha512-stream-k32-n1024-c1"
+    },
+    {
+      "family": "base58",
+      "stages": [
+        "round2-base58-limbs-v3"
+      ],
+      "change": "Grouped-radix limb conversion",
+      "representative": "base58-encode-4096-pattern"
+    },
+    {
+      "family": "bech32",
+      "stages": [
+        "round2-bech32-candidate3"
+      ],
+      "change": "Checksum table and grouped bit conversion",
+      "representative": ""
+    },
+    {
+      "family": "secp256k1",
+      "stages": [
+        "round2-secp-vendor-candidate"
+      ],
+      "change": "Reuse Schnorr constructor results and secret-tweak public point",
+      "representative": "r2-secp256k1-schnorr-sign-message-32"
+    },
+    {
+      "family": "p256",
+      "stages": [
+        "round2-p256-combined"
+      ],
+      "change": "Fixed-base key multiplication and public-input verifier",
+      "representative": "p256_verify_ecdsa_fast"
+    },
+    {
+      "family": "bls12-381",
+      "stages": [
+        "round2-bls-final",
+        "round2-bls-empty-final",
+        "round2-bls-cachecap-aggregates",
+        "round2-bls-long-capped"
+      ],
+      "change": "Pairing/MSM and aggregation reuse",
+      "representative": "bls12_381_pairing_identity_fast"
+    },
+    {
+      "family": "Bitcoin composition",
+      "stages": [
+        "round2-bitcoin-api-v3",
+        "round2-bitcoin-workflows-v3",
+        "round2-bitcoin-extra-v3"
+      ],
+      "change": "Contiguous writers, direct copies and prepared data reuse",
+      "representative": "api-bitcoin-transaction-serialize"
+    }
+  ]
+}

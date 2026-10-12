@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "name": "r2-p256-public-key-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-public-key-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-public-key-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "name": "p256_public_key_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_public_key_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/p256_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    }
+  ]
+}

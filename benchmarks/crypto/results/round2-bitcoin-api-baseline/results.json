@@ -1,0 +1,2409 @@
+{
+  "stage": "round2-bitcoin-api-baseline",
+  "expected_case_count": 47,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:04:13.932Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "3d9faa74960bdacd359a2bebe56c1ee9c11f006d295f5a80d8a9a8f6ffa874dd",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-bitcoin-hash-hash160",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-hash160",
+      "public_api": "Bitcoin/Hash.hash160",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "c749ae3d88f0ce79b9cb1269cd4c96043d9c267a",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-hash160/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "10e297e150f9b7bd43eb334e8eef9ca6f6b832831550ac80d9ef694ae395ded5",
+      "wasm": "api-bitcoin-hash-hash160/native/main.wasm",
+      "wasm_sha256": "67c60841fcdee6914e07f4bf2596b953f09e0d5288757764acac5d80b5e0d964",
+      "wasm_bytes": 283422,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8574,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "0ede0cb07216bc891bd3b9803db27a85b38e3a145a1b8c60281564b15f142370",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8574,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "0ede0cb07216bc891bd3b9803db27a85b38e3a145a1b8c60281564b15f142370",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8574,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "0ede0cb07216bc891bd3b9803db27a85b38e3a145a1b8c60281564b15f142370",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-hash-sha256d",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-sha256d",
+      "public_api": "Bitcoin/Hash.sha256d",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "10501ef36ef0609bddeee0071cb6d3ec5b28314abad7963c30698bfed0cbda81",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-sha256d/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "6aec68075852da0fe7752a36d4d1fd1ee99a1ded4f92e295a7b76da8880a2d69",
+      "wasm": "api-bitcoin-hash-sha256d/native/main.wasm",
+      "wasm_sha256": "03b089e5a6ec90b9a305d82fa8d0eb01144d453235ef872b258e52afe103ab1d",
+      "wasm_bytes": 274539,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-hash-digest256",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-digest256",
+      "public_api": "Bitcoin/Hash.digest256",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "10501ef36ef0609bddeee0071cb6d3ec5b28314abad7963c30698bfed0cbda81",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-digest256/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "42eb938524601b1aa1e4003b6bfd905b364954c73a8d4af74a2e8c202a1769a6",
+      "wasm": "api-bitcoin-hash-digest256/native/main.wasm",
+      "wasm_sha256": "03b089e5a6ec90b9a305d82fa8d0eb01144d453235ef872b258e52afe103ab1d",
+      "wasm_bytes": 274539,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9696,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a674ad988fc8bbfc78c9003d30f490d33791b6a53dea42f7469c76aaf3fcd031",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-hash-taggedhash",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-taggedhash",
+      "public_api": "Bitcoin/Hash.taggedHash",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "0b6790132daca874c4c3745c6589b1fda0414023411812f94efc604765cec8f8",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-taggedhash/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f0347cfee51117ef2ef349c0f0eeefff26f35ff6f743679b7154eceed833ae07",
+      "wasm": "api-bitcoin-hash-taggedhash/native/main.wasm",
+      "wasm_sha256": "3c4bd25ffba80802a03400f2505828dc1848069a1a905f0e951723cc039307b4",
+      "wasm_bytes": 276550,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 40459,
+          "allocated_bytes": 1328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 40459,
+          "allocated_bytes": 1328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 40459,
+          "allocated_bytes": 1328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-hash-taggedhasher",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-taggedhasher",
+      "public_api": "Bitcoin/Hash.taggedHasher",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "0b6790132daca874c4c3745c6589b1fda0414023411812f94efc604765cec8f8",
+      "notes": "Measure closure construction only; invoke it outside measurement to verify retained tag state.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-taggedhasher/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "59b4b7323de67a120638b9aaf211483cd4c6cc04ea8893706b9b5916a154cd39",
+      "wasm": "api-bitcoin-hash-taggedhasher/native/main.wasm",
+      "wasm_sha256": "0b6d767cdea1278dfba3c0fdc3039d71285074436ca0ba7b131091a2134de8ac",
+      "wasm_bytes": 277096,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5954,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5954,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5954,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-hash-taggedhasher-call",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-hash-taggedhasher-call",
+      "public_api": "Bitcoin/Hash.taggedHasher.call",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "0b6790132daca874c4c3745c6589b1fda0414023411812f94efc604765cec8f8",
+      "notes": "Measure returned closure invocation; tag preparation outside measurement.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-hash-taggedhasher-call/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "d6b6d9f275981990afa78a928232901cd71814e89e678f5e66c9294849d47c52",
+      "wasm": "api-bitcoin-hash-taggedhasher-call/native/main.wasm",
+      "wasm_sha256": "bcd6f379b9287c727baf6bac1094c9031721fb6a318541b76089903818b1c52a",
+      "wasm_bytes": 276926,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 34915,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 34915,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 34915,
+          "allocated_bytes": 1272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "05abd67143f1f98e814645219b0299974e37667a4e0861a046e774bed2391b5c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-hrp",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-hrp",
+      "public_api": "Bitcoin/Address.hrp",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "62637274",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-hrp/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "7ef1fc1cd07e4f5a13e457f16fcb57e4def4f38a3cf03019f37d49989a3a3e8f",
+      "wasm": "api-bitcoin-address-hrp/native/main.wasm",
+      "wasm_sha256": "187c2c177c633943d390772754dc0db863f086785e00847b24c33d8d91e26f71",
+      "wasm_bytes": 245062,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 324,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "9575abffb44c5c9cfdb0d2c1a5cda7adac5a9a41e8ccab089628fb94d8d7ad95",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 324,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "9575abffb44c5c9cfdb0d2c1a5cda7adac5a9a41e8ccab089628fb94d8d7ad95",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 324,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "9575abffb44c5c9cfdb0d2c1a5cda7adac5a9a41e8ccab089628fb94d8d7ad95",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-encode",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-encode",
+      "public_api": "Bitcoin/Address.encode",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "626331716d68747a68336b7a32757139686b656d376a3977636376793635336e6766796d38376d647874",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-encode/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "6142dac6cf5dcb4c9ce3c9a3d9955d71f53e3f5c96c2520823f91a006fe6338b",
+      "wasm": "api-bitcoin-address-encode/native/main.wasm",
+      "wasm_sha256": "7e957ee27267916b45dc526f99403647e3c0fefe2451b3f1c5dbad6863133d09",
+      "wasm_bytes": 292648,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 17958,
+          "allocated_bytes": 1064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 17958,
+          "allocated_bytes": 1064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 17958,
+          "allocated_bytes": 1064,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-decode",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-decode",
+      "public_api": "Bitcoin/Address.decode",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "00ddd62bc6c257005bdb3bf48aec6184d52334249b",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-decode/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "ec3c5545d1c7895817feb4a7020bdae7f7bf27f8010a034b77ba89a642c151fa",
+      "wasm": "api-bitcoin-address-decode/native/main.wasm",
+      "wasm_sha256": "6dc2fbb9d679d460e7fafe2b21352f427450f648dd8d7ee44ec96ac55fcf5673",
+      "wasm_bytes": 295729,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 20680,
+          "allocated_bytes": 1296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "8a4e775634e488e79923c57fefe3f48ae5f79f64a1a7c28dd98c2a780b2db591",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 20680,
+          "allocated_bytes": 1296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "8a4e775634e488e79923c57fefe3f48ae5f79f64a1a7c28dd98c2a780b2db591",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 20680,
+          "allocated_bytes": 1296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21,
+          "output_sha256": "8a4e775634e488e79923c57fefe3f48ae5f79f64a1a7c28dd98c2a780b2db591",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2pkh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2pkh",
+      "public_api": "Bitcoin/Address.p2pkh",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "314d4478754674423152374171715a784e37756753774578436d7579684e794a794b",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2pkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "00a8f2cae515ee3fd1e55fead68ad2f91a763b24b2f3f7fb2c03c5e8a79cb6ca",
+      "wasm": "api-bitcoin-address-p2pkh/native/main.wasm",
+      "wasm_sha256": "f4a606c76232560e6db12cd5116490b4d1db3ccfd800825fb387101a9c481dc8",
+      "wasm_bytes": 505173,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 615535,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "a296e8da02b612d8b756d045747e2edb3903e515dfa3cec90617c26b8863af29",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 615535,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "a296e8da02b612d8b756d045747e2edb3903e515dfa3cec90617c26b8863af29",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 615535,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "a296e8da02b612d8b756d045747e2edb3903e515dfa3cec90617c26b8863af29",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2wpkh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2wpkh",
+      "public_api": "Bitcoin/Address.p2wpkh",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "626331716d68747a68336b7a32757139686b656d376a3977636376793635336e6766796d38376d647874",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2wpkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "795dcb60cdf81c3edbe1c2f42fe2646f2897ecd746b6ca008244eb39ee11e6e2",
+      "wasm": "api-bitcoin-address-p2wpkh/native/main.wasm",
+      "wasm_sha256": "9399e4ddc84cfe2bb1060151f205aedb93914d132b9bd77f46a455874e25d640",
+      "wasm_bytes": 505271,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 602688,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 602688,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 602688,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6d6855774a74b74028c2e070ffa65f90998adfb8f2cb282ea208c9ba38ae0a68",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2sh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2sh",
+      "public_api": "Bitcoin/Address.p2sh",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "334e6a73636a6f4455706b346b7777436f41624e704e435459573945374842317046",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2sh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "205f78b1662c51724b4fc27e7ffe79b7cc0ada3eec62db04e2d14f1f1fef13a1",
+      "wasm": "api-bitcoin-address-p2sh/native/main.wasm",
+      "wasm_sha256": "9e063232101e47ca5f97a67d2376bc28bd3d25e678012db6bddf8c9279bd8a22",
+      "wasm_bytes": 301573,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 40139,
+          "allocated_bytes": 1432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "f6ce8549fdd74b90dee912842f58478e38fee31990252d38e8f19cf6ea035479",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 40139,
+          "allocated_bytes": 1432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "f6ce8549fdd74b90dee912842f58478e38fee31990252d38e8f19cf6ea035479",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 40139,
+          "allocated_bytes": 1432,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "f6ce8549fdd74b90dee912842f58478e38fee31990252d38e8f19cf6ea035479",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2wsh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2wsh",
+      "public_api": "Bitcoin/Address.p2wsh",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "626331713576686e66616a656a32396d333573353676766d34776a6e766e7461796a7777766874777736306e326d797a796c64767334757168617977796a",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2wsh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "56cde5c5ec681070d00fa2fa895d8723cb0db9233f87b862f167bde9a5c4e32d",
+      "wasm": "api-bitcoin-address-p2wsh/native/main.wasm",
+      "wasm_sha256": "5ede872f276a15b71823133866d0bb9afa6d3f25dd05fd6120a0b74a8565dd92",
+      "wasm_bytes": 292756,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 32379,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "7be17620c3cfa4bab66172ce3c49449f702c1107a4f4380e91be14590244843f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 32379,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "7be17620c3cfa4bab66172ce3c49449f702c1107a4f4380e91be14590244843f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 32379,
+          "allocated_bytes": 1568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "7be17620c3cfa4bab66172ce3c49449f702c1107a4f4380e91be14590244843f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-taprootoutputkey",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-taprootoutputkey",
+      "public_api": "Bitcoin/Address.taprootOutputKey",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "01d9e40f82c148b28294bfc7f328b7b3b5a76a083aaa313dec7b88c1ffde5e5448",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-taprootoutputkey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f504f47e3f871f410fe5f929ac84832c68db28212ef9a4f05cbe71da70fcf0b7",
+      "wasm": "api-bitcoin-address-taprootoutputkey/native/main.wasm",
+      "wasm_sha256": "dce1463d658f29d85739bdcdbe11b5c9420e1948f14933ca17c31e2c288e6840",
+      "wasm_bytes": 483881,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7004165,
+          "allocated_bytes": 1912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "295e99874ce1166c8c18a435053f0a0ebfe7479997e3fb6f73b9f0fc1bffc332",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7004165,
+          "allocated_bytes": 1912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "295e99874ce1166c8c18a435053f0a0ebfe7479997e3fb6f73b9f0fc1bffc332",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7004165,
+          "allocated_bytes": 1912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "295e99874ce1166c8c18a435053f0a0ebfe7479997e3fb6f73b9f0fc1bffc332",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-taprootsecretkey",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-taprootsecretkey",
+      "public_api": "Bitcoin/Address.taprootSecretKey",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "011799f6727b262622f987eaf36e846689182670b6902a764873ef775ea5be42",
+      "notes": "Full-width local internal secret, empty Taproot tree; independent affine scalar oracle.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-taprootsecretkey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "edbfed4aec88203e870341b3d3069820532e8bfcede9b903439032b9d5ea758b",
+      "wasm": "api-bitcoin-address-taprootsecretkey/native/main.wasm",
+      "wasm_sha256": "4981e226f72de31bf7fa8d91ef0d290e42d1d945f8eb6bce6f887d0d11ef2f79",
+      "wasm_bytes": 483400,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19093958,
+          "allocated_bytes": 1960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3aa0871d8fae05e640791c09fecb9489f8faddff150fa3bd3e3e74e53db8608b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19093958,
+          "allocated_bytes": 1960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3aa0871d8fae05e640791c09fecb9489f8faddff150fa3bd3e3e74e53db8608b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19093958,
+          "allocated_bytes": 1960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3aa0871d8fae05e640791c09fecb9489f8faddff150fa3bd3e3e74e53db8608b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-signtaprootkeypath",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-signtaprootkeypath",
+      "public_api": "Bitcoin/Address.signTaprootKeyPath",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "83040de19aceaa56775368a36345600705855ea908205df908fa3cec1d005069a5344c4207a1066f597fe2df22c19702ef26b1fa1e5312a2b9531edd173715e9",
+      "notes": "Full local secret tweak and BIP340 signing of supplied digest; no extra prehash. No Schnorr API in bitcoin 0.2.1.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-signtaprootkeypath/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "b7e079368313c4ca64f88ddbf2b4c5d052bd3e9665d4bed49041df51d216b17d",
+      "wasm": "api-bitcoin-address-signtaprootkeypath/native/main.wasm",
+      "wasm_sha256": "f923e5034f4d058bf8b4d73a9c1641372fd74766953b559aa16deb3c59ddb3d6",
+      "wasm_bytes": 485914,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 44549408,
+          "allocated_bytes": 2112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7e7832f09c968235bbf4da27a8bfd34aa3d2df07fb0ac4c90bd000272ff408b3",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 44549408,
+          "allocated_bytes": 2112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7e7832f09c968235bbf4da27a8bfd34aa3d2df07fb0ac4c90bd000272ff408b3",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 44549408,
+          "allocated_bytes": 2112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7e7832f09c968235bbf4da27a8bfd34aa3d2df07fb0ac4c90bd000272ff408b3",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2troutput",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2troutput",
+      "public_api": "Bitcoin/Address.p2trOutput",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "626331706d386a716c716b70667a65673939396c636c656a3364616e6b6b6e6b357a70363467636e6d6d726d3372716c6c686a37323379716b38346b6534",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2troutput/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "abf40ab3fb4d945f56c7d85a952b46b2ef6e5f263815b94221c888f97405b85c",
+      "wasm": "api-bitcoin-address-p2troutput/native/main.wasm",
+      "wasm_sha256": "f6c2188fae89a711ff61a46c94f26d808b2a7c007230eec53ad8193e2044d722",
+      "wasm_bytes": 496295,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 613805,
+          "allocated_bytes": 2304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 613805,
+          "allocated_bytes": 2304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 613805,
+          "allocated_bytes": 2304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-p2tr",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-p2tr",
+      "public_api": "Bitcoin/Address.p2tr",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "626331706d386a716c716b70667a65673939396c636c656a3364616e6b6b6e6b357a70363467636e6d6d726d3372716c6c686a37323379716b38346b6534",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-p2tr/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "13cfb94bd6b733884b90d5895e9344101ac1ae6c67b2af23afc6b2d2d9f853cd",
+      "wasm": "api-bitcoin-address-p2tr/native/main.wasm",
+      "wasm_sha256": "70847cb591be294643b4ef9c040ad59c82c0e4c4fe26763d9e99911aa3d8c0bc",
+      "wasm_bytes": 498781,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7030745,
+          "allocated_bytes": 3424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7030745,
+          "allocated_bytes": 3424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7030745,
+          "allocated_bytes": 3424,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "79bfc6486d4d76921023be7c58976e357a107674fe861f67bfc02f5258c33d74",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-address-scriptpubkey",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-address-scriptpubkey",
+      "public_api": "Bitcoin/Address.scriptPubKey",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "76a914ddd62bc6c257005bdb3bf48aec6184d52334249b88ac",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-address-scriptpubkey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "e8ff667034f682ae6236040a1112af9cf72f4b572c8d6b6ff75dd9d407e10810",
+      "wasm": "api-bitcoin-address-scriptpubkey/native/main.wasm",
+      "wasm_sha256": "19c44d6990fe2712efe45b1032a1e330d49bff1ce79bf6e89a1e706a7020a5b4",
+      "wasm_bytes": 297848,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 36542,
+          "allocated_bytes": 1992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 36542,
+          "allocated_bytes": 1992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 36542,
+          "allocated_bytes": 1992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-frompublickey",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-frompublickey",
+      "public_api": "Bitcoin/Bip32.fromPublicKey",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "787075623636314d794d77417152626346573331594577706b4d756335544879325053743562444d736b745751634646387379416d52556170534347753845443957366f444d536776365a7a3869646f633461366d723842447a544a5934374c4a686b4a3855423757454775647542",
+      "notes": "All returned node metadata verified by serialization outside timing; validates compressed point inside public API.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-frompublickey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "ef458916fc68b717e541f88163ce3123abf91f83c4d027a0f4b6c9a3c9a373da",
+      "wasm": "api-bitcoin-bip32-frompublickey/native/main.wasm",
+      "wasm_sha256": "996441c2c9666f002ce30ae9e58b1e612ff4c3a6514601496979c416ed48af2e",
+      "wasm_bytes": 488210,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 575914,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 575914,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 575914,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-fingerprint",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-fingerprint",
+      "public_api": "Bitcoin/Bip32.fingerprint",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "bd16bee5",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-fingerprint/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "8f5f559ab59779838a911ac82dc32e9c35553df995c02171aa8fc1ab5cc1f9be",
+      "wasm": "api-bitcoin-bip32-fingerprint/native/main.wasm",
+      "wasm_sha256": "953fdb5a5dc09fa8038f6491b2f7cdd1b7ca97726726fc107b07d20c80c691f7",
+      "wasm_bytes": 488283,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 586042,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 586042,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 586042,
+          "allocated_bytes": 368,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4,
+          "output_sha256": "863a3f7dcdc9f350dc0868090cd012231ac46d24538e88c9e4760bf6e46da266",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-parse",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-parse",
+      "public_api": "Bitcoin/Bip32.parse",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "787075623636314d794d77417152626346573331594577706b4d756335544879325053743562444d736b745751634646387379416d52556170534347753845443957366f444d536776365a7a3869646f633461366d723842447a544a5934374c4a686b4a3855423757454775647542",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-parse/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "0a6e87a82224c7c5bcab3e465f5173167eda42a76cb1b67c2a2c54ff0540ab0b",
+      "wasm": "api-bitcoin-bip32-parse/native/main.wasm",
+      "wasm_sha256": "16b598ca8aa672592235b95b013d000e4ccddc1903a66cf2f01281f7fc633abd",
+      "wasm_bytes": 493614,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 638662,
+          "allocated_bytes": 2336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 638662,
+          "allocated_bytes": 2336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 638662,
+          "allocated_bytes": 2336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivechild",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-derivechild",
+      "public_api": "Bitcoin/Bip32.deriveChild",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivechild/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "602bfadd1c6e4bff9f8f73afa0cdabaf8505003aa36ee2d1e0602764c77d99e6",
+      "wasm": "api-bitcoin-bip32-derivechild/native/main.wasm",
+      "wasm_sha256": "08286f438b40d5c8df7ac67d740cb7ed365ef89d6fd1a131140c67614eb51b59",
+      "wasm_bytes": 541836,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7601802,
+          "allocated_bytes": 1928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7601802,
+          "allocated_bytes": 1928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7601802,
+          "allocated_bytes": 1928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivepath",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-derivepath",
+      "public_api": "Bitcoin/Bip32.derivePath",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "78707562364153415667654e3231587266676d7a747164563871316735666d6b3435614d554c41414b4e5554687072574d385734524a3548626b635561543658444c485033727a4133504856675a366242703771466d4c6337466f487a6e366d4e4e6a35747a45316d656359717556",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivepath/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f6d61f9146fe3c47c4a881b5b7f6fea3ddd5a0c8c3803796069da0606a1fa25b",
+      "wasm": "api-bitcoin-bip32-derivepath/native/main.wasm",
+      "wasm_sha256": "b3a267a25dd790a6938f18f817b36172b4f9c41b61a3b55f731d9495f0afcfd8",
+      "wasm_bytes": 542469,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14626608,
+          "allocated_bytes": 3792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14626608,
+          "allocated_bytes": 3792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14626608,
+          "allocated_bytes": 3792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-derivetextpath",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-derivetextpath",
+      "public_api": "Bitcoin/Bip32.deriveTextPath",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "78707562364153415667654e3231587266676d7a747164563871316735666d6b3435614d554c41414b4e5554687072574d385734524a3548626b635561543658444c485033727a4133504856675a366242703771466d4c6337466f487a6e366d4e4e6a35747a45316d656359717556",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-derivetextpath/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "6f4dae88ba605ff926ceba8a6122f306ce93076af481b0be49f165a65d5c127b",
+      "wasm": "api-bitcoin-bip32-derivetextpath/native/main.wasm",
+      "wasm_sha256": "dc20a6648c4a5320f11a2f00befb937bc2a047825296d61f36fe5e8520559877",
+      "wasm_bytes": 555134,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14645857,
+          "allocated_bytes": 5848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14645857,
+          "allocated_bytes": 5848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14645857,
+          "allocated_bytes": 5848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "ada211b067df5e7de1b9963b918dd9f4699659d0fc1ced13d764c940b9f3b9ce",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-serialize",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-serialize",
+      "public_api": "Bitcoin/Bip32.serialize",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "787075623636314d794d77417152626346573331594577706b4d756335544879325053743562444d736b745751634646387379416d52556170534347753845443957366f444d536776365a7a3869646f633461366d723842447a544a5934374c4a686b4a3855423757454775647542",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-serialize/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f4e90bfd3bd8c4326e779c5417885b9e582ddb88fd27f5274f4d86010d45b994",
+      "wasm": "api-bitcoin-bip32-serialize/native/main.wasm",
+      "wasm_sha256": "8e1782a7d7b6811c55decabec78d96138cae9e6944a810db6eac7f6dce7313a9",
+      "wasm_bytes": 493412,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 664381,
+          "allocated_bytes": 2576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 664381,
+          "allocated_bytes": 2576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 664381,
+          "allocated_bytes": 2576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "d5309c6ff8d1a8266e29b8a3c0797fbfb8b93f1575699de70f60c369d9415671",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-bip32-parsepath",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-bip32-parsepath",
+      "public_api": "Bitcoin/Bip32.parsePath",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "0000000001000000",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-bip32-parsepath/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "a0edb0cc3881f7b0a76d7baf461d5bb6d64c60fd771e03ced68756a86e95e4f3",
+      "wasm": "api-bitcoin-bip32-parsepath/native/main.wasm",
+      "wasm_sha256": "51ca533a63d883b1fea5d2e49f9668b8df1e4999f1eb828b1612fe85557c46c4",
+      "wasm_bytes": 259381,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 18506,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 18506,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 18506,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "01acecb507abfe1a354aa8064f4af5d3f1acd019e37db3c11c97523b71c76e9d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-pushdata",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-pushdata",
+      "public_api": "Bitcoin/Script.pushData",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "4c50000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-pushdata/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "bab82cd7ba94027dc34cd62c01c134e7e2b56833b4193a193ffc66bce4f3e268",
+      "wasm": "api-bitcoin-script-pushdata/native/main.wasm",
+      "wasm_sha256": "d827f0f8ad8425059243df04d0c272fea347c1db2fd7c051fa6d36a1949432fb",
+      "wasm_bytes": 250424,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 29140,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 29140,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 29140,
+          "allocated_bytes": 888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 82,
+          "output_sha256": "7337af4b9e1f9f3a516e396945a499188d576474a10a37d557f1bf05ed987c00",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2pkh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-p2pkh",
+      "public_api": "Bitcoin/Script.p2pkh",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "76a914ddd62bc6c257005bdb3bf48aec6184d52334249b88ac",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2pkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "761b18149cf91053fe52337dbfa1dfff0160c993975fe0717ab24e8d5d03e2b4",
+      "wasm": "api-bitcoin-script-p2pkh/native/main.wasm",
+      "wasm_sha256": "40ff575cb3a8e91f0977407149ccbb6fe17fa401e6318836c32511e732815f97",
+      "wasm_bytes": 246930,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9269,
+          "allocated_bytes": 336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9269,
+          "allocated_bytes": 336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9269,
+          "allocated_bytes": 336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 25,
+          "output_sha256": "1a086d6d0d30a1c1e2f843a83b282f6d71c2f16a07d5335f22ff582ca0693890",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2sh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-p2sh",
+      "public_api": "Bitcoin/Script.p2sh",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "a914ddd62bc6c257005bdb3bf48aec6184d52334249b87",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2sh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "d76ca41e4efdde732dd238b87ebdb9c997b151442e871c18d02d515f42d8740f",
+      "wasm": "api-bitcoin-script-p2sh/native/main.wasm",
+      "wasm_sha256": "a5b4a2f9105b02d98eda08f4125a88d72de5c84059fb446068f999533f094b8d",
+      "wasm_bytes": 246894,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8679,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8679,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8679,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 23,
+          "output_sha256": "b4ed012838491122871d1d0a93cb5e5074e89b905edecb4d69e4f0940f53aaf8",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-witnessprogram",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-witnessprogram",
+      "public_api": "Bitcoin/Script.witnessProgram",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5220e57bf04d66bd0a446f3f55d7a0f1ae84e99e747c0541726824f3b4153e27d0e0",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-witnessprogram/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "d96d48e3b6421585f90d2234e3707469596b14e09e272ab534feb60d7542f2a3",
+      "wasm": "api-bitcoin-script-witnessprogram/native/main.wasm",
+      "wasm_sha256": "f0acf1369f99c1baeac76ac579b3fd82acc5bdf3b0803accc6abc828821e8ac3",
+      "wasm_bytes": 247409,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12634,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12634,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12634,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "2af6df0933b2f47530976456942180a80446eba2ab312339011e389487c64057",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2wpkh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-p2wpkh",
+      "public_api": "Bitcoin/Script.p2wpkh",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "0014ddd62bc6c257005bdb3bf48aec6184d52334249b",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2wpkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "5e55c3981ce084b73905720eb66b5691b2fd9cad2c27bccc4f1200c4596e51b1",
+      "wasm": "api-bitcoin-script-p2wpkh/native/main.wasm",
+      "wasm_sha256": "1de437f43f6be1c724e3f939b8235fd849ece6604de8a63f120c513eb70231a6",
+      "wasm_bytes": 247500,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8536,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8536,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8536,
+          "allocated_bytes": 344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 22,
+          "output_sha256": "80ea81b4f9ddba7974dfa93300609ca2f2959413fdcfdbd3d9c0e22a8b0c1188",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2wsh",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-p2wsh",
+      "public_api": "Bitcoin/Script.p2wsh",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "0020e57bf04d66bd0a446f3f55d7a0f1ae84e99e747c0541726824f3b4153e27d0e0",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2wsh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "9ff48a33a2910ea008ffae919bebe689110f925fcd747a7169e19b4742ba7297",
+      "wasm": "api-bitcoin-script-p2wsh/native/main.wasm",
+      "wasm_sha256": "c5744ae787c877b869c18e6901f3a87adc06789a890b2b50ae5d016081f485fd",
+      "wasm_bytes": 247508,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12686,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12686,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12686,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "82d86276e6110b2b494a9415e37de84bbff261be6872a4fd978f2c6d68289f08",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-p2tr",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-p2tr",
+      "public_api": "Bitcoin/Script.p2tr",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5120d9e40f82c148b28294bfc7f328b7b3b5a76a083aaa313dec7b88c1ffde5e5448",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-p2tr/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "ed9a0a82b55f7e270f32ad39e11530de867234902d90262ce162255cda839aa2",
+      "wasm": "api-bitcoin-script-p2tr/native/main.wasm",
+      "wasm_sha256": "2010ae3cf221a2a7abe9b854a0c89030b1c8a8fcd147bbfce7187506d892ef64",
+      "wasm_bytes": 247507,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12676,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12676,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12676,
+          "allocated_bytes": 456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "ac7c32fcdf32554cdd896dfee4df83b6ce3ab012691a005be27fd04882fb0a34",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-tapleafhash",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-tapleafhash",
+      "public_api": "Bitcoin/Script.tapLeafHash",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "f57d5a6d1700a76c02b1322a5966e4d8e94eaf0c9a8ebaa9c3d1731ae7c0c529",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-tapleafhash/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "50a76d286dc75f2f2079aa8dfd318587a6301028be189dc2c8e76fe016d21488",
+      "wasm": "api-bitcoin-script-tapleafhash/native/main.wasm",
+      "wasm_sha256": "4c4413885748f1edb4db77d1db96003839b96e7c5f039170a893291d8eff9add",
+      "wasm_bytes": 278648,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 50743,
+          "allocated_bytes": 1648,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 50743,
+          "allocated_bytes": 1648,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 50743,
+          "allocated_bytes": 1648,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ce3d52629145a1c54b88f773694aa48ddb068a5cc5666b8c4310f3626871a7d4",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-script-tapbranchhash",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-script-tapbranchhash",
+      "public_api": "Bitcoin/Script.tapBranchHash",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "cf5a26bd3bd1fe7813b164e2dde20d05fcbb142fe5261cbd5f5df8746461253e",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-script-tapbranchhash/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "7442e9de4d8f328513d3edaba01ff21ceba51d7ff56379b29bac078dab79f3cd",
+      "wasm": "api-bitcoin-script-tapbranchhash/native/main.wasm",
+      "wasm_sha256": "c4fe206578e60d92fa718a1a090d203212b235ebc484e812e320da0f2e4a1aa8",
+      "wasm_bytes": 277377,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 61164,
+          "allocated_bytes": 2032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 61164,
+          "allocated_bytes": 2032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 61164,
+          "allocated_bytes": 2032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "3a8ecf414b6c229f5434dcdd5a065c6ad180d85e7dd6559537578184df1207e8",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-serialize",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-serialize",
+      "public_api": "Bitcoin/Transaction.serialize",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "020000000adcddf4133e65b951d540aa470ac62d7da2ac0b03034933be7159d3ad0c8d65440000000000fdffffff32a3b459f1d29d0a523e8f055dee33d4f3d574d871e637c5c4573636c442630f0100000000fcffffff26c99840378bfb91a124f285405ea26f221c4a0249594e9cbcfa1c9b4b729eab0200000000fbffffff9088354f49893162ada72190eec94f692f2c97c59f073327db0a59d0ae20cd0a0000000000faffffff7d5aa08ab9a5cdaccc6241bbc2c8593eb0d13b84ac54ba8fddd7740437297c780100000000f9fffffff95c6c9a2f99a8fe3440f2d614f58c4548ad73f750dc50777eed403e83d4b6370200000000f8ffffff5124096a1fe33239f952bd50d03cc8ae9046752baafcd861ff01feb9d9d6a7790000000000f7ffffffadb5b7122c2df5c0d650486bc59c23700151b0474a215ee19c05868566ad20c50100000000f6ffffffc39aea0f65a3a0fc79797f0337e53c9035cdffafa60ddffa6f7be109ad615ecf0200000000f5ffffff15f1bacd92003789bd41f6f99d121d8a3233c405bc4029b2e1a7cd80fddfb9eb0000000000f4ffffff02a0bb0d0000000000160014719e49da51c483a232337387ed060dfc2b022ce2401f00000000000022512073d500d5f2b38dbb1f841178ceffc009c5b22d0b344496f6f5bd60abe07f742150f80c00",
+      "notes": "",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-serialize/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "7f388aec460cfd521b4f9080fb9e56de28bfb34ee3e2a8d63dab545bf18a094e",
+      "wasm": "api-bitcoin-transaction-serialize/native/main.wasm",
+      "wasm_sha256": "7f1a6b2e8568d209f40fc494e65e09ceb961c1bcc665e69c3f2e31efc2ab429e",
+      "wasm_bytes": 258298,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 402453,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 402453,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 402453,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-parse",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-parse",
+      "public_api": "Bitcoin/Transaction.parse",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "020000000adcddf4133e65b951d540aa470ac62d7da2ac0b03034933be7159d3ad0c8d65440000000000fdffffff32a3b459f1d29d0a523e8f055dee33d4f3d574d871e637c5c4573636c442630f0100000000fcffffff26c99840378bfb91a124f285405ea26f221c4a0249594e9cbcfa1c9b4b729eab0200000000fbffffff9088354f49893162ada72190eec94f692f2c97c59f073327db0a59d0ae20cd0a0000000000faffffff7d5aa08ab9a5cdaccc6241bbc2c8593eb0d13b84ac54ba8fddd7740437297c780100000000f9fffffff95c6c9a2f99a8fe3440f2d614f58c4548ad73f750dc50777eed403e83d4b6370200000000f8ffffff5124096a1fe33239f952bd50d03cc8ae9046752baafcd861ff01feb9d9d6a7790000000000f7ffffffadb5b7122c2df5c0d650486bc59c23700151b0474a215ee19c05868566ad20c50100000000f6ffffffc39aea0f65a3a0fc79797f0337e53c9035cdffafa60ddffa6f7be109ad615ecf0200000000f5ffffff15f1bacd92003789bd41f6f99d121d8a3233c405bc4029b2e1a7cd80fddfb9eb0000000000f4ffffff02a0bb0d0000000000160014719e49da51c483a232337387ed060dfc2b022ce2401f00000000000022512073d500d5f2b38dbb1f841178ceffc009c5b22d0b344496f6f5bd60abe07f742150f80c00",
+      "notes": "Parse all ten inputs/two outputs; reserialization only in output query.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-parse/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "dac548d0c2099df2c91cfa7ca134b4a09c618086ecca194a53b594d555698a17",
+      "wasm": "api-bitcoin-transaction-parse/native/main.wasm",
+      "wasm_sha256": "bf94162bf98f3f0dfdcea46a68b181f88b8ef5bf33e6132bbc64b6471de9b6f7",
+      "wasm_bytes": 269642,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 224491,
+          "allocated_bytes": 14264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 224491,
+          "allocated_bytes": 14264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 224491,
+          "allocated_bytes": 14264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-txid",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-txid",
+      "public_api": "Bitcoin/Transaction.txid",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "a91cb68af610755cdd57ef5d2c56a77d3a93a38fc1a6ee52c72a5fb41ee65d7e",
+      "notes": "Ten-input transaction has no witness; txid and wtxid therefore match. Existing serializer workloads retain larger cases.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-txid/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "e34df441387b279d2d0705c9ec90a9fcbf287862c4bd401945d1b6b05e620953",
+      "wasm": "api-bitcoin-transaction-txid/native/main.wasm",
+      "wasm_sha256": "24f787bc67e1d9b59a31f98477faa2dc90b8d15291ea5f776a58c36d5d48318a",
+      "wasm_bytes": 289327,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 455621,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 455621,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 455621,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-wtxid",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-wtxid",
+      "public_api": "Bitcoin/Transaction.wtxid",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "a91cb68af610755cdd57ef5d2c56a77d3a93a38fc1a6ee52c72a5fb41ee65d7e",
+      "notes": "Ten-input transaction has no witness; txid and wtxid therefore match. Existing serializer workloads retain larger cases.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-wtxid/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "e972f19572a688fb27dddbb35b3823e08b4c298e533df172e90b3199276f65c0",
+      "wasm": "api-bitcoin-transaction-wtxid/native/main.wasm",
+      "wasm_sha256": "533482b8c13411141d5c6d57d43b6dd612ccefc1522cce6b5c043f532e8f7efa",
+      "wasm_bytes": 289328,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 456562,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 456562,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 456562,
+          "allocated_bytes": 21472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "8fe281f77874d0f3da91af28844e5aae410aae60e66beec2833626ea320cb421",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-signaturehashlegacy",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-signaturehashlegacy",
+      "public_api": "Bitcoin/Transaction.signatureHashLegacy",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "10e80f4dd20aba61a25e65455092a78f7c210a11f4d197060e8bde04a6586554",
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-signaturehashlegacy/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "25d744063d950eb043f943729fe176db59ca5505b52dcf4ed215fa971be085d7",
+      "wasm": "api-bitcoin-transaction-signaturehashlegacy/native/main.wasm",
+      "wasm_sha256": "d571098922201e48071a5d1d8c1d9e4ddeaa8dbb10aeff0884d4da504dfc7460",
+      "wasm_bytes": 289960,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 462352,
+          "allocated_bytes": 21304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "e0c269a13f9cbc4284188d16bd1d00134b62b00d2da9be7b639110dc7e722629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 462352,
+          "allocated_bytes": 21304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "e0c269a13f9cbc4284188d16bd1d00134b62b00d2da9be7b639110dc7e722629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 462352,
+          "allocated_bytes": 21304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "e0c269a13f9cbc4284188d16bd1d00134b62b00d2da9be7b639110dc7e722629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-signaturehashsegwitv0",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-signaturehashsegwitv0",
+      "public_api": "Bitcoin/Transaction.signatureHashSegwitV0",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5ffd768915d9a9e7ab2dc55d5a779c8a11d3ca4b93970c9ab07c08b3cb1a40bb",
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-signaturehashsegwitv0/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "ba2134c0388e4a8523c336fbc3a20bc1463ee333bbd38eff2ae1cfcc0da3a706",
+      "wasm": "api-bitcoin-transaction-signaturehashsegwitv0/native/main.wasm",
+      "wasm_sha256": "dd25000aaf4e4c091b4789fc87a3e41ce01d804a0d11ff8fc648a0d1ceaf4d30",
+      "wasm_bytes": 292353,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 558447,
+          "allocated_bytes": 24920,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 558447,
+          "allocated_bytes": 24920,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 558447,
+          "allocated_bytes": 24920,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-signaturehashtaproot",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-signaturehashtaproot",
+      "public_api": "Bitcoin/Transaction.signatureHashTaproot",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8af",
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-signaturehashtaproot/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "fb33cf3cb99964f98afb4519093a1e1cce1446587085cb2baad553bd4167126a",
+      "wasm": "api-bitcoin-transaction-signaturehashtaproot/native/main.wasm",
+      "wasm_sha256": "4b3893b2f26decae71f15d00169d44acf61bdfa2d5594a911556b635bb0546c5",
+      "wasm_bytes": 297809,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 766172,
+          "allocated_bytes": 31960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 766172,
+          "allocated_bytes": 31960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 766172,
+          "allocated_bytes": 31960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-preparesegwitv0",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-preparesegwitv0",
+      "public_api": "Bitcoin/Transaction.prepareSegwitV0",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5ffd768915d9a9e7ab2dc55d5a779c8a11d3ca4b93970c9ab07c08b3cb1a40bb",
+      "notes": "Measure reusable hasher creation/validation only; first digest invoked outside timing to verify returned state.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-preparesegwitv0/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "00aacd2e9a8a3661d68d4f6d303f6d9cb933df058d2f9a3ac4bc22621989f56c",
+      "wasm": "api-bitcoin-transaction-preparesegwitv0/native/main.wasm",
+      "wasm_sha256": "7e5e78452e81dc477b77874df5a0bdd859f155249d18f0a81cffa22abd8f7311",
+      "wasm_bytes": 292080,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 21213,
+          "allocated_bytes": 1968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 21213,
+          "allocated_bytes": 1968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 21213,
+          "allocated_bytes": 1968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-segwitv0hasher-signaturehash",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-segwitv0hasher-signaturehash",
+      "public_api": "Bitcoin/Transaction.SegwitV0Hasher.signatureHash",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5ffd768915d9a9e7ab2dc55d5a779c8a11d3ca4b93970c9ab07c08b3cb1a40bb",
+      "notes": "First cold returned-method invocation, including lazy common hashes; prepare/validate outside timing. No prewarmed caches.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-segwitv0hasher-signaturehash/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "724afc896abc4cf58e7929f4128ce770dbf8f3103b9a4f269d580a6552ddba0b",
+      "wasm": "api-bitcoin-transaction-segwitv0hasher-signaturehash/native/main.wasm",
+      "wasm_sha256": "33ec8c7ade20dc8a77fe54186892030f56ae50bbeeda845eff5c4aba3288d61e",
+      "wasm_bytes": 292257,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 537474,
+          "allocated_bytes": 22952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 537474,
+          "allocated_bytes": 22952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 537474,
+          "allocated_bytes": 22952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5310f3b2df40935045e063b8dab28e5f18b766aa073df1d7763e088332405152",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-preparetaproot",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-preparetaproot",
+      "public_api": "Bitcoin/Transaction.prepareTaproot",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8af",
+      "notes": "Measure reusable hasher creation/validation only; first digest invoked outside timing to verify returned state.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-preparetaproot/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "9b7e94d8ec75bd571ef3e66efdb52f355347ce403d8ace9d88b65b4411af0904",
+      "wasm": "api-bitcoin-transaction-preparetaproot/native/main.wasm",
+      "wasm_sha256": "e0b6f048086f48e520bbbf92a41803c145699669c826d69b4e6c451cb46c47b8",
+      "wasm_bytes": 297569,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 30389,
+          "allocated_bytes": 2928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 30389,
+          "allocated_bytes": 2928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 30389,
+          "allocated_bytes": 2928,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-bitcoin-transaction-taproothasher-signaturehash",
+      "family": "bitcoin",
+      "implementation": "native",
+      "comparison": "api-bitcoin-transaction-taproothasher-signaturehash",
+      "public_api": "Bitcoin/Transaction.TaprootHasher.signatureHash",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8af",
+      "notes": "First cold returned-method invocation, including lazy common hashes; prepare/validate outside timing. No prewarmed caches.",
+      "fixture_provenance": "round2/api-bitcoin/generate.py: independent hashlib, HMAC, affine secp256k1, BIP32 public derivation, BIP173/350 checksum and Bitcoin wire encodings; no measured implementation outputs",
+      "operations_per_sample": 1,
+      "source": "round2/api-bitcoin/actors/api-bitcoin-transaction-taproothasher-signaturehash/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f70bbc7c648cd17bfb32b8bb7039cf5331716ec2e357464771a1d1415c6f8c9c",
+      "wasm": "api-bitcoin-transaction-taproothasher-signaturehash/native/main.wasm",
+      "wasm_sha256": "0f450ad80e2ebce3f3358d6b540a4ae7d8433f92bd6ac75e27f5d0bdb389567f",
+      "wasm_bytes": 297728,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 736012,
+          "allocated_bytes": 29032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 736012,
+          "allocated_bytes": 29032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 736012,
+          "allocated_bytes": 29032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "fce18954eeb698c47bb730264c4ebc2797f3512493d5e1f49fe1185d92a5cf85",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

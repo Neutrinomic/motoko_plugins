@@ -1,0 +1,102 @@
+{
+  "status": "passed_no_findings",
+  "selected_candidate": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/hmac-directout",
+  "runtime_source_sha256": "d2b680ce0b6169a516cbd7f6b108bfa501af2055ffaa26b1aa9adcad75d82c2a",
+  "baseline_runtime_source_sha256": "f41e7463e9bfabfb16963de484427d1281bbf7096b2ff5aa390806ae9d48e929",
+  "candidate_patch_sha256": "e58bf5aa68f3e6ffc595a57cee615e5393e0545abe0ae0b3d8715eb19a563997",
+  "artifact_sha256": {
+    "dist/hmac-sha2/build.json": "5ae7c0aa0155fc85ee7a256ffdb483fcfaa56d6664c3abd688e59c78602b6cce",
+    "dist/hmac-sha2/plugin.cmxs": "ed9c9054c53e9c74e2debfc661e5ed9cee004c69f6c9e17e61305f6da9d6b0c0",
+    "dist/hmac-sha2/runtime.wasm": "6341bd80510855833b56cae9c8f657c2a5c3cf9d8fc73f2281a95fd5ba74e48a"
+  },
+  "source_and_artifacts_unchanged_after_tests": true,
+  "findings": [],
+  "static_review": [
+    "HMAC pad init 0x36 and key xor is equivalent for empty, short and hashed long keys; repeated 0x6a u64 xor has no endianness dependency.",
+    "zero_tail checks each complete 8-byte word and all remainder bytes without aligned reads or out-of-bounds loads.",
+    "new, decode and update preserve canonical zero tail; sum consumes its context, so full tail copies preserve state semantics.",
+    "Pinned generic-array representation has valid byte-only repr(C)/repr(transparent) layout; size/alignment assertions, complete input block bounds and scoped immutable borrows justify bulk compress casts.",
+    "write_state writes all bytes in disjoint ranges: 0..32,32..64,64..72,72..136 for SHA256 and 0..64,64..128,128..144,144..272 for SHA512.",
+    "Raw write_unaligned(value.to_be()) is equivalent to to_be_bytes copies; no references to uninitialized output are made; temporary count bytes live through copy calls.",
+    "Compiler output allocation remains fresh and managed; public HMAC module and compiler implementations unchanged.",
+    "Second independent static reviewer cross-checked the same source and reported no findings."
+  ],
+  "tests": {
+    "existing_independent_suite": {
+      "native_tests_passed": 9,
+      "native_hmac_openssl_vectors": 364,
+      "hmac_stream_strides": [
+        1,
+        63,
+        64,
+        127,
+        128,
+        129
+      ],
+      "hmac_public_cases": 84,
+      "public_backends": [
+        "source",
+        "IR",
+        "lowered IR",
+        "Wasm"
+      ],
+      "rts_sanity_checks": true,
+      "predetermined_success_marker": true,
+      "accept_outputs_used": false,
+      "report": "_build/crypto-optimization-round2/hmac-audit/hmac-directout/_build/crypto-audit/hash-codec/run-uvlfcl14/report.json"
+    },
+    "openssl_vectors_regenerated": {
+      "cases": 364,
+      "method": "Python hmac.digest OpenSSL-backed SHA256/SHA512; all stored TSV answers independently reproduced"
+    },
+    "address_sanitizer": {
+      "tests_passed": 6,
+      "coverage": [
+        "364 OpenSSL vector matrix",
+        "RFC4231",
+        "streaming/prepared RustCrypto differential",
+        "guarded unaligned pointer ABI and input immutability",
+        "every tail occupancy and 10,336 malformed suffix cases",
+        "malformed and overflow states"
+      ],
+      "dependencies": [
+        {
+          "name": "crypto-common",
+          "version": "0.1.6"
+        },
+        {
+          "name": "crypto-common",
+          "version": "0.2.2"
+        },
+        {
+          "name": "generic-array",
+          "version": "0.14.9"
+        },
+        {
+          "name": "hmac",
+          "version": "0.12.1"
+        },
+        {
+          "name": "sha2",
+          "version": "0.10.9"
+        }
+      ],
+      "log": "_build/crypto-optimization-round2/hmac-audit/hmac-directout/asan-production.log"
+    },
+    "previous_hmac_final_candidate": {
+      "source_sha256": "478510a0b4dd54a7b12a8e4470becb30e5b01e4f76a076caf12ac08dab9f136e",
+      "report": "_build/crypto-optimization-round2/hmac-audit/hmac-final/_build/crypto-audit/hash-codec/run-26oeflkx/report.json"
+    },
+    "central_auditor_crosscheck_reported": {
+      "tests_passed": 11,
+      "coverage": "Exact all-state-byte differential against baseline, 16 alignment residues, all tail occupancies, exact-block \u00b11, empty and 1024-byte updates, immutable buffers and guard canaries; approximately34,000 comparisons. Independently run by /root/audit_crypto_round2/review_hash_state.",
+      "evidence": "_build/crypto-optimization-round2/central-audit/hash-state/hmac-output/native.log"
+    }
+  },
+  "scope_notes": [
+    "Audit did not edit production or frozen candidate sources.",
+    "Existing native harness uses generic-array0.14.7 and crypto-common0.1.7; private ASan harness additionally passed with deployed generic-array0.14.9 and crypto-common0.1.6.",
+    "All364oracle vectors run natively;84representative cases run on each public Motoko backend."
+  ],
+  "production_edits": false
+}

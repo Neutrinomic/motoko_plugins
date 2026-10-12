@@ -1,0 +1,396 @@
+{
+  "stage": "curves-bls-expanded-baseline",
+  "recorded_utc": "2026-10-12T11:52:34.841Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "45ecf106930438ffa59b5dc4b60a297f8b9f1e12a86cdf502b259f3afc8013c6",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bls12_381_g1_msm_distinct_4_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_msm_distinct_4",
+      "plugins": [],
+      "expected_hex": "b74cf56d4fefbbb7a6d539b630dae3069bf7fb088ebb8a70cdc68ad2d7d62794dfc0ee2f03f63ffa64480911351a1e8f",
+      "notes": "MSM of 4 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g1_msm_distinct_4_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "4b2d99147bb1766140f7cf3e33c9040f0a0609b185841832587f7d5bd2b279fb",
+      "wasm": "bls12_381_g1_msm_distinct_4_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "6bde76d73a42a73f803661dc0daf50956fabc093795ca8beea009c35257ebe7e",
+      "wasm_bytes": 258470,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 875649889,
+          "allocated_bytes": 33269872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "67b9f18697eff9aef6f7bd84b2b3c7d08dc98640e35337186af2afdb9c067e4d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 875649889,
+          "allocated_bytes": 33269872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "67b9f18697eff9aef6f7bd84b2b3c7d08dc98640e35337186af2afdb9c067e4d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 875649889,
+          "allocated_bytes": 33269872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "67b9f18697eff9aef6f7bd84b2b3c7d08dc98640e35337186af2afdb9c067e4d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_msm_distinct_16_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_msm_distinct_16",
+      "plugins": [],
+      "expected_hex": "ada6f295b47a309353ec952bf8fa77f3103432681d68dfcba5b2466889cb91a6e9213716134a9c39b038d69fb8f86e1a",
+      "notes": "MSM of 16 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g1_msm_distinct_16_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "8cc16f79efc41ea850c308e0972fa3500aa0b9a9d10b4ff4a87103cf5695d3ec",
+      "wasm": "bls12_381_g1_msm_distinct_16_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "ff83d4cf76b5b8ce2a7ead19e94189da5dc4aaa7eb1f9b5d7b395dc3576dc6d0",
+      "wasm_bytes": 267539,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1513968263,
+          "allocated_bytes": 56375056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c87466eb4897230f98d701de6543611b867408c673fbb9591accaba9adf81bff",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1513968263,
+          "allocated_bytes": 56375056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c87466eb4897230f98d701de6543611b867408c673fbb9591accaba9adf81bff",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1513968263,
+          "allocated_bytes": 56375056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c87466eb4897230f98d701de6543611b867408c673fbb9591accaba9adf81bff",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_msm_distinct_64_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_msm_distinct_64",
+      "plugins": [],
+      "expected_hex": "90f4719d8e9cc2a3448fa22ba0e0c43d4f72dbb5afa4ddf32e01179f9b5a83592c8033829e5d5ed81a0a595d3afc5a9d",
+      "notes": "MSM of 64 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g1_msm_distinct_64_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "c7a2e6a1943e1d60d1aef4945e73e9a3b1cb3b44354c8f2d3f6f17461487e66a",
+      "wasm": "bls12_381_g1_msm_distinct_64_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "22adca68d20467c435fafbb3275ee200b33a1c11fc22ad7dfc4109377f3a746f",
+      "wasm_bytes": 303877,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4240282195,
+          "allocated_bytes": 156666992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "302dad6a6366b2011152f96e5eb3f393cc073f2ed561d1d772160754e4e98c4b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4240282195,
+          "allocated_bytes": 156666992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "302dad6a6366b2011152f96e5eb3f393cc073f2ed561d1d772160754e4e98c4b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4240282195,
+          "allocated_bytes": 156666992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "302dad6a6366b2011152f96e5eb3f393cc073f2ed561d1d772160754e4e98c4b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_distinct_4_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_distinct_4",
+      "plugins": [],
+      "expected_hex": "b6581352d83e972622710be2618897f1d66e2346001cc389067a38506d041c8ead7cc6fea8ab7a17b2a7dbf29a0b1a4f13522b0814470ee04e1c7e7044b89b992ba23a1755310077c8b1c6c86ae38c1e1d94d3b1d928de192c026826ad7032c6",
+      "notes": "MSM of 4 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g2_msm_distinct_4_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "36428bc4d6fe8d6061dde1743694174d6ae7271b46c422125a7e272e697b7a02",
+      "wasm": "bls12_381_g2_msm_distinct_4_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "de7a4d9c3d89852eb700764ad92c32fc11de50fc819ae8c59388c28f02b162ea",
+      "wasm_bytes": 262903,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2204890555,
+          "allocated_bytes": 89409232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "093d1cf4e55025272c2a3760021fe84624d1f96193a75acfea1cbb2adc2741f7",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2204890555,
+          "allocated_bytes": 89409232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "093d1cf4e55025272c2a3760021fe84624d1f96193a75acfea1cbb2adc2741f7",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2204890555,
+          "allocated_bytes": 89409232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "093d1cf4e55025272c2a3760021fe84624d1f96193a75acfea1cbb2adc2741f7",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_distinct_16_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_distinct_16",
+      "plugins": [],
+      "expected_hex": "955e991e0eab9430e43f338f73556735fcf69cb68a3afbfbe2bf6fbad8459a35c8272d0db7406528c8828ecf66ccd6a30e067f2dc9ab72698645c406acd9e50afce6c774f0ade8112f23357b9254386174b744ae660c6edc12198e80752f5efd",
+      "notes": "MSM of 16 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g2_msm_distinct_16_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "b0fcb5b996ffa497c30fd89626c9c07a75d807c61ed2c426ec94bcaaa1363505",
+      "wasm": "bls12_381_g2_msm_distinct_16_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "6e1bd0d287b8cae61f65ebd19946bec03f752f28586cb8f708ce05eca702f234",
+      "wasm_bytes": 279975,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4131480448,
+          "allocated_bytes": 167573456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "adb77fcbb32fd0b2781910ee685f3d7cea4abeaa1a77271c8d228b43c6506ede",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4131480448,
+          "allocated_bytes": 167573456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "adb77fcbb32fd0b2781910ee685f3d7cea4abeaa1a77271c8d228b43c6506ede",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4131480448,
+          "allocated_bytes": 167573456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "adb77fcbb32fd0b2781910ee685f3d7cea4abeaa1a77271c8d228b43c6506ede",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_distinct_64_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_distinct_64",
+      "plugins": [],
+      "expected_hex": "8568ec1e58d21f6030d5823123646b1d298c34c8c9558e7abab86489c33e417e215f7aee8f5a9a33a9db831fd09bdf7e0346ed84c0884dce53107c35153795714883abd34b3ba2d57aa769ca9fb0a68cc3805ac905fa626530ac24f46b3b9e00",
+      "notes": "MSM of 64 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+      "benchmark_kind": "paired",
+      "source": "curve-cases/bls12_381_g2_msm_distinct_64_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "91cd8e1a4485e00f2fc686e86105d64f16c50fdeeaf04b04a861eabceed1b22f",
+      "wasm": "bls12_381_g2_msm_distinct_64_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "03f88e5b46a5170eee8f018a9e8f2c4ea8c7e92b6c0e7d0edb31007c861d9b7f",
+      "wasm_bytes": 348356,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11671365958,
+          "allocated_bytes": 470713768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "5de402e7fc73ebca72d2ab05f9361f52a433181b755fb29f2c29fda30a36e487",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11671365958,
+          "allocated_bytes": 470713768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "5de402e7fc73ebca72d2ab05f9361f52a433181b755fb29f2c29fda30a36e487",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11671365958,
+          "allocated_bytes": 470713768,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "5de402e7fc73ebca72d2ab05f9361f52a433181b755fb29f2c29fda30a36e487",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_add_validated_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_add_validated",
+      "plugins": [],
+      "expected_hex": "a572cbea904d67468808c8eb50a9450c9721db309128012543902d0ac358a62ae28f75bb8f1c7c42c39a8c5529bf0f4e",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement.",
+      "source": "curve-cases/bls12_381_g1_add_validated_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "cb7c2200e587010e6bbd8e527493b2710287ada746b0c1aa09d77bff102f406d",
+      "wasm": "bls12_381_g1_add_validated_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "98a25b2f896fa0e3d2170d18dfb108ae701275a64b3c1a7c92d9911c18a70e73",
+      "wasm_bytes": 254252,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 329466206,
+          "allocated_bytes": 12654008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 329466206,
+          "allocated_bytes": 12654008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 329466206,
+          "allocated_bytes": 12654008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_add_validated_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_add_validated",
+      "plugins": [],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement. Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.",
+      "source": "curve-cases/bls12_381_g2_add_validated_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "c521023e27f615b4bf8b26c2baa83653f69bef28621c92da0f4888cbe6356e5d",
+      "wasm": "bls12_381_g2_add_validated_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "61cbd80ffaf00375670da5038976d02d2ee2a8d5b696ec3e3743ce625c3b332d",
+      "wasm_bytes": 256817,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

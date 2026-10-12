@@ -1,0 +1,25 @@
+{
+  "scope": "Independent review of combined P256 compiler DER exact-capacity shortcut and generated publicKey comb control/address dependence after LTO.",
+  "findings": [],
+  "public_key_comb": [
+    "Checked all supplied source, runtime and plugin artifact hashes before review.",
+    "Re-derived every exact comb-table scalar multiple independently with OpenSSL from constants parsed directly out of frozen combined Rust source. All 15 matched.",
+    "Re-extracted complete p256_public_key Wasm function and confirmed exact textual identity to previous reviewed comb artifact: SHA256 87588f6a0d0714e808e24237bef989c62a8a6ba5fb298d95a2ced387466926cf.",
+    "Re-inspected loop condition/address instructions: scalar-byte offsets use only descending public bit index; 15 projective table candidates are accessed with fixed 96-byte stride; secret digit enters only masks through subtle black_box; both loop branches use fixed public counters.",
+    "Scalar-byte zeroization remains emitted immediately after the 64-step loop. SecretKey and nonzero scalar cleanup are unchanged.",
+    "No secret-dependent address or branch found in added comb loop; upstream field arithmetic and execution engine are not formally re-proven here."
+  ],
+  "der_capacity_shortcut": [
+    "Only signature_to_der registers O.variable=true; its capacity is 72, O.boolean=false and O.compressed=false. Initial result allocation is therefore exactly 72 bytes.",
+    "The outer signed status<0 check selects an error variant before any success-payload evaluation. Negative lengths cannot reach Blob.of_ptr_size or the new direct-return branch.",
+    "On status==72 the existing managed result Blob is returned directly inside #ok; its length already equals actual output and its entire payload is initialized by the Rust ABI writer.",
+    "On shorter successful encodings the previous payload-pointer plus status copy path remains unchanged, preserving exact Blob size for lengths8..71.",
+    "No mutation of Blob headers, new raw-pointer lifetime, shared mutable output or GC safepoint is introduced. Arguments remain evaluated exactly once.",
+    "Compiler source hash is369d3b99f0c8d00e497728baf872d5b2f4817dafc6a6f22c741e1521c3ca7f8c; source snapshot saved as register.ml.reviewed."
+  ],
+  "limitations": [
+    "The source and generated-Wasm findings apply to pinned combined artifacts only.",
+    "Targeted compiled-loop inspection is not a formal constant-time proof or complete register/stack erasure assurance.",
+    "Parent owns native, all-engine and DER72 retained-output/GC tests; this reviewer did not duplicate those suites."
+  ]
+}

@@ -1,0 +1,1104 @@
+{
+  "stage": "round2-api-pure-curves",
+  "expected_case_count": 23,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:05:13.514Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "f9178c38e1b1a4e58828a5055160183c94ceba3d225d3addd4c37830c0df3c91",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-secp256k1-publicKey-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-public-key-uncompressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-publicKey-ecdsa/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "api": "Secp256k1.publicKey",
+      "plugin_case": "r2-secp256k1-public-key-uncompressed",
+      "fixture_case": "r2-secp256k1-public-key-uncompressed",
+      "returncode": 0,
+      "source_sha256": "4d4c49d81ebe6ba75355ee44dff6898c6864b3855e9a055194df8fb1836d2e43",
+      "wasm": "api-secp256k1-publicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "2af0cedd50835142b59b2ae2aae0abd803f25f05d158b7ecf21d6e6eee199e17",
+      "wasm_bytes": 675108,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 70236803,
+          "allocated_bytes": 5596840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 70236803,
+          "allocated_bytes": 5596840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 70236803,
+          "allocated_bytes": 5596840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-derivePublicKey-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "api-secp256k1-derivePublicKey",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-derivePublicKey-ecdsa/main.mo",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "api": "Secp256k1.derivePublicKey",
+      "plugin_case": "api-secp256k1-derivePublicKey-fast",
+      "fixture_case": "r2-secp256k1-public-key-uncompressed",
+      "returncode": 0,
+      "source_sha256": "ef9bb083b168101f1177e7a753a01bcf568f070e0140be22b3b20e1ab686b191",
+      "wasm": "api-secp256k1-derivePublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "51f10c97cb494f0bcaf328d1d7d0da9905e7011e80e36e6a5f4a40b56aa4a4d1",
+      "wasm_bytes": 675074,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 63224878,
+          "allocated_bytes": 5278944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 63224878,
+          "allocated_bytes": 5278944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 63224878,
+          "allocated_bytes": 5278944,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-convertPublicKey-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-convertPublicKey-ecdsa/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "Secp256k1.convertPublicKey",
+      "plugin_case": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "fixture_case": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "returncode": 0,
+      "source_sha256": "36c48c3edf14da372a00c089c9e002aa26685d9cd9d303e6c8470e173214b5ea",
+      "wasm": "api-secp256k1-convertPublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "2b7129eee3c9b468ffa55a1fa457d31bf199b9b819ebefaeb62b2acefa654422",
+      "wasm_bytes": 653552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-verifyPrehash-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "Secp256k1.verifyPrehash",
+      "plugin_case": "r2-secp256k1-verify-compressed-low-s",
+      "fixture_case": "r2-secp256k1-verify-compressed-low-s",
+      "returncode": 0,
+      "source_sha256": "437dc06eb53e294be790f3cca503c75601422a5fbb70759b7281af664fca6bb7",
+      "wasm": "api-secp256k1-verifyPrehash-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "026f90ac9d4f8ee0a05812102f7c6c427e83abf77f125a9a455350a9d3d87a44",
+      "wasm_bytes": 659724,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-signatureToDer-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-der-encode-ordinary",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-signatureToDer-ecdsa/main.mo",
+      "expected_hex": "3045022100d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35402203fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "Secp256k1.signatureToDer",
+      "plugin_case": "r2-secp256k1-der-encode-ordinary",
+      "fixture_case": "r2-secp256k1-der-encode-ordinary",
+      "returncode": 0,
+      "source_sha256": "3a0921c75ed02733362583a220a25cd782624515806cc22c51449559ef2ea355",
+      "wasm": "api-secp256k1-signatureToDer-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "323c221f41f4d648d4c0ac63bee22113e31939d154f17709ac4f12dddc2ca2a2",
+      "wasm_bytes": 352023,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14826684,
+          "allocated_bytes": 677040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "42e911079f3d4cf000f255d0d25e77bd8e2ea960dbdc14066d736d24a92859fa",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14826684,
+          "allocated_bytes": 677040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "42e911079f3d4cf000f255d0d25e77bd8e2ea960dbdc14066d736d24a92859fa",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14826684,
+          "allocated_bytes": 677040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 71,
+          "output_sha256": "42e911079f3d4cf000f255d0d25e77bd8e2ea960dbdc14066d736d24a92859fa",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-signatureFromDer-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-der-decode-ordinary",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-signatureFromDer-ecdsa/main.mo",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+      "api": "Secp256k1.signatureFromDer",
+      "plugin_case": "r2-secp256k1-der-decode-ordinary",
+      "fixture_case": "r2-secp256k1-der-decode-ordinary",
+      "returncode": 0,
+      "source_sha256": "3027c4a4656752521d9d72d3517981f86cfd04627f25327b81b9f6552174d55f",
+      "wasm": "api-secp256k1-signatureFromDer-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "10402d14d006d7c1d26db4a078d9890855e6a93be9293ad88b4bd1d226d7a9cf",
+      "wasm_bytes": 390630,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16972885,
+          "allocated_bytes": 822160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 16972885,
+          "allocated_bytes": 822160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 16972885,
+          "allocated_bytes": 822160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-normalizeSignature-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-normalize-high-s",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-normalizeSignature-ecdsa/main.mo",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+      "api": "Secp256k1.normalizeSignature",
+      "plugin_case": "r2-secp256k1-normalize-high-s",
+      "fixture_case": "r2-secp256k1-normalize-high-s",
+      "returncode": 0,
+      "source_sha256": "ffcd2577ea6d7ce8d64887bbd8de8b32ffaa8330e37d21e7dc5466fa2cdf331b",
+      "wasm": "api-secp256k1-normalizeSignature-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "0866c4b5ba1b470d291576c71f257f9fe654bd07f396c90611607dda8381a577",
+      "wasm_bytes": 352244,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14488926,
+          "allocated_bytes": 666624,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14488926,
+          "allocated_bytes": 666624,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14488926,
+          "allocated_bytes": 666624,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "48ff728126775b7b89b68e93935420c617156d85d3c0c8450e9537189e59a45b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-compressPublicKey-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "api-secp256k1-compressPublicKey",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-compressPublicKey-ecdsa/main.mo",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "Secp256k1.compressPublicKey",
+      "plugin_case": "api-secp256k1-compressPublicKey-fast",
+      "fixture_case": "r2-secp256k1-convert-uncompressed-to-compressed",
+      "returncode": 0,
+      "source_sha256": "f06e92339d8fe2f38cf1872588dbbd69c10eb26a1d1d4e67676b9ea523716364",
+      "wasm": "api-secp256k1-compressPublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "1007334d45aa4b6d134b0461d90dd5cdc70b718656dcb2ee001a7744ca9b918f",
+      "wasm_bytes": 653552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9341246,
+          "allocated_bytes": 470584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9341246,
+          "allocated_bytes": 470584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9341246,
+          "allocated_bytes": 470584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-secp256k1-decompressPublicKey-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "api-secp256k1-decompressPublicKey",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-secp256k1-decompressPublicKey-ecdsa/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "Secp256k1.decompressPublicKey",
+      "plugin_case": "api-secp256k1-decompressPublicKey-fast",
+      "fixture_case": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "returncode": 0,
+      "source_sha256": "36c48c3edf14da372a00c089c9e002aa26685d9cd9d303e6c8470e173214b5ea",
+      "wasm": "api-secp256k1-decompressPublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "2b7129eee3c9b468ffa55a1fa457d31bf199b9b819ebefaeb62b2acefa654422",
+      "wasm_bytes": 653552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 39574794,
+          "allocated_bytes": 1664968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "d60525cd773409010cd013a0c632106c6b500fb8b373f5e6d3fd617fa5674029",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-publicKey-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-public-key-uncompressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-publicKey-ecdsa/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "api": "P256.publicKey",
+      "plugin_case": "r2-p256-public-key-uncompressed",
+      "fixture_case": "r2-p256-public-key-uncompressed",
+      "returncode": 0,
+      "source_sha256": "c8d286b24f1d49e5edc21abd14fd890d3a1e9cc3aaa3b55c3d05bd1fa6a2602e",
+      "wasm": "api-p256-publicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "2903e4def936a539e552084404c2b663539951a020e6a399bcbe9b703786ac4a",
+      "wasm_bytes": 675107,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 175332443,
+          "allocated_bytes": 12810992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 175332443,
+          "allocated_bytes": 12810992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 175332443,
+          "allocated_bytes": 12810992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-derivePublicKey-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "api-p256-derivePublicKey",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-derivePublicKey-ecdsa/main.mo",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "api": "P256.derivePublicKey",
+      "plugin_case": "api-p256-derivePublicKey-fast",
+      "fixture_case": "r2-p256-public-key-uncompressed",
+      "returncode": 0,
+      "source_sha256": "2bc67f66dd810ed455ca60775f750545c3215e10da42cbb4d28207a0d1657a3e",
+      "wasm": "api-p256-derivePublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "9d50563ce35961cc4293411d4559adf5faf5b4988b1b54b414a7b33f3c97cd6e",
+      "wasm_bytes": 675073,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 168233483,
+          "allocated_bytes": 12489816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 168233483,
+          "allocated_bytes": 12489816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 168233483,
+          "allocated_bytes": 12489816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-convertPublicKey-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-convert-compressed-to-uncompressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-convertPublicKey-ecdsa/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "P256.convertPublicKey",
+      "plugin_case": "r2-p256-convert-compressed-to-uncompressed",
+      "fixture_case": "r2-p256-convert-compressed-to-uncompressed",
+      "returncode": 0,
+      "source_sha256": "ca715e08e27c1ce5455fb7e488404c208c410d16dde4c5967a8d336c88688233",
+      "wasm": "api-p256-convertPublicKey-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "a29ba206ed4e108e23a43d8c36924f0a2cba603fba0a3d8cdfe927b5ae9e7bf7",
+      "wasm_bytes": 653552,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 31098672,
+          "allocated_bytes": 1397304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 31098672,
+          "allocated_bytes": 1397304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 31098672,
+          "allocated_bytes": 1397304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-verifyPrehash-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "P256.verifyPrehash",
+      "plugin_case": "r2-p256-verify-compressed-low-s",
+      "fixture_case": "r2-p256-verify-compressed-low-s",
+      "returncode": 0,
+      "source_sha256": "786e36eea07273861926a0a543c58f75cb82be4b02db84f0b15766d491cce52d",
+      "wasm": "api-p256-verifyPrehash-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "ad0ca4d8e2e1920985a8b6e464f774c3106faa5ce3da1939fb88ee7d4f9823e8",
+      "wasm_bytes": 659724,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-signatureToDer-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-der-encode-ordinary",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-signatureToDer-ecdsa/main.mo",
+      "expected_hex": "304402202ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380022063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "api": "P256.signatureToDer",
+      "plugin_case": "r2-p256-der-encode-ordinary",
+      "fixture_case": "r2-p256-der-encode-ordinary",
+      "returncode": 0,
+      "source_sha256": "c85b32137ec6343570b23c9d4dd19c58e5a0888a9e32fc670a88fbaf81a9d159",
+      "wasm": "api-p256-signatureToDer-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "16cd2a7bfbefc4618eff046c92d203d736cadd6c8361989a480f141d03ec91f5",
+      "wasm_bytes": 351906,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14518740,
+          "allocated_bytes": 667264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14518740,
+          "allocated_bytes": 667264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14518740,
+          "allocated_bytes": 667264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-signatureFromDer-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-der-decode-ordinary",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-signatureFromDer-ecdsa/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+      "api": "P256.signatureFromDer",
+      "plugin_case": "r2-p256-der-decode-ordinary",
+      "fixture_case": "r2-p256-der-decode-ordinary",
+      "returncode": 0,
+      "source_sha256": "af136983585ed6c21cb081d358ff007b830dbfd770ba8730cbb4ef79efed3ded",
+      "wasm": "api-p256-signatureFromDer-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "e153325ae7fd02fbc697793b67945d80d52a63517a0b65afd230cae6204581e0",
+      "wasm_bytes": 390513,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16875526,
+          "allocated_bytes": 817952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 16875526,
+          "allocated_bytes": 817952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 16875526,
+          "allocated_bytes": 817952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-normalizeSignature-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-normalize-high-s",
+      "plugins": [],
+      "source": "round2/api-curves/pure/ecdsa/api-p256-normalizeSignature-ecdsa/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+      "api": "P256.normalizeSignature",
+      "plugin_case": "r2-p256-normalize-high-s",
+      "fixture_case": "r2-p256-normalize-high-s",
+      "returncode": 0,
+      "source_sha256": "d7d278886c3af5ce7ee04cea5a5bc23fbe48c2509c8e341e7653ebe3115e0e98",
+      "wasm": "api-p256-normalizeSignature-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "a00578b4d47ef1f69793cdb703ed1be26917b4895783351c026fa7eaec0ce7b9",
+      "wasm_bytes": 352128,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14437561,
+          "allocated_bytes": 664552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14437561,
+          "allocated_bytes": 664552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14437561,
+          "allocated_bytes": 664552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-point-add-compressed-distinct",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-point-add-compressed-distinct/main.mo",
+      "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-point-add-compressed-distinct",
+      "api": "pointAdd",
+      "returncode": 0,
+      "source_sha256": "a3d93722235646afc3595f3d5a2ea6bfb6f611ebc2f222f9c48cbf28a86cd744",
+      "wasm": "r2-secp256k1-point-add-compressed-distinct/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "8422f26289022f7e0fd350b0407dca7945fb9e769ce823ea5ac5ec25f4f98115",
+      "wasm_bytes": 276828,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 28485267,
+          "allocated_bytes": 1248456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "c9cda6d435b6d3e5da0cfaeb482a64d7f223b8fec834a66665ea118728e52216",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 28485267,
+          "allocated_bytes": 1248456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "c9cda6d435b6d3e5da0cfaeb482a64d7f223b8fec834a66665ea118728e52216",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 28485267,
+          "allocated_bytes": 1248456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "c9cda6d435b6d3e5da0cfaeb482a64d7f223b8fec834a66665ea118728e52216",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-point-multiply-compressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-point-multiply-compressed/main.mo",
+      "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-point-multiply-compressed",
+      "api": "pointMultiply",
+      "returncode": 0,
+      "source_sha256": "2fa0e6baa16fc351d0317339eedee69eef7670ecf8708f5b15d41c674d6e3b6c",
+      "wasm": "r2-secp256k1-point-multiply-compressed/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "17158830ec65f76b6da4ce4b94bb55e1ef163b11e205e2f1839651dc7544decb",
+      "wasm_bytes": 277747,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 148898913,
+          "allocated_bytes": 6414664,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "fcaee9b3f4cd09d5991ae35acb295ee9d4cb3eac251b900ed6b59dee8dc90478",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 148898913,
+          "allocated_bytes": 6414664,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "fcaee9b3f4cd09d5991ae35acb295ee9d4cb3eac251b900ed6b59dee8dc90478",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 148898913,
+          "allocated_bytes": 6414664,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "fcaee9b3f4cd09d5991ae35acb295ee9d4cb3eac251b900ed6b59dee8dc90478",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-base-multiply-full-width",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-base-multiply-full-width/main.mo",
+      "expected_hex": "039193c50bbcb78cc870c74b2fbab8c0d77c29e9661d2cf575610da3505e22b3c7",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-base-multiply-full-width",
+      "api": "baseMultiply",
+      "returncode": 0,
+      "source_sha256": "bb9c236404e1099067b2a404a9a5f9a6c249c25fa6a489669d5e454f8dedac89",
+      "wasm": "r2-secp256k1-base-multiply-full-width/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "810c66d1ebb0aa9922c0219a761807e850024c22aadbb78377d0d6b6ff8db291",
+      "wasm_bytes": 273467,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 124175848,
+          "allocated_bytes": 5444616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "712c1c359f6da0c97c8298a3ccad18d72030b16cf96de7a695affb8e916ee232",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 124175848,
+          "allocated_bytes": 5444616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "712c1c359f6da0c97c8298a3ccad18d72030b16cf96de7a695affb8e916ee232",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 124175848,
+          "allocated_bytes": 5444616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "712c1c359f6da0c97c8298a3ccad18d72030b16cf96de7a695affb8e916ee232",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-tweak-compressed-full-width",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-compressed-full-width/main.mo",
+      "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-tweak-compressed-full-width",
+      "api": "tweakPublicKey",
+      "returncode": 0,
+      "source_sha256": "89dd48c5f7e77122f1e58e3773833fb0132f810e41f40a9b1a4d8875fdf3327a",
+      "wasm": "r2-secp256k1-tweak-compressed-full-width/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "5697e94c6a0346fca71872d9d1f6c52031f0035f30b809091c2ef54a1afe7c66",
+      "wasm_bytes": 279721,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 149275314,
+          "allocated_bytes": 6440800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "1334ed23ea851acb52127792431015c42db74fbbc705d8a48de7f8f2f02c4ad4",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 149275314,
+          "allocated_bytes": 6440800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "1334ed23ea851acb52127792431015c42db74fbbc705d8a48de7f8f2f02c4ad4",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 149275314,
+          "allocated_bytes": 6440800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "1334ed23ea851acb52127792431015c42db74fbbc705d8a48de7f8f2f02c4ad4",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-x-only-compressed",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-x-only-compressed",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-x-only-compressed/main.mo",
+      "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-x-only-compressed",
+      "api": "xOnlyPublicKey",
+      "returncode": 0,
+      "source_sha256": "68acdf8ff46e80a74327462a1c7a9e17b5f86ec5e368e27b40c85705bbf1ad79",
+      "wasm": "r2-secp256k1-x-only-compressed/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "704dd35062a19de0a7dbfb2f58d1d63cd6a1813116df42fbb9b8391d40b20a7a",
+      "wasm_bytes": 272324,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 24765721,
+          "allocated_bytes": 980168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a265977de6af5c0c06af8d3abc96c15e6901b3dd23154431c8ff2479d3477852",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 24765721,
+          "allocated_bytes": 980168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a265977de6af5c0c06af8d3abc96c15e6901b3dd23154431c8ff2479d3477852",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 24765721,
+          "allocated_bytes": 980168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "a265977de6af5c0c06af8d3abc96c15e6901b3dd23154431c8ff2479d3477852",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-tweak-x-only-public-full-width",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-x-only-public-full-width/main.mo",
+      "expected_hex": "03464ba5b8c027406a45d4570cce4d9b7f9a6829cf8f7056aadd86208ec50d3d7c",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-tweak-x-only-public-full-width",
+      "api": "tweakXOnlyPublicKey",
+      "returncode": 0,
+      "source_sha256": "318e98539032c148d706f029f6d4fafb06bdf24ef1febd0c22deab256242d533",
+      "wasm": "r2-secp256k1-tweak-x-only-public-full-width/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "3149aaa515471f8cd9c80a56ad07c97a318fd5188abc643aae8ec825a3b15059",
+      "wasm_bytes": 282764,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 152652841,
+          "allocated_bytes": 6684456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "50a0917c3fe3be85b45abd73c417ac71ab5a60ee9483859889672a3a002313fe",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 152652841,
+          "allocated_bytes": 6684456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "50a0917c3fe3be85b45abd73c417ac71ab5a60ee9483859889672a3a002313fe",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 152652841,
+          "allocated_bytes": 6684456,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "50a0917c3fe3be85b45abd73c417ac71ab5a60ee9483859889672a3a002313fe",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "family": "secp256k1",
+      "implementation": "mops-bitcoin-api",
+      "comparison": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "plugins": [],
+      "source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-x-only-secret-even-y/main.mo",
+      "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+      "operations_per_sample": 1,
+      "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Variable-time Motoko NAF multiplication and Nat arithmetic; reference composition for a fixed public test secret, not a constant-time signing implementation.",
+      "fixture_provenance": "Exact inputs/expected bytes copied from frozen independently computed curve-hotspots fixtures; no plugin outputs used as oracle.",
+      "plugin_source_case": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "api": "tweakXOnlySecretKey",
+      "returncode": 0,
+      "source_sha256": "c716e9252700e776a0a460baf473b0faf53b2ac9f59182a9710e8c1813014308",
+      "wasm": "r2-secp256k1-tweak-x-only-secret-even-y/mops-bitcoin-api/main.wasm",
+      "wasm_sha256": "a37df974d89c04a1a2bd780c2e6d18c2fb847c86064d2d40606fbe44bd6afe5e",
+      "wasm_bytes": 273629,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 124045300,
+          "allocated_bytes": 5446472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5fd4b2e34e6f6a77c9992dfc010f30a51cd9ea62267bd6fc8c678e9913ca452e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 124045300,
+          "allocated_bytes": 5446472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5fd4b2e34e6f6a77c9992dfc010f30a51cd9ea62267bd6fc8c678e9913ca452e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 124045300,
+          "allocated_bytes": 5446472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5fd4b2e34e6f6a77c9992dfc010f30a51cd9ea62267bd6fc8c678e9913ca452e",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

@@ -1,0 +1,658 @@
+{
+  "stage": "curves-baseline-initial",
+  "recorded_utc": "2026-10-12T11:43:04.078Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "5034844b42b306d1f5248aff1a0ba2204c23f1682ad9fc7c039450c43d5480bb",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "secp256k1_public_key_ecdsa_ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "secp256k1_public_key_ecdsa",
+      "plugins": [],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_ecdsa_ecdsa/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "09dac017756205b12002da2b7e2efc235f006250b7b6275f2adac0e98a151cb4",
+      "wasm": "secp256k1_public_key_ecdsa_ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "4747c534bf0f40871af23b00e5d18f4692866eea6276f131662d86d83aef5cec",
+      "wasm_bytes": 625778,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 55053942,
+          "allocated_bytes": 4886480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 55053942,
+          "allocated_bytes": 4886480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 55053942,
+          "allocated_bytes": 4886480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_verify_ecdsa_ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "secp256k1_verify_ecdsa",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/secp256k1_verify_ecdsa_ecdsa/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "c33cb3e4c60844f071bca4e66ac54ad6271889d08a4cb2066d995e0fd5eeeab8",
+      "wasm": "secp256k1_verify_ecdsa_ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "fff847c17cd6ada4d33f4bd9a3194bde0afb08f122c0522610974521cdbcc827",
+      "wasm_bytes": 625854,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 109871125,
+          "allocated_bytes": 9713568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 109871125,
+          "allocated_bytes": 9713568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 109871125,
+          "allocated_bytes": 9713568,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_public_key_bitcoin_bitcoin",
+      "family": "secp256k1",
+      "implementation": "bitcoin",
+      "comparison": "secp256k1_public_key_bitcoin",
+      "plugins": [],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_bitcoin_bitcoin/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "9a7f2f9a21062ee4afc8510cdb24122d070f42673f7d27580c1273e44ec0d131",
+      "wasm": "secp256k1_public_key_bitcoin_bitcoin/bitcoin/main.wasm",
+      "wasm_sha256": "4f6652fd6843021ed25f6578d7825652ac45f498836af256b875b9a91f9a737e",
+      "wasm_bytes": 270454,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 120653824,
+          "allocated_bytes": 5199272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 120653824,
+          "allocated_bytes": 5199272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 120653824,
+          "allocated_bytes": 5199272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_verify_bitcoin_bitcoin",
+      "family": "secp256k1",
+      "implementation": "bitcoin",
+      "comparison": "secp256k1_verify_bitcoin",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement. Both sides include SHA-256 prehashing of the same message.",
+      "source": "curve-cases/secp256k1_verify_bitcoin_bitcoin/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "c3396dcc19d6a9b8c50d45433c6ffd69ccc063dbbaf0f58ef1a22eea8c779297",
+      "wasm": "secp256k1_verify_bitcoin_bitcoin/bitcoin/main.wasm",
+      "wasm_sha256": "73468bb21cd7d363cc5756fa861c6c124d6292095156cd4841edb394cb8aa282",
+      "wasm_bytes": 523965,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 241727789,
+          "allocated_bytes": 10588256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 241727789,
+          "allocated_bytes": 10588256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 241727789,
+          "allocated_bytes": 10588256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_public_key_ecdsa_ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "p256_public_key_ecdsa",
+      "plugins": [],
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/p256_public_key_ecdsa_ecdsa/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "54c3bbafefdb127aa690a4c6285aacabeeb62185bcd44b4ee8efe7e8bbafce83",
+      "wasm": "p256_public_key_ecdsa_ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "b1b79689eeb9d5deaec9638ea31040ebeb5fe156a180b5687a739014a67a6b3d",
+      "wasm_bytes": 625663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 160021992,
+          "allocated_bytes": 12095712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 160021992,
+          "allocated_bytes": 12095712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 160021992,
+          "allocated_bytes": 12095712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_verify_ecdsa_ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "p256_verify_ecdsa",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/p256_verify_ecdsa_ecdsa/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "e6ba7ba68f2147134242fe7424141d7632f1a236a7e94e74bdbeae186de0dd62",
+      "wasm": "p256_verify_ecdsa_ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "fd41abbb82e7c5cc3661d10fcdf7e9640202a84f84330a09c044fb0a02fffd75",
+      "wasm_bytes": 625739,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 324683945,
+          "allocated_bytes": 24513360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 324683945,
+          "allocated_bytes": 24513360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 324683945,
+          "allocated_bytes": 24513360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_add_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_add",
+      "plugins": [],
+      "expected_hex": "a572cbea904d67468808c8eb50a9450c9721db309128012543902d0ac358a62ae28f75bb8f1c7c42c39a8c5529bf0f4e",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_add_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "8792703afeb03547ff4d76a0d4e6f957c536106928acacfd91c9cf5fbe85620a",
+      "wasm": "bls12_381_g1_add_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "28ebda5bf24bc3c48438554ed771489b96f10276fa8d8b47b1beb31b535fa058",
+      "wasm_bytes": 250503,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 420986,
+          "allocated_bytes": 19216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 420986,
+          "allocated_bytes": 19216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 420986,
+          "allocated_bytes": 19216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_mul_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_mul",
+      "plugins": [],
+      "expected_hex": "b36bb0cb2098dced2a7f73194928bd2b3887a2716cf87f26bc30198d199f319c0837094342924611300d2419a22a9105",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_mul_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "938e1db5df87842cfad3e60f3b294cf6e5ef816540fc2615811c0aa495cbfef5",
+      "wasm": "bls12_381_g1_mul_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "7abc85af31475133403e6459166fc2fa90acab88c711c598970d2dac17dcfe4d",
+      "wasm_bytes": 250681,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 226788417,
+          "allocated_bytes": 8606544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 226788417,
+          "allocated_bytes": 8606544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 226788417,
+          "allocated_bytes": 8606544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_msm_8_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g1_msm_8",
+      "plugins": [],
+      "expected_hex": "94838c170fa86de4f7b2baa8c94d79ec455cfa761d0c3efa34bfd67a86dcc67bcf0c219e67d7f161bb5081255a4af11b",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_msm_8_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "af6aec270bf0a3086eb85c0e99f96075549b61ef9775d9d9f57acd7aa10a5c77",
+      "wasm": "bls12_381_g1_msm_8_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "935c0d847575d3f16599993988ab92ec0280acea2fe0b61e62d93a624f101039",
+      "wasm_bytes": 256590,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1824822521,
+          "allocated_bytes": 69219232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1824822521,
+          "allocated_bytes": 69219232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1824822521,
+          "allocated_bytes": 69219232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_add_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_add",
+      "plugins": [],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_add_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "de96681ee651289ed850fa1960db0bfdc687d7565459d23047c59f4a032dd70a",
+      "wasm": "bls12_381_g2_add_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "8d1d5e6263c9ba9430d8c07bb2745d8983b77f5b24d58e4a0fc350f58b17f83a",
+      "wasm_bytes": 252938,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 977954,
+          "allocated_bytes": 49744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 977954,
+          "allocated_bytes": 49744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 977954,
+          "allocated_bytes": 49744,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_mul_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_mul",
+      "plugins": [],
+      "expected_hex": "9757e7dbd984e5d54cfbd9fb8bc970dc28a2ab63ddb27e0a5c7ccee3bea02bf5c35492c91fde905c97f866c57119be4618c2c8363f2317d1331be0d1b9d751617f4ad9d1f020104546cd3c69eeba793c4ccbe2a93a6cfd8631a92002de1b67af",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_mul_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "c7160749d95b6a380f1601f5af65bc6aedbef2dc4865352078844ddfd6909295",
+      "wasm": "bls12_381_g2_mul_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "fdbf47264f4a5ee2eb84ed0ba54c3a39d2ecb000b1a144eb07bb5cf1e35ec555",
+      "wasm_bytes": 253120,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_8_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_8",
+      "plugins": [],
+      "expected_hex": "b552e62de03ae2f5e6989fbeef018df87855ab795bd388943f9e96bf9369f7152891376ca5872374aea2a8d9d5548b8007d3eb0a6861725104c33ed27f2ceed1b749b607597cb422ce0e5b6d26cc8865ab5df1c7fde09572995cd43c8c71bbfa",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_msm_8_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "7b510046248bbbaa609ace60f4742b3ee53702b7c83e219a7b4192743bcd19d3",
+      "wasm": "bls12_381_g2_msm_8_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "4888262456f92a6c3b7b27812bc2da466a4c77c29bc24a418af6b8c448a7fb68",
+      "wasm_bytes": 259004,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_identity_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_identity_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "7b928328f2f2dbdba79265c1ac23a364778945cad4328220e8c1f88457bb736d",
+      "wasm": "bls12_381_pairing_identity_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "cc2e8ffce863d7bcfb47e1bab257b1d7b166b6ba5107cd13169fdb159abfa8d9",
+      "wasm_bytes": 273122,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_nonidentity_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_pairing_nonidentity",
+      "plugins": [],
+      "expected_hex": "00",
+      "notes": "Nondegenerate generator pairing e(G1,G2)!=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_nonidentity_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators.",
+      "returncode": 0,
+      "source_sha256": "03eebe11e21c5dfa1d730c93c7829d77f073e1c76bfb9308e5ad1799b2a87fdf",
+      "wasm": "bls12_381_pairing_nonidentity_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "82e2e6d7560e6b8063992ba9f8d45a4301ddac39d761ae7fc7de609101613025",
+      "wasm_bytes": 272566,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 947109408,
+          "allocated_bytes": 42883040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 947109408,
+          "allocated_bytes": 42883040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 947109408,
+          "allocated_bytes": 42883040,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

@@ -1,0 +1,472 @@
+--- a/packages/fast/src/Bitcoin/Hash.mo
++++ b/packages/fast/src/Bitcoin/Hash.mo
+@@ -16,9 +16,9 @@
+   func tagged(tagHash : Blob, message : Blob) : Blob {
+     let output = Prim.Array_init<Nat8>(64 + message.size(), 0);
+     var i = 0;
+-    for (byte in tagHash.vals()) { output[i] := byte; output[i + 32] := byte; i += 1 };
+-    i := 64;
+-    for (byte in message.vals()) { output[i] := byte; i += 1 };
++    while (i < 32) { output[i] := tagHash[i]; output[i + 32] := tagHash[i]; i += 1 };
++    i := 0;
++    while (i < message.size()) { output[i + 64] := message[i]; i += 1 };
+     SHA256.digest(Prim.arrayMutToBlob(output))
+   };
+ 
+--- a/packages/fast/src/Bitcoin/Address.mo
++++ b/packages/fast/src/Bitcoin/Address.mo
+@@ -28,7 +28,11 @@
+     for (part in parts.vals()) { size += part.size() };
+     let output = Prim.Array_init<Nat8>(size, 0);
+     var i = 0;
+-    for (part in parts.vals()) { for (byte in part.vals()) { output[i] := byte; i += 1 } };
++    for (part in parts.vals()) {
++      var j = 0;
++      while (j < part.size()) { output[i + j] := part[j]; j += 1 };
++      i += part.size();
++    };
+     Prim.arrayMutToBlob(output)
+   };
+   func slice(bytes : Blob, start : Nat, size : Nat) : Blob {
+--- a/packages/fast/src/Bitcoin/Bip32.mo
++++ b/packages/fast/src/Bitcoin/Bip32.mo
+@@ -5,10 +5,9 @@
+ /// reached through hardened private derivation can still be imported.
+ import Array "mo:core/Array";
+ import Blob "mo:core/Blob";
+-import Char "mo:core/Char";
+ import Nat8 "mo:core/Nat8";
+ import Nat32 "mo:core/Nat32";
+-import Text "mo:core/Text";
++import Prim "mo:⛔";
+ import VarArray "mo:core/VarArray";
+ import Base58Check "../Base58Check";
+ import HMAC "../HMAC";
+@@ -63,11 +62,8 @@
+   };
+ 
+   func copy(bytes : [var Nat8], start : Nat, source : Blob) {
+-    var i = start;
+-    for (byte in source.values()) {
+-      bytes[i] := byte;
+-      i += 1;
+-    };
++    var i = 0;
++    while (i < source.size()) { bytes[start + i] := source[i]; i += 1 };
+   };
+ 
+   func validate(key : ExtendedPublicKey) : Result<()> {
+@@ -222,23 +218,32 @@
+   /// indices >= 2^31 return #hardenedChild. At most 255 indices are accepted.
+   /// This parser returns indices only; deriveTextPath enforces root depth.
+   public func parsePath(path : Text) : Result<[Nat32]> {
+-    let segments = Array.fromIter(Text.split(path, #char '/'));
+-    if (segments.size() == 0) return #err(#invalidPath);
+-    let start : Nat = if (segments[0] == "m" or segments[0] == "M") 1 else 0;
+-    let size = segments.size() - start;
++    let bytes = Prim.encodeUtf8(path);
++    let n = bytes.size();
++    let absolute = n != 0 and (bytes[0] == 0x6d or bytes[0] == 0x4d) and (n == 1 or bytes[1] == 0x2f);
++    if (absolute and n == 1) return #ok([]);
++    let start = if (absolute) 2 else 0;
++    // Count first so maximum-depth errors retain precedence over malformed segments.
++    var size = 1;
++    var i = start;
++    while (i < n) { if (bytes[i] == 0x2f) size += 1; i += 1 };
+     if (size > 255) return #err(#maximumDepth);
+     let indices = VarArray.repeat<Nat32>(0, size);
+-    var i = 0;
+-    while (i < size) {
+-      let segment = segments[start + i];
+-      if (segment.size() == 0) return #err(#invalidPath);
++    i := start;
++    var segment = 0;
++    while (segment < size) {
++      let begin = i;
+       var value : Nat = 0;
+-      for (char in segment.chars()) {
+-        if (char < '0' or char > '9') return #err(#invalidPath);
+-        value := value * 10 + Nat32.toNat(Char.toNat32(char) - 48);
++      while (i < n and bytes[i] != 0x2f) {
++        let byte = bytes[i];
++        if (byte < 0x30 or byte > 0x39) return #err(#invalidPath);
++        value := value * 10 + Nat8.toNat(byte - 0x30);
+         if (value >= 0x80000000) return #err(#hardenedChild);
+-      };
+-      indices[i] := Nat32.fromNat(value);
++        i += 1;
++      };
++      if (i == begin) return #err(#invalidPath);
++      indices[segment] := Nat32.fromNat(value);
++      segment += 1;
+       i += 1;
+     };
+     #ok(VarArray.toArray(indices))
+--- a/packages/fast/src/Bitcoin/Script.mo
++++ b/packages/fast/src/Bitcoin/Script.mo
+@@ -6,15 +6,17 @@
+ import Blob "mo:core/Blob";
+ import Nat8 "mo:core/Nat8";
+ import SHA256 "../SHA256";
++import Prim "mo:⛔";
+ 
+ module {
+   func join(prefix : [Nat8], data : Blob, suffix : [Nat8]) : Blob {
+-    let bytes = data;
+-    Blob.fromArray(Array.tabulate<Nat8>(prefix.size() + bytes.size() + suffix.size(), func(i) {
+-      if (i < prefix.size()) prefix[i]
+-      else if (i < prefix.size() + bytes.size()) bytes[i - prefix.size()]
+-      else suffix[i - prefix.size() - bytes.size()]
+-    }))
++    let bytes = Prim.Array_init<Nat8>(prefix.size() + data.size() + suffix.size(), 0);
++    var i = 0;
++    for (b in prefix.values()) { bytes[i] := b; i += 1 };
++    var j = 0;
++    while (j < data.size()) { bytes[i] := data[j]; i += 1; j += 1 };
++    for (b in suffix.values()) { bytes[i] := b; i += 1 };
++    Prim.arrayMutToBlob(bytes)
+   };
+ 
+   /// Encode a minimally encoded data push, including OP_0, OP_1NEGATE and OP_1..16.
+@@ -83,11 +85,15 @@
+     })
+   };
+ 
+-  func tagged(tag : Blob, message : Blob) : Blob {
+-    let digest = SHA256.digest(tag);
+-    SHA256.digest(Blob.fromArray(Array.tabulate<Nat8>(64 + message.size(), func(i) {
+-      if (i < 64) digest[i % 32] else message[i - 64]
+-    })))
++  // SHA256 of the UTF-8 protocol tags, fixed by BIP341.
++  let tapLeafTag : Blob = "\ae\ea\8f\dc\42\08\98\31\05\73\4b\58\08\1d\1e\26\38\d3\5f\1c\b5\40\08\d4\d3\57\ca\03\be\78\e9\ee";
++  let tapBranchTag : Blob = "\19\41\a1\f2\e5\6e\b9\5f\a2\a9\f1\94\be\5c\01\f7\21\6f\33\ed\82\b0\91\46\34\90\d0\5b\f5\16\a0\15";
++
++  func tagPrefix(tag : Blob, size : Nat) : [var Nat8] {
++    let bytes = Prim.Array_init<Nat8>(size, 0);
++    var i = 0;
++    while (i < 32) { bytes[i] := tag[i]; bytes[i + 32] := tag[i]; i += 1 };
++    bytes
+   };
+ 
+   /// BIP341 TapLeaf hash over an even leaf version and a CompactSize-prefixed
+@@ -96,11 +102,13 @@
+   public func tapLeafHash(script : Blob, leafVersion : Nat8) : ?Blob {
+     if (leafVersion & 1 != 0 or script.size() > 0xffff_ffff_ffff_ffff) return null;
+     let length = compact(script.size());
+-    let message = Blob.fromArray(Array.tabulate<Nat8>(1 + length.size() + script.size(), func(i) {
+-      if (i == 0) leafVersion else if (i <= length.size()) length[i - 1]
+-      else script[i - 1 - length.size()]
+-    }));
+-    ?tagged("TapLeaf", message)
++    let bytes = tagPrefix(tapLeafTag, 65 + length.size() + script.size());
++    bytes[64] := leafVersion;
++    var i = 65;
++    for (b in length.values()) { bytes[i] := b; i += 1 };
++    var j = 0;
++    while (j < script.size()) { bytes[i] := script[j]; i += 1; j += 1 };
++    ?SHA256.digest(Prim.arrayMutToBlob(bytes))
+   };
+ 
+   /// BIP341 TapBranch hash. Children must be 32-byte hashes; their order is
+@@ -108,9 +116,10 @@
+   public func tapBranchHash(left : Blob, right : Blob) : ?Blob {
+     if (left.size() != 32 or right.size() != 32) return null;
+     let (first, second) = if (left < right) (left, right) else (right, left);
+-    ?tagged("TapBranch", Blob.fromArray(Array.tabulate<Nat8>(64, func(i) {
+-      if (i < 32) first[i] else second[i - 32]
+-    })))
++    let bytes = tagPrefix(tapBranchTag, 128);
++    var i = 0;
++    while (i < 32) { bytes[i + 64] := first[i]; bytes[i + 96] := second[i]; i += 1 };
++    ?SHA256.digest(Prim.arrayMutToBlob(bytes))
+   };
+ 
+ }
+--- a/packages/fast/src/Bitcoin/Transaction.mo
++++ b/packages/fast/src/Bitcoin/Transaction.mo
+@@ -13,7 +13,6 @@
+ /// extends the latter as https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki.
+ import Array "mo:core/Array";
+ import Blob "mo:core/Blob";
+-import List "mo:core/List";
+ import Nat8 "mo:core/Nat8";
+ import Nat32 "mo:core/Nat32";
+ import Nat64 "mo:core/Nat64";
+@@ -61,11 +60,34 @@
+     let bytes = VarArray.repeat<Nat8>(0, size);
+     var offset = 0;
+     public func byte(b : Nat8) { bytes[offset] := b; offset += 1 };
+-    public func raw(b : Blob) { for (v in b.values()) byte(v) };
++    public func raw(b : Blob) {
++      var i = 0;
++      let n = b.size();
++      while (i < n) { bytes[offset + i] := b[i]; i += 1 };
++      offset += n;
++    };
+     public func le(n : Nat, width : Nat) {
+       var rest = n;
+       var i = 0;
+       while (i < width) { byte(Nat8.fromNat(rest % 256)); rest /= 256; i += 1 };
++    };
++    public func le32(n : Nat32) {
++      bytes[offset] := Nat8.fromNat32(n & 255);
++      bytes[offset + 1] := Nat8.fromNat32((n >> 8) & 255);
++      bytes[offset + 2] := Nat8.fromNat32((n >> 16) & 255);
++      bytes[offset + 3] := Nat8.fromNat32(n >> 24);
++      offset += 4;
++    };
++    public func le64(n : Nat64) {
++      bytes[offset] := Nat8.fromNat64(n & 255);
++      bytes[offset + 1] := Nat8.fromNat64((n >> 8) & 255);
++      bytes[offset + 2] := Nat8.fromNat64((n >> 16) & 255);
++      bytes[offset + 3] := Nat8.fromNat64((n >> 24) & 255);
++      bytes[offset + 4] := Nat8.fromNat64((n >> 32) & 255);
++      bytes[offset + 5] := Nat8.fromNat64((n >> 40) & 255);
++      bytes[offset + 6] := Nat8.fromNat64((n >> 48) & 255);
++      bytes[offset + 7] := Nat8.fromNat64(n >> 56);
++      offset += 8;
+     };
+     public func compact(n : Nat) {
+       if (n < 253) byte(Nat8.fromNat(n))
+@@ -74,8 +96,8 @@
+       else { byte(0xff); le(n, 8) }
+     };
+     public func field(b : Blob) { compact(b.size()); raw(b) };
+-    public func outpoint(input : Input) { raw(input.previousTxid); le(input.previousIndex.toNat(), 4) };
+-    public func output(out : Output) { le(out.value.toNat(), 8); field(out.scriptPubKey) };
++    public func outpoint(input : Input) { raw(input.previousTxid); le32(input.previousIndex) };
++    public func output(out : Output) { le64(out.value); field(out.scriptPubKey) };
+     public func finish() : Blob { assert offset == size; Blob.fromVarArray(bytes) };
+   };
+ 
+@@ -85,11 +107,11 @@
+     public func remaining() : Nat = bytes.size() - offset;
+     public func le(width : Nat) : ?Nat {
+       if (width > remaining()) return null;
+-      var n = 0;
+-      var factor = 1;
++      var n : Nat64 = 0;
++      var shift : Nat64 = 0;
+       var i = 0;
+-      while (i < width) { n += bytes[offset].toNat() * factor; factor *= 256; offset += 1; i += 1 };
+-      ?n
++      while (i < width) { n |= Nat64.fromNat8(bytes[offset]) << shift; shift += 8; offset += 1; i += 1 };
++      ?n.toNat()
+     };
+     public func take(n : Nat) : ?Blob {
+       if (n > remaining()) return null;
+@@ -139,10 +161,10 @@
+       };
+     };
+     let w = Writer(size);
+-    w.le(tx.version.toNat(), 4);
++    w.le32(tx.version);
+     if (hasWitness) { w.byte(0); w.byte(1) };
+     w.compact(tx.inputs.size());
+-    for (input in tx.inputs.values()) { w.outpoint(input); w.field(input.scriptSig); w.le(input.sequence.toNat(), 4) };
++    for (input in tx.inputs.values()) { w.outpoint(input); w.field(input.scriptSig); w.le32(input.sequence) };
+     w.compact(tx.outputs.size());
+     for (output in tx.outputs.values()) w.output(output);
+     if (hasWitness) {
+@@ -151,7 +173,7 @@
+         for (item in input.witness.values()) w.field(item);
+       };
+     };
+-    w.le(tx.lockTime.toNat(), 4);
++    w.le32(tx.lockTime);
+     ?w.finish()
+   };
+ 
+@@ -171,27 +193,27 @@
+       count := switch (r.compact()) { case null return null; case (?v) v };
+     };
+     if (count == 0 or count > r.remaining() / 41 or count > 0xffff_ffff) return null;
+-    let inputs = List.empty<Input>();
++    let inputs = VarArray.repeat<Input>({ previousTxid = ""; previousIndex = 0; scriptSig = ""; sequence = 0; witness = [] }, count);
+     var i = 0;
+     while (i < count) {
+       let previousTxid = switch (r.take(32)) { case null return null; case (?v) v };
+       let previousIndex = switch (r.le(4)) { case null return null; case (?v) Nat32.fromNat(v) };
+       let scriptSig = switch (r.field()) { case null return null; case (?v) v };
+       let sequence = switch (r.le(4)) { case null return null; case (?v) Nat32.fromNat(v) };
+-      inputs.add({ previousTxid; previousIndex; scriptSig; sequence; witness = [] });
++      inputs[i] := { previousTxid; previousIndex; scriptSig; sequence; witness = [] };
+       i += 1;
+     };
+     let outputCount = switch (r.compact()) { case null return null; case (?v) v };
+     if (outputCount > r.remaining() / 9) return null;
+-    let outputs = List.empty<Output>();
++    let outputs = VarArray.repeat<Output>({ value = 0; scriptPubKey = "" }, outputCount);
+     i := 0;
+     while (i < outputCount) {
+       let value = switch (r.le(8)) { case null return null; case (?v) Nat64.fromNat(v) };
+       let scriptPubKey = switch (r.field()) { case null return null; case (?v) v };
+-      outputs.add({ value; scriptPubKey });
++      outputs[i] := { value; scriptPubKey };
+       i += 1;
+     };
+-    let inputArray = VarArray.fromArray<Input>(inputs.toArray());
++    let inputArray = inputs;
+     if (witness) {
+       var anyWitness = false;
+       i := 0;
+@@ -199,11 +221,11 @@
+         let n = switch (r.compact()) { case null return null; case (?v) v };
+         if (n > r.remaining()) return null;
+         if (n != 0) anyWitness := true;
+-        let stack = List.empty<Blob>();
++        let stack = VarArray.repeat<Blob>("", n);
+         var j = 0;
+         while (j < n) {
+           let item = switch (r.field()) { case null return null; case (?v) v };
+-          stack.add(item);
++          stack[j] := item;
+           j += 1;
+         };
+         let input = inputArray[i];
+@@ -219,8 +241,7 @@
+ 
+   func doubleHash(bytes : Blob) : Blob = SHA256.digest(SHA256.digest(bytes));
+   func reverse(bytes : Blob) : Blob {
+-    let a = bytes.toArray();
+-    Blob.fromArray(Array.tabulate<Nat8>(a.size(), func(i) { a[a.size() - 1 - i] }))
++    Blob.fromArray(Array.tabulate<Nat8>(bytes.size(), func(i) { bytes[bytes.size() - 1 - i] }))
+   };
+   /// Transaction ID in explorer/display byte order, excluding all witness data.
+   public func txid(tx : Tx) : ?Blob {
+@@ -236,12 +257,19 @@
+   // A malformed push rejects the script instead of interpreting payload bytes.
+   func withoutCodeSeparators(script : Blob) : ?Blob {
+     let bytes = script;
+-    let keep = VarArray.repeat<Bool>(true, bytes.size());
++    var keep : ?[var Bool] = null;
+     var removed = 0;
+     var offset = 0;
+     while (offset < bytes.size()) {
+       let op = bytes[offset].toNat();
+-      if (op == 0xab) { keep[offset] := false; removed += 1 };
++      if (op == 0xab) {
++        let marks = switch keep {
++          case (?marks) marks;
++          case null { let marks = VarArray.repeat<Bool>(true, bytes.size()); keep := ?marks; marks };
++        };
++        marks[offset] := false;
++        removed += 1;
++      };
+       offset += 1;
+       if (op <= 0x4e) {
+         var n = op;
+@@ -258,9 +286,10 @@
+       };
+     };
+     if (removed == 0) return ?script;
++    let ?marks = keep else return ?script;
+     let w = Writer(bytes.size() - removed);
+     offset := 0;
+-    while (offset < bytes.size()) { if (keep[offset]) w.byte(bytes[offset]); offset += 1 };
++    while (offset < bytes.size()) { if (marks[offset]) w.byte(bytes[offset]); offset += 1 };
+     ?w.finish()
+   };
+ 
+@@ -283,7 +312,7 @@
+     if (mode == 3) size += index * 9 + outputSize(tx.outputs[index])
+     else if (mode != 2) { for (output in tx.outputs.values()) { size += outputSize(output) } };
+     let w = Writer(size);
+-    w.le(tx.version.toNat(), 4);
++    w.le32(tx.version);
+     w.compact(inputCount);
+     var i = 0;
+     while (i < inputCount) {
+@@ -291,18 +320,18 @@
+       let input = tx.inputs[n];
+       w.outpoint(input);
+       w.field(if (n == index) script else "");
+-      w.le(if (n != index and (mode == 2 or mode == 3)) 0 else input.sequence.toNat(), 4);
++      w.le32(if (n != index and (mode == 2 or mode == 3)) 0 else input.sequence);
+       i += 1;
+     };
+     w.compact(outputCount);
+     i := 0;
+     while (i < outputCount) {
+-      if (mode == 3 and i != index) { w.le(max64, 8); w.byte(0) }
++      if (mode == 3 and i != index) { w.le64(0xffff_ffff_ffff_ffff); w.byte(0) }
+       else w.output(tx.outputs[i]);
+       i += 1;
+     };
+-    w.le(tx.lockTime.toNat(), 4);
+-    w.le(hashType.toNat(), 4);
++    w.le32(tx.lockTime);
++    w.le32(hashType);
+     ?doubleHash(w.finish())
+   };
+ 
+@@ -313,7 +342,7 @@
+   };
+   func sequences(tx : Tx) : Blob {
+     let w = Writer(tx.inputs.size() * 4);
+-    for (input in tx.inputs.values()) w.le(input.sequence.toNat(), 4);
++    for (input in tx.inputs.values()) w.le32(input.sequence);
+     w.finish()
+   };
+   func outputsBytes(outputs : [Output]) : Blob {
+@@ -365,16 +394,16 @@
+         let anyone = hashType & 0x80 != 0;
+         let input = tx.inputs[index];
+         let w = Writer(156 + fieldSize(scriptCode));
+-        w.le(tx.version.toNat(), 4);
++        w.le32(tx.version);
+         w.raw(if (anyone) zero32 else prevouts());
+         w.raw(if (anyone or mode == 2 or mode == 3) zero32 else sequenceHash());
+         w.outpoint(input);
+         w.field(scriptCode);
+-        w.le(value.toNat(), 8);
+-        w.le(input.sequence.toNat(), 4);
++        w.le64(value);
++        w.le32(input.sequence);
+         w.raw(if (mode != 2 and mode != 3) outputHash() else if (mode == 3 and index < tx.outputs.size()) doubleHash(outputBytes(tx.outputs[index])) else zero32);
+-        w.le(tx.lockTime.toNat(), 4);
+-        w.le(hashType.toNat(), 4);
++        w.le32(tx.lockTime);
++        w.le32(hashType);
+         ?doubleHash(w.finish())
+       }
+     })
+@@ -416,7 +445,7 @@
+         case (?v) v;
+         case null {
+           let w = Writer(prevouts.size() * 8);
+-          for (output in prevouts.values()) w.le(output.value.toNat(), 8);
++          for (output in prevouts.values()) w.le64(output.value);
+           let v = SHA256.digest(w.finish()); amountsHash := ?v; v
+         };
+       }
+@@ -477,16 +506,16 @@
+         let t = tag(); w.raw(t); w.raw(t);
+         w.byte(0); // sighash epoch
+         w.byte(hashType);
+-        w.le(tx.version.toNat(), 4);
+-        w.le(tx.lockTime.toNat(), 4);
++        w.le32(tx.version);
++        w.le32(tx.lockTime);
+         if (not anyone) { w.raw(points()); w.raw(amounts()); w.raw(scripts()); w.raw(sequenceHash()) };
+         if (mode != 2 and mode != 3) w.raw(outputHash());
+         w.byte(spendType);
+         if (anyone) {
+           w.outpoint(input);
+-          w.le(prevout.value.toNat(), 8);
++          w.le64(prevout.value);
+           w.field(prevout.scriptPubKey);
+-          w.le(input.sequence.toNat(), 4);
++          w.le32(input.sequence);
+         } else w.le(index, 4);
+         switch annex {
+           case null {};
+@@ -495,7 +524,7 @@
+         if (mode == 3) w.raw(SHA256.digest(outputBytes(tx.outputs[index])));
+         switch extension {
+           case null {};
+-          case (?ext) { w.raw(ext.tapLeafHash); w.byte(0); w.le(ext.codeSeparatorPosition.toNat(), 4) };
++          case (?ext) { w.raw(ext.tapLeafHash); w.byte(0); w.le32(ext.codeSeparatorPosition) };
+         };
+         ?SHA256.digest(w.finish())
+       }

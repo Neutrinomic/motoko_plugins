@@ -1,0 +1,36 @@
+--- _build/crypto-optimization-round2/bls-final/packages/fast/src/BLS12381.mo	2026-10-12 13:05:22.714052214 +0000
++++ _build/crypto-optimization-round2/bls-capped/packages/fast/src/BLS12381.mo	2026-10-12 13:16:03.472214829 +0000
+@@ -180,7 +180,8 @@
+     #ok(())
+   };
+   /// Ethereum aggregate verification with PoP verification for every key.
+-  /// Repeated messages reuse their hash after possession is checked. 1..127 entries.
++  /// Repeated messages up to 1024 bytes reuse their hash after possession is checked.
++  /// Longer messages are hashed directly to bound byte-comparison work. 1..127 entries.
+   public func aggregateVerifyEthereum(keys : [Blob], proofs : [Blob], messages : [Blob], signature : Blob) : Result<Bool> {
+     let n = keys.size();
+     if (n != messages.size() or n != proofs.size()) return #err(#invalidLength);
+@@ -194,7 +195,10 @@
+     while (i < n) {
+       var representative = i;
+       var j = 0;
+-      while (j < i and representative == i) {
++      // Keep pairwise byte comparisons bounded independently of message length.
++      // Ethereum signing roots are 32 bytes; longer raw messages remain supported.
++      let reusable = messages[i].size() <= 1024;
++      while (reusable and j < i and representative == i) {
+         if (messages[j] == messages[i]) representative := j;
+         j += 1;
+       };
+--- _build/crypto-optimization-round2/bls-final/plugins/bls12-381/README.md	2026-10-12 13:05:22.714052214 +0000
++++ _build/crypto-optimization-round2/bls-capped/plugins/bls12-381/README.md	2026-10-12 13:16:25.761185701 +0000
+@@ -22,7 +22,8 @@
+ every distinct byte-identical key/proof pair in each call before using its key.
+ A previously verified pair may be reused within that call; a different proof is
+ always checked. No result or native state is retained between calls. Repeated
+-messages reuse their hash within the call. There is no unchecked assertion flag.
++messages up to 1024 bytes reuse their hash within the call. Longer messages
++are hashed directly, bounding comparison work independently of message length. There is no unchecked assertion flag.
+ Callers construct Ethereum signing roots themselves. Raw group aggregation does
+ not prove key possession and should not be substituted for signature verification.
+ 

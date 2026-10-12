@@ -1,0 +1,361 @@
+{
+  "stage": "curves-secp-final",
+  "recorded_utc": "2026-10-12T11:53:33.954Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "a29244424910e906d2d82842d905832de7e58f896912fda8f9e5600c31dbe536",
+  "runner_sha256": "8e4a65148e227c4d657829eb0039ab3d16738913f1217979d79f3039f86b2f89",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "secp256k1_public_key_ecdsa_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_public_key_ecdsa",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "4153a40bde2e758974b1413c65724e95e16ab1d5466df34e2d6cb65f29c71c50",
+      "wasm": "secp256k1_public_key_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "63819ecf8ecabd5564d355b7303d4dcf9b790a316534b4eb5e4dcd9448e635fa",
+      "wasm_bytes": 449308,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_verify_ecdsa_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_verify_ecdsa",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/secp256k1_verify_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "d1c4dfa90bde5cf188467fb9bcf6cbc7b46ea9d34fef36e39cef33ebecc7839b",
+      "wasm": "secp256k1_verify_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "fdd448d885494863ca25bdaf2e258dbc808e43e5b0be6795b9409e0516320b18",
+      "wasm_bytes": 448311,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 10093699,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 10093699,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 10093699,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_public_key_bitcoin_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_public_key_bitcoin",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_bitcoin_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "4153a40bde2e758974b1413c65724e95e16ab1d5466df34e2d6cb65f29c71c50",
+      "wasm": "secp256k1_public_key_bitcoin_fast/fast/main.wasm",
+      "wasm_sha256": "63819ecf8ecabd5564d355b7303d4dcf9b790a316534b4eb5e4dcd9448e635fa",
+      "wasm_bytes": 449308,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6351616,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "34047f32368dbfa0a8eaf66ce4814426a18e0d29824997e54d057c2a89e90c6c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_verify_bitcoin_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_verify_bitcoin",
+      "plugins": [
+        "secp256k1",
+        "sha256"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement. Both sides include SHA-256 prehashing of the same message.",
+      "source": "curve-cases/secp256k1_verify_bitcoin_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "0048e826f9c96ac27a4634430cb82ef0bb6ca0b07c8f0684973704582a122385",
+      "wasm": "secp256k1_verify_bitcoin_fast/fast/main.wasm",
+      "wasm_sha256": "2fed51e531befde8bf8c0d6988ba7dceea9bc3d34ce7f2a3731011900d7e817f",
+      "wasm_bytes": 477338,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 10104010,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 10104010,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 10104010,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_sign_rfc6979_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_sign_rfc6979",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "385cd1a83f1e9b94a03b6a704abaed20879541ff0af652704b55d1bd0473d8536938f2a4e0b4167e44c697f45390f12e2891edef3030ab6fcc32877ddf519ae8",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "curve-cases/secp256k1_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "7b06c67269377755e3fd2140d4b997909977166b0db8e47ea8fcfd4d3210e608",
+      "wasm": "secp256k1_sign_rfc6979_fast/fast/main.wasm",
+      "wasm_sha256": "36464740954f4c2cc755ec755a59aef8ddeeff3e99e54e83d9a0516045066865",
+      "wasm_bytes": 448051,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7452214,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7452214,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7452214,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_schnorr_sign_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_schnorr_sign",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Official BIP340 test vector 1: https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv",
+      "notes": "Absolute-only BIP340 Schnorr; bitcoin 0.2.1 does not implement Schnorr. Full-width official secret key and message; explicit auxiliary randomness.",
+      "source": "curve-cases/secp256k1_schnorr_sign_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "127a8a8a3b6e18af77a8c4f75d16fbabdea5074b66c4e78baae1272ea141e136",
+      "wasm": "secp256k1_schnorr_sign_fast/fast/main.wasm",
+      "wasm_sha256": "2f5e13947b2f133eb626b98d8bbfcf94fbe1d8c8783a3e97bb30b75c2a769f38",
+      "wasm_bytes": 448227,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 25455494,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "4d39498aa9042bcce8e165c20170d95dba17a1c0b0ef350d134ec73d52301236",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 25455494,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "4d39498aa9042bcce8e165c20170d95dba17a1c0b0ef350d134ec73d52301236",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 25455494,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "4d39498aa9042bcce8e165c20170d95dba17a1c0b0ef350d134ec73d52301236",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "secp256k1_schnorr_verify_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_schnorr_verify",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Official BIP340 test vector 1: https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv",
+      "notes": "Absolute-only BIP340 Schnorr; bitcoin 0.2.1 does not implement Schnorr. Full-width official secret key and message; explicit auxiliary randomness.",
+      "source": "curve-cases/secp256k1_schnorr_verify_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "5a861180d220e3b38227e2c161a1f51a0cf2565189e5bd897eab08733ca37b78",
+      "wasm": "secp256k1_schnorr_verify_fast/fast/main.wasm",
+      "wasm_sha256": "01b706de405403318f3f4f4593a039ac6543dc5186546f46a54d9850e9471906",
+      "wasm_bytes": 448311,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9928829,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9928829,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9928829,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

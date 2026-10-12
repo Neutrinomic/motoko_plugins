@@ -1,0 +1,178 @@
+{
+  "stage": "blake3-baseline-initial",
+  "recorded_utc": "2026-10-12T11:42:53.901Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "a8796fac39930c36bda43d4fe89314a08b9402e1fad5f9291074a8fe6883edc2",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "blake3-64",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "4eed7141ea4a5cd4b788606bd23f46e212af9cacebacdc7d1f4c6dc7f2511b98",
+      "notes": "",
+      "source": "cases/blake3-64/mops-blake3/main.mo",
+      "returncode": 0,
+      "source_sha256": "1dcc77fd53cb443026e3e931e9e3a09342fc8bc07074dafd56acf7b3c0dfe726",
+      "wasm": "blake3-64/mops-blake3/main.wasm",
+      "wasm_sha256": "729af79ede3e70b517626c88bbe16b3ed9ad950cd2d38b6c5316f81b5e6c57d2",
+      "wasm_bytes": 299423,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 387472,
+          "allocated_bytes": 40376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "58ce8ddeffa8bc5f03c286c3d33c9b9e1ed29a55bdeee227ba4472d0de517d79",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 387472,
+          "allocated_bytes": 40376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "58ce8ddeffa8bc5f03c286c3d33c9b9e1ed29a55bdeee227ba4472d0de517d79",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 387472,
+          "allocated_bytes": 40376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "58ce8ddeffa8bc5f03c286c3d33c9b9e1ed29a55bdeee227ba4472d0de517d79",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "blake3-1024",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "",
+      "source": "cases/blake3-1024/mops-blake3/main.mo",
+      "returncode": 0,
+      "source_sha256": "ef3c2d91eabe12095f78c13064a1543cb21c39c6a8019c3061a03bfcfa38a76e",
+      "wasm": "blake3-1024/mops-blake3/main.wasm",
+      "wasm_sha256": "2c1d4c84a772ed724434ef1e5864081aa26768a53690119923dbfe34b5f024aa",
+      "wasm_bytes": 299423,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3485872,
+          "allocated_bytes": 135536,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3485872,
+          "allocated_bytes": 135536,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3485872,
+          "allocated_bytes": 135536,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "blake3-16384",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "f875d6646de28985646f34ee13be9a576fd515f76b5b0a26bb324735041ddde4",
+      "notes": "",
+      "source": "cases/blake3-16384/mops-blake3/main.mo",
+      "returncode": 0,
+      "source_sha256": "78b418e0ebbcd85fa5e0603702f223d1beef3c9eb3901718d062c7e3e76e7a8a",
+      "wasm": "blake3-16384/mops-blake3/main.wasm",
+      "wasm_sha256": "16177997b7711db26fdd2315406d3629bc136daa47acaa8eae34e94454888edd",
+      "wasm_bytes": 299424,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 313527472,
+          "allocated_bytes": 17325296,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-16384/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '5d5a4de81ad864715b4d7431ea78fd51c999d0a603ae816d2f9a569992a593a1'\n- 'f875d6646de28985646f34ee13be9a576fd515f76b5b0a26bb324735041ddde4'\n"
+        },
+        {
+          "trial": 1,
+          "instructions": 313527472,
+          "allocated_bytes": 17325296,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-16384/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '5d5a4de81ad864715b4d7431ea78fd51c999d0a603ae816d2f9a569992a593a1'\n- 'f875d6646de28985646f34ee13be9a576fd515f76b5b0a26bb324735041ddde4'\n"
+        },
+        {
+          "trial": 2,
+          "instructions": 313527472,
+          "allocated_bytes": 17325296,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-16384/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '5d5a4de81ad864715b4d7431ea78fd51c999d0a603ae816d2f9a569992a593a1'\n- 'f875d6646de28985646f34ee13be9a576fd515f76b5b0a26bb324735041ddde4'\n"
+        }
+      ]
+    },
+    {
+      "name": "blake3-keyed-1024",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "",
+      "source": "cases/blake3-keyed-1024/mops-blake3/main.mo",
+      "returncode": 0,
+      "source_sha256": "80347854faeb3aa4c95da3336770f8f624bdd3da06dbeeb1f76201290f1d2c2e",
+      "wasm": "blake3-keyed-1024/mops-blake3/main.wasm",
+      "wasm_sha256": "7f19e15766231259439c31a8b64f2d4079f06b643a9b35bda4fb1ae77673e5ea",
+      "wasm_bytes": 300414,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3527522,
+          "allocated_bytes": 144040,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-keyed-1024/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7'\n- '75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4'\n"
+        },
+        {
+          "trial": 1,
+          "instructions": 3527522,
+          "allocated_bytes": 144040,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-keyed-1024/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7'\n- '75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4'\n"
+        },
+        {
+          "trial": 2,
+          "instructions": 3527522,
+          "allocated_bytes": 144040,
+          "reclaimed_bytes": 0,
+          "error": "AssertionError [ERR_ASSERTION]: blake3-keyed-1024/mops-blake3 independent oracle mismatch\n+ actual - expected\n\n+ '42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7'\n- '75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4'\n"
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 8,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

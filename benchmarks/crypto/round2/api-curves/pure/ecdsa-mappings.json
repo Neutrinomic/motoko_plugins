@@ -1,0 +1,214 @@
+{
+  "Secp256k1.publicKey": {
+    "native_case": {
+      "name": "api-secp256k1-publicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-public-key-uncompressed",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+    "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#uncompressed)"
+  },
+  "Secp256k1.derivePublicKey": {
+    "native_case": {
+      "name": "api-secp256k1-derivePublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "api-secp256k1-derivePublicKey-fast",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+    "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#compressed)"
+  },
+  "Secp256k1.convertPublicKey": {
+    "native_case": {
+      "name": "api-secp256k1-convertPublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+  },
+  "Secp256k1.verifyPrehash": {
+    "native_case": {
+      "name": "api-secp256k1-verifyPrehash-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-verify-compressed-low-s",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) + E.Signature -> PublicKey.verifyHashed"
+  },
+  "Secp256k1.signatureToDer": {
+    "native_case": {
+      "name": "api-secp256k1-signatureToDer-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-der-encode-ordinary",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "Validated compact scalar decoding -> E.Signature.toBytes(#der)"
+  },
+  "Secp256k1.signatureFromDer": {
+    "native_case": {
+      "name": "api-secp256k1-signatureFromDer-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-der-decode-ordinary",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+    "counterpart_api": "Strict DER guards -> E.signatureFromBytes(#der) -> Signature.toBytes(#raw)"
+  },
+  "Secp256k1.normalizeSignature": {
+    "native_case": {
+      "name": "api-secp256k1-normalizeSignature-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-normalize-high-s",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+    "counterpart_api": "Validated compact scalar decoding -> min(S,n-S) -> E.Signature.toBytes(#raw)"
+  },
+  "Secp256k1.compressPublicKey": {
+    "native_case": {
+      "name": "api-secp256k1-compressPublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "api-secp256k1-compressPublicKey-fast",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#compressed)"
+  },
+  "Secp256k1.decompressPublicKey": {
+    "native_case": {
+      "name": "api-secp256k1-decompressPublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "api-secp256k1-decompressPublicKey-fast",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+  },
+  "P256.publicKey": {
+    "native_case": {
+      "name": "api-p256-publicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-public-key-uncompressed",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+    "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#uncompressed)"
+  },
+  "P256.derivePublicKey": {
+    "native_case": {
+      "name": "api-p256-derivePublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "api-p256-derivePublicKey-fast",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+    "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#compressed)"
+  },
+  "P256.convertPublicKey": {
+    "native_case": {
+      "name": "api-p256-convertPublicKey-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-convert-compressed-to-uncompressed",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+  },
+  "P256.verifyPrehash": {
+    "native_case": {
+      "name": "api-p256-verifyPrehash-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-verify-compressed-low-s",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+    "counterpart_api": "E.publicKeyFromBytes(#raw) + E.Signature -> PublicKey.verifyHashed"
+  },
+  "P256.signatureToDer": {
+    "native_case": {
+      "name": "api-p256-signatureToDer-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-der-encode-ordinary",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+    "counterpart_api": "Validated compact scalar decoding -> E.Signature.toBytes(#der)"
+  },
+  "P256.signatureFromDer": {
+    "native_case": {
+      "name": "api-p256-signatureFromDer-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-der-decode-ordinary",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+    "counterpart_api": "Strict DER guards -> E.signatureFromBytes(#der) -> Signature.toBytes(#raw)"
+  },
+  "P256.normalizeSignature": {
+    "native_case": {
+      "name": "api-p256-normalizeSignature-ecdsa",
+      "implementation": "ecdsa"
+    },
+    "plugin_case": {
+      "name": "r2-p256-normalize-high-s",
+      "implementation": "fast"
+    },
+    "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+    "counterpart_api": "Validated compact scalar decoding -> min(S,n-S) -> E.Signature.toBytes(#raw)"
+  },
+  "Secp256k1.signPrehash": {
+    "native_case": null,
+    "notes": "Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation.",
+    "counterpart_api": null
+  },
+  "Secp256k1.schnorrSign": {
+    "native_case": null,
+    "notes": "Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation.",
+    "counterpart_api": null
+  },
+  "Secp256k1.schnorrVerify": {
+    "native_case": null,
+    "notes": "Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation.",
+    "counterpart_api": null
+  },
+  "P256.signPrehash": {
+    "native_case": null,
+    "notes": "Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation.",
+    "counterpart_api": null
+  }
+}

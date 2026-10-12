@@ -1,0 +1,747 @@
+{
+  "oracle_source": "benchmarks/crypto/generate-curves.py",
+  "oracle_sha256": "0c482636d28ce22a8ecb70c1a0fe6dd34cc289a1efa6c8ebd013d0d41ed29ea4",
+  "cases": [
+    {
+      "name": "r2-secp256k1-convert-compressed-to-compressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.convertPublicKey(key, true)",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.convertPublicKey(key, false)",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-convert-uncompressed-to-compressed",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1"
+      },
+      "expression": "C.convertPublicKey(key, true)",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-convert-uncompressed-to-uncompressed",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1"
+      },
+      "expression": "C.convertPublicKey(key, false)",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-public-key-uncompressed",
+      "inputs": {
+        "secret": "2a513914cd57984308a5bd998df04d3637128e6ea6f4906db67faec8f168abe2"
+      },
+      "expression": "C.publicKey(secret, false)",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-verify-compressed-low-s",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-compressed-high-s",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e354c05fcc52abc80b1b00f4a52387c1ef7e3f8406f04ce9b39624b897063d90c292"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-compressed-invalid-equation",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "635a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "00",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-uncompressed-low-s",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-uncompressed-high-s",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e354c05fcc52abc80b1b00f4a52387c1ef7e3f8406f04ce9b39624b897063d90c292"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-uncompressed-invalid-equation",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "digest": "635a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "00",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-digest-zero",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35418f84965e3a98b8eee9d362fa6f33f4408aba407936443eac30a82a463f37148"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-digest-order",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35418f84965e3a98b8eee9d362fa6f33f4408aba407936443eac30a82a463f37148"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-digest-all-ff",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e354475947b00bff81881781a6dbfc4679c41d6b60a79b3ff9ab6a2fa31ce3d4b2d9"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-key-generator",
+      "inputs": {
+        "key": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e354552feee185025669872a9f315570ed0ccb7ceae1c7ce16388c5f7abb15f1c900"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-verify-key-negated-generator",
+      "inputs": {
+        "key": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35407e01a52a3e583bd664e55d7b2db4a93e67e870429d8c4c2dc40f0f6b88dae32"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-der-encode-ordinary",
+      "inputs": {
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.signatureToDer(signature)",
+      "expected_hex": "3045022100d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35402203fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-der-decode-ordinary",
+      "inputs": {
+        "der": "3045022100d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35402203fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.signatureFromDer(der)",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-der-encode-both-integers-padded",
+      "inputs": {
+        "signature": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413f"
+      },
+      "expression": "C.signatureToDer(signature)",
+      "expected_hex": "3046022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413f",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-der-decode-both-integers-padded",
+      "inputs": {
+        "der": "3046022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413f"
+      },
+      "expression": "C.signatureFromDer(der)",
+      "expected_hex": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413f",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-normalize-low-s",
+      "inputs": {
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf"
+      },
+      "expression": "C.normalizeSignature(signature)",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-normalize-high-s",
+      "inputs": {
+        "signature": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e354c05fcc52abc80b1b00f4a52387c1ef7e3f8406f04ce9b39624b897063d90c292"
+      },
+      "expression": "C.normalizeSignature(signature)",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "inputs": {
+        "left": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "right": "049f7f7d213f7a495bd12ccb4efa4482be4ea9f1f8fd812ff0fab95857093c876ebd22d455fe65a09eb0d0578004e9890e127ed99fc9ec6db01b0f91ebc730808d"
+      },
+      "expression": "C.pointAdd(left, right)",
+      "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-add-compressed-doubling",
+      "inputs": {
+        "left": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "right": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.pointAdd(left, right)",
+      "expected_hex": "0396c299b66d5359a5f6f7a576f276a16de073ac7fbad56c23f4dfcf6a134ffb2e",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.pointMultiply(key, scalar)",
+      "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-x-only-compressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.xOnlyPublicKey(key)",
+      "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-compressed-zero",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expression": "C.tweakPublicKey(key, tweak)",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakPublicKey(key, tweak)",
+      "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-add-uncompressed-distinct",
+      "inputs": {
+        "left": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "right": "049f7f7d213f7a495bd12ccb4efa4482be4ea9f1f8fd812ff0fab95857093c876ebd22d455fe65a09eb0d0578004e9890e127ed99fc9ec6db01b0f91ebc730808d"
+      },
+      "expression": "C.pointAdd(left, right)",
+      "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-add-uncompressed-doubling",
+      "inputs": {
+        "left": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "right": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.pointAdd(left, right)",
+      "expected_hex": "0396c299b66d5359a5f6f7a576f276a16de073ac7fbad56c23f4dfcf6a134ffb2e",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-multiply-uncompressed",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.pointMultiply(key, scalar)",
+      "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-x-only-uncompressed",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1"
+      },
+      "expression": "C.xOnlyPublicKey(key)",
+      "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-uncompressed-zero",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "tweak": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expression": "C.tweakPublicKey(key, tweak)",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-uncompressed-full-width",
+      "inputs": {
+        "key": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakPublicKey(key, tweak)",
+      "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "inputs": {
+        "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.baseMultiply(scalar)",
+      "expected_hex": "039193c50bbcb78cc870c74b2fbab8c0d77c29e9661d2cf575610da3505e22b3c7",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "inputs": {
+        "key": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakXOnlyPublicKey(key, tweak)",
+      "expected_hex": "03464ba5b8c027406a45d4570cce4d9b7f9a6829cf8f7056aadd86208ec50d3d7c",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "inputs": {
+        "secret": "d5aec6eb32a867bcf75a4266720fb2c8839c4e7808540fce0952afc3decd955f",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakXOnlySecretKey(secret, tweak)",
+      "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-secret-odd-y",
+      "inputs": {
+        "secret": "2a513914cd57984308a5bd998df04d3637128e6ea6f4906db67faec8f168abe2",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakXOnlySecretKey(secret, tweak)",
+      "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-convert-compressed-to-compressed",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3"
+      },
+      "expression": "C.convertPublicKey(key, true)",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-convert-compressed-to-uncompressed",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3"
+      },
+      "expression": "C.convertPublicKey(key, false)",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-convert-uncompressed-to-compressed",
+      "inputs": {
+        "key": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a"
+      },
+      "expression": "C.convertPublicKey(key, true)",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-convert-uncompressed-to-uncompressed",
+      "inputs": {
+        "key": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a"
+      },
+      "expression": "C.convertPublicKey(key, false)",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-public-key-uncompressed",
+      "inputs": {
+        "secret": "2a513914cd57984308a5bd998df04d3637128e6ea6f4906db67faec8f168abe2"
+      },
+      "expression": "C.publicKey(secret, false)",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-verify-compressed-low-s",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-compressed-high-s",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d873809c16ac94190a7796a8a80d535503924204bd2be2614344acc23502615f9022ec"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-compressed-invalid-equation",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "635a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "00",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-low-s",
+      "inputs": {
+        "key": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-high-s",
+      "inputs": {
+        "key": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d873809c16ac94190a7796a8a80d535503924204bd2be2614344acc23502615f9022ec"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-invalid-equation",
+      "inputs": {
+        "key": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+        "digest": "635a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "00",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-digest-zero",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380284af59acc9916c2c6307affa0927e5e5a090c7049ef27d630907be93ea9dbee"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-digest-order",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380284af59acc9916c2c6307affa0927e5e5a090c7049ef27d630907be93ea9dbee"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-digest-all-ff",
+      "inputs": {
+        "key": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+        "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380014d50e0cb841e43c22301877699cb9f37bacf15c5dda93c4ce1686147544c1d"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-key-generator",
+      "inputs": {
+        "key": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d873801ae9631c85d8a14673fcff2fad8248a8eb07ecbf3e0e1c244b4a4a9cc06e53a3"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-verify-key-negated-generator",
+      "inputs": {
+        "key": "026b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+        "digest": "625a2b789994838c524d28306e0694d625f7aadaa4b4c5f2e8f31090332de7da",
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d873806dd9e142456e7b6b69b411763da9d898159d8938713f1e5ca686e7357fa284c0"
+      },
+      "expression": "C.verifyPrehash(key, digest, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-p256-der-encode-ordinary",
+      "inputs": {
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.signatureToDer(signature)",
+      "expected_hex": "304402202ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380022063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-der-decode-ordinary",
+      "inputs": {
+        "der": "304402202ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380022063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.signatureFromDer(der)",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-der-encode-both-integers-padded",
+      "inputs": {
+        "signature": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f"
+      },
+      "expression": "C.signatureToDer(signature)",
+      "expected_hex": "3046022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-der-decode-both-integers-padded",
+      "inputs": {
+        "der": "3046022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f"
+      },
+      "expression": "C.signatureFromDer(der)",
+      "expected_hex": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-normalize-low-s",
+      "inputs": {
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265"
+      },
+      "expression": "C.normalizeSignature(signature)",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-p256-normalize-high-s",
+      "inputs": {
+        "signature": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d873809c16ac94190a7796a8a80d535503924204bd2be2614344acc23502615f9022ec"
+      },
+      "expression": "C.normalizeSignature(signature)",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-sign-message-32",
+      "inputs": {
+        "secret": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
+        "key": "dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000001",
+        "message": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+        "signature": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a"
+      },
+      "expression": "C.schnorrSign(secret, message, aux)",
+      "expected_hex": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-verify-message-32",
+      "inputs": {
+        "secret": "b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef",
+        "key": "dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000001",
+        "message": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+        "signature": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a"
+      },
+      "expression": "C.schnorrVerify(key, message, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-sign-message-0",
+      "inputs": {
+        "secret": "0340034003400340034003400340034003400340034003400340034003400340",
+        "key": "778caa53b4393ac467774d09497a87224bf9fab6f6e68b23086497324d6fd117",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000000",
+        "message": "",
+        "signature": "71535db165ecd9fbbc046e5ffaea61186bb6ad436732fccc25291a55895464cf6069ce26bf03466228f19a3a62db8a649f2d560fac652827d1af0574e427ab63"
+      },
+      "expression": "C.schnorrSign(secret, message, aux)",
+      "expected_hex": "71535db165ecd9fbbc046e5ffaea61186bb6ad436732fccc25291a55895464cf6069ce26bf03466228f19a3a62db8a649f2d560fac652827d1af0574e427ab63",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-verify-message-0",
+      "inputs": {
+        "secret": "0340034003400340034003400340034003400340034003400340034003400340",
+        "key": "778caa53b4393ac467774d09497a87224bf9fab6f6e68b23086497324d6fd117",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000000",
+        "message": "",
+        "signature": "71535db165ecd9fbbc046e5ffaea61186bb6ad436732fccc25291a55895464cf6069ce26bf03466228f19a3a62db8a649f2d560fac652827d1af0574e427ab63"
+      },
+      "expression": "C.schnorrVerify(key, message, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-sign-message-100",
+      "inputs": {
+        "secret": "0340034003400340034003400340034003400340034003400340034003400340",
+        "key": "778caa53b4393ac467774d09497a87224bf9fab6f6e68b23086497324d6fd117",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000000",
+        "message": "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+        "signature": "403b12b0d8555a344175ea7ec746566303321e5dbfa8be6f091635163eca79a8585ed3e3170807e7c03b720fc54c7b23897fcba0e9d0b4a06894cfd249f22367"
+      },
+      "expression": "C.schnorrSign(secret, message, aux)",
+      "expected_hex": "403b12b0d8555a344175ea7ec746566303321e5dbfa8be6f091635163eca79a8585ed3e3170807e7c03b720fc54c7b23897fcba0e9d0b4a06894cfd249f22367",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-verify-message-100",
+      "inputs": {
+        "secret": "0340034003400340034003400340034003400340034003400340034003400340",
+        "key": "778caa53b4393ac467774d09497a87224bf9fab6f6e68b23086497324d6fd117",
+        "aux": "0000000000000000000000000000000000000000000000000000000000000000",
+        "message": "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+        "signature": "403b12b0d8555a344175ea7ec746566303321e5dbfa8be6f091635163eca79a8585ed3e3170807e7c03b720fc54c7b23897fcba0e9d0b4a06894cfd249f22367"
+      },
+      "expression": "C.schnorrVerify(key, message, signature)",
+      "expected_hex": "01",
+      "expected_result": "ok",
+      "result_type": "Bool"
+    }
+  ]
+}

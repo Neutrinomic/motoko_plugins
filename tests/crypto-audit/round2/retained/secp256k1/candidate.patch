@@ -1,0 +1,137 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,6 +1,6 @@
+ [workspace]
+ members = ["plugins/*/runtime"]
+-exclude = ["_build"]
++exclude = ["_build", "plugins/secp256k1/runtime/vendor/k256"]
+ resolver = "3"
+ 
+ [profile.release]
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -282,8 +282,6 @@
+ [[package]]
+ name = "k256"
+ version = "0.13.4"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
+ dependencies = [
+  "cfg-if",
+  "ecdsa",
+--- a/plugins/secp256k1/runtime/Cargo.toml
++++ b/plugins/secp256k1/runtime/Cargo.toml
+@@ -8,4 +8,4 @@
+ crate-type = ["cdylib"]
+ 
+ [dependencies]
+-k256 = { version = "=0.13.4", default-features = false, features = ["ecdsa", "schnorr"] }
++k256 = { version = "=0.13.4", path = "vendor/k256", default-features = false, features = ["ecdsa", "schnorr"] }
+--- a/plugins/secp256k1/runtime/src/lib.rs
++++ b/plugins/secp256k1/runtime/src/lib.rs
+@@ -4,10 +4,11 @@
+ #![cfg_attr(not(test), feature(simd_wasm64))]
+ 
+ use k256::{ProjectivePoint, PublicKey, Scalar, SecretKey};
+-use k256::ecdsa::{Signature, VerifyingKey, hazmat::SignPrimitive, signature::hazmat::PrehashVerifier};
++use k256::ecdsa::{Signature, hazmat::SignPrimitive};
+ use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, LinearCombination}};
+ use k256::sha2::{Digest, Sha256};
+ use k256::elliptic_curve::zeroize::Zeroize;
++use k256::elliptic_curve::{point::AffineCoordinates, subtle::ConditionallySelectable};
+ 
+ const SECRET: i64 = -1;
+ const PUBLIC: i64 = -2;
+@@ -52,7 +53,15 @@
+             if a.len() != 32 { return Err(SECRET); }
+             Ok(write(key.public_key().to_encoded_point(true).as_bytes(), out))
+         }
+-        1 | 2 => Ok(write(public(a)?.to_encoded_point(op == 1).as_bytes(), out)),
++        1 | 2 => {
++            let key = public(a)?;
++            if (op == 1 && a.len() == 33) || (op == 2 && a.len() == 65) {
++                // SEC1 parsing above validates the canonical source encoding.
++                Ok(write(a, out))
++            } else {
++                Ok(write(key.to_encoded_point(op == 1).as_bytes(), out))
++            }
++        },
+         3 => encoded(public(a)?.to_projective() + public(b)?.to_projective(), true, out),
+         4 => encoded(public(a)?.to_projective() * scalar(b)?, true, out),
+         5 => encoded(ProjectivePoint::GENERATOR * scalar(a)?, true, out),
+@@ -76,13 +85,13 @@
+             Ok(write(&sig.to_bytes(), out))
+         }
+         8 => {
+-            let key = VerifyingKey::from(public(a)?);
+-            if b.len() != 32 { return Err(DIGEST); }
++            let key = public(a)?;
++            let digest: [u8; 32] = b.try_into().map_err(|_| DIGEST)?;
+             let sig = signature(c)?;
+-            // Standard ECDSA accepts both s and n-s. k256's verifier intentionally
+-            // rejects high-S, so normalize only for verification at this boundary.
+-            let sig = sig.normalize_s().unwrap_or(sig);
+-            Ok(i64::from(key.verify_prehash(b, &sig).is_ok()))
++            // The generic upstream ECDSA verifier accepts both s and n-s, as
++            // required here, without a normalize-then-reject-high-S roundtrip.
++            Ok(i64::from(k256::ecdsa::hazmat::verify_prehashed::<k256::Secp256k1>(
++                &key.to_projective(), &digest.into(), &sig).is_ok()))
+         }
+         9 => Ok(write(signature(a)?.to_der().as_bytes(), out)),
+         10 => Ok(write(&Signature::from_der(a).map_err(|_| SIGNATURE)?.to_bytes(), out)),
+@@ -90,7 +99,11 @@
+             let sig = signature(a)?;
+             Ok(write(&sig.normalize_s().unwrap_or(sig).to_bytes(), out))
+         }
+-        12 => Ok(write(&public(a)?.to_encoded_point(true).as_bytes()[1..], out)),
++        12 => {
++            let _validated = public(a)?;
++            // Both supported canonical SEC1 encodings start with the X bytes.
++            Ok(write(&a[1..33], out))
++        },
+         13 => {
+             if a.len() != 32 { return Err(SECRET); }
+             let key = k256::schnorr::SigningKey::from_bytes(a).map_err(|_| SECRET)?;
+@@ -114,15 +127,17 @@
+             ];
+             if c[..32] >= FIELD[..] { return Err(SIGNATURE); }
+             let s = scalar(&c[32..]).map_err(|_| SIGNATURE)?;
+-            let tag = Sha256::digest(b"BIP0340/challenge");
++            // SHA256("BIP0340/challenge"), independent of key/signature/message.
++            const TAG: [u8; 32] = [0x7b, 0xb5, 0x2d, 0x7a, 0x9f, 0xef, 0x58, 0x32, 0x3e, 0xb1, 0xbf, 0x7a, 0x40, 0x7d, 0xb3, 0x82, 0xd2, 0xf3, 0xf2, 0xd8, 0x1b, 0xb1, 0x22, 0x4f, 0x49, 0xfe, 0x51, 0x8f, 0x6d, 0x48, 0xd3, 0x7c];
++            let tag = TAG;
+             let challenge = Sha256::new().chain_update(tag).chain_update(tag)
+                 .chain_update(&c[..32]).chain_update(a).chain_update(b).finalize();
+             let e = <Scalar as Reduce<U256>>::reduce_bytes(&challenge);
+             let r = ProjectivePoint::lincomb(&ProjectivePoint::GENERATOR, &s,
+                 &ProjectivePoint::from(*key.as_affine()), &-e);
+             if bool::from(r.is_identity()) { return Ok(0); }
+-            let point = r.to_affine().to_encoded_point(true);
+-            Ok(i64::from(point.as_bytes()[0] == 2 && point.as_bytes()[1..] == c[..32]))
++            let point = r.to_affine();
++            Ok(i64::from(!bool::from(point.y_is_odd()) && point.x()[..] == c[..32]))
+         }
+         15 => {
+             if a.len() != 32 { return Err(PUBLIC); }
+@@ -131,10 +146,17 @@
+         }
+         16 => {
+             if a.len() != 32 { return Err(SECRET); }
+-            // BIP340's signing key normalizes d to n-d when dG has odd Y.
+-            // Perform BIP341's secret tweak inside the native scalar arithmetic.
+-            let key = k256::schnorr::SigningKey::from_bytes(a).map_err(|_| SECRET)?;
+-            let mut tweaked = *key.as_nonzero_scalar().as_ref() + scalar(b)?;
++            // BIP341 parity normalization needs one multiplication, not a
++            // Schnorr signing key (which also caches a recomputed public key).
++            let key = SecretKey::from_slice(a).map_err(|_| SECRET)?;
++            let tweak = scalar(b)?;
++            let mut secret = key.to_nonzero_scalar();
++            let odd = PublicKey::from_secret_scalar(&secret).as_affine().y_is_odd();
++            let mut negated = -secret;
++            secret.conditional_assign(&negated, odd);
++            negated.zeroize();
++            let mut tweaked = *secret.as_ref() + tweak;
++            secret.zeroize();
+             let result = if bool::from(tweaked.is_zero()) { Err(INFINITY) }
+                 else {
+                     let mut encoded = tweaked.to_bytes();

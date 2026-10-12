@@ -9,16 +9,54 @@ its calls specialize directly to the plugin implementation.
 | `mo:fast/JSON` | `encode(value)`, `decode<T>(text)` | `json` |
 | `mo:fast/CBOR` | `encode(value)`, `decode<T>(bytes)` | `cbor` |
 | `mo:fast/SHA256` | `digest(bytes)` → 32-byte Blob | `sha256` |
+| `mo:fast/BLAKE3` | Hash, keyed hash, context derivation, streaming, XOF | `blake3` |
+| `mo:fast/SHA512` | SHA-512/SHA-384 digest and streaming | `sha512` |
+| `mo:fast/RIPEMD160` | Digest and streaming | `ripemd160` |
+| `mo:fast/HMAC` | HMAC-SHA256/SHA512, prepared keys, streaming | `hmac-sha2` |
+| `mo:fast/Secp256k1` | Key operations, deterministic ECDSA, BIP340 Schnorr, tweaks | `secp256k1` |
+| `mo:fast/P256` | P-256 keys, deterministic ECDSA and signature encoding | `p256` |
+| `mo:fast/Base58` | Bitcoin alphabet encode/decode | `base58` |
+| `mo:fast/Base58Check` | Base58 with a double-SHA256 checksum | `base58`, `sha256` |
+| `mo:fast/Bech32`, `mo:fast/Segwit` | Bech32/Bech32m and witness addresses | `bech32` |
+| `mo:fast/BLS12381` | G1/G2, MSM, hash-to-curve, pairings and IC/Ethereum verification | `bls12-381` |
 | `mo:fast/Map` | Mutable ordered map | `mutable-map` |
 | `mo:fast/pure/Map` | Persistent ordered map | `pure-map` |
 | `mo:fast/Set` | Core-compatible mutable ordered set | `mutable-set` |
 | `mo:fast/pure/Set` | Persistent ordered set with rank/select and split/join | `pure-set` |
 
+The cryptographic APIs use `Blob` for bytes. Each primitive module loads only
+its own plugin; HMAC and curve signing include their internal hash operations.
+Streaming state is held in managed Motoko values, and a digest can be finalized
+without consuming its saved state. Individual modules document malformed-input
+errors, output/batch limits, scalar byte order, and signature encoding.
+
+`BLS12381` distinguishes the IC profile (G1 signatures, G2 keys) from the
+Ethereum proof-of-possession profile (G2 signatures, G1 keys). Its aggregate
+verification functions enforce their respective distinct-message or
+proof-of-possession requirements. These are local cryptographic operations;
+full certificate/delegation verification and threshold-signing protocols are
+separate layers.
+
+The Bitcoin modules assemble the primitives into complete operations:
+
+| Import | Operations | Required compiler plugins |
+|---|---|---|
+| `mo:fast/Bitcoin/Hash` | HASH160, double-SHA256, tagged hashes | `sha256`, `ripemd160` |
+| `mo:fast/Bitcoin/Bip32` | Parse/serialize extended public keys; derive public children and paths | `sha256`, `ripemd160`, `hmac-sha2`, `secp256k1`, `base58` |
+| `mo:fast/Bitcoin/Address` | Legacy, SegWit and Taproot addresses; local Taproot key-path signing | `sha256`, `ripemd160`, `secp256k1`, `base58`, `bech32` |
+| `mo:fast/Bitcoin/Script` | Script serialization, pushdata and Taproot leaf helpers | `sha256` |
+| `mo:fast/Bitcoin/Transaction` | Transaction serialization, txid/wtxid, legacy/BIP143/BIP341 sighashes | `sha256` |
+
+These modules are composed Motoko libraries rather than another native plugin.
+See the source API comments and public test vectors for exact transaction and
+address types. [Crypto benchmarks](../../benchmarks/crypto/) distinguish
+primitive costs from full address, key-derivation and transaction workflows.
+
 `Map` and `Set` expose every function from their `mo:core` counterparts,
 including implicit comparator and formatter arguments. Their `toPure` and
 `fromPure` conversions use Core’s pure Map/Set types, matching Core’s interface.
-These two modules use the declared `core` dependency; other modules import only
-`Prim`. Conversions rebuild the tree while sharing keys, values, and elements.
+These two modules use the declared `core` dependency for conversions.
+Conversions rebuild the container while sharing keys, values, and elements.
 
 Both pure modules also provide Core’s function interfaces, with additional
 operations. The plugin containers have different storage representations from

@@ -1,0 +1,48 @@
+{
+  "status": "accepted",
+  "trials_per_case": 3,
+  "cases": 3,
+  "all_outputs_correct": true,
+  "source_and_artifact_inputs_verified": true,
+  "rows": [
+    {
+      "case": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes4096_fast",
+      "baseline_instructions": 7220723042,
+      "capped_instructions": 7220929687,
+      "instruction_change_percent": 0.0028618325172982033,
+      "baseline_allocated_bytes": 998912,
+      "capped_allocated_bytes": 998912
+    },
+    {
+      "case": "api_bls12_381_aggregate_ethereum_long_distinct_n16_bytes65536_fast",
+      "baseline_instructions": 7295219042,
+      "capped_instructions": 7295425687,
+      "instruction_change_percent": 0.002832608572961338,
+      "baseline_allocated_bytes": 998912,
+      "capped_allocated_bytes": 998912
+    },
+    {
+      "case": "api_bls12_381_aggregate_ethereum_long_repeated_n16_bytes65536_fast",
+      "baseline_instructions": 7295219042,
+      "capped_instructions": 6747644547,
+      "instruction_change_percent": -7.505936310445331,
+      "baseline_allocated_bytes": 998912,
+      "capped_allocated_bytes": 704072
+    }
+  ],
+  "evidence_sha256": {
+    "round2-bls-long-baseline": {
+      "results.json": "11d12a266e0a1566b3dfe5825cd8ed7beb443cdb6cfc399e27f3e8a96d519e00",
+      "build.json": "40aeb0f66bcf0db572acd22128f5b3cd0ec31b3d47ad2b46af39139898d87209",
+      "round2.json": "5623f36fca62ce733c70742d229e8884f946e287fa5f9481420e7cf5373a015b",
+      "oracle-provenance.json": "3d59b43be8aef172a8843e012aa196fc7ef1671732ed6690c06620a2f3ef287a"
+    },
+    "round2-bls-long-capped": {
+      "results.json": "3697899b46e9c5dacbc75bba11c22ed277a2d7d192e64655169324e5bfc596d2",
+      "build.json": "312c01cb498e75c3588b7ba6c1f8716af03114cc68e1d5851f7866155c199e3e",
+      "round2.json": "68e582c387bebe56a95c849e9eca5a864e1877ba65913a8d4fc776d464c7d807",
+      "oracle-provenance.json": "d29ca7ae1114e82710f76bd95b75f1e084332192783932f19562ec4a665265ef"
+    }
+  },
+  "interpretation": "Comparison is against the pre-round2 baseline. Long distinct n16 cases add <0.003% instructions with unchanged allocation. Repeated64KiB messages improve7.506% instructions and29.516% allocation. The1024-byte guard removes growth of equality-scan work with longer messages."
+}

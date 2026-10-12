@@ -1,0 +1,1064 @@
+{
+  "stage": "bitcoin-tx-native-initial",
+  "recorded_utc": "2026-10-12T11:48:03.954Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "e1665e06571f7a026029d36740a50c52a6bc5935fa784db7dd17582b9ae75d19",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bitcoin-serialize-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-serialize-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "0200000001dcddf4133e65b951d540aa470ac62d7da2ac0b03034933be7159d3ad0c8d65440000000000fdffffff02905f010000000000160014719e49da51c483a232337387ed060dfc2b022ce2401f00000000000022512073d500d5f2b38dbb1f841178ceffc009c5b22d0b344496f6f5bd60abe07f742150f80c00",
+      "notes": "Legacy wire serialization, empty scriptSig and witnesses, two outputs. Inputs constructed or parsed before measurement. Baseline [Nat8] to Blob output conversion is outside measurement.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-serialize-1-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f9a7543a9ec57b58f301f7e5ab247ffd2ed0fb4b1b1927378d9b4f9b9053f198",
+      "wasm": "bitcoin-serialize-1-inputs/native/main.wasm",
+      "wasm_sha256": "c0b605de18470d31677ea2b1b776fefcc3b4996135e60cbce87584518d467c8b",
+      "wasm_bytes": 255737,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 74323,
+          "allocated_bytes": 3704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 125,
+          "output_sha256": "5b9785da656aef1552b8d5f5af3ce1d7ca44b12a2a249d2517effbc41ce70195",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 74323,
+          "allocated_bytes": 3704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 125,
+          "output_sha256": "5b9785da656aef1552b8d5f5af3ce1d7ca44b12a2a249d2517effbc41ce70195",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 74323,
+          "allocated_bytes": 3704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 125,
+          "output_sha256": "5b9785da656aef1552b8d5f5af3ce1d7ca44b12a2a249d2517effbc41ce70195",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-legacy-all-sign-all-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-legacy-all-sign-all-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "da02909b5440d3985d7088cb79606c872dfd7f4075e2fdcd10f985066564fa17",
+      "notes": "Compute all 1 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. Legacy SIGHASH_ALL, no witnesses. Baseline mutates its input scripts; native preserves the transaction.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-legacy-all-sign-all-1-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "9f7ad40bd554a516dcb8e55c0960ff353bce537995eba4b9d56efb626d6dedd7",
+      "wasm": "bitcoin-legacy-all-sign-all-1-inputs/native/main.wasm",
+      "wasm_sha256": "1e32e81af93cee156778a9e7ff8318461aa26ab6cc99671013c910374d8dbfa4",
+      "wasm_bytes": 289961,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 106600,
+          "allocated_bytes": 4336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "4f79b0bdd6acbbec8959c58cd81ee32fbc2c00dccefe42cdc6cfa974317e0f43",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 106600,
+          "allocated_bytes": 4336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "4f79b0bdd6acbbec8959c58cd81ee32fbc2c00dccefe42cdc6cfa974317e0f43",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 106600,
+          "allocated_bytes": 4336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "4f79b0bdd6acbbec8959c58cd81ee32fbc2c00dccefe42cdc6cfa974317e0f43",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-sign-all-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-sign-all-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d103ce989be980dfd9e2bd366d3e240ae462e21196d7e175a6f8ea017b6b0ddc",
+      "notes": "Compute all 1 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. BIP341 key-path DEFAULT, no annex. All spent scripts are the same P2TR script to match the restricted bitcoin 0.2.1 API; each amount and outpoint differs.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-sign-all-1-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "abe9eea33cdd80d07110f292d797d19a5cef40ae9ea97d621126bcbd5e23c660",
+      "wasm": "bitcoin-taproot-default-sign-all-1-inputs/native/main.wasm",
+      "wasm_sha256": "89a44456dd9e539ca12ae0c07094638019b1946c7c41c66258f5d8776a2c2445",
+      "wasm_bytes": 296656,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-bip143-all-cache-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "c05a4b92636bc195473cf27d80653fcc6f6bb050ded8f66412ef75db51659edf",
+      "notes": "Native API comparison: compute all 1 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-1-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "a212358ea10ce36bdab97dde8e1b98a9a88342e27597739ff93249ccb0a55824",
+      "wasm": "bitcoin-bip143-all-cache-1-inputs/native/main.wasm",
+      "wasm_sha256": "61f868586338575c9dc5427bb32c4fa85cfdb01563812255f31ad6a7b9596b9e",
+      "wasm_bytes": 291175,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 219522,
+          "allocated_bytes": 9408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 219522,
+          "allocated_bytes": 9408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 219522,
+          "allocated_bytes": 9408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-bip143-all-cache-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "c05a4b92636bc195473cf27d80653fcc6f6bb050ded8f66412ef75db51659edf",
+      "notes": "Native API comparison: compute all 1 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-1-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "b0c5a97900003fcef290d9f172e45e09650c9e7d74a9f310c79a799d285ae62b",
+      "wasm": "bitcoin-bip143-all-cache-1-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "6134c9ccd52de8a7b9dc9341ce327785d1dfc8e76b8e43a5538d444e2dd471ad",
+      "wasm_bytes": 291249,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 219641,
+          "allocated_bytes": 9448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 219641,
+          "allocated_bytes": 9448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 219641,
+          "allocated_bytes": 9448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "dddd5fcb419305cc1f365b583a5c29da6b7aa8e03907815ee8b3c1e9d3b63524",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-cache-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d103ce989be980dfd9e2bd366d3e240ae462e21196d7e175a6f8ea017b6b0ddc",
+      "notes": "Native API comparison: compute all 1 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-1-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "abe9eea33cdd80d07110f292d797d19a5cef40ae9ea97d621126bcbd5e23c660",
+      "wasm": "bitcoin-taproot-default-cache-1-inputs/native/main.wasm",
+      "wasm_sha256": "89a44456dd9e539ca12ae0c07094638019b1946c7c41c66258f5d8776a2c2445",
+      "wasm_bytes": 296656,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 245413,
+          "allocated_bytes": 10952,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-1-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-taproot-default-cache-1-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d103ce989be980dfd9e2bd366d3e240ae462e21196d7e175a6f8ea017b6b0ddc",
+      "notes": "Native API comparison: compute all 1 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-1-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "bacb7c98e0e05521cf68b8ea69b2a20ff3b2bcc9c034cf2598fb96dc02e43052",
+      "wasm": "bitcoin-taproot-default-cache-1-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "06be62543763ec33c66c5a4910f5bed75f56b36537e929b9b57458d9cfe8feef",
+      "wasm_bytes": 296723,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 245525,
+          "allocated_bytes": 10992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 245525,
+          "allocated_bytes": 10992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 245525,
+          "allocated_bytes": 10992,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "c25ae15582e3222fb50099f9febecc38428310793b0af22352cd705875dc5b63",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-serialize-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-serialize-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "020000000adcddf4133e65b951d540aa470ac62d7da2ac0b03034933be7159d3ad0c8d65440000000000fdffffff32a3b459f1d29d0a523e8f055dee33d4f3d574d871e637c5c4573636c442630f0100000000fcffffff26c99840378bfb91a124f285405ea26f221c4a0249594e9cbcfa1c9b4b729eab0200000000fbffffff9088354f49893162ada72190eec94f692f2c97c59f073327db0a59d0ae20cd0a0000000000faffffff7d5aa08ab9a5cdaccc6241bbc2c8593eb0d13b84ac54ba8fddd7740437297c780100000000f9fffffff95c6c9a2f99a8fe3440f2d614f58c4548ad73f750dc50777eed403e83d4b6370200000000f8ffffff5124096a1fe33239f952bd50d03cc8ae9046752baafcd861ff01feb9d9d6a7790000000000f7ffffffadb5b7122c2df5c0d650486bc59c23700151b0474a215ee19c05868566ad20c50100000000f6ffffffc39aea0f65a3a0fc79797f0337e53c9035cdffafa60ddffa6f7be109ad615ecf0200000000f5ffffff15f1bacd92003789bd41f6f99d121d8a3233c405bc4029b2e1a7cd80fddfb9eb0000000000f4ffffff02a0bb0d0000000000160014719e49da51c483a232337387ed060dfc2b022ce2401f00000000000022512073d500d5f2b38dbb1f841178ceffc009c5b22d0b344496f6f5bd60abe07f742150f80c00",
+      "notes": "Legacy wire serialization, empty scriptSig and witnesses, two outputs. Inputs constructed or parsed before measurement. Baseline [Nat8] to Blob output conversion is outside measurement.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-serialize-10-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "086753f48c3c8706d076b6a8fe55edea4fb9a4cf490a272fc4855d7f0201af68",
+      "wasm": "bitcoin-serialize-10-inputs/native/main.wasm",
+      "wasm_sha256": "5113c6ea564722f488b028c37d6f1d33ef0865a597bd098e02b1c1653f8293ef",
+      "wasm_bytes": 258232,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 402445,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 402445,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 402445,
+          "allocated_bytes": 20704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 494,
+          "output_sha256": "d615756797a5f65c22e39fcbc37805d1cebc7489306f234d66a074f246fe5bc1",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-legacy-all-sign-all-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-legacy-all-sign-all-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "10e80f4dd20aba61a25e65455092a78f7c210a11f4d197060e8bde04a6586554475ada1c8184cf97371ed34292dbee6e6f0ecc59cc455a527743f97c049e40aedc3bc5951e44a26676337df4fd43d54092ba60c34e3de0075d41ae32c0970abe1775711f6c8b5d2dc31105f3e22866ea8761a1bcb735da3fdd19984f298c6bf6cc042dfb52a4d47bcf672255068f84feaee794196484468c6ee3ae3da2bfe04f7fdc45378bcc922e3ac3458cd2c05472629362bf674fff1cfdfdcb9d94b1ee50b2b970328cad6b531c223fdd08063607836a8b0a152e5b7fac1d8f70dee7eb4d78739fac3e4d0d111a74f89d3126442bb42e567d9d12f0f2ab996587f0d7c93debe0e6772647164d2109ed2e85937f95784b97149bc49c86342665df819710d983b77572cba4ab95d14bc45b82f0d17ef6bf7ee5f7d7beec6c783ec6867eaad3",
+      "notes": "Compute all 10 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. Legacy SIGHASH_ALL, no witnesses. Baseline mutates its input scripts; native preserves the transaction.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-legacy-all-sign-all-10-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "b93e4b7c922bb66791a9c98594f37862af9fc93ebf406f79598b386001fc4a71",
+      "wasm": "bitcoin-legacy-all-sign-all-10-inputs/native/main.wasm",
+      "wasm_sha256": "b54d189aad4a56e7cc1b722e58a9f2f64671e4a652e31e08a1310a87fc020279",
+      "wasm_bytes": 292456,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4622134,
+          "allocated_bytes": 213144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "b89aa0c0686acef2cc8d0fd9161ebbf7118601a6ee14a71a88ed5db3e468e9ee",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4622134,
+          "allocated_bytes": 213144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "b89aa0c0686acef2cc8d0fd9161ebbf7118601a6ee14a71a88ed5db3e468e9ee",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4622134,
+          "allocated_bytes": 213144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "b89aa0c0686acef2cc8d0fd9161ebbf7118601a6ee14a71a88ed5db3e468e9ee",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-sign-all-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-sign-all-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8aff87765598ae85fdbdc796efe3af97d73b6d002f1293a1288b663848bfb183eca4c5c4b1daa07f3ba1fb367fa9d803378776bcad4c53b7cd39ac2716babab4a8ef051fc1b2a41771f8cad92637a9d9823598823fbaaa15779c8f8c1c97352575738fbe65933ff90e496a2cc019fa34641db37f462cc0ee4329db70862bfbaf1cbcb0eae63f40ffa94d0fe486025ac0917916cc2aa5027bbde88d04aea7dacae7594bd7ebe1712e15d18dbb5a665993181567523a32c4c7b99d72e570b77938e1d299df2db108d1decbc9fbb36594a86d84c330d1078a2d1ca7070ada5cecf9efa09e6d6c753f750c0a8471c32816823ce6a96d0705ce2914875db0f750941de72de202b96982cc46e42f85879e86f4b76057c056c474e763117f93dbd70036a6a",
+      "notes": "Compute all 10 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. BIP341 key-path DEFAULT, no annex. All spent scripts are the same P2TR script to match the restricted bitcoin 0.2.1 API; each amount and outpoint differs.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-sign-all-10-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "c98ea5a0e28b79081eeb698896350a4536c2c7556075a3735fdc24ae71ebee36",
+      "wasm": "bitcoin-taproot-default-sign-all-10-inputs/native/main.wasm",
+      "wasm_sha256": "d47c5c31a3f67214456dbfba447fa7f04ace3dbf6dfb2a21adddaa61319a329f",
+      "wasm_bytes": 300278,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-bip143-all-cache-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5ffd768915d9a9e7ab2dc55d5a779c8a11d3ca4b93970c9ab07c08b3cb1a40bbc3894f6287fbf5517ddb0734b8260db9047d862d9a7163111265005ce3c3898019cfbfc8c75276bfc7c22bb34f59bd80e92c8ab1e6a12efef00b825490b379d6728c1507b8f5c134881155f256ec0a0d42f832aed97cf078b7f2e651bae7fc73f935d951792ee5a58702310396826c6643988b2383b3ad1822d5c509848bc5c8f13ec1a6d52080c6dc9499210733d1462d2a72f5f9d1d6de02f108dec1ad61c06087e010f35e87f3706542985884667ea7414da295a8502738ec0603aae280811a627f3d2a82eb97dd7e986181f82248ba019c0085b022d57b1473722b638516f79bbedcc26d00ec19cbd42ec59855a3112fcde472d6fc5fd8c364634afe3b77f40c8fef804489443c916c2ab713c3b0bddd005f72468d3977aad6d47b2da6f6",
+      "notes": "Native API comparison: compute all 10 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-10-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "f295192a4a81432cb5a677696cb12171c4e2e5aa65f2a0858cb4b3d0a28cb93a",
+      "wasm": "bitcoin-bip143-all-cache-10-inputs/native/main.wasm",
+      "wasm_sha256": "4a13bff916ca0c1a717bb451a556c0de85f2862f676bca5a966b540edd3b9490",
+      "wasm_bytes": 294828,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5583084,
+          "allocated_bytes": 249304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5583084,
+          "allocated_bytes": 249304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5583084,
+          "allocated_bytes": 249304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-bip143-all-cache-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "5ffd768915d9a9e7ab2dc55d5a779c8a11d3ca4b93970c9ab07c08b3cb1a40bbc3894f6287fbf5517ddb0734b8260db9047d862d9a7163111265005ce3c3898019cfbfc8c75276bfc7c22bb34f59bd80e92c8ab1e6a12efef00b825490b379d6728c1507b8f5c134881155f256ec0a0d42f832aed97cf078b7f2e651bae7fc73f935d951792ee5a58702310396826c6643988b2383b3ad1822d5c509848bc5c8f13ec1a6d52080c6dc9499210733d1462d2a72f5f9d1d6de02f108dec1ad61c06087e010f35e87f3706542985884667ea7414da295a8502738ec0603aae280811a627f3d2a82eb97dd7e986181f82248ba019c0085b022d57b1473722b638516f79bbedcc26d00ec19cbd42ec59855a3112fcde472d6fc5fd8c364634afe3b77f40c8fef804489443c916c2ab713c3b0bddd005f72468d3977aad6d47b2da6f6",
+      "notes": "Native API comparison: compute all 10 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-10-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "6592918a942221bf3544a4cfc2240a1a7b6c23222ba8238a83e69216f09bd09a",
+      "wasm": "bitcoin-bip143-all-cache-10-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "c2526c840c1c0cdc2bc68b2eed0487c37bfb48fb1b915c6d20931863147e54e1",
+      "wasm_bytes": 294869,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1545803,
+          "allocated_bytes": 62792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1545803,
+          "allocated_bytes": 62792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1545803,
+          "allocated_bytes": 62792,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "39731a4456eaf8645f738498c5a88333e1c12f19e389799028f83e157ed7213a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-cache-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8aff87765598ae85fdbdc796efe3af97d73b6d002f1293a1288b663848bfb183eca4c5c4b1daa07f3ba1fb367fa9d803378776bcad4c53b7cd39ac2716babab4a8ef051fc1b2a41771f8cad92637a9d9823598823fbaaa15779c8f8c1c97352575738fbe65933ff90e496a2cc019fa34641db37f462cc0ee4329db70862bfbaf1cbcb0eae63f40ffa94d0fe486025ac0917916cc2aa5027bbde88d04aea7dacae7594bd7ebe1712e15d18dbb5a665993181567523a32c4c7b99d72e570b77938e1d299df2db108d1decbc9fbb36594a86d84c330d1078a2d1ca7070ada5cecf9efa09e6d6c753f750c0a8471c32816823ce6a96d0705ce2914875db0f750941de72de202b96982cc46e42f85879e86f4b76057c056c474e763117f93dbd70036a6a",
+      "notes": "Native API comparison: compute all 10 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-10-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "c98ea5a0e28b79081eeb698896350a4536c2c7556075a3735fdc24ae71ebee36",
+      "wasm": "bitcoin-taproot-default-cache-10-inputs/native/main.wasm",
+      "wasm_sha256": "d47c5c31a3f67214456dbfba447fa7f04ace3dbf6dfb2a21adddaa61319a329f",
+      "wasm_bytes": 300278,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 7660354,
+          "allocated_bytes": 319704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-10-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-taproot-default-cache-10-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d39d77f288dc03065bc621599e6ea360c713e5133b86e7ab50eb7697078bf8aff87765598ae85fdbdc796efe3af97d73b6d002f1293a1288b663848bfb183eca4c5c4b1daa07f3ba1fb367fa9d803378776bcad4c53b7cd39ac2716babab4a8ef051fc1b2a41771f8cad92637a9d9823598823fbaaa15779c8f8c1c97352575738fbe65933ff90e496a2cc019fa34641db37f462cc0ee4329db70862bfbaf1cbcb0eae63f40ffa94d0fe486025ac0917916cc2aa5027bbde88d04aea7dacae7594bd7ebe1712e15d18dbb5a665993181567523a32c4c7b99d72e570b77938e1d299df2db108d1decbc9fbb36594a86d84c330d1078a2d1ca7070ada5cecf9efa09e6d6c753f750c0a8471c32816823ce6a96d0705ce2914875db0f750941de72de202b96982cc46e42f85879e86f4b76057c056c474e763117f93dbd70036a6a",
+      "notes": "Native API comparison: compute all 10 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 10,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-10-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "1423ea6f83ab67b190fadecf47dffb361795af62ab1f077e5ff14c80e49e8056",
+      "wasm": "bitcoin-taproot-default-cache-10-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "d9bde78ed53586a6275a1aa083c09e115fe93d0afd4032f4e61cd19b0fa6518c",
+      "wasm_bytes": 300345,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1764053,
+          "allocated_bytes": 66376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1764053,
+          "allocated_bytes": 66376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1764053,
+          "allocated_bytes": 66376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 320,
+          "output_sha256": "5992a64d2e943ddd3caf7f5191e25a9ad8cf6261c05640affe393e77dd4df12e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-serialize-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-serialize-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "0200000064dcddf4133e65b951d540aa470ac62d7da2ac0b03034933be7159d3ad0c8d65440000000000fdffffff32a3b459f1d29d0a523e8f055dee33d4f3d574d871e637c5c4573636c442630f0100000000fcffffff26c99840378bfb91a124f285405ea26f221c4a0249594e9cbcfa1c9b4b729eab0200000000fbffffff9088354f49893162ada72190eec94f692f2c97c59f073327db0a59d0ae20cd0a0000000000faffffff7d5aa08ab9a5cdaccc6241bbc2c8593eb0d13b84ac54ba8fddd7740437297c780100000000f9fffffff95c6c9a2f99a8fe3440f2d614f58c4548ad73f750dc50777eed403e83d4b6370200000000f8ffffff5124096a1fe33239f952bd50d03cc8ae9046752baafcd861ff01feb9d9d6a7790000000000f7ffffffadb5b7122c2df5c0d650486bc59c23700151b0474a215ee19c05868566ad20c50100000000f6ffffffc39aea0f65a3a0fc79797f0337e53c9035cdffafa60ddffa6f7be109ad615ecf0200000000f5ffffff15f1bacd92003789bd41f6f99d121d8a3233c405bc4029b2e1a7cd80fddfb9eb0000000000f4ffffff53921cae4e284be23265c01764bc439db0c7c2476a3119fc265b8dd7e48a5e6a0100000000f3ffffff1787406257dd5a2774e60938ab458f704246e5de89ce2159c0e874db06c9d4440200000000f2ffffffe5b7db92fde8f726104bdf01f1e1d299ec67cf73571c8da4e7c9693ccb4e0c520000000000f1ffffffed10fff898479a4dfe9f899cc87003a2bebcb5a27c9ad3c459aee1ecdb7e12060100000000f0ffffff1813a950456479e4bdef660a61129aa2d8626bd11161401ed719332c5e1eedb70200000000efffffff49b614bad2b2404aecede9eb694f43a14a0eaa91010e20be21e47210a9d66d200000000000eeffffffc692414460bb80a59b5c6f91347a2be0b090e44c782254c69b5649ed7a2ba94c0100000000edffffffbbfdacb5f95914e4ce007d2ffca24dda478a71dc8174618ff298b8f7cfab2c530200000000ecffffff6ca3a10b379e8c9a0d2b46176a327d9464b02c6a2fcfce8bd94d36e6ede57ac80000000000ebffffffd5066253575ac9678e69ddd7d318ae555b313f8d3c1ca0b03ed7fb0f37b1669f0100000000eaffffff7c74f0d8940e3c358bdc81c6de9329edbb7654eb5ad919081998b69d67f210fc0200000000e9ffffff7750f1a4e88645ddf6487b1fb9b5f95a869fecfacb8656db386399fc2b059e010000000000e8ffffff3d65edd622e7bf385c06f6271097d4adaa9ffdfa15e641970cd9faa5ab6b5bf40100000000e7ffffff1949b4e25f08bc594dc72437ce76e1546822929037666fef4318d653ddb27a400200000000e6ffffff18152fb45053e98a856fb258355493c83b6c48f4012d2c9a5861aa449855554d0000000000e5ffffff230f75d60c14428bcb78ba412e4819e38b673f9b43cec9ef560ef0432e16f9df0100000000e4ffffffab6d882a900d6ade555bcfd78153e9395c7a93203f82e24ebe0606c509a6c4000200000000e3ffffff98c3f9e618a1fc070e378f47769edca3f12fa6f6ffbe88bbb7597e46f475c1760000000000e2fffffff9843ac0e151f3ae9ba757bae348a0b4f01d5a0953bbfae90973fbd56a62561c0100000000e1ffffff2b30ca8a4b7ac15a6d7251823cc789f2a76eccdd124dcbf8cde4df40c4c6f0330200000000e0ffffffe711876683c9e9c9cbbbea83d4e34ed2737e95d2eb161ebafe5250a678a2c2620000000000dfffffff4614199b99a3a8f6b73b49149f44b479c5fb49c01a2f1c0a67524b131673ab890100000000deffffffd3d551129eb71b1e49746a95d934ef3d0488425e0c67d6f061f89157e64d3f070200000000ddffffffb58104398ba4ade09e28de0e9bbb3afd2499ebf11b64675e8be9eb841bafa9430000000000dcffffffabdba635c508846dde6b3e8fe86fb52e23a11d25413357261b9bb7e9f2f8d7e40100000000dbffffff82cf31b7a4e2df202711d8bb282320d0f2b04c59213e3049c7d6dfe975df37290200000000daffffff7a3b26c70a7f9d82df1c1aa873ae886884fb25d617cb8d642c0beb8bd2505b950000000000d9ffffff447686bf15aef3d28701315c808fb4bbde5823eb5344c9233278e94557404be70100000000d8ffffff8567c5d090f83ceb10758012c9b720826c60cb69228496b985f3b5a5519879260200000000d7ffffff58e55440e7063be79f1e4452856f064179edb4d1d1856ca88984bb5c2dfd206e0000000000d6ffffff4d5c88f75663c3320829ad8cd285b003a81d759e142059896a541f06a8653bf70100000000d5ffffffdad6554426de1d9f3a2ac67a83c3a7530bf83f0d1aa6dce49c068bd08a09d03b0200000000d4ffffff73a04474eb26d309f455e9c925621946f2e0f1be383546ff73ba04a7d3115db70000000000d3ffffff29cd38a49113d60139b7340da14819015fdeb1bc69222ae4664543005dc8f3de0100000000d2ffffff67ac5b60e881af720717defcfbf42ce8fc083f0bd9dc5a05d5e90144a94d1b350200000000d1ffffff6258445fc6e76f00377c3b36769501f3a9550755a424097e0912276e74d879470000000000d0ffffff1dea0f949dcc0a70cca4dc3d0469e951c98807da64616220f9eca3854897c65d0100000000cfffffff2f317cf86b65b8f89c6ad130db5f5050c018751636928267d157700e8ab62d250200000000ceffffff75e19865a2a283b350f6cf6766ed21d62718ee868c3c353a652de42621ce2b3f0000000000cdffffff68de6135290a5e6104a627c7dc385bd75bb9618d6c5ce2ce6dd9ed477ecb47c30100000000ccffffff7e1bc3256ac9970d218eb128cff5b1a97c389a2d7f92024967fbb958045014320200000000cbffffffa0157e76204702c4aadf8088186c03fe642551e1dadcd19790133a368d255e050000000000caffffffc052375f26f9e9523fdb4a3d16ca7d63cc743c7ee47a1c83ff3c661efe29b8290100000000c9ffffff54e6b43c4209141351198cf7a2a17a5173c9ac29c1216c696aabf2413efa787c0200000000c8ffffff9cba7eef88402fb48d6a427fe2e0ebe93808fdcc07f92a739fe32bf7e23ace3e0000000000c7ffffff59d4b47994e83ea60e1b952798ef0fe594f200dbbdf758189f5c4e71ce09bdcf0100000000c6ffffffd5973c7b82c0a8c9118511f733469e11c25a03c994546fecc93a6889a39cf1160200000000c5fffffff33289cd54ff8cee1987ec7e7cf5962c2c1f9c655fa83aafcc1183ed18d6eb6e0000000000c4ffffff8d9e2a2e2fe91719fdac3fa705614ef5024fbd9c0fd6f24421d9635a88084eb10100000000c3ffffff00de997e7d9e3f6e304f0ce31ebd773f8d1cf79c800d211d30e17e2c9bdb68700200000000c2ffffff290a83b2894a3b2fbb496b6c6adb211131b848559773cce92b6daa67c211085c0000000000c1ffffffc3cef09120aae28f4170187ebad86e855d5864410295d932ba2d588579d6ca620100000000c0ffffff054cae80f5fd808310915a29e73a38b77580c101f083f1165eb5eb8f286ec1550200000000bfffffff421622dad164bbdbf8f192e95ff4c5073ad1fb3bb22ab1c922da507c545788730000000000beffffff4f8c8267d4d933299ef6740f5c1539652e6d37f373186d8935d4abff697662af0100000000bdffffff4d4c67f492c40ab77f3541239a032d68249b287b983dca9e00aed7e916893ca30200000000bcffffff27f720a15a330c3f53b248586d2bf0b7b4fdb92e2b927c501cf18833ae99e3030000000000bbffffff6993621b821dee6a5916c26f2a86faac3a661f346752109449a9b26b6a0460100100000000bafffffff8fe451d6ad05bbcb32df23ef8dbe4ea119fbf62efc4ea3ffe3b6f9a75c886630200000000b9ffffffb7e4ed04b3088e0b7f721991117c6bf187489e250d6ce25c7aa6621bd9f1535d0000000000b8ffffff5cb19eb370cb5cf49736f11411105399e7cf8f8465f70b616189a120f46fca8f0100000000b7ffffff5a8ed3e1eb2e900e8b329c70c0ba5623f294ef65eab947b792f17ab73552b6260200000000b6ffffff70527d469cc881cb005042ecf2742691832653388b866db858c6e10d80da32fa0000000000b5fffffffebb022f78cdb494103595da68dedd46237fb21a6f46251b60a4f4f4609ae9500100000000b4ffffff49f3f03312c5c59c6f3977edcf9437a556c8be1df6f72b42da658a43e45b60210200000000b3ffffff911473689677c9d0347093c291c1f50e5520ddc6474c758e4351f77cf271dfc00000000000b2ffffff8a4124a811abe5da89ac32306f8f46aff5cf1689450bf2da93a6807969f0e5420100000000b1ffffffcba4a170fa0c3711b0032a247199782977000ecb6ac7ae246e21f0602a6105010200000000b0ffffff7f4b103143413e21d54da9a0db9bcd980d2f1467c9c276952bb8f6770b70a3550000000000afffffffd427547803f97239852eeb8710e786445d7663b85f9b7ab5b4d8c74ae4eb9a020100000000aeffffffa3caaee2376bc0a65669e2282deddd1456801ed74325544ce13f9a91f27fd0fc0200000000adffffff4a2bea894de65b80095fdc21e22032c604b56f3b45b60f66a7917400ea88c8200000000000acffffffcbc44fe21e75c605a73fe8e6d4f7cb9e7176941f4c138301fd2be9adf40dc3c00100000000abffffff5ac5f8f8bac8aed81d0d34027f51496244c9cec53bdc7eccfb74b3915eed6eac0200000000aaffffff88dae5afde6c558ec389b28970314cf5404701869d700c6dd57e36be0c5eaabc0000000000a9ffffffa2f0ca79b0a3bca57288052dd8ad158fec35f9c3042b6537892543a9911f06950100000000a8ffffff32b07dbddc46b7d54c5a4384adfceacc74dded39c4a98f440c74eff6c1c3c83c0200000000a7ffffff6904a8d4866a1eac6edb4aae46ca1e37e8579ec9ae568068a2a8b780f4d7ca760000000000a6ffffffaeb873c7d19e4cfd57a0411fd0c65dcabce5ec6d54a9120a487b7e9e5324b31e0100000000a5ffffffe84b012710b4c465ad5aec89a2261254dfc4a7f899155b327ccc2e12e890a1010200000000a4ffffffe8c6eb9ac088431795eb1aef566ed04207b12a2d332adcc49e21af0b4863d9a00000000000a3fffffffb4ef74e95090682a1b0c393489f5344ab180fbe77a1fae06c1801ca86b675920100000000a2ffffff233a81ae785990bc6a8d13f0a9b4bd37cdaf800967726c3e10c8001c66e3a0a70200000000a1ffffff94acc0c0b32a62b5135b259215dc104625f483ca3333d4cc6962f7b73adf453d0000000000a0ffffff02f0bc82782955714e7cf6ffcc88eb690ec94b84c9bcf63f8c75428d64fb374701000000009fffffffa67f46bab9a2c47feb9ecf7941cf4e44b593e54e4316a2a12e35c713210de51402000000009effffff78a7862461a1065807e14de8d51c38f0a5391b83e92155eb2c55e3f5b6890eb600000000009dffffff43ce3b82053bbd9d57fecd832f1e80889c43f65102b521cb09dde5a0242c599101000000009cfffffffbd52ee9af136dc977ff5145b51812889c157882ea48ce382268275d5289070802000000009bffffff7bd347657bf7c2df63900c60866fa6ce32ef268b94ee00586f0fe336b2d3657a00000000009affffff024054890000000000160014719e49da51c483a232337387ed060dfc2b022ce2401f00000000000022512073d500d5f2b38dbb1f841178ceffc009c5b22d0b344496f6f5bd60abe07f742150f80c00",
+      "notes": "Legacy wire serialization, empty scriptSig and witnesses, two outputs. Inputs constructed or parsed before measurement. Baseline [Nat8] to Blob output conversion is outside measurement.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-serialize-100-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "29734ca9e8e68788e139214566cc9f804ea7da358509160fe8995a7361a86a8d",
+      "wasm": "bitcoin-serialize-100-inputs/native/main.wasm",
+      "wasm_sha256": "0a89c13c4ffdb957eea84b249bb5e5d3dd2f0462997082ae450c1ca46bd731e6",
+      "wasm_bytes": 283314,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3683665,
+          "allocated_bytes": 190712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4184,
+          "output_sha256": "bd758ae1de9940de5f952e1294b5c73a16bfead7926592e0e13c36813674d718",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3683665,
+          "allocated_bytes": 190712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4184,
+          "output_sha256": "bd758ae1de9940de5f952e1294b5c73a16bfead7926592e0e13c36813674d718",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3683665,
+          "allocated_bytes": 190712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 4184,
+          "output_sha256": "bd758ae1de9940de5f952e1294b5c73a16bfead7926592e0e13c36813674d718",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-legacy-all-sign-all-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-legacy-all-sign-all-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "caab958ad2ae966937d3bc2840fa1dd4ce62c958958e2a33b8a4004baef673a35c4160b48b7361e141dcf58c0adec2c93cf9662c8e6e57fbea1af696c864efabf0694500ffb7f4a45810d95bc06eba52798af3be466371a1f587be07590a2f31558ee0f66799de5bcdfc8dbef8545f2ebbbcac3380e257acaa26ee09ef5246111115c6955a84d41e4cbcb8392a6135f7ecae8d4e4759ba7a5803db91c4462eef13fc5fa201d2c94471d8aabb61bec441656589da20a01794585bba469ee21f9b4335c80dd0ce50e2e1c13f7891e42778ffad24eb89779a4b5456d0ed2399f64f93300940ac2b8a8be4e4480fe2ad1f7b9afe6c0d0cab0b18b4063600ae51c935148a56ade73d22a1b5a886a734eac8e3774c2824e3c173ca0bce6680745eb68a13ddf8937233c7efec85721ac5c61f9001548a474e076c067a556bc6f32139bf5e012bf40283fec7f204aa512d5584cd9c758fd8c851ddc4927367e9ac7c1f8f74c26f33225636872fd4581b048c6a7fc61c18a05d9234b216f35e3ab492cf6c1f3c47ad784461238d926f5c41d60aef5c676fa41eff0b81b0d44ac2017bf7b04855a43d2f88c4f8dcf6b090273762861dad098c6af72f66ea02a6784c9abeef60061cf838cec6fd4afd35728fe556966d961a6f27f717e80ff48ba63005c9a3405b7dd97b5c267b9ceb16b8b295fdcf598ddeb467477bbc3bdfd8e5d33d3b865caaaf42b9775d904c57580ccad26b73ee5e6eaff9b6514780aa372d4b00cc4574168ae07e4ab4a1d4e36f6288f4bdda7bb21ba4d448f3aedb33d8d6faf40c615211032696a2bd7a4368cbfdc89dbe61b0d1375813e3e1f3318786a9e72454e8406f08c70daa0c05d5c3acb879be24a81d64843a408813fb5561c9f3f90f557081fa6cbf5cf6cd1873f9f1e82c1022498f33a9544e5a4a1833e0940e050b48d7f0f101018e5adbe887b47a716cd2c0a33d601f67c1cbec4b2501612403183c87d2f4b48356843c8ad8a5ede936b3a166cc2078122099b4eb13af90a34150ad5116a2d86aa48b9f5f6ce08137483e5b8d0952c313a6b678b8cac647c857e704621d1f25337b6f874abe0a26b4d8aa1e1bf2dff01ca1adfafa18deb1023b16ef5ac3d25e5343c29f73d6c8854da151c1f9e6b5b8b5885f7ed816361903dc09dbbf139030dfd7c1c7b6ac2a2aa50477b19329c2dc36350e13ff308a6e6b056af780cae7412122d749913540e6086dbee76154d4e9786978792e151108e276d3a4f84129ce00a1b628dd80c56f0610896372fdebe60a2efe7cf12fe398d13fe968b7165fa0832f7f4a73336bddb6d970554bf49bf2720bbf7eef06566bfc9c29c20a880bb5bf9c0f87c2285f9517cca5c8563b99416f8e707ba2e2960a1c1db0a0f69ec78ed92f39b9d380f614e7194cc2ecf47922b0f42927e4f113d986c224422fadc3977717a4a8e93e0a00108fbd099f45a2cf779ea1d9a40b1feaab985c1c0980c0ca12a5b813563c05f368c94437b4c98cd3f023535205fe9e420b55ed27844af6d37d926e50283817bf18d8209406747c95b5c676e7313c444124d238e106ec9261f39974566d26d1a13e1f018344b5de895fa9db95be7f3983419e05a7c6d5e4e9b262ba28c68eb359f545ea333af210e35ff4703fa5c1644abe21d1bb1220db9adf557a10df8ba96542668ac81bddf393939c2ef9874994d79de2e7562e227e0f9a2678ebe7dc589d0c98f5d464ebffa5680f39225242fdd9a4f47c43d795a57c63dc4db70c49865bc6ed846d828627b4a3e9e8af8962ae77357bf491b7100195b93f955b1cd4ddb323f75833014cda62e756a6bab8d47423c3fe5cde60823338a25c33eaa6e02da61a5dda8e31bfbbf89ba577db335750ddb3a76b94e35372b6ac42f727aff60b9a9ae605378609cd9280dc0d1a1cc5bef3cdcf9c645f68259b81ba1a6274d65fe370bc6f20a1491ef9852b1f37bc019fc5f3070f061ec67e1c21c65959a493cab8779d8704688bd28085560980d5af8f122599fdae970acb5e494d73dadcf91f3a3686a3ac5aba362b5fdbab7fc58a801963fc0faaf0eb762b0d5ae5139b5f6e9ddf0fadc03d28c2e8ff89629da0de2e5db6cf5763f5f60d463c38551fd692ec10ec24344e01e99a2dcdfd75040497394c85459109707a36cb20a97a02cd0e8829d778a72cfd3d42490e31721a103a9e5713d64eb0ce87df2b5f72167fa84c40535baa9b29776702bfbd112271a2cf24a25f094fd332a799aefe5dd6ec30b9ad4ba861b3fc7abb8e247dd8e714ef22ab4775756b86f258332ef15f585bbb9ea080975f2726d2590b90733af4842645ff5f596fdfc300e79c892d7ea7c96d772dcb6b1c89dbb1832a530b60e6f163a50ab458af95c4e873e30ab0352614e617a4333efee91e2adab14ca1c861d3d61dd3966456bd271c9dcfb2728c6bb92f10071b7501b0ea9975063b682aa6120a03f3c715b4515e2d7c8316a5f292b83d50b73c806da783c43d5f9f81a6287bfbce1b2d2c101cfeecaaf1e3f1f37c6eec9efd372c61812f3acf04047808a05402ec0869d4b7f57e68b8842d1015d70b9e72f1cf64f22a04a40a0042f2202b0b54dc7f7d381d034e05523e071e29a5157ad7b1086293e2475846ab51690b3ad192e30074df6e1f5cc24e04ad7dbb62dd46a3fff2cad409ca4b011ee8ef76293ce8d4955651ac0e953f373bd236a04d22c3f510275fe9cedf9e0f8b48bdb6614608c2bd4a3e770af53475c5b073f4c2e02eea04465f2122c848f4dcf54ac1d4a38b301e49a60a0324dc16e7a5dc1693378eecb9f1c75461252434b5b8a73cfce3e60810e855dfeacac834bf77757294662e397336b559166788ff011738fb36dbe1911d2fe72620c35b2d8e421e757520f7187e9265813d7f453d32ae2f2e5f6d9af485c64a385433e23cd0c3c7042f604b0f5ed7548d27b679fc369b3b9ef5931537b6d1c40008f670dc9ffb5401418cb641d4ba7cae0c28ba164ab22158de3938bf3ec24e000874b828597e107b6624d892f2044faef051a597f56168ca8548594b281554dded4fd307c41ec0d4539fa4144c1e6517630a6d5450ff000b069a5f5b03b5f1dab506465a1b4e8e54d3c391baf447283f308c141e73d07ded1dd4881725a1dbf358388e55622d784383b0daf535015ab6f26705c95238808d34df99ece426f5bab238da22f9bdb4f03bc996841a6143d2adeef5a418e783b93f1e0e06623e05cc71e53c871d09341e48600fa109941b4458c2b369f622ad52f5c1f834499b985ef8dba7bad0a32cddd2d72fe6e5f9794df5b5c380c46091f2cf207157bccdbc741cf5005d1da32fa712c3885a924d3182ab9a131c92d8ef8b13e0352e2ec0b29a5b37c9d62726b2ee9e18b962be1cc0c631d5e00ed4c21828c1087ef6aaa8a29442f75e01ac5e885306f9ae02ee053449d742faf0cbd7b6af5eb31667735ee2592f3ec902ecddd074d9de8ccf7f86448cb7d46929b4c642f70d7006faac7a1f077d405318a1b3c3cc4fce62d06fdcf43a98d29ec31d1154cdabe6a5fa719da91dc021052abb8f036cf11b6125acd54bdc4a9f952afc6e8d62cfe069d6a41db450a209cf760e40ec26e665b3a09ed97ad17fc3fb6664bb0fc6f5665609fdeb41a625d3c8a039e15204fa3ca964e6b5ded88e5053ba04ef9e3710d9e6517970c67d4f15f086e66d66352bb9e59fb5a523e2d74f396f01ee20a300ae6d98e77f71f8d9a1699ccbe72c4f129db94dca9642e8c5681c2dd2d857196db83a72b896192c08bae5f317333590386a51b4075b57d7c8db0a8063d380c37695ea6a7c70b93bd58ae54cca5a5137a66d94f83262ea2ab4a2634d671f4bc7e161a2380830c3c386da4825b1102cfc07da84acb9a788a49393f744a266480bc51a30d23ddfbe22a56e749672f6a63cfa761fd0c774bcb3e0ebf6ae0905f72ec9567d4b12c244e243e2fcc2124073647db00dfef977878593b887fa3ace0b6dfb51250908fc67d57d68ea45ba388862147b79077c90de0bb5bb03149f7a8f6339d9892270187b2641405912e44e3951226555d452b047eb9a2a20a68fe94ded74eaa8dad477c0acec72420bdb90b1dc59142a69b57d7a4625211ae6460743cfde1a6dd12c8335bf1262b8d0bb709f731488e11154894751a203d5020e3a44b4fe269cdf45ed47e2cdf330c0f49945ffb143abbac98181fe466b559e6bca7ed03c84805c9b14140305f5f30547e5d9ab511dd8f67ca8ce28fe0a7b4467d25cdea80de9665de2b4e3d102e13896cd6e03ba481722be9f0be1f689cfb051bd531477a45bedebf4a068e8cc14367a371cd7733f82decd69a7d402d1e170db5cf89b897c3d8fca51b254f5479fd2aabb179fc8ba81f2b90e0160885ff2785cee0d67077c0b0917463895368bd5350712c464fc07e1900b15f8c253f356a3a97b6c23980ba9adfb39eb85641485c9b19fd87c9dba5e705aeda936fa2e4955a4e319e3422980b3c2748ae38131c3",
+      "notes": "Compute all 100 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. Legacy SIGHASH_ALL, no witnesses. Baseline mutates its input scripts; native preserves the transaction.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-legacy-all-sign-all-100-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "0caff3fb131007fca0a420ab807cad9cfcc920611c2e511f2e436e71a5a8ca04",
+      "wasm": "bitcoin-legacy-all-sign-all-100-inputs/native/main.wasm",
+      "wasm_sha256": "898d04013761f3475c3427d99c1ef1a8236f7bb454d0a3f78a79f355d3bce6dc",
+      "wasm_bytes": 317547,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 400819144,
+          "allocated_bytes": 19132024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "98a6011ed193a690350ccd17c65357625d474a075ad5be44b4efb1752dc808b6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 400819144,
+          "allocated_bytes": 19132024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "98a6011ed193a690350ccd17c65357625d474a075ad5be44b4efb1752dc808b6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 400819144,
+          "allocated_bytes": 19132024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "98a6011ed193a690350ccd17c65357625d474a075ad5be44b4efb1752dc808b6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-sign-all-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-sign-all-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "01f66f6f324b343c01d9b98109ce8e58bc9af30e7dd537969ff3e37d0e3bb68f70ba549b510a33c19ee0f09990f50e9c3da9c149b0046420763e735d5fadfece41b905a16de36d9457a962c09b4ae287077d875fc154f1381d68e207d90339ab848f0d9ecd0760b884f6cbf8bc6bdfed361885f605010c566ac6689057fa58b5ac9fe02d0202fd15885c89c47ed5dc4696fb98499dbb9b32f8ab7dcf76da7a1bb69476002b684129b06ae3ab9e7b061e379e9e15213496226a0d1225d3fe20b281e51953160a662e4ff075f824504d335b25fd3778906758513efe7e06b333c32ee5be074fc8b187af9a6d1b001b1c062a257231245790e44daa53f1500c2fe2134ba547998c80fcb6c0767a9b751f8038d693d2252eeba5edbc8ef87be24d55bdcd3ea20b840ccf806de4c84f9ad85f5b7cf30f3f047eeab9428c427e1e426ba1c9af31a719264176c640e5f9d50ad651cff02131b22505e500b592ea70f91fbad6ff2e829cdfba1973c601a6f6888dc21c47c546eacef548db8dae3e94e158a145ed2cfa06bcad603457e12ef1c747dd0fa68117d8d725b4f3abb89b739fe807b64aa376e64b4544aef3843e1739ec9d2815eeac158cda5990c9c651a08f58a0795748724b43520202065804d2bd96f21194c8c07a2b9e969665631ac826e375c890e8f954582b5cf5f3f25b1ca96f6c07755c6ed6858c93890d68ebdebb15fef5881a63326809e8220615c8c1db4a25d8dbb3e9637b7c8211b1e783ca20d61830d4bc87d6e0b29a59b5e39cda7767d194d5c9a459bba30a32541d8631565c0d38f67ed2a3697f7302ebd71e5eef47ded8ea7da8f1787562c7f49e726a7961f7587af64c00a393d8eb0c765f929dc53aefc7daad836153c8e266da13a5e0d50fa1ae0a2f4d5a20b8fd0f0dfeee65ff58d3d2dd05aa844b96866c1a71d7d32dc8a2e698eafe9664b331871e01364b8e788fb2e997af18a67119a947ccc28ba8bbdf36d73ef2d6f6cd3b328dcb1e9ffdf10b503b43af9b544990afdab799400d4d2d9aebdea7bc2b5508684c830043113f04583aea00f32fb97c4087ba5912a0b25865fcdeab95ec78a06f6ac63265528bf4a10097f31d96282aad111c086c8b79d477414c8107dbb9978b8d86966b173981e106e38a083e22ef353b522daefce3baf33c0730f069d2b4f2173fccf60e47ccce55afc7f5085ece9db08aa97fead1ef8cf181c1604055e4cb054fd56f991f945e92c22ad51f3d20095c3e992db1b3d99da3c78faa65e5edd6e5af9dc7a3399ebb151ed633eb5fbe968a905509a283e0442ba2d204dfe0b85f46974c7b7cbbe525aa7fc98225642db1ed8bc07d2dea4dfba9f8d93c90be1baeb57f65e9b4b3c3bfd57d9affbef437364a4267144d59b64b393c34d3aa17c1b8838633436ff53eff9d840c77d6fec3259846a3a605ac4a7b4a6ba0472c84d31e3f0f87bf71913ff3b3b16485147b62337c4fc1db8dd2fa89164a0646d93e804a8038e75b20040afea69606dfb75bc1faddedcc21529907cb315345ba9f4701ecdc5e45208b116b5058c9eaf167103b08bf48e7682ceb5a5994e20b13a6e9c049c75f9ed36f54de40373a86efb888f3344cca2e7f407077696faef38875d145b98c2cd0a12ab82c252234196cab4f5efb4419ad1c6cf9ab32e138230cbe7e0cfea65b7566adf409de5ea918c3f18a365a5c9715a0c668fe25f80dedfcc84b340e6f3ede623ca36efef881e99616a04c8478faedc6d7bb2358ce5890b9dc41496eb02f7e05b9cb0d4aef22786e45b7b13284386255bb6307fa9bf4666649fdab3fdcf580b5da8cd9f56d91ddff64402d43bf61ecfce8d2681fa868733f30d69f76623432950657538c147d9c2f6e71d133ae33bd1ab597274420381180308b558e7ceaec575f6c4df68da4179a8efaa189d43cd03b4e03ea08148ffaded74881d18d87ed8bf18a9be4382a679bc16fce7bac63e923fbef7a10bab7cf7bb5352320fbb0dbd569542cb7c977405416201c5afb7edd4257754106b59898271b9f6c06d3896d639b6d48769a9609055adf981270a451597376b02adf3101b3c383db1a2d398c42623e13e41e5124b9a712386bd0a50e1e1245fdbed56ecf22179697dd572bc279c59c36844aba5992ab7b86b67dca6e33ed41333cc994eeb1adaf6022288fdbb441a0d30c9141fda5fedaef91898de926bdb2e21cda31a858d641fafb312381681c261e4741dc342fb33f089c9bee2ee196c0061d53e828de56ab27e6ede19f0db8aadbe06cecc6d0ab9a5389fd8574a295028f6354d29de7908aecff24a73958fe441eac2b99153f9d5ebbfe8da16ef71b1118d1e729d7b60c79b51d30b27877797f1d08dd61dea33dc9eed75df0e2652658e51ff093ecb01566f1945ce124c2f33577fb2f422b94848e4ff75da4d66e6413e745399f1b752f1d2fc3f45de133226b095aef91f2415da1392665c84ea442f08001ef12ca11a1ba11bd9d08f7ad752aa18179266f8f2b62704737b6889dacc3db11fabe854c4c070f1316fc20c7727830e19d657f7fa7b8662fe2417638826031181fa1519358a324f5f75ec20ba4ea9e862dcaf7b035dcc9fa2037670c4d415809b72076f0c72403993cd99ff97bae0d617ec55b91bc56991a5cf6c53e9d1907d129c3ba74b3500fb1cdd32544c3bd59a526d863159b045d0c7db7eef639f0916b701ebe561e1565e99d78d6af514078eaef32b4dbf05acf40280556387b45e9f0ea2d80d3a059faaaae5566f7fbe2e29a4938fd4f733cbd1a416bf5fc3e286731235edd43d44b0c1e718943204272029d9ffccf77d5af3e6eaa04f2f667ace49605919d4d82b9bea72171cdd24ea18ac284bd50fb25284acd02ca72cebb729cf1e1167462ff920924912212a3d591029cf671698ea426982647cf4ee9faa23e1458ca881c0d852871d503092b3564b8e6bd1c4d757c50e24b4c21ce21dfe86842be7b1b2296f77d10570cc2ae7fb0b5047e7b8959315e29e28ab53bb6179c7957ce6d21d520f781743a904a742ba9dc57a1b07feff978d666781655c0d5fb5a081ba546ed2b33572fb283a28a8e75b85279f859b5b55cc65fb48f7dbc9749d8deec2e135ed4cdc39b2080778c7c0d37927dbcdb72a0e34dc861f3290b7a26e9312ef71e59633655179431019edd288b9cfec1f4f1199e65404788797b2a88ee75429876a204d655edddbb2ab45944a8795b2e5da1b1717a0fc11532b8e7b8be44cef1c45555c1f681af3e3b8903299e5e8e416281eb7d5ddada93b9f47c11cfdf01b05417f18260486c77af87d08032cc3c5b476b9b9296cf4fc027664475da042dd490f94064afe2e7f1d4bdd230c56201590c9c0e40eab9f7c6335d0b235a004e4fe54f82b3704dc6e64a9d18349ce2bb4d900328a4de7c9cc3827aa7cddc37caa5c3972f3992a966cc790119ffc068ef273ca41844e4c3a2e8b21e47a2d1ceecef8f3531423bee2c9d76145bed4e9751cedb2c773dbbede575127e6b287b2ee8bcf72380561249a8d7fe59ebc73e709b6cf58110a5716140b414dd3300328e6565056468cdbf3aa1eaa3145a4c303cc4babc8758eda1913e7da080bf0615b48b76c8f99b1a0f6ecd1d4f65f3cc3f9eb0e54a68a4f97affe8655757a2c029753272e2765d581308d65f317d89fe49b319bc90356ed7a167eaeba6415436931e8f72d3d6e4f0b5e9411da0d1fc9955d4e73670aada5de0f4dc32a0afcc5101d2de165f984160e758657a99463492ebb3bcc01ae6d2e1a0da5952364b7141472a0739ca19395ed170499eb13b9332e3720e853cdb9b32e1bda13acc03cc34ee76aedd0f7094ad996572282c21266aebbc1a163dfb708b4dc6f09f6ca1709785057058a12a48e47bb36fe6d1494940e4c09816fc3d41ff43a0fbca69f18b3ad83b8b1dfe08d0e899df2a137bd16f83d63a10968049b2feca909b6db95efa0b2a178bf154cdfdcf48afd26083809f7abed4ebb4c26cd4031ff7816a2c96b3e562d919750b1c1499696810eed929707e7365066626d01136cb2fa04efc1bd505181fecccd75e9c52195f4d6ee59b3fc332f07277ff64ec770712be916f393f617eeb1fce1cf2de545d7c565802d30f7fa86411fe7c2699007fe1fb792462eeaf2ee8cc92368a3796b101409395f81b3d1bae7e8f3dc48148f85e8b152b1681dc0d40e79f1318886a15fd680ba72b6f4094ce7fb7bb6bc410c6133a507bce1d098e0e85f11fc2f16cfad2999b2ed7b6af3d166e29e9540cf9bc3ac1d2f16f1ed0ffbd20d825215b662507002863124a24a89079b1744c93c7b6b16071254e0d92c7f1ff18fd553a6c251c72eea54f5fbb0115ab1537762b182583037968825f12a4e49a384ff4d381180c6e4a9380f0f61e08cb3b298cb0da2bb5fedd1c55df8dc26f92fc6229defd6074dc522e5011141fa0819809b4a99e1f5ac76f032a5f29095a14d9f23f055bfd580bdc51c52030c56151a8e749313d87d0c45439edae",
+      "notes": "Compute all 100 input sighashes, in input order, including per-call validation and transaction-wide hashing. Output concatenation outside measurement. BIP341 key-path DEFAULT, no annex. All spent scripts are the same P2TR script to match the restricted bitcoin 0.2.1 API; each amount and outpoint differs.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-sign-all-100-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "0f467d5c23c368670c02c384e97318d40161af71a31c4071f2613330c25a0e47",
+      "wasm": "bitcoin-taproot-default-sign-all-100-inputs/native/main.wasm",
+      "wasm_sha256": "5b7c48957d1eb1a20197fd583c31e1c504dd5d406b2cd9948e571c4db3ecee4d",
+      "wasm_bytes": 336707,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-bip143-all-cache-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d1e9c2e3083188b47ffec43f4c53716ec8efa1b00f585ddfb062c8219dc0824c6ee4f733c4fad95bf9186e9a4665bd1d010635f3cba81065b8519ae950686fdbaf2ac52892a812ed9686e777c3d1fdd06c4d7481c005b2145ec98822d6db7ff95e95841ab42a41b77d059076486ce98b305c38e9c1c869c67bce40377809dc9c14c7e7bb90966ff1022c3c3ed39399aa0bfb924623bd89abe84fc3475db59498f91b401de953d985b78aa81cfb1653efb40dcc6d7e73c336fda85b44fadd1f8d0bd16aba50e54f7918287153768c5821de78883a204bfd646d775f35754985cc34576dc3238a7d179e18ca941d748e11d11837dab0f8663f93e73553022a61077fe7d4d8d1c8717f495a82d19a30e529c98ab1f1553c07f2fc3dbd4bfd620fe0e6cf44671a50aed076368594f5f686bb02e7e7e3739d19625d1ef7e367438f43fa75c0e00a225a36cbe996bda81988add495491072ea93cb665552e7f96a2b376b4ab12c8c388ced7463a6449b9ca6c3687553c3ea912374bfae9097ea99f005a4d491d61226899b796162677afd24eda983f94a43987ec05ac280d476ea3248a7cc6f8a3235ccb23d055987b481240a70dc42f1e7503029b202b514c49616e749e3c53597dd11e768bc7a26304daa01654b6463a9d732dd19b6881b0976b8c82dab584bf79e51f376f2a91414182d4b3b5ef8f6f1b86f94221d2787a2b8063e8d796a7ddb99c4e192edde38905c60779b864ff6fd6742e237368032ae030a79543f30619ae7920c3ad21c92971aeb8e6241ee640e3e59ba2fa9d390d8b66f03d3d817f96b9d749299317ce8e8e3121a84a58309756cc0138fad0eea439795e5719603445f6466e18b9cbeebd609cdd9348d7f8112430219bbe7fbca3586a9da8337f78fc18b2627f5a97ec106cf6975875553b85970754ef4a8db77391a6be72f57b201f24a4c4dede1dcf3e6161b52c06188e87b6a2ba9fccb9d14ca02c7a84018cf19173a93dbaaee665bf500f009e0c438929e0db63fdb592e1b11593abe88b7a79e7d4fdeda262156a5ef3886f67a12b6e39e72b7ed4ba73643ab1640dcf71dcee3517c256ec317e0e185e57cd4b98ef92266b1150d163036c9f611d6d5a05e28efc24fa04d4727156b3bacdea3355799806f4dd95d09f178a61e860b15c436dc31ef794ecb9fcf33d57c8f8964bdc1576a2054401a26cccdc0e4784d2f6e0686085407ecc0f19f7803688d006c65c34ee604e686521a9796d2adb9c35eaf4f44615c1335b395790ceef1e79bc5e93e95c6321f0c017558e2688a320ce4ea3e44549a5611c24fecf3c309ba6058428dbf60555308c8c2bc8fec490ec8fb010042c2d8be8dd6f19fc68f4a25e5fbbba5c1d2621f78836b4f7108eded18a966f40d094007a29a4f285117cf0f1ca8f495dd2a0fd4755b7bd1f62e0fc609176a38039bd2390160e7dcc3aa881be695f4f9d986ff311faa1c82c880727391f1c864752ff2167cd4da468dc4de39b500aa6ae1d5c1a92eb35d31eb7a14dd1228cf8783e2be8c0c2af3e02608825defee5e1a01d80da37fe7d454c7dcfd0e27e732c4668355e4d1d12f7d42b11f3dcfc7a2aa93d670ddc684742e390f45d89ebe79299478f2ad4f47ec056005273cdc8a4169eac850ccefddcf104c0432333299e3558e19f1d0b3484266cd5ec66b418b61d51d936439427159819324fd161efb02c4ecdee3151aae3128ca83e9ab8f757414cddd3aaca12a294a00146bf352f20f9da9f8e381e8e3b087655be741303ac5ff03afdfcb62156fc47c06be51fdc435ab4ebb081f34ce585effa475c5ce8f264d5a51fdc61fc8027ec2e1aae840004d9497e4f98fd22d64a1cf210ff8df1d5ab44ea6e34421356eb5917e6e3f15a4e0aecc112e666234290a8d607932851f9138b1be72643dacd751a7310b06f63b35d0a7fc647b87893bde9825489d835bcd482f09a4f76bee1e32ee7ddaea3e1aa9feac56dfc0772dc764c8088239803c9a3d23cf495d1a051b94d1752551feb235022f72ca64041d5884e5e74af17c5a6f294d2115a61f041a74e4152af595c5c832ab7bb8a84f15ef22883d2191b2e490b82c87829827d22177850fe937cbccd59229c4380c47f2019d47ec3a436c2fd693fa08b6fa0e74705e39bd3239f9a39781a66aeff1815b9f453464a090cb8cf8557a816d715fd85e417f118bb84cb6bb2c1025fa948302db13f09e211eb9d05cd39deb1f9ef50fa812a548ed77e32ca16651513bce8bcc9639b9b697bf5f34e1b4aaf0aa05224d7a336229e9f7bfc3fc9ca562f70095838046c557bfd490c7482f5a93e445efea3adcd2d08b12b81fb46eb41b259191cc4f52d18ccb94dd068fe2371a6d0238cc371dd07d10577285c70f219270f43946ec60747130d9581e7ae5f51b32ec075b06061b8e89375276f9573090f5d379be640bc5cc0dbe659a1bfeaedd2b842c9003ccfaf20480b9e6a755ae41743b4554995be2dd99dc852d4cf27f21a2bd617cd0b4d139fa55f01501304858976df17a450da811712ab56dd2b6476a0547249b7e2318eaba727396fb7487490097f2998c8140350ddc6111b50fe039ecb339466bededd167a6f4ec8071ab45a57067651121e6e9fa96b93449bd668ff2a5959ea7370b1d7d116780c69f26d83e4c39bb05e6a4144aca60ed286c86a0598026c8596ce050d16293b21bc948f97b00bf5b5f74f2114b04f2b70c741e4758803316ec737a9fca05b2f196b5e397a255f59e3512e07abbab999f56fab45a7d665ed3179a23e7febed39f92b8ea3fdb1fd670f4758617c736de1fe8dadabba5800b7ca43ff8ff5f5dea7ae38fc4b1256c3d49b04b7b824dee98431b41990ecbf8bf79e9979b46ec594fde81c17441e4454fb14c27284cd3ea8390468384eace9ecf38ce06eed678e47da171240649eb8a6c883b0bdedd466e49b2f3de99dcc9f24c98f64844641d8e50769277c62de3f26d647d9dd22641c7f5e26561ee74de9b3ac312d82e270e7fe537fcc75cf65caf5de173e1f4522280711212ef79b2aa0f32932038589f2b34aa09daf2477c5b9fdb4cf32386dccd5712f6a3fe2b7b0e5765c5f8f85afb74d414230c65f5f4380523897502acb76ad16378d28c79f0214de61c864c6c5c81b312315ad9e3015728e425d4db1e5296156bb892b394e7c3cc5e35d59845b470103d74006a808a5cd8ccd22dbaf137ef9c45135180a51ab80188a1907c03e7e7be710dd0a27edc947333cbb7f4f569ade417071fe6ff7edee521a2c8536bd2fefd5ae0b163e734e87e52b1e352255b4059c7c1b4f10ee8ce567a98a3acaf67a0eb147f44fb7adfd3d6be339e171c6460fe5b9f26b03850fcee712eb5c7f86719680ff6afd40533a54e22e8ee6c784665e79c12457b77cc142298f61ccd86ad09b0da5ae4de8def42812a2c3fc5f99d7c2c2268a83ba2906a554ba8519ab84d660d4f9acacacaafc66d2cfe023906f7374eefa1a5c77e40f41cfc8a9f2c7acf0765fc6ee06c4d156c7cfe50d7197d31e5d751cf47814aae84b3e8c989db530f72d57ca3c374dca59a9edfb2dd2329fc3b8edc37e3fb407dd1c1d99961da50a172b1c42f8ac843a8198d7a04fc1fed4f946fc2762d137c21ed7c73339278d5334a4ec5ac36729ab6aba8a34c6e808e342d2f6410b781866e7e65054d22e007269b1834e9f05c1280ea5ce284c1bfb042d427771d5e273cd9bf3227abbd7ed84a1d540fab43a46aece5da259eb27be704744325ee9cd889548e74cdea338ecb1238397e7169c4f0aad8734c1083ab7b86a5ad4049326d660d6e5eb5042790c42c86405cf922175402cdeca296ab1dad96143e9bba63afedc20164ff183d81e5c782b3dc15f2d3d0c7266bf1a655bb239e14919bd15be5ed93379249f643d076e7828e5650e5d88542cae13fc936bb09987c0dee20e6b179f6346105a0cf1b0294d8e87e7c5aef609fe2ada09d05f313db19ccb784dcd0275665b87467e19d54b080ab6f733593fd09daf0b3c001006d35b93ceafa185e5685ad8da73a8794b2ab1f779cda1f2ede0703487bb92382a1895b810d2a7f042209212d9409f12fd0e530a210979143fee6eff1258b8fd36eea3b63a1ca11d3e8630e1c6bb43c5b17c866aabd3fe0c1b91adb705b529c246f9a689eaff91dea084facdff60eadf954a600e532125b1aade69b2720b9ac5bc654fe60493d87b77f7daac6642016423dd6496a8179de5c4b46d76112d523122ffb5153decb3998911382c0ed04312ec97bdf8c4f085362995a57ec1b5935e09d5f81ca606ddb0a1ca752e9d7fa3af93395435a4a5e54597d934fc0df825db48a126b09f0da9434ce3c23f304932953bc8aef120b9e1c74ecb235c5f1d2217c1a259c17edd4fa7b1556e918a8baeb90de764392bc553b67d20725c4f61f11826933aef0a3caa77e8d2512c3f88b4df50f0701ac46d527977959709d70a8ca0033374c281fed4bbc70fb0f3aa32baa98a0eeff7ff5c4",
+      "notes": "Native API comparison: compute all 100 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-100-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "1e4e0d0aab688d8a2d90424304e1aef9fd7b32672379f14359b647cb9d3318cf",
+      "wasm": "bitcoin-bip143-all-cache-100-inputs/native/main.wasm",
+      "wasm_sha256": "f05f95488521b031f1c2441b2c7a08162b14db03580e85b42992ceeeda85747b",
+      "wasm_bytes": 331258,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 398305644,
+          "allocated_bytes": 18044824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 398305644,
+          "allocated_bytes": 18044824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 398305644,
+          "allocated_bytes": 18044824,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip143-all-cache-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-bip143-all-cache-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "d1e9c2e3083188b47ffec43f4c53716ec8efa1b00f585ddfb062c8219dc0824c6ee4f733c4fad95bf9186e9a4665bd1d010635f3cba81065b8519ae950686fdbaf2ac52892a812ed9686e777c3d1fdd06c4d7481c005b2145ec98822d6db7ff95e95841ab42a41b77d059076486ce98b305c38e9c1c869c67bce40377809dc9c14c7e7bb90966ff1022c3c3ed39399aa0bfb924623bd89abe84fc3475db59498f91b401de953d985b78aa81cfb1653efb40dcc6d7e73c336fda85b44fadd1f8d0bd16aba50e54f7918287153768c5821de78883a204bfd646d775f35754985cc34576dc3238a7d179e18ca941d748e11d11837dab0f8663f93e73553022a61077fe7d4d8d1c8717f495a82d19a30e529c98ab1f1553c07f2fc3dbd4bfd620fe0e6cf44671a50aed076368594f5f686bb02e7e7e3739d19625d1ef7e367438f43fa75c0e00a225a36cbe996bda81988add495491072ea93cb665552e7f96a2b376b4ab12c8c388ced7463a6449b9ca6c3687553c3ea912374bfae9097ea99f005a4d491d61226899b796162677afd24eda983f94a43987ec05ac280d476ea3248a7cc6f8a3235ccb23d055987b481240a70dc42f1e7503029b202b514c49616e749e3c53597dd11e768bc7a26304daa01654b6463a9d732dd19b6881b0976b8c82dab584bf79e51f376f2a91414182d4b3b5ef8f6f1b86f94221d2787a2b8063e8d796a7ddb99c4e192edde38905c60779b864ff6fd6742e237368032ae030a79543f30619ae7920c3ad21c92971aeb8e6241ee640e3e59ba2fa9d390d8b66f03d3d817f96b9d749299317ce8e8e3121a84a58309756cc0138fad0eea439795e5719603445f6466e18b9cbeebd609cdd9348d7f8112430219bbe7fbca3586a9da8337f78fc18b2627f5a97ec106cf6975875553b85970754ef4a8db77391a6be72f57b201f24a4c4dede1dcf3e6161b52c06188e87b6a2ba9fccb9d14ca02c7a84018cf19173a93dbaaee665bf500f009e0c438929e0db63fdb592e1b11593abe88b7a79e7d4fdeda262156a5ef3886f67a12b6e39e72b7ed4ba73643ab1640dcf71dcee3517c256ec317e0e185e57cd4b98ef92266b1150d163036c9f611d6d5a05e28efc24fa04d4727156b3bacdea3355799806f4dd95d09f178a61e860b15c436dc31ef794ecb9fcf33d57c8f8964bdc1576a2054401a26cccdc0e4784d2f6e0686085407ecc0f19f7803688d006c65c34ee604e686521a9796d2adb9c35eaf4f44615c1335b395790ceef1e79bc5e93e95c6321f0c017558e2688a320ce4ea3e44549a5611c24fecf3c309ba6058428dbf60555308c8c2bc8fec490ec8fb010042c2d8be8dd6f19fc68f4a25e5fbbba5c1d2621f78836b4f7108eded18a966f40d094007a29a4f285117cf0f1ca8f495dd2a0fd4755b7bd1f62e0fc609176a38039bd2390160e7dcc3aa881be695f4f9d986ff311faa1c82c880727391f1c864752ff2167cd4da468dc4de39b500aa6ae1d5c1a92eb35d31eb7a14dd1228cf8783e2be8c0c2af3e02608825defee5e1a01d80da37fe7d454c7dcfd0e27e732c4668355e4d1d12f7d42b11f3dcfc7a2aa93d670ddc684742e390f45d89ebe79299478f2ad4f47ec056005273cdc8a4169eac850ccefddcf104c0432333299e3558e19f1d0b3484266cd5ec66b418b61d51d936439427159819324fd161efb02c4ecdee3151aae3128ca83e9ab8f757414cddd3aaca12a294a00146bf352f20f9da9f8e381e8e3b087655be741303ac5ff03afdfcb62156fc47c06be51fdc435ab4ebb081f34ce585effa475c5ce8f264d5a51fdc61fc8027ec2e1aae840004d9497e4f98fd22d64a1cf210ff8df1d5ab44ea6e34421356eb5917e6e3f15a4e0aecc112e666234290a8d607932851f9138b1be72643dacd751a7310b06f63b35d0a7fc647b87893bde9825489d835bcd482f09a4f76bee1e32ee7ddaea3e1aa9feac56dfc0772dc764c8088239803c9a3d23cf495d1a051b94d1752551feb235022f72ca64041d5884e5e74af17c5a6f294d2115a61f041a74e4152af595c5c832ab7bb8a84f15ef22883d2191b2e490b82c87829827d22177850fe937cbccd59229c4380c47f2019d47ec3a436c2fd693fa08b6fa0e74705e39bd3239f9a39781a66aeff1815b9f453464a090cb8cf8557a816d715fd85e417f118bb84cb6bb2c1025fa948302db13f09e211eb9d05cd39deb1f9ef50fa812a548ed77e32ca16651513bce8bcc9639b9b697bf5f34e1b4aaf0aa05224d7a336229e9f7bfc3fc9ca562f70095838046c557bfd490c7482f5a93e445efea3adcd2d08b12b81fb46eb41b259191cc4f52d18ccb94dd068fe2371a6d0238cc371dd07d10577285c70f219270f43946ec60747130d9581e7ae5f51b32ec075b06061b8e89375276f9573090f5d379be640bc5cc0dbe659a1bfeaedd2b842c9003ccfaf20480b9e6a755ae41743b4554995be2dd99dc852d4cf27f21a2bd617cd0b4d139fa55f01501304858976df17a450da811712ab56dd2b6476a0547249b7e2318eaba727396fb7487490097f2998c8140350ddc6111b50fe039ecb339466bededd167a6f4ec8071ab45a57067651121e6e9fa96b93449bd668ff2a5959ea7370b1d7d116780c69f26d83e4c39bb05e6a4144aca60ed286c86a0598026c8596ce050d16293b21bc948f97b00bf5b5f74f2114b04f2b70c741e4758803316ec737a9fca05b2f196b5e397a255f59e3512e07abbab999f56fab45a7d665ed3179a23e7febed39f92b8ea3fdb1fd670f4758617c736de1fe8dadabba5800b7ca43ff8ff5f5dea7ae38fc4b1256c3d49b04b7b824dee98431b41990ecbf8bf79e9979b46ec594fde81c17441e4454fb14c27284cd3ea8390468384eace9ecf38ce06eed678e47da171240649eb8a6c883b0bdedd466e49b2f3de99dcc9f24c98f64844641d8e50769277c62de3f26d647d9dd22641c7f5e26561ee74de9b3ac312d82e270e7fe537fcc75cf65caf5de173e1f4522280711212ef79b2aa0f32932038589f2b34aa09daf2477c5b9fdb4cf32386dccd5712f6a3fe2b7b0e5765c5f8f85afb74d414230c65f5f4380523897502acb76ad16378d28c79f0214de61c864c6c5c81b312315ad9e3015728e425d4db1e5296156bb892b394e7c3cc5e35d59845b470103d74006a808a5cd8ccd22dbaf137ef9c45135180a51ab80188a1907c03e7e7be710dd0a27edc947333cbb7f4f569ade417071fe6ff7edee521a2c8536bd2fefd5ae0b163e734e87e52b1e352255b4059c7c1b4f10ee8ce567a98a3acaf67a0eb147f44fb7adfd3d6be339e171c6460fe5b9f26b03850fcee712eb5c7f86719680ff6afd40533a54e22e8ee6c784665e79c12457b77cc142298f61ccd86ad09b0da5ae4de8def42812a2c3fc5f99d7c2c2268a83ba2906a554ba8519ab84d660d4f9acacacaafc66d2cfe023906f7374eefa1a5c77e40f41cfc8a9f2c7acf0765fc6ee06c4d156c7cfe50d7197d31e5d751cf47814aae84b3e8c989db530f72d57ca3c374dca59a9edfb2dd2329fc3b8edc37e3fb407dd1c1d99961da50a172b1c42f8ac843a8198d7a04fc1fed4f946fc2762d137c21ed7c73339278d5334a4ec5ac36729ab6aba8a34c6e808e342d2f6410b781866e7e65054d22e007269b1834e9f05c1280ea5ce284c1bfb042d427771d5e273cd9bf3227abbd7ed84a1d540fab43a46aece5da259eb27be704744325ee9cd889548e74cdea338ecb1238397e7169c4f0aad8734c1083ab7b86a5ad4049326d660d6e5eb5042790c42c86405cf922175402cdeca296ab1dad96143e9bba63afedc20164ff183d81e5c782b3dc15f2d3d0c7266bf1a655bb239e14919bd15be5ed93379249f643d076e7828e5650e5d88542cae13fc936bb09987c0dee20e6b179f6346105a0cf1b0294d8e87e7c5aef609fe2ada09d05f313db19ccb784dcd0275665b87467e19d54b080ab6f733593fd09daf0b3c001006d35b93ceafa185e5685ad8da73a8794b2ab1f779cda1f2ede0703487bb92382a1895b810d2a7f042209212d9409f12fd0e530a210979143fee6eff1258b8fd36eea3b63a1ca11d3e8630e1c6bb43c5b17c866aabd3fe0c1b91adb705b529c246f9a689eaff91dea084facdff60eadf954a600e532125b1aade69b2720b9ac5bc654fe60493d87b77f7daac6642016423dd6496a8179de5c4b46d76112d523122ffb5153decb3998911382c0ed04312ec97bdf8c4f085362995a57ec1b5935e09d5f81ca606ddb0a1ca752e9d7fa3af93395435a4a5e54597d934fc0df825db48a126b09f0da9434ce3c23f304932953bc8aef120b9e1c74ecb235c5f1d2217c1a259c17edd4fa7b1556e918a8baeb90de764392bc553b67d20725c4f61f11826933aef0a3caa77e8d2512c3f88b4df50f0701ac46d527977959709d70a8ca0033374c281fed4bbc70fb0f3aa32baa98a0eeff7ff5c4",
+      "notes": "Native API comparison: compute all 100 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. bitcoin 0.2.1 has no BIP143 implementation; this is not a Mops comparison.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-bip143-all-cache-100-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "14a3c95dcc2d26769e1ebc8ec2e4ee428baaef10b1401ba9884ca986c605e7f4",
+      "wasm": "bitcoin-bip143-all-cache-100-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "c492432489810cb875affe1c35ee1a9ccfcf823b620639c7bb5e99c3718af77d",
+      "wasm_bytes": 331301,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14840351,
+          "allocated_bytes": 596312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14840351,
+          "allocated_bytes": 596312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14840351,
+          "allocated_bytes": 596312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "582b373caf4bf8a0747efbe21516ba2b7502b215202e70e1857dede925f5a931",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-taproot-default-cache-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "01f66f6f324b343c01d9b98109ce8e58bc9af30e7dd537969ff3e37d0e3bb68f70ba549b510a33c19ee0f09990f50e9c3da9c149b0046420763e735d5fadfece41b905a16de36d9457a962c09b4ae287077d875fc154f1381d68e207d90339ab848f0d9ecd0760b884f6cbf8bc6bdfed361885f605010c566ac6689057fa58b5ac9fe02d0202fd15885c89c47ed5dc4696fb98499dbb9b32f8ab7dcf76da7a1bb69476002b684129b06ae3ab9e7b061e379e9e15213496226a0d1225d3fe20b281e51953160a662e4ff075f824504d335b25fd3778906758513efe7e06b333c32ee5be074fc8b187af9a6d1b001b1c062a257231245790e44daa53f1500c2fe2134ba547998c80fcb6c0767a9b751f8038d693d2252eeba5edbc8ef87be24d55bdcd3ea20b840ccf806de4c84f9ad85f5b7cf30f3f047eeab9428c427e1e426ba1c9af31a719264176c640e5f9d50ad651cff02131b22505e500b592ea70f91fbad6ff2e829cdfba1973c601a6f6888dc21c47c546eacef548db8dae3e94e158a145ed2cfa06bcad603457e12ef1c747dd0fa68117d8d725b4f3abb89b739fe807b64aa376e64b4544aef3843e1739ec9d2815eeac158cda5990c9c651a08f58a0795748724b43520202065804d2bd96f21194c8c07a2b9e969665631ac826e375c890e8f954582b5cf5f3f25b1ca96f6c07755c6ed6858c93890d68ebdebb15fef5881a63326809e8220615c8c1db4a25d8dbb3e9637b7c8211b1e783ca20d61830d4bc87d6e0b29a59b5e39cda7767d194d5c9a459bba30a32541d8631565c0d38f67ed2a3697f7302ebd71e5eef47ded8ea7da8f1787562c7f49e726a7961f7587af64c00a393d8eb0c765f929dc53aefc7daad836153c8e266da13a5e0d50fa1ae0a2f4d5a20b8fd0f0dfeee65ff58d3d2dd05aa844b96866c1a71d7d32dc8a2e698eafe9664b331871e01364b8e788fb2e997af18a67119a947ccc28ba8bbdf36d73ef2d6f6cd3b328dcb1e9ffdf10b503b43af9b544990afdab799400d4d2d9aebdea7bc2b5508684c830043113f04583aea00f32fb97c4087ba5912a0b25865fcdeab95ec78a06f6ac63265528bf4a10097f31d96282aad111c086c8b79d477414c8107dbb9978b8d86966b173981e106e38a083e22ef353b522daefce3baf33c0730f069d2b4f2173fccf60e47ccce55afc7f5085ece9db08aa97fead1ef8cf181c1604055e4cb054fd56f991f945e92c22ad51f3d20095c3e992db1b3d99da3c78faa65e5edd6e5af9dc7a3399ebb151ed633eb5fbe968a905509a283e0442ba2d204dfe0b85f46974c7b7cbbe525aa7fc98225642db1ed8bc07d2dea4dfba9f8d93c90be1baeb57f65e9b4b3c3bfd57d9affbef437364a4267144d59b64b393c34d3aa17c1b8838633436ff53eff9d840c77d6fec3259846a3a605ac4a7b4a6ba0472c84d31e3f0f87bf71913ff3b3b16485147b62337c4fc1db8dd2fa89164a0646d93e804a8038e75b20040afea69606dfb75bc1faddedcc21529907cb315345ba9f4701ecdc5e45208b116b5058c9eaf167103b08bf48e7682ceb5a5994e20b13a6e9c049c75f9ed36f54de40373a86efb888f3344cca2e7f407077696faef38875d145b98c2cd0a12ab82c252234196cab4f5efb4419ad1c6cf9ab32e138230cbe7e0cfea65b7566adf409de5ea918c3f18a365a5c9715a0c668fe25f80dedfcc84b340e6f3ede623ca36efef881e99616a04c8478faedc6d7bb2358ce5890b9dc41496eb02f7e05b9cb0d4aef22786e45b7b13284386255bb6307fa9bf4666649fdab3fdcf580b5da8cd9f56d91ddff64402d43bf61ecfce8d2681fa868733f30d69f76623432950657538c147d9c2f6e71d133ae33bd1ab597274420381180308b558e7ceaec575f6c4df68da4179a8efaa189d43cd03b4e03ea08148ffaded74881d18d87ed8bf18a9be4382a679bc16fce7bac63e923fbef7a10bab7cf7bb5352320fbb0dbd569542cb7c977405416201c5afb7edd4257754106b59898271b9f6c06d3896d639b6d48769a9609055adf981270a451597376b02adf3101b3c383db1a2d398c42623e13e41e5124b9a712386bd0a50e1e1245fdbed56ecf22179697dd572bc279c59c36844aba5992ab7b86b67dca6e33ed41333cc994eeb1adaf6022288fdbb441a0d30c9141fda5fedaef91898de926bdb2e21cda31a858d641fafb312381681c261e4741dc342fb33f089c9bee2ee196c0061d53e828de56ab27e6ede19f0db8aadbe06cecc6d0ab9a5389fd8574a295028f6354d29de7908aecff24a73958fe441eac2b99153f9d5ebbfe8da16ef71b1118d1e729d7b60c79b51d30b27877797f1d08dd61dea33dc9eed75df0e2652658e51ff093ecb01566f1945ce124c2f33577fb2f422b94848e4ff75da4d66e6413e745399f1b752f1d2fc3f45de133226b095aef91f2415da1392665c84ea442f08001ef12ca11a1ba11bd9d08f7ad752aa18179266f8f2b62704737b6889dacc3db11fabe854c4c070f1316fc20c7727830e19d657f7fa7b8662fe2417638826031181fa1519358a324f5f75ec20ba4ea9e862dcaf7b035dcc9fa2037670c4d415809b72076f0c72403993cd99ff97bae0d617ec55b91bc56991a5cf6c53e9d1907d129c3ba74b3500fb1cdd32544c3bd59a526d863159b045d0c7db7eef639f0916b701ebe561e1565e99d78d6af514078eaef32b4dbf05acf40280556387b45e9f0ea2d80d3a059faaaae5566f7fbe2e29a4938fd4f733cbd1a416bf5fc3e286731235edd43d44b0c1e718943204272029d9ffccf77d5af3e6eaa04f2f667ace49605919d4d82b9bea72171cdd24ea18ac284bd50fb25284acd02ca72cebb729cf1e1167462ff920924912212a3d591029cf671698ea426982647cf4ee9faa23e1458ca881c0d852871d503092b3564b8e6bd1c4d757c50e24b4c21ce21dfe86842be7b1b2296f77d10570cc2ae7fb0b5047e7b8959315e29e28ab53bb6179c7957ce6d21d520f781743a904a742ba9dc57a1b07feff978d666781655c0d5fb5a081ba546ed2b33572fb283a28a8e75b85279f859b5b55cc65fb48f7dbc9749d8deec2e135ed4cdc39b2080778c7c0d37927dbcdb72a0e34dc861f3290b7a26e9312ef71e59633655179431019edd288b9cfec1f4f1199e65404788797b2a88ee75429876a204d655edddbb2ab45944a8795b2e5da1b1717a0fc11532b8e7b8be44cef1c45555c1f681af3e3b8903299e5e8e416281eb7d5ddada93b9f47c11cfdf01b05417f18260486c77af87d08032cc3c5b476b9b9296cf4fc027664475da042dd490f94064afe2e7f1d4bdd230c56201590c9c0e40eab9f7c6335d0b235a004e4fe54f82b3704dc6e64a9d18349ce2bb4d900328a4de7c9cc3827aa7cddc37caa5c3972f3992a966cc790119ffc068ef273ca41844e4c3a2e8b21e47a2d1ceecef8f3531423bee2c9d76145bed4e9751cedb2c773dbbede575127e6b287b2ee8bcf72380561249a8d7fe59ebc73e709b6cf58110a5716140b414dd3300328e6565056468cdbf3aa1eaa3145a4c303cc4babc8758eda1913e7da080bf0615b48b76c8f99b1a0f6ecd1d4f65f3cc3f9eb0e54a68a4f97affe8655757a2c029753272e2765d581308d65f317d89fe49b319bc90356ed7a167eaeba6415436931e8f72d3d6e4f0b5e9411da0d1fc9955d4e73670aada5de0f4dc32a0afcc5101d2de165f984160e758657a99463492ebb3bcc01ae6d2e1a0da5952364b7141472a0739ca19395ed170499eb13b9332e3720e853cdb9b32e1bda13acc03cc34ee76aedd0f7094ad996572282c21266aebbc1a163dfb708b4dc6f09f6ca1709785057058a12a48e47bb36fe6d1494940e4c09816fc3d41ff43a0fbca69f18b3ad83b8b1dfe08d0e899df2a137bd16f83d63a10968049b2feca909b6db95efa0b2a178bf154cdfdcf48afd26083809f7abed4ebb4c26cd4031ff7816a2c96b3e562d919750b1c1499696810eed929707e7365066626d01136cb2fa04efc1bd505181fecccd75e9c52195f4d6ee59b3fc332f07277ff64ec770712be916f393f617eeb1fce1cf2de545d7c565802d30f7fa86411fe7c2699007fe1fb792462eeaf2ee8cc92368a3796b101409395f81b3d1bae7e8f3dc48148f85e8b152b1681dc0d40e79f1318886a15fd680ba72b6f4094ce7fb7bb6bc410c6133a507bce1d098e0e85f11fc2f16cfad2999b2ed7b6af3d166e29e9540cf9bc3ac1d2f16f1ed0ffbd20d825215b662507002863124a24a89079b1744c93c7b6b16071254e0d92c7f1ff18fd553a6c251c72eea54f5fbb0115ab1537762b182583037968825f12a4e49a384ff4d381180c6e4a9380f0f61e08cb3b298cb0da2bb5fedd1c55df8dc26f92fc6229defd6074dc522e5011141fa0819809b4a99e1f5ac76f032a5f29095a14d9f23f055bfd580bdc51c52030c56151a8e749313d87d0c45439edae",
+      "notes": "Native API comparison: compute all 100 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-100-inputs/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "0f467d5c23c368670c02c384e97318d40161af71a31c4071f2613330c25a0e47",
+      "wasm": "bitcoin-taproot-default-cache-100-inputs/native/main.wasm",
+      "wasm_sha256": "5b7c48957d1eb1a20197fd583c31e1c504dd5d406b2cd9948e571c4db3ecee4d",
+      "wasm_bytes": 336707,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 600914344,
+          "allocated_bytes": 24248024,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-taproot-default-cache-100-inputs",
+      "family": "bitcoin-transaction",
+      "implementation": "native-prepared",
+      "comparison": "bitcoin-taproot-default-cache-100-inputs",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "01f66f6f324b343c01d9b98109ce8e58bc9af30e7dd537969ff3e37d0e3bb68f70ba549b510a33c19ee0f09990f50e9c3da9c149b0046420763e735d5fadfece41b905a16de36d9457a962c09b4ae287077d875fc154f1381d68e207d90339ab848f0d9ecd0760b884f6cbf8bc6bdfed361885f605010c566ac6689057fa58b5ac9fe02d0202fd15885c89c47ed5dc4696fb98499dbb9b32f8ab7dcf76da7a1bb69476002b684129b06ae3ab9e7b061e379e9e15213496226a0d1225d3fe20b281e51953160a662e4ff075f824504d335b25fd3778906758513efe7e06b333c32ee5be074fc8b187af9a6d1b001b1c062a257231245790e44daa53f1500c2fe2134ba547998c80fcb6c0767a9b751f8038d693d2252eeba5edbc8ef87be24d55bdcd3ea20b840ccf806de4c84f9ad85f5b7cf30f3f047eeab9428c427e1e426ba1c9af31a719264176c640e5f9d50ad651cff02131b22505e500b592ea70f91fbad6ff2e829cdfba1973c601a6f6888dc21c47c546eacef548db8dae3e94e158a145ed2cfa06bcad603457e12ef1c747dd0fa68117d8d725b4f3abb89b739fe807b64aa376e64b4544aef3843e1739ec9d2815eeac158cda5990c9c651a08f58a0795748724b43520202065804d2bd96f21194c8c07a2b9e969665631ac826e375c890e8f954582b5cf5f3f25b1ca96f6c07755c6ed6858c93890d68ebdebb15fef5881a63326809e8220615c8c1db4a25d8dbb3e9637b7c8211b1e783ca20d61830d4bc87d6e0b29a59b5e39cda7767d194d5c9a459bba30a32541d8631565c0d38f67ed2a3697f7302ebd71e5eef47ded8ea7da8f1787562c7f49e726a7961f7587af64c00a393d8eb0c765f929dc53aefc7daad836153c8e266da13a5e0d50fa1ae0a2f4d5a20b8fd0f0dfeee65ff58d3d2dd05aa844b96866c1a71d7d32dc8a2e698eafe9664b331871e01364b8e788fb2e997af18a67119a947ccc28ba8bbdf36d73ef2d6f6cd3b328dcb1e9ffdf10b503b43af9b544990afdab799400d4d2d9aebdea7bc2b5508684c830043113f04583aea00f32fb97c4087ba5912a0b25865fcdeab95ec78a06f6ac63265528bf4a10097f31d96282aad111c086c8b79d477414c8107dbb9978b8d86966b173981e106e38a083e22ef353b522daefce3baf33c0730f069d2b4f2173fccf60e47ccce55afc7f5085ece9db08aa97fead1ef8cf181c1604055e4cb054fd56f991f945e92c22ad51f3d20095c3e992db1b3d99da3c78faa65e5edd6e5af9dc7a3399ebb151ed633eb5fbe968a905509a283e0442ba2d204dfe0b85f46974c7b7cbbe525aa7fc98225642db1ed8bc07d2dea4dfba9f8d93c90be1baeb57f65e9b4b3c3bfd57d9affbef437364a4267144d59b64b393c34d3aa17c1b8838633436ff53eff9d840c77d6fec3259846a3a605ac4a7b4a6ba0472c84d31e3f0f87bf71913ff3b3b16485147b62337c4fc1db8dd2fa89164a0646d93e804a8038e75b20040afea69606dfb75bc1faddedcc21529907cb315345ba9f4701ecdc5e45208b116b5058c9eaf167103b08bf48e7682ceb5a5994e20b13a6e9c049c75f9ed36f54de40373a86efb888f3344cca2e7f407077696faef38875d145b98c2cd0a12ab82c252234196cab4f5efb4419ad1c6cf9ab32e138230cbe7e0cfea65b7566adf409de5ea918c3f18a365a5c9715a0c668fe25f80dedfcc84b340e6f3ede623ca36efef881e99616a04c8478faedc6d7bb2358ce5890b9dc41496eb02f7e05b9cb0d4aef22786e45b7b13284386255bb6307fa9bf4666649fdab3fdcf580b5da8cd9f56d91ddff64402d43bf61ecfce8d2681fa868733f30d69f76623432950657538c147d9c2f6e71d133ae33bd1ab597274420381180308b558e7ceaec575f6c4df68da4179a8efaa189d43cd03b4e03ea08148ffaded74881d18d87ed8bf18a9be4382a679bc16fce7bac63e923fbef7a10bab7cf7bb5352320fbb0dbd569542cb7c977405416201c5afb7edd4257754106b59898271b9f6c06d3896d639b6d48769a9609055adf981270a451597376b02adf3101b3c383db1a2d398c42623e13e41e5124b9a712386bd0a50e1e1245fdbed56ecf22179697dd572bc279c59c36844aba5992ab7b86b67dca6e33ed41333cc994eeb1adaf6022288fdbb441a0d30c9141fda5fedaef91898de926bdb2e21cda31a858d641fafb312381681c261e4741dc342fb33f089c9bee2ee196c0061d53e828de56ab27e6ede19f0db8aadbe06cecc6d0ab9a5389fd8574a295028f6354d29de7908aecff24a73958fe441eac2b99153f9d5ebbfe8da16ef71b1118d1e729d7b60c79b51d30b27877797f1d08dd61dea33dc9eed75df0e2652658e51ff093ecb01566f1945ce124c2f33577fb2f422b94848e4ff75da4d66e6413e745399f1b752f1d2fc3f45de133226b095aef91f2415da1392665c84ea442f08001ef12ca11a1ba11bd9d08f7ad752aa18179266f8f2b62704737b6889dacc3db11fabe854c4c070f1316fc20c7727830e19d657f7fa7b8662fe2417638826031181fa1519358a324f5f75ec20ba4ea9e862dcaf7b035dcc9fa2037670c4d415809b72076f0c72403993cd99ff97bae0d617ec55b91bc56991a5cf6c53e9d1907d129c3ba74b3500fb1cdd32544c3bd59a526d863159b045d0c7db7eef639f0916b701ebe561e1565e99d78d6af514078eaef32b4dbf05acf40280556387b45e9f0ea2d80d3a059faaaae5566f7fbe2e29a4938fd4f733cbd1a416bf5fc3e286731235edd43d44b0c1e718943204272029d9ffccf77d5af3e6eaa04f2f667ace49605919d4d82b9bea72171cdd24ea18ac284bd50fb25284acd02ca72cebb729cf1e1167462ff920924912212a3d591029cf671698ea426982647cf4ee9faa23e1458ca881c0d852871d503092b3564b8e6bd1c4d757c50e24b4c21ce21dfe86842be7b1b2296f77d10570cc2ae7fb0b5047e7b8959315e29e28ab53bb6179c7957ce6d21d520f781743a904a742ba9dc57a1b07feff978d666781655c0d5fb5a081ba546ed2b33572fb283a28a8e75b85279f859b5b55cc65fb48f7dbc9749d8deec2e135ed4cdc39b2080778c7c0d37927dbcdb72a0e34dc861f3290b7a26e9312ef71e59633655179431019edd288b9cfec1f4f1199e65404788797b2a88ee75429876a204d655edddbb2ab45944a8795b2e5da1b1717a0fc11532b8e7b8be44cef1c45555c1f681af3e3b8903299e5e8e416281eb7d5ddada93b9f47c11cfdf01b05417f18260486c77af87d08032cc3c5b476b9b9296cf4fc027664475da042dd490f94064afe2e7f1d4bdd230c56201590c9c0e40eab9f7c6335d0b235a004e4fe54f82b3704dc6e64a9d18349ce2bb4d900328a4de7c9cc3827aa7cddc37caa5c3972f3992a966cc790119ffc068ef273ca41844e4c3a2e8b21e47a2d1ceecef8f3531423bee2c9d76145bed4e9751cedb2c773dbbede575127e6b287b2ee8bcf72380561249a8d7fe59ebc73e709b6cf58110a5716140b414dd3300328e6565056468cdbf3aa1eaa3145a4c303cc4babc8758eda1913e7da080bf0615b48b76c8f99b1a0f6ecd1d4f65f3cc3f9eb0e54a68a4f97affe8655757a2c029753272e2765d581308d65f317d89fe49b319bc90356ed7a167eaeba6415436931e8f72d3d6e4f0b5e9411da0d1fc9955d4e73670aada5de0f4dc32a0afcc5101d2de165f984160e758657a99463492ebb3bcc01ae6d2e1a0da5952364b7141472a0739ca19395ed170499eb13b9332e3720e853cdb9b32e1bda13acc03cc34ee76aedd0f7094ad996572282c21266aebbc1a163dfb708b4dc6f09f6ca1709785057058a12a48e47bb36fe6d1494940e4c09816fc3d41ff43a0fbca69f18b3ad83b8b1dfe08d0e899df2a137bd16f83d63a10968049b2feca909b6db95efa0b2a178bf154cdfdcf48afd26083809f7abed4ebb4c26cd4031ff7816a2c96b3e562d919750b1c1499696810eed929707e7365066626d01136cb2fa04efc1bd505181fecccd75e9c52195f4d6ee59b3fc332f07277ff64ec770712be916f393f617eeb1fce1cf2de545d7c565802d30f7fa86411fe7c2699007fe1fb792462eeaf2ee8cc92368a3796b101409395f81b3d1bae7e8f3dc48148f85e8b152b1681dc0d40e79f1318886a15fd680ba72b6f4094ce7fb7bb6bc410c6133a507bce1d098e0e85f11fc2f16cfad2999b2ed7b6af3d166e29e9540cf9bc3ac1d2f16f1ed0ffbd20d825215b662507002863124a24a89079b1744c93c7b6b16071254e0d92c7f1ff18fd553a6c251c72eea54f5fbb0115ab1537762b182583037968825f12a4e49a384ff4d381180c6e4a9380f0f61e08cb3b298cb0da2bb5fedd1c55df8dc26f92fc6229defd6074dc522e5011141fa0819809b4a99e1f5ac76f032a5f29095a14d9f23f055bfd580bdc51c52030c56151a8e749313d87d0c45439edae",
+      "notes": "Native API comparison: compute all 100 input sighashes. Prepared case includes hasher creation and the first lazy transaction-wide hashes inside measurement. No warm cache from configure. All prevout amounts and outpoints differ; spent scripts are equal for comparability with the separate Mops workload.",
+      "benchmark_kind": "native-api-comparison",
+      "operations_per_sample": 100,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations.",
+      "source": "bitcoin-tx-cases/bitcoin-taproot-default-cache-100-inputs/native-prepared/main.mo",
+      "returncode": 0,
+      "source_sha256": "c0a4e99f54385434f912d1dd5db3a1eb83a30e6b50fad94f7957f4ed6e4788b2",
+      "wasm": "bitcoin-taproot-default-cache-100-inputs/native-prepared/main.wasm",
+      "wasm_sha256": "4286c75d46b489b040d38e5990f5af2b40b4361881ce79319a48acd582108ecf",
+      "wasm_bytes": 336776,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16982261,
+          "allocated_bytes": 620328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 16982261,
+          "allocated_bytes": 620328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 16982261,
+          "allocated_bytes": 620328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3200,
+          "output_sha256": "2d0ed0ec8182a05c1cb29afc86c97e87b4ee357ba52a5b798266b008fb2e6e64",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

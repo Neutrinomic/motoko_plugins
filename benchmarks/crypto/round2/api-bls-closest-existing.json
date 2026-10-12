@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "name": "bls12_381_g2_mul_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_mul",
+      "plugins": [],
+      "expected_hex": "9757e7dbd984e5d54cfbd9fb8bc970dc28a2ab63ddb27e0a5c7ccee3bea02bf5c35492c91fde905c97f866c57119be4618c2c8363f2317d1331be0d1b9d751617f4ad9d1f020104546cd3c69eeba793c4ccbe2a93a6cfd8631a92002de1b67af",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_mul_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "bls12_381_g2_msm_8_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_8",
+      "plugins": [],
+      "expected_hex": "b552e62de03ae2f5e6989fbeef018df87855ab795bd388943f9e96bf9369f7152891376ca5872374aea2a8d9d5548b8007d3eb0a6861725104c33ed27f2ceed1b749b607597cb422ce0e5b6d26cc8865ab5df1c7fde09572995cd43c8c71bbfa",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_msm_8_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "bls12_381_pairing_identity_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_identity_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "bls12_381_g2_add_validated_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_add_validated",
+      "plugins": [],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement. Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.",
+      "source": "curve-cases/bls12_381_g2_add_validated_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    }
+  ]
+}

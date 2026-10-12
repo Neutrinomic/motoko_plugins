@@ -1,0 +1,23 @@
+{
+  "status": "passed_static_and_oracle_checks",
+  "findings": [],
+  "scope": "Read-only closest-native hash/codec benchmark fixture review. Native means native Motoko; plugin build/report numbers reviewed separately by parent.",
+  "cases": 12,
+  "evidence": "oracle-source-checks.json",
+  "review": [
+    "All12 closest-native expected bytes match the unchanged corresponding plugin case. RIPEMD recomputed with Python/OpenSSL hashlib; convertBits independently recomputed by whole-integer bit slicing; BLAKE values taken from retained official corpus.",
+    "RIPEMD init times mutable Digest construction versus immutable Blob construction. Updates append identical input to identical17-byte prefix. Native write mutates receiver, whereas plugin update preserves/validates input state. Native finalization consumes/locks state, whereas plugin finalization preserves it. Required Blob/array conversions are timed and all differences explicitly disclosed.",
+    "Bech32 convertBits actor contains the exact unmodified private function from pinned bitcoin0.2.1. Published source/extraction hashes and line attribution match. Both execute valid32-byte8-to-5 padded conversion; benchmark does not claim equivalent malformed-width/size-limit handling.",
+    "BLAKE longXOF composes published public seek calls(13,51) and(64,49), producing contiguous bytes13..112. Both output concatenation and Blob conversion are timed. One-shot includes initialization/update; prepared finalization excludes setup.",
+    "BLAKE derivation composes exported immutable record fields/flags and public hash functions. Context hash uses DERIVE_KEY_CONTEXT and default IV; context-key output initializes keyed state before replacing KEYED_HASH with DERIVE_KEY_MATERIAL. Context and1024-byte material fit the upstream singlechunk implementation. Official empty/material derive vectors match.",
+    "No hash/codec native table blanks remain after these overrides. Comparisons require concise representation/mutation/private-extraction/composition caveats in final table; direct upstream derivation and multichunk defects remain unrepaired.",
+    "All20closest sourcepins and all12successful compilecheck entries verified."
+  ],
+  "runtime_status": "Owner harness pending actual fresh-canister output verification when this static review completed; compiling alone is not execution.",
+  "required_final_integration": [
+    "Apply closest/override.json to table rows.",
+    "Remove stale table prose claiming no valid longXOF/derivation native comparison while retaining correct warning about upstream direct helper/multichunk defects.",
+    "Retain visible concise difference labels, with detailed per-row evidence."
+  ],
+  "implementation_edits": false
+}

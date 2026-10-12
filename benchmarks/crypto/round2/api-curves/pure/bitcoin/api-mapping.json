@@ -1,0 +1,182 @@
+{
+  "Secp256k1.pointAdd": {
+    "api": "pointAdd",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-point-add-compressed-distinct",
+    "native_case": {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Canonical SEC1 checks; Jacobi.fromBytes on both keys; Jacobi.add; infinity check; Jacobi.toBytes(compressed).",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-point-add-compressed-distinct/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Canonical SEC1 checks; Jacobi.fromBytes on both keys; Jacobi.add; infinity check; Jacobi.toBytes(compressed).",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "left": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "right": "049f7f7d213f7a495bd12ccb4efa4482be4ea9f1f8fd812ff0fab95857093c876ebd22d455fe65a09eb0d0578004e9890e127ed99fc9ec6db01b0f91ebc730808d"
+    },
+    "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+    "source_sha256": "a3d93722235646afc3595f3d5a2ea6bfb6f611ebc2f222f9c48cbf28a86cd744"
+  },
+  "Secp256k1.pointMultiply": {
+    "api": "pointMultiply",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-point-multiply-compressed",
+    "native_case": {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.mul; infinity check; Jacobi.toBytes(compressed).",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-point-multiply-compressed/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.mul; infinity check; Jacobi.toBytes(compressed).",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+    },
+    "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+    "source_sha256": "2fa0e6baa16fc351d0317339eedee69eef7670ecf8708f5b15d41c674d6e3b6c"
+  },
+  "Secp256k1.baseMultiply": {
+    "api": "baseMultiply",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-base-multiply-full-width",
+    "native_case": {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Canonical scalar checks; Jacobi.mulBase; infinity check; Jacobi.toBytes(compressed).",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-base-multiply-full-width/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Canonical scalar checks; Jacobi.mulBase; infinity check; Jacobi.toBytes(compressed).",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+    },
+    "expected_hex": "039193c50bbcb78cc870c74b2fbab8c0d77c29e9661d2cf575610da3505e22b3c7",
+    "source_sha256": "bb9c236404e1099067b2a404a9a5f9a6c249c25fa6a489669d5e454f8dedac89"
+  },
+  "Secp256k1.tweakPublicKey": {
+    "api": "tweakPublicKey",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-tweak-compressed-full-width",
+    "native_case": {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Composition: canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.add(P, Jacobi.mulBase(t)); infinity check; compressed encoding.",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-compressed-full-width/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Composition: canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.add(P, Jacobi.mulBase(t)); infinity check; compressed encoding.",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+    },
+    "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+    "source_sha256": "89dd48c5f7e77122f1e58e3773833fb0132f810e41f40a9b1a4d8875fdf3327a"
+  },
+  "Secp256k1.xOnlyPublicKey": {
+    "api": "xOnlyPublicKey",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-x-only-compressed",
+    "native_case": {
+      "name": "r2-secp256k1-x-only-compressed",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-x-only-compressed",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Composition: canonical SEC1 checks; Jacobi.fromBytes; Jacobi.toBytes(compressed); remove parity prefix.",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-x-only-compressed/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Composition: canonical SEC1 checks; Jacobi.fromBytes; Jacobi.toBytes(compressed); remove parity prefix.",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+    },
+    "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+    "source_sha256": "68acdf8ff46e80a74327462a1c7a9e17b5f86ec5e368e27b40c85705bbf1ad79"
+  },
+  "Secp256k1.tweakXOnlyPublicKey": {
+    "api": "tweakXOnlyPublicKey",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-tweak-x-only-public-full-width",
+    "native_case": {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "implementation": "fast"
+    },
+    "counterpart_api": "P2tr.tweakPublicKey after canonical x/scalar bounds; reconstruct compressed SEC1 prefix from returned is_even plus x bytes.",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-x-only-public-full-width/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "P2tr.tweakPublicKey after canonical x/scalar bounds; reconstruct compressed SEC1 prefix from returned is_even plus x bytes.",
+    "caveats": "Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+    "input_hex": {
+      "key": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+    },
+    "expected_hex": "03464ba5b8c027406a45d4570cce4d9b7f9a6829cf8f7056aadd86208ec50d3d7c",
+    "source_sha256": "318e98539032c148d706f029f6d4fafb06bdf24ef1febd0c22deab256242d533"
+  },
+  "Secp256k1.tweakXOnlySecretKey": {
+    "api": "tweakXOnlySecretKey",
+    "family": "secp256k1",
+    "plugin_source_case": "r2-secp256k1-tweak-x-only-secret-even-y",
+    "native_case": {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "implementation": "mops-bitcoin-api"
+    },
+    "plugin_case": {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "implementation": "fast"
+    },
+    "counterpart_api": "Reference composition: validate secret/tweak; Jacobi.mulBase(secret); toAffine for parity; normalize d to even Y; add tweak modulo group order; reject zero; Common.writeBE256.",
+    "notes": "Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Variable-time Motoko NAF multiplication and Nat arithmetic; reference composition for a fixed public test secret, not a constant-time signing implementation.",
+    "pure_source": "round2/api-curves/pure/bitcoin/cases/r2-secp256k1-tweak-x-only-secret-even-y/main.mo",
+    "package": "bitcoin@0.2.1",
+    "kind": "composed",
+    "recipe": "Reference composition: validate secret/tweak; Jacobi.mulBase(secret); toAffine for parity; normalize d to even Y; add tweak modulo group order; reject zero; Common.writeBE256.",
+    "caveats": "Variable-time Motoko NAF multiplication and Nat arithmetic; reference composition for a fixed public test secret, not a constant-time signing implementation.",
+    "input_hex": {
+      "secret": "d5aec6eb32a867bcf75a4266720fb2c8839c4e7808540fce0952afc3decd955f",
+      "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+    },
+    "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+    "source_sha256": "c716e9252700e776a0a460baf473b0faf53b2ac9f59182a9710e8c1813014308"
+  }
+}

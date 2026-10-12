@@ -1,0 +1,46 @@
+{
+  "scope": "Private RIPEMD160 streaming adapter candidate; production sources unchanged",
+  "source_sha256": "b807b27d6ac4d196d0bdfa74af0b6a46ed84f88ff00731e9be0ee79c633ea94d",
+  "candidate_root": "_build/crypto-optimization-round2/ripemd160-state-v2",
+  "changes": [
+    "Shared canonical-state validator, unchanged acceptance rules",
+    "Short update directly copies canonical 104-byte state and appends input without hash serialization",
+    "CoreProxy compose/decompose uses explicit 28-byte chaining/count serialization and public buffer APIs",
+    "Init uses immediate unaligned stores with exact baseline Wasm instruction body"
+  ],
+  "validation": {
+    "native_tests": 9,
+    "native_passed": 9,
+    "new_raw_state_cases": 45268,
+    "public_fixtures": 4,
+    "public_fixtures_passed": 4,
+    "public_run_modes": [
+      "interpreter",
+      "IR",
+      "low",
+      "Wasm"
+    ],
+    "negative_controls_detected": [
+      "truncated 32-bit block counter",
+      "missing zero-tail validation"
+    ]
+  },
+  "audit_invariants": [
+    "Validation precedes use of state offsets and applies to zero-length writes too",
+    "Direct-copy condition is strictly input.len() < 64-used; a completed block must compress",
+    "Maximum total is checked before direct-copy return; fresh state and zero-rejection-output ABI are retained",
+    "Core block counter remains 64-bit and equals total/64; buffer length equals total%64",
+    "Read-only state/input may overlap; output remains fresh/disjoint; unaligned byte buffers are supported",
+    "Unused public tail bytes remain initialized zero; no Rust layout transmutation"
+  ],
+  "runtime_bytes": {
+    "baseline": 9515,
+    "candidate": 9480
+  },
+  "performance": "No instruction-count claim made here; parent is benchmarking frozen candidates",
+  "evidence": "../ripemd160-state-audit/audit-summary.json",
+  "limitations": [
+    "Raw-state oracle uses the same pinned RustCrypto compression but independent public whole-hasher serialization adapter; independent known-answer vectors remain included",
+    "Native ABI guard bytes detect overwritten bounds, not protected-page overreads"
+  ]
+}

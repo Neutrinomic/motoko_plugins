@@ -1,0 +1,736 @@
+{
+  "stage": "round2-api-pure-sha-ripemd",
+  "expected_case_count": 16,
+  "complete": true,
+  "recorded_utc": "2026-10-12T12:52:21.902Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "b85239f6c55bdee9eab5e20c35c1c88f3a5e0ce86a1652180760873943644388",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-sha512-digest-constructor-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-constructor-0/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "00c52ba1d1927695325be5a6f89c692035bd8cdd0a488282b553da352642dd5f",
+      "wasm": "api-sha512-digest-constructor-0/mops-sha2/main.wasm",
+      "wasm_sha256": "69b46e2ade5b3a27a069ff7b3498b983bf2c70ffe2c12670d8a8b6b459788c36",
+      "wasm_bytes": 439200,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9529,
+          "allocated_bytes": 3256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9529,
+          "allocated_bytes": 3256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9529,
+          "allocated_bytes": 3256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha512-digest-write-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "8eba474273f11ca03780cce2f3c3fbfd120b3a65329ed3b17b3c586f8d59b9a3",
+      "wasm": "api-sha512-digest-write-32/mops-sha2/main.wasm",
+      "wasm_sha256": "62cfa20b81f22a135f363036064761c49dd196efdcf0b9e4b9e86350d56e4fed",
+      "wasm_bytes": 439328,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha512-digest-write-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "e2dfcfa8248c57d18fe86b6a895332888fd77711bc09d801f70c67e1c8503c4b",
+      "wasm": "api-sha512-digest-write-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "e43dffe666b37182e2e185d81e337d3871184053adb8a4b045c5f709d4afad13",
+      "wasm_bytes": 440323,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha512-digest-sum-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "e7639cfeecb6a344924b9dc770b04d8f4c5a2d57ef404e68721be6785e23f454",
+      "wasm": "api-sha512-digest-sum-32/mops-sha2/main.wasm",
+      "wasm_sha256": "71349421bd6ca93bbe5da589251c0723e8c8a57e3e2097286609c8e192813d0e",
+      "wasm_bytes": 439920,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 60651,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 60651,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 60651,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "fc6cbb07fdde421f7f5881821bcaac3370267a0224ed8cbdcedba2881c0e98d7",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha512-digest-sum-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "ca27a716c4433aff3f6a6b456bea150dded91c9a0c14bb9dc2e86c4a9e5b160c",
+      "wasm": "api-sha512-digest-sum-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "ceb07e18b3f124e32bc73bd8cf825d277b0c08c8f2c581d6d10d1086cc899af5",
+      "wasm_bytes": 440915,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 61335,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 61335,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 61335,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha512-digest-reset-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-reset-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "2ad1c0580876bd95f4ad1731d7e71156e960ef8698186bf845accf3a7a755cda",
+      "wasm": "api-sha512-digest-reset-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "d1f18538a78b31663768a96861b693a8ae0757a251e3f29924f0180b800acdd5",
+      "wasm_bytes": 440361,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "001d686db504e20c792eaa07fe09224a45ff328e24a80072d04d16abc5c2b5d2",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-constructor-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-constructor-0/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "2802fc98182b978b86915ad1d7d920af7ef10f293e45e554964d5c7c3e3b69c7",
+      "wasm": "api-sha384-digest384-constructor-0/mops-sha2/main.wasm",
+      "wasm_sha256": "ee1b32e0f99692f30138d9bef6b6fd41d5971bcff7eaa75936450c1a3db7774d",
+      "wasm_bytes": 439083,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9274,
+          "allocated_bytes": 3128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9274,
+          "allocated_bytes": 3128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9274,
+          "allocated_bytes": 3128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-write-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "ac43db8be48a028d0f2aa446f7f977a4be206e3cabdefd0fad17052712a2678f",
+      "wasm": "api-sha384-digest384-write-32/mops-sha2/main.wasm",
+      "wasm_sha256": "e4292422605c1d62f3b1da4b14274614da2e50750027f282be7858437574ec25",
+      "wasm_bytes": 439211,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6012,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-write-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "b172f09c2fb24397437f602dacc3c426e0f7878e74f9f1b567d85edfb4352b9d",
+      "wasm": "api-sha384-digest384-write-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "1da1a767095b1d511fc7ef4097e92d187927513c8cea08e6ff706e3f4984a842",
+      "wasm_bytes": 440206,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 154080,
+          "allocated_bytes": 256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-sum-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "d6b13e84ab62f861cd57b50615c82e75090bd92f088f530489dedfe4620eb8b1",
+      "wasm": "api-sha384-digest384-sum-32/mops-sha2/main.wasm",
+      "wasm_sha256": "30e47b35f09a16d59ba4771791381f68341c88358a4d6e4deacdfe01dda7a684",
+      "wasm_bytes": 439803,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 56119,
+          "allocated_bytes": 5336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 56119,
+          "allocated_bytes": 5336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 56119,
+          "allocated_bytes": 5336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "c416fced547e43ed598f53ec147e46ff3a7fec1091c8ada0f670366de6dd9f77",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-sum-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "a463b403a540f28f431df6fa01fdee9b2e2236b1aa380593d181fdc9ef309310",
+      "wasm": "api-sha384-digest384-sum-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "b198f9bdb29412e39485f9988669f2aca62e2ce462ddd5c6967a26013f7ca059",
+      "wasm_bytes": 440798,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 56677,
+          "allocated_bytes": 5304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 56677,
+          "allocated_bytes": 5304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 56677,
+          "allocated_bytes": 5304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "9dd9bb7e2592ee4b26887c99d10e7fa5b9fd02c170323b52b4f4a9dd632db392",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-sha384-digest384-reset-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-reset-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "0d48ceb29452a3a3bf80598f6a66ea20f7d41739d4f5943126694b366f943f20",
+      "wasm": "api-sha384-digest384-reset-1024/mops-sha2/main.wasm",
+      "wasm_sha256": "a25e4ffa0a1a14fc64811ff4af9a1a5f839c361a4c44358700c1db2a73e8e6d7",
+      "wasm_bytes": 440244,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1194,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "4800fbfc4566eb02d1727a4b1c949ccbc7535c216a0766564c199308631b5dd6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-digest-constructor-0",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-constructor-0/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "b71400a3d0a694dc3d1f15eb27413184478768e6b4787e2d66a1e10e50952cd3",
+      "wasm": "api-ripemd160-digest-constructor-0/mops-bitcoin/main.wasm",
+      "wasm_sha256": "8e3b1362c7690b2adba53c931a620fd1bca9e66f087aab15d6f3c20e619ef121",
+      "wasm_bytes": 286252,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-digest-write-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-32/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "c5ceab884b3f00253edc5b6a1fb302ea43e5fc2bc227004537e18c129dddc7f4",
+      "wasm": "api-ripemd160-digest-write-32/mops-bitcoin/main.wasm",
+      "wasm_sha256": "59fff46b5cec30c57c5f8a76cad3cd3744a2696b34fef8c409d27dd0541a6047",
+      "wasm_bytes": 286601,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11860,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11860,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11860,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-digest-write-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-1024/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "3ebe5551d14f7610794335b0cffb724ad9f2823e53a308668a828c2e76b468ec",
+      "wasm": "api-ripemd160-digest-write-1024/mops-bitcoin/main.wasm",
+      "wasm_sha256": "b25db4dcf9a8d6c6e1dc3d4b106168a4adca465a05acc72afbfe101f9b089c93",
+      "wasm_bytes": 287596,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 527428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 527428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 527428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-digest-reset-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-reset-1024/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations",
+      "returncode": 0,
+      "source_sha256": "7554c2c055f57ea0e8d8bbcc537523cb778694208e5e91d6c52e6207430461d0",
+      "wasm": "api-ripemd160-digest-reset-1024/mops-bitcoin/main.wasm",
+      "wasm_sha256": "bca6831cbf7c38e9c54b55a7cb9a77c72400a5dc90ed53ca9a472b668a2ef809",
+      "wasm_bytes": 287636,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 542,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 542,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 542,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

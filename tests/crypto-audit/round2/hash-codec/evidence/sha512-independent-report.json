@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "candidate": "sha512-combined-v1",
+  "sources": {
+    "baseline": {
+      "source": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/baseline/plugins/sha512/runtime/src/lib.rs",
+      "sha256": "c971c3b4eff1d3b39fcb4ef5171bcfc635f1627846f8e787a42ce047235623c1"
+    },
+    "candidate": {
+      "source": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/sha512-combined-v1/plugins/sha512/runtime/src/lib.rs",
+      "sha256": "4aa226a8e29ac2d77384ec4365f8403030838c4d2b1afb4af9e37d95292e491e"
+    }
+  },
+  "source_unchanged_at_end": true,
+  "production_files_modified": false,
+  "source_adaptation": "Only no_mangle export annotations removed from private baseline/candidate copies to permit both modules in one test binary; algorithm, ABI signatures and implementation unchanged.",
+  "compiler": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+  "dependency_versions": {
+    "block-buffer": "0.10.4",
+    "cfg-if": "1.0.5",
+    "cpufeatures": "0.2.17",
+    "crypto-common": "0.1.6",
+    "digest": "0.10.7",
+    "generic-array": "0.14.9",
+    "libc": "0.2.190",
+    "sha2": "0.10.9",
+    "sha512-round2-independent-audit": "0.0.0",
+    "typenum": "1.20.1",
+    "version_check": "0.9.5"
+  },
+  "native_tests": {
+    "debug_exact_lock": 16,
+    "address_sanitizer_release_exact_lock": 16,
+    "software_compression_release_exact_lock": 16
+  },
+  "logs": [
+    "native-debug-exact-lock.log",
+    "native-asan-exact-lock.log",
+    "native-software-exact-lock.log"
+  ],
+  "coverage": {
+    "independent_python_hashlib_vectors": 2092,
+    "largest_independent_hashlib_input_bytes": 1000000,
+    "unused_tail_single_bit_mutations_rejected": 132096,
+    "randomized_encoded_states": 24000,
+    "count_limit_carry_and_padding_updates": 36064,
+    "alignment_residues": 16,
+    "guard_pages": "Read-only inputs plus inaccessible prefix/suffix pages; init/update/sum/one-shot boundary lengths through4096; every malformed state length 0..256.",
+    "initialized_outputs": "Different poison bytes on baseline and candidate; byte-exact equivalence, guard canaries and failure all-zero assertions.",
+    "count_boundaries": "All residues surrounding zero,2^64 and2^125 by +/-257 with14input lengths; rejects2^125+,2^127,u128MAX."
+  },
+  "review": [
+    "No defects found in exact output initialization, endian writes, canonical unused-tail scanning, count limits, padding or input immutability.",
+    "Pinned generic-array0.14.9 transparent representation over recursive C-layout u8 storage gives size128 alignment1; its own slice adapter and sha2 compress512 use matching pointer casts.",
+    "Batch slice bound derives from len/128; multiplication cannot overflow. All current callers pass complete blocks.",
+    "One-shot padding matches RustCrypto at 111/112,127/128 and exact-block boundaries; usize64 count converts to u128 before bit shift; output truncation matches SHA384."
+  ],
+  "limitations": "Native suite validates raw ABI; parent owns compiler/interpreter/Wasm/IC artifact tests and performance measurements. AddressSanitizer validates address safety, not uninitialized reads; output initialization also checked by poison/canary comparisons and static byte-range accounting."
+}

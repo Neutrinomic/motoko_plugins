@@ -1,0 +1,9 @@
+# SHA and RIPEMD public method fixtures
+
+`inventory.json` covers all 19 public callables in SHA256, SHA512, and RIPEMD160. Its 43 workload rows reference 20 existing one-shot workloads and 23 newly isolated operations. `cases.json` contains only the 39 newly generated implementation/workload combinations; the parent combines these with the existing manifest.
+
+Every new measurement times the named operation and result assignment. The fixture prepares input and stream state before the counter interval. The separate `bytesResult` query finalizes or inspects the resulting state and compares its bytes with Python `hashlib` digests. Constructors and resets are checked against the empty-message digest; resets start with 1024 bytes already written. Writes and sums cover 32 and 1024 bytes. Immutable RIPEMD updates append to a prepared 17-byte prefix and separately check that the original state remains unchanged.
+
+The SHA2 package's `sum` mutates its receiver. Its timed `sumPreserving` adapter therefore constructs a digest, clones the prepared state through `share`/`unshare`, and sums the clone. This cost is included because the plugin's public `sum` preserves its receiver. The query verifies the original still produces the expected digest. Bitcoin RIPEMD exposes neither cloning nor immutable raw-state methods, so its consuming `sum` is not presented as an equivalent non-destructive counterpart. The inventory marks those counterparts absent explicitly. RIPEMD `write` includes the pure Motoko implementation's required Blob-to-array conversion.
+
+Run `python generate.py` to regenerate sources and expected bytes; run `python check.py` to compile against the immutable delivered baseline and locked Mops dependencies. All 39 new fixtures compiled successfully. Actual fresh-canister execution and measurement belong to the parent benchmark harness.

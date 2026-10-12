@@ -1,0 +1,113 @@
+{
+  "stage": "round2-p256-comb-screen",
+  "expected_case_count": 2,
+  "complete": true,
+  "recorded_utc": "2026-10-12T12:47:43.974Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "cb7da7bcd24fa6c9d9cfd2f54203d709e224651f782933d6cb2d45e6a818df5a",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "r2-p256-public-key-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-public-key-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-public-key-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "8a1c9a1b2443f0b50a93c7b94f1caa9cdadb48036039a0c7d8660fef2fc7a349",
+      "wasm": "r2-p256-public-key-uncompressed/fast/main.wasm",
+      "wasm_sha256": "658b5500bdd583c09cf4c1d97a251539b4e767bfebb7ed127bd70e81a8f1d542",
+      "wasm_bytes": 334515,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5207302,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5207302,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5207302,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_public_key_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_public_key_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/p256_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "41f862537e72e1aa3d1d6771f9a4ce925307a2301566357cca07842256e44100",
+      "wasm": "p256_public_key_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "41569462a65dbf2fca31aac2e2bf55d570ba95853e45517c84a4c40319e19db7",
+      "wasm_bytes": 334295,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 5207139,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 5207139,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 5207139,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

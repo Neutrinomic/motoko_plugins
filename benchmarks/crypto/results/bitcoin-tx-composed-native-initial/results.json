@@ -1,0 +1,65 @@
+{
+  "stage": "bitcoin-tx-composed-native-initial",
+  "recorded_utc": "2026-10-12T11:51:06.805Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "84a22ac333642e75479b50751a7e7cccbca3f7795a0c44282a39a00c3cd5ced9",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bitcoin-legacy-sighash-verify-1-input",
+      "family": "bitcoin-transaction",
+      "implementation": "native",
+      "comparison": "bitcoin-legacy-sighash-verify-1-input",
+      "plugins": [
+        "sha256",
+        "secp256k1"
+      ],
+      "expected_hex": "01",
+      "notes": "Composed transaction workflow: legacy SIGHASH_ALL then ECDSA verify of the exact digest. Native uses SHA256 and secp256k1 plugins; baseline uses bitcoin 0.2.1 transaction hashing and ecdsa 8.0.1 verifyHashed because bitcoin Ecdsa.verify would add an extra prehash. Full-width independent Python key/signature fixture. Baseline curve/key/signature setup outside measurement; native compressed-key/signature decoding inside measurement.",
+      "benchmark_kind": "paired",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "fixture_provenance": "generate-bitcoin-tx.py independent Python Bitcoin wire encoding and hashlib; BIP143 SIGHASH_ALL and BIP341 key-path SIGHASH_DEFAULT equations. ECDSA fixture generated and algebraically verified with generate-curves.py independent affine Python.",
+      "source": "bitcoin-tx-cases/bitcoin-legacy-sighash-verify-1-input/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "e6addd79da3b6e760c3ea86cdbb127bbd616bb64656e7231647cadccb94534a1",
+      "wasm": "bitcoin-legacy-sighash-verify-1-input/native/main.wasm",
+      "wasm_sha256": "e413743918923b3d70198fa5e3c4adac3a893dfe91010e913a40ea0b11a8aa82",
+      "wasm_bytes": 488267,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 10193289,
+          "allocated_bytes": 4360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 10193289,
+          "allocated_bytes": 4360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 10193289,
+          "allocated_bytes": 4360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

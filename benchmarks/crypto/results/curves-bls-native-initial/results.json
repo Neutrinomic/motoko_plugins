@@ -1,0 +1,606 @@
+{
+  "stage": "curves-bls-native-initial",
+  "recorded_utc": "2026-10-12T11:49:38.954Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "c6495dfdfefe85cd39beb6fa7d84e63791447865d3d23ddaed0bf187628e7856",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bls12_381_g1_add_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g1_add",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "a572cbea904d67468808c8eb50a9450c9721db309128012543902d0ac358a62ae28f75bb8f1c7c42c39a8c5529bf0f4e",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_add_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "15e4f0cc7560fcce72a8aec5361a3a30fab219e3279b094a0152171cc5551557",
+      "wasm": "bls12_381_g1_add_fast/fast/main.wasm",
+      "wasm_sha256": "b7c8ea8897e97771e3fdb49fa2ef53849af108571cd5ffc66db938972163f200",
+      "wasm_bytes": 771905,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 28411964,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 28411964,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 28411964,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "cbcf45213dd7b4716864d378f3c6d861467987e4d94b7f79a1f814a697e38637",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_mul_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g1_mul",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "b36bb0cb2098dced2a7f73194928bd2b3887a2716cf87f26bc30198d199f319c0837094342924611300d2419a22a9105",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_mul_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "8bac7694feabcb4e9a36e36d9df64ea51171ee5cfd17aaf4c6186656cda29238",
+      "wasm": "bls12_381_g1_mul_fast/fast/main.wasm",
+      "wasm_sha256": "6f29691e3d584b02bd290f44b861661bdef6a2007e9d613ece7fd19eeab3affa",
+      "wasm_bytes": 772026,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 54272188,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 54272188,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 54272188,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "62c68eb4e7a9de7f4b0ee1765214b0c76fb08808ed22255ff2045ac0cd885928",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g1_msm_8_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g1_msm_8",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "94838c170fa86de4f7b2baa8c94d79ec455cfa761d0c3efa34bfd67a86dcc67bcf0c219e67d7f161bb5081255a4af11b",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g1_msm_8_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "4c857d978981c081611cb1d133de250c26f8a9661eda7b817a7952b22f7607a4",
+      "wasm": "bls12_381_g1_msm_8_fast/fast/main.wasm",
+      "wasm_sha256": "86ce79de774787395f52cd45d949de752e1a4d955d445d92aee073ba8ac1d30b",
+      "wasm_bytes": 772592,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 407959718,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 407959718,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 407959718,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "161f0f6b616b24c02b140c66b3c65ec954feb8c57a3a7d54d3688d8cfa58f11e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_add_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_add",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_add_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "cb84d2c38c4afe65892b8d56a66eae74248d6d6ddc7a42e7195dc2c9ac9865a6",
+      "wasm": "bls12_381_g2_add_fast/fast/main.wasm",
+      "wasm_sha256": "87fe21b8c95aeffb66577e1dcb85abbb25c7a7b29ec8f3cf89f85f50dc6fb688",
+      "wasm_bytes": 772006,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 75737738,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 75737738,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 75737738,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_mul_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_mul",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "9757e7dbd984e5d54cfbd9fb8bc970dc28a2ab63ddb27e0a5c7ccee3bea02bf5c35492c91fde905c97f866c57119be4618c2c8363f2317d1331be0d1b9d751617f4ad9d1f020104546cd3c69eeba793c4ccbe2a93a6cfd8631a92002de1b67af",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_mul_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "1c9d7b617ca0a97d55ef409b8a679f93609db9b4ec202b218d2edcf1950a170c",
+      "wasm": "bls12_381_g2_mul_fast/fast/main.wasm",
+      "wasm_sha256": "ddba748502e0228e919b52ff5b2aa456086eeafb59d02a3451431ee1b07ca3d7",
+      "wasm_bytes": 772127,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 168868421,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 168868421,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 168868421,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_8_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_msm_8",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "b552e62de03ae2f5e6989fbeef018df87855ab795bd388943f9e96bf9369f7152891376ca5872374aea2a8d9d5548b8007d3eb0a6861725104c33ed27f2ceed1b749b607597cb422ce0e5b6d26cc8865ab5df1c7fde09572995cd43c8c71bbfa",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_msm_8_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "284695acace74238cbca470a2bd1c936af41f335c90adcfe42310db788fed661",
+      "wasm": "bls12_381_g2_msm_8_fast/fast/main.wasm",
+      "wasm_sha256": "5eae203b473d298626e54cce4f7e0b394a4c83f5fab9c589eba7bd13204fd72e",
+      "wasm_bytes": 773027,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1326066433,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1326066433,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1326066433,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_identity_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_identity_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "d7f542c9334ca69ab77e7967131f3f43a665e03802db76576d504025f528aee4",
+      "wasm": "bls12_381_pairing_identity_fast/fast/main.wasm",
+      "wasm_sha256": "5c71129d2e91cc4321f9953cd4e42597e023181fbb1e4c0f5148d48cf3e75c0a",
+      "wasm_bytes": 772189,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 268416685,
+          "allocated_bytes": 40056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 268416685,
+          "allocated_bytes": 40056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 268416685,
+          "allocated_bytes": 40056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_nonidentity_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_pairing_nonidentity",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "notes": "Nondegenerate generator pairing e(G1,G2)!=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_nonidentity_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "e527b47b96b50ac63cd8d97db776c00b64ac45b49b9abd9d6da1af15a785cef9",
+      "wasm": "bls12_381_pairing_nonidentity_fast/fast/main.wasm",
+      "wasm_sha256": "6209cf8227e0fb5071100f383285326fc41862c51c6a163fc3fd2860ea579ac4",
+      "wasm_bytes": 772045,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 183561474,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 183561474,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 183561474,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ic_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ic_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "notes": "Absolute-only IC BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "curve-cases/bls12_381_verify_ic_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "cf50dfd98c74bac6bb1643ce9a1d6cda867ecc5c35ce19671441e4bbf1b561c4",
+      "wasm": "bls12_381_verify_ic_valid_fast/fast/main.wasm",
+      "wasm_sha256": "08cd11071b84c294a9892f235f14053e270b8d0ab9cfff796e4973c6ecd8a8af",
+      "wasm_bytes": 772348,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ic_wrong_message_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ic_wrong_message",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "notes": "Absolute-only IC BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile. Message first byte flipped from the valid fixture.",
+      "source": "curve-cases/bls12_381_verify_ic_wrong_message_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "3ac49031b1cfafae4b764ccba4d06cb063ce8c2f9d8233b17139801f0afa9cff",
+      "wasm": "bls12_381_verify_ic_wrong_message_fast/fast/main.wasm",
+      "wasm_sha256": "0d44433541d8c161fbde5329bdff6b00059bdc678f93954faaaf64c346296230",
+      "wasm_bytes": 772348,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 236236292,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ethereum_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ethereum_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "notes": "Absolute-only Ethereum BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "curve-cases/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "edeb37e5ff77534c4a4fcb3ab3ae068c03a8e34e0e5093528a4d5acf0f8a822f",
+      "wasm": "bls12_381_verify_ethereum_valid_fast/fast/main.wasm",
+      "wasm_sha256": "423e6fd014a0f2516c40bc5292bef809b8f248f5aa4d3aadd44b586eafd302eb",
+      "wasm_bytes": 772334,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ethereum_wrong_message_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ethereum_wrong_message",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "notes": "Absolute-only Ethereum BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile. Message first byte flipped from the valid fixture.",
+      "source": "curve-cases/bls12_381_verify_ethereum_wrong_message_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "e2460a91a3f0b03df10e60f20931205ae67ec7f9075275765d9621fca56e9957",
+      "wasm": "bls12_381_verify_ethereum_wrong_message_fast/fast/main.wasm",
+      "wasm_sha256": "d0188d7213bcdfb83a27d36cec07e21575465ce99b2deebacd6bfba00b87cc7a",
+      "wasm_bytes": 772334,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 286386469,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

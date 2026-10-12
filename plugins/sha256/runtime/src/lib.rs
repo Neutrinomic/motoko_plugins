@@ -154,25 +154,37 @@ unsafe fn write_digest(state: &[u32; 8], output: *mut u8) {
     }
 }
 
-// Common digest and Merkle-parent inputs expose their padding to constant
-// folding. A 64-byte input has an entirely constant second message schedule.
-// Keep each specialization separate from the general loop so fixed inputs
-// avoid its stack frame and padding setup.
+// A 64-byte Merkle-parent input has an entirely constant second message
+// schedule. Keep it separate from the general loop so it avoids the loop's
+// padding setup and state spills.
 #[inline(never)]
-unsafe fn sha256_fixed<const INPUT_LEN: usize>(input: *const u8, output: *mut u8) {
-    const { assert!(INPUT_LEN == 32 || INPUT_LEN == 64) };
-    let input = unsafe { core::slice::from_raw_parts(input, INPUT_LEN) };
+unsafe fn sha256_merkle_parent(input: *const u8, output: *mut u8) {
+    let input = unsafe { &*input.cast::<[u8; 64]>() };
+    let mut state = INITIAL;
+    compress(&mut state, input);
+    let mut tail = [0u8; 64];
+    tail[0] = 0x80;
+    tail[62] = 2;
+    compress(&mut state, &tail);
+    unsafe { write_digest(&state, output) };
+}
+
+// Hashes and compressed SEC1 public keys share eight complete input words.
+// The ninth word and encoded bit length differ; all other padding words are
+// constant, so one specialization serves both lengths without duplicated rounds.
+#[inline(never)]
+unsafe fn sha256_digest_or_public_key(input: *const u8, len: usize, output: *mut u8) {
     let mut state = INITIAL;
     let mut tail = [0u8; 64];
-    let remaining = if INPUT_LEN == 64 {
-        compress(&mut state, input.try_into().expect("block length"));
-        &[][..]
+    unsafe { core::ptr::copy_nonoverlapping(input, tail.as_mut_ptr(), 32) };
+    if len == 33 {
+        tail[32] = unsafe { input.add(32).read() };
+        tail[33] = 0x80;
+        tail[63] = 8;
     } else {
-        input
-    };
-    tail[..remaining.len()].copy_from_slice(remaining);
-    tail[remaining.len()] = 0x80;
-    tail[56..].copy_from_slice(&(INPUT_LEN as u64 * 8).to_be_bytes());
+        tail[32] = 0x80;
+    }
+    tail[62] = 1;
     compress(&mut state, &tail);
     unsafe { write_digest(&state, output) };
 }
@@ -198,10 +210,10 @@ pub unsafe extern "C" fn sha256_digest(input: *const u8, len: usize, output: *mu
         }
         return;
     }
-    if len == 32 {
-        unsafe { sha256_fixed::<32>(input, output) };
+    if len == 32 || len == 33 {
+        unsafe { sha256_digest_or_public_key(input, len, output) };
     } else if len == 64 {
-        unsafe { sha256_fixed::<64>(input, output) };
+        unsafe { sha256_merkle_parent(input, output) };
     } else {
         unsafe { sha256_general(input, len, output) };
     }
@@ -274,7 +286,7 @@ mod tests {
     #[test]
     fn fixed_size_extremes() {
         // Independent hashlib/OpenSSL answers exercise constant padding and
-        // message-schedule carries in both specialized kernels.
+        // message-schedule carries in the shared digest/public-key and parent paths.
         for (length, byte, expected) in [
             (
                 32,
@@ -285,6 +297,16 @@ mod tests {
                 32,
                 0xff,
                 "af9613760f72635fbdb44a5a0a63c39f12af30f950a6ee5c971be188e89c4051",
+            ),
+            (
+                33,
+                0x00,
+                "7f9c9e31ac8256ca2f258583df262dbc7d6f68f2a03043d5c99a4ae5a7396ce9",
+            ),
+            (
+                33,
+                0xff,
+                "ffb8b6e27a06ffb98ecf60d261a6818cdc573f8256f06429000a2b125b070c37",
             ),
             (
                 64,
@@ -312,6 +334,10 @@ mod tests {
             (
                 32,
                 "43599ef388fde687ef9376c222e271b733efb0b6982a7810af4a0cbd5a0050e3",
+            ),
+            (
+                33,
+                "494429bb371f5d9fbd3d20a65986a827a6f0059deeb28b157d5a42b82d2f00b4",
             ),
             (
                 55,

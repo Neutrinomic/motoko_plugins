@@ -1,0 +1,204 @@
+{
+  "stage": "round2-api-pure-bls-arithmetic",
+  "expected_case_count": 4,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:25:14.122Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "dd0a5e8fd616de0b6f19b437dc40db1490ee6b6fa4a78bee8b874fe931bb6682",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bls12_381_g2_mul_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_mul",
+      "plugins": [],
+      "expected_hex": "9757e7dbd984e5d54cfbd9fb8bc970dc28a2ab63ddb27e0a5c7ccee3bea02bf5c35492c91fde905c97f866c57119be4618c2c8363f2317d1331be0d1b9d751617f4ad9d1f020104546cd3c69eeba793c4ccbe2a93a6cfd8631a92002de1b67af",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_mul_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "c7160749d95b6a380f1601f5af65bc6aedbef2dc4865352078844ddfd6909295",
+      "wasm": "bls12_381_g2_mul_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "fdbf47264f4a5ee2eb84ed0ba54c3a39d2ecb000b1a144eb07bb5cf1e35ec555",
+      "wasm_bytes": 253120,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 572985181,
+          "allocated_bytes": 23188592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "f8f8ddc57da45c8e3580902cfc4de672171bb106ef25f91abf934e1aa49d8925",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_msm_8_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_msm_8",
+      "plugins": [],
+      "expected_hex": "b552e62de03ae2f5e6989fbeef018df87855ab795bd388943f9e96bf9369f7152891376ca5872374aea2a8d9d5548b8007d3eb0a6861725104c33ed27f2ceed1b749b607597cb422ce0e5b6d26cc8865ab5df1c7fde09572995cd43c8c71bbfa",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "curve-cases/bls12_381_g2_msm_8_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "7b510046248bbbaa609ace60f4742b3ee53702b7c83e219a7b4192743bcd19d3",
+      "wasm": "bls12_381_g2_msm_8_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "4888262456f92a6c3b7b27812bc2da466a4c77c29bc24a418af6b8c448a7fb68",
+      "wasm_bytes": 259004,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4617878655,
+          "allocated_bytes": 186921344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "323709a1d0b83f3a09214c827d6cdac1273f370692b26071e687aca68380eb4c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_identity_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "curve-cases/bls12_381_pairing_identity_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "7b928328f2f2dbdba79265c1ac23a364778945cad4328220e8c1f88457bb736d",
+      "wasm": "bls12_381_pairing_identity_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "cc2e8ffce863d7bcfb47e1bab257b1d7b166b6ba5107cd13169fdb159abfa8d9",
+      "wasm_bytes": 273122,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 676099164,
+          "allocated_bytes": 31422544,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_g2_add_validated_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_g2_add_validated",
+      "plugins": [],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement. Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.",
+      "source": "curve-cases/bls12_381_g2_add_validated_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "c521023e27f615b4bf8b26c2baa83653f69bef28621c92da0f4888cbe6356e5d",
+      "wasm": "bls12_381_g2_add_validated_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "61cbd80ffaf00375670da5038976d02d2ee2a8d5b696ec3e3743ce625c3b332d",
+      "wasm_bytes": 256817,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 168180323,
+          "allocated_bytes": 7255832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "62504967d51e27745ae24eb2a0cab6e94d30905d3626a4281852b41bbc3a7d5f",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

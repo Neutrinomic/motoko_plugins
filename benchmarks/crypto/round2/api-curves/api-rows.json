@@ -1,0 +1,1280 @@
+{
+  "api_rows": [
+    {
+      "id": "Secp256k1.derivePublicKey",
+      "module": "Secp256k1",
+      "function": "derivePublicKey",
+      "workload": "32-byte secret; compressed SEC1 output",
+      "size": "32 bytes",
+      "plugin_case": {
+        "name": "api-secp256k1-derivePublicKey-fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "native_case": {
+        "name": "api-secp256k1-derivePublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#compressed)"
+    },
+    {
+      "id": "Secp256k1.compressPublicKey",
+      "module": "Secp256k1",
+      "function": "compressPublicKey",
+      "workload": "Valid uncompressed SEC1 input",
+      "size": "65 bytes",
+      "plugin_case": {
+        "name": "api-secp256k1-compressPublicKey-fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-secp256k1-compressPublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#compressed)"
+    },
+    {
+      "id": "Secp256k1.decompressPublicKey",
+      "module": "Secp256k1",
+      "function": "decompressPublicKey",
+      "workload": "Valid compressed SEC1 input",
+      "size": "33 bytes",
+      "plugin_case": {
+        "name": "api-secp256k1-decompressPublicKey-fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-secp256k1-decompressPublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+    },
+    {
+      "id": "Secp256k1.convertPublicKey",
+      "module": "Secp256k1",
+      "function": "convertPublicKey",
+      "workload": "Valid compressed SEC1 to uncompressed",
+      "size": "33 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-convert-compressed-to-uncompressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-secp256k1-convertPublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+    },
+    {
+      "id": "Secp256k1.publicKey",
+      "module": "Secp256k1",
+      "function": "publicKey",
+      "workload": "Full-width secret; uncompressed SEC1 output",
+      "size": "32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-public-key-uncompressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "native_case": {
+        "name": "api-secp256k1-publicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#uncompressed)"
+    },
+    {
+      "id": "Secp256k1.pointAdd",
+      "module": "Secp256k1",
+      "function": "pointAdd",
+      "workload": "Compressed and uncompressed distinct points",
+      "size": "33 + 65 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-point-add-compressed-distinct",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-point-add-compressed-distinct",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Canonical SEC1 checks; Jacobi.fromBytes on both keys; Jacobi.add; infinity check; Jacobi.toBytes(compressed)."
+    },
+    {
+      "id": "Secp256k1.pointMultiply",
+      "module": "Secp256k1",
+      "function": "pointMultiply",
+      "workload": "Compressed point and full-width scalar",
+      "size": "33 + 32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-point-multiply-compressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-point-multiply-compressed",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.mul; infinity check; Jacobi.toBytes(compressed)."
+    },
+    {
+      "id": "Secp256k1.baseMultiply",
+      "module": "Secp256k1",
+      "function": "baseMultiply",
+      "workload": "Generator times full-width scalar",
+      "size": "32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-base-multiply-full-width",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-base-multiply-full-width",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Canonical scalar checks; Jacobi.mulBase; infinity check; Jacobi.toBytes(compressed)."
+    },
+    {
+      "id": "Secp256k1.tweakPublicKey",
+      "module": "Secp256k1",
+      "function": "tweakPublicKey",
+      "workload": "Compressed point plus full-width scalar times generator",
+      "size": "33 + 32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-tweak-compressed-full-width",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-tweak-compressed-full-width",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Composition: canonical SEC1/scalar checks; Jacobi.fromBytes; Jacobi.add(P, Jacobi.mulBase(t)); infinity check; compressed encoding."
+    },
+    {
+      "id": "Secp256k1.signPrehash",
+      "module": "Secp256k1",
+      "function": "signPrehash",
+      "workload": "RFC6979 deterministic ECDSA of a SHA-256 digest",
+      "size": "32-byte secret + 32-byte digest",
+      "plugin_case": {
+        "name": "secp256k1_sign_rfc6979_fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Pinned Mops ecdsa accepts a supplied nonce and lacks RFC6979 nonce generation, so no equivalent pure-Motoko comparison is claimed. Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation."
+    },
+    {
+      "id": "Secp256k1.verifyPrehash",
+      "module": "Secp256k1",
+      "function": "verifyPrehash",
+      "workload": "Valid compact low-S signature and compressed public key",
+      "size": "33 + 32 + 64 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-verify-compressed-low-s",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "native_case": {
+        "name": "api-secp256k1-verifyPrehash-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) + E.Signature -> PublicKey.verifyHashed"
+    },
+    {
+      "id": "Secp256k1.signatureToDer",
+      "module": "Secp256k1",
+      "function": "signatureToDer",
+      "workload": "Compact low-S signature to minimal DER",
+      "size": "64 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-der-encode-ordinary",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-secp256k1-signatureToDer-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Validated compact scalar decoding -> E.Signature.toBytes(#der)"
+    },
+    {
+      "id": "Secp256k1.signatureFromDer",
+      "module": "Secp256k1",
+      "function": "signatureFromDer",
+      "workload": "Minimal DER to compact signature",
+      "size": "71 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-der-decode-ordinary",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+      "native_case": {
+        "name": "api-secp256k1-signatureFromDer-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Strict DER guards -> E.signatureFromBytes(#der) -> Signature.toBytes(#raw)"
+    },
+    {
+      "id": "Secp256k1.normalizeSignature",
+      "module": "Secp256k1",
+      "function": "normalizeSignature",
+      "workload": "Compact high-S to low-S signature",
+      "size": "64 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-normalize-high-s",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+      "native_case": {
+        "name": "api-secp256k1-normalizeSignature-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Validated compact scalar decoding -> min(S,n-S) -> E.Signature.toBytes(#raw)"
+    },
+    {
+      "id": "Secp256k1.xOnlyPublicKey",
+      "module": "Secp256k1",
+      "function": "xOnlyPublicKey",
+      "workload": "Validate compressed SEC1 and extract X",
+      "size": "33 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-x-only-compressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-x-only-compressed",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Composition: canonical SEC1 checks; Jacobi.fromBytes; Jacobi.toBytes(compressed); remove parity prefix."
+    },
+    {
+      "id": "Secp256k1.schnorrSign",
+      "module": "Secp256k1",
+      "function": "schnorrSign",
+      "workload": "Official BIP340 vector 1, supplied auxiliary bytes",
+      "size": "32-byte message",
+      "plugin_case": {
+        "name": "r2-secp256k1-schnorr-sign-message-32",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Pinned Mops ecdsa and bitcoin packages lack BIP340; pure-Motoko cell intentionally blank. Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation."
+    },
+    {
+      "id": "Secp256k1.schnorrVerify",
+      "module": "Secp256k1",
+      "function": "schnorrVerify",
+      "workload": "Official BIP340 vector 1, valid signature",
+      "size": "32-byte message + 64-byte signature",
+      "plugin_case": {
+        "name": "r2-secp256k1-schnorr-verify-message-32",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Pinned Mops ecdsa and bitcoin packages lack BIP340; pure-Motoko cell intentionally blank. Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation."
+    },
+    {
+      "id": "Secp256k1.tweakXOnlyPublicKey",
+      "module": "Secp256k1",
+      "function": "tweakXOnlyPublicKey",
+      "workload": "Even-Y lift of X-only key plus full-width tweak",
+      "size": "32 + 32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-tweak-x-only-public-full-width",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Valid-input API counterpart with canonical bounds restored in wrapper; Bitcoin Jacobian multiplication is variable-time.",
+      "native_case": {
+        "name": "r2-secp256k1-tweak-x-only-public-full-width",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "P2tr.tweakPublicKey after canonical x/scalar bounds; reconstruct compressed SEC1 prefix from returned is_even plus x bytes."
+    },
+    {
+      "id": "Secp256k1.tweakXOnlySecretKey",
+      "module": "Secp256k1",
+      "function": "tweakXOnlySecretKey",
+      "workload": "Full-width even-Y secret and tweak",
+      "size": "32 + 32 bytes",
+      "plugin_case": {
+        "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented API counterpart: Blob decode, canonical validation, public package calls, result encoding and Blob construction are all measured. Result unwrap and expected comparison are outside measurement. Variable-time Motoko NAF multiplication and Nat arithmetic; reference composition for a fixed public test secret, not a constant-time signing implementation.",
+      "native_case": {
+        "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+        "implementation": "mops-bitcoin-api"
+      },
+      "counterpart_api": "Reference composition: validate secret/tweak; Jacobi.mulBase(secret); toAffine for parity; normalize d to even Y; add tweak modulo group order; reject zero; Common.writeBE256."
+    },
+    {
+      "id": "P256.publicKey",
+      "module": "P256",
+      "function": "publicKey",
+      "workload": "Full-width secret; uncompressed SEC1 output",
+      "size": "32 bytes",
+      "plugin_case": {
+        "name": "r2-p256-public-key-uncompressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "native_case": {
+        "name": "api-p256-publicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#uncompressed)"
+    },
+    {
+      "id": "P256.derivePublicKey",
+      "module": "P256",
+      "function": "derivePublicKey",
+      "workload": "32-byte secret; compressed SEC1 output",
+      "size": "32 bytes",
+      "plugin_case": {
+        "name": "api-p256-derivePublicKey-fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. The pure Motoko key multiplication is variable-time; this is a mathematical output comparison and does not assert the native secret operation and this reference have equivalent side-channel properties.",
+      "native_case": {
+        "name": "api-p256-derivePublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.privateKeyFromBytes(#raw) -> PrivateKey.getPublicKey -> PublicKey.toBytes(#compressed)"
+    },
+    {
+      "id": "P256.convertPublicKey",
+      "module": "P256",
+      "function": "convertPublicKey",
+      "workload": "Valid compressed SEC1 to uncompressed",
+      "size": "33 bytes",
+      "plugin_case": {
+        "name": "r2-p256-convert-compressed-to-uncompressed",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-p256-convertPublicKey-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) -> PublicKey.toBytes(#uncompressed)"
+    },
+    {
+      "id": "P256.signPrehash",
+      "module": "P256",
+      "function": "signPrehash",
+      "workload": "RFC6979 deterministic ECDSA of a SHA-256 digest",
+      "size": "32-byte secret + 32-byte digest",
+      "plugin_case": {
+        "name": "p256_sign_rfc6979_fast",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Pinned Mops ecdsa accepts a supplied nonce and lacks RFC6979 nonce generation, so no equivalent pure-Motoko comparison is claimed. Neither pinned ecdsa@8.0.1 nor bitcoin@0.2.1 supplies RFC6979 nonce derivation or BIP340 signing/verification. Supplied-nonce ECDSA signing is not a semantically equivalent operation."
+    },
+    {
+      "id": "P256.verifyPrehash",
+      "module": "P256",
+      "function": "verifyPrehash",
+      "workload": "Valid compact low-S signature and compressed public key",
+      "size": "33 + 32 + 64 bytes",
+      "plugin_case": {
+        "name": "r2-p256-verify-compressed-low-s",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "native_case": {
+        "name": "api-p256-verifyPrehash-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "E.publicKeyFromBytes(#raw) + E.Signature -> PublicKey.verifyHashed"
+    },
+    {
+      "id": "P256.signatureToDer",
+      "module": "P256",
+      "function": "signatureToDer",
+      "workload": "Compact low-S signature to minimal DER",
+      "size": "64 bytes",
+      "plugin_case": {
+        "name": "r2-p256-der-encode-ordinary",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input.",
+      "native_case": {
+        "name": "api-p256-signatureToDer-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Validated compact scalar decoding -> E.Signature.toBytes(#der)"
+    },
+    {
+      "id": "P256.signatureFromDer",
+      "module": "P256",
+      "function": "signatureFromDer",
+      "workload": "Minimal DER to compact signature",
+      "size": "70 bytes",
+      "plugin_case": {
+        "name": "r2-p256-der-decode-ordinary",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Strict DER framing/minimal-positive-integer and scalar-range guards precede the package ASN.1 decoder, whose raw acceptance is more permissive.",
+      "native_case": {
+        "name": "api-p256-signatureFromDer-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Strict DER guards -> E.signatureFromBytes(#der) -> Signature.toBytes(#raw)"
+    },
+    {
+      "id": "P256.normalizeSignature",
+      "module": "P256",
+      "function": "normalizeSignature",
+      "workload": "Compact high-S to low-S signature",
+      "size": "64 bytes",
+      "plugin_case": {
+        "name": "r2-p256-normalize-high-s",
+        "implementation": "fast"
+      },
+      "notes": "One direct public API call. Blob input construction and Result/output checks are outside measurement. Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. Scalar min(S,n-S) is composed explicitly around E.Signature serialization to preserve the precise half-order boundary for both curves.",
+      "native_case": {
+        "name": "api-p256-normalizeSignature-ecdsa",
+        "implementation": "ecdsa"
+      },
+      "counterpart_api": "Validated compact scalar decoding -> min(S,n-S) -> E.Signature.toBytes(#raw)"
+    },
+    {
+      "id": "BLS12381.validateG1",
+      "api": "BLS12381.validateG1",
+      "function": "validateG1",
+      "public_name": "validateG1",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_validate_g1_valid",
+      "size": "48-byte point",
+      "plugin_case": {
+        "name": "round2_bls12_381_validate_g1_valid",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_validate_g1_mops",
+        "implementation": "mops"
+      },
+      "notes": "Canonical compressed nonidentity point validation, including subgroup membership. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 20,
+      "alias_target": "Prim.bls12_381_validate_g1",
+      "aliases": [],
+      "existing_cases": [
+        "round2_bls12_381_validate_g1_valid",
+        "round2_bls12_381_validate_g1_identity",
+        "round2_bls12_381_validate_g1_non_subgroup"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_validate_g1_valid",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_validate_g1_valid/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "decompress_g1 + g1_subgroup_check + compressed encoding",
+        "case": "api_bls12_381_validate_g1_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_validate_g1_mops/main.mo",
+        "comparison": "round2_bls12_381_validate_g1_valid",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside."
+      },
+      "closest_pure_motoko_primitive": "decompress_g1 + g1_subgroup_check + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.validateG2",
+      "api": "BLS12381.validateG2",
+      "function": "validateG2",
+      "public_name": "validateG2",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_validate_g2_valid",
+      "size": "96-byte point",
+      "plugin_case": {
+        "name": "round2_bls12_381_validate_g2_valid",
+        "implementation": "fast"
+      },
+      "notes": "Canonical compressed nonidentity point validation, including subgroup membership. Mops decoder requires 256-byte EIP-2537 uncompressed input; fast accepts 96-byte IETF compressed input.",
+      "kind": "primitive_alias",
+      "declaration_line": 21,
+      "alias_target": "Prim.bls12_381_validate_g2",
+      "aliases": [],
+      "existing_cases": [
+        "round2_bls12_381_validate_g2_valid",
+        "round2_bls12_381_validate_g2_identity",
+        "round2_bls12_381_validate_g2_non_subgroup"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_validate_g2_valid",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_validate_g2_valid/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "decode_g2",
+      "counterpart_caveat": "Mops decoder requires 256-byte EIP-2537 uncompressed input; fast accepts 96-byte IETF compressed input.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.g1Add",
+      "api": "BLS12381.g1Add",
+      "function": "g1Add",
+      "public_name": "g1Add",
+      "module": "BLS12381",
+      "workload": "bls12_381_g1_add_validated_fast",
+      "size": "2 x 48-byte points",
+      "plugin_case": {
+        "name": "bls12_381_g1_add_validated_fast",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_g1_add_mops",
+        "implementation": "mops"
+      },
+      "notes": "Add two compressed copies of the generator, with canonical decoding, subgroup validation and compressed output. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 22,
+      "alias_target": "Prim.bls12_381_g1_add",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g1_add_fast",
+        "bls12_381_g1_add_validated_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_g1_add_validated_fast",
+      "representative_fast_source": "curve-cases/bls12_381_g1_add_validated_fast/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "decompress_g1 + g1_subgroup_check + g1_add + compressed encoding",
+        "case": "api_bls12_381_g1_add_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_g1_add_mops/main.mo",
+        "comparison": "bls12_381_g1_add_validated",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside."
+      },
+      "closest_pure_motoko_primitive": "decompress_g1 + g1_subgroup_check + g1_add + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g1_add_bls12_381",
+          "source": "curve-cases/bls12_381_g1_add_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g1_add_validated_bls12_381",
+          "source": "curve-cases/bls12_381_g1_add_validated_bls12_381/main.mo",
+          "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.g2Add",
+      "api": "BLS12381.g2Add",
+      "function": "g2Add",
+      "public_name": "g2Add",
+      "module": "BLS12381",
+      "workload": "bls12_381_g2_add_validated_fast",
+      "size": "2 x 96-byte points",
+      "plugin_case": {
+        "name": "bls12_381_g2_add_validated_fast",
+        "implementation": "fast"
+      },
+      "notes": "Add two compressed copies of the generator, with canonical decoding, subgroup validation and compressed output. Historical validated comparator uses 256-byte EIP-2537 input, not 96-byte compressed input; trusted comparator additionally omits validation.",
+      "kind": "primitive_alias",
+      "declaration_line": 23,
+      "alias_target": "Prim.bls12_381_g2_add",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g2_add_fast",
+        "bls12_381_g2_add_validated_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_g2_add_validated_fast",
+      "representative_fast_source": "curve-cases/bls12_381_g2_add_validated_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "decode_g2 + g2_add",
+      "counterpart_caveat": "Historical validated comparator uses 256-byte EIP-2537 input, not 96-byte compressed input; trusted comparator additionally omits validation.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g2_add_bls12_381",
+          "source": "curve-cases/bls12_381_g2_add_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g2_add_validated_bls12_381",
+          "source": "curve-cases/bls12_381_g2_add_validated_bls12_381/main.mo",
+          "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement. Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.g1Mul",
+      "api": "BLS12381.g1Mul",
+      "function": "g1Mul",
+      "public_name": "g1Mul",
+      "module": "BLS12381",
+      "workload": "bls12_381_g1_mul_fast",
+      "size": "48-byte point + 32-byte scalar",
+      "plugin_case": {
+        "name": "bls12_381_g1_mul_fast",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_g1_mul_mops",
+        "implementation": "mops"
+      },
+      "notes": "Multiply the compressed generator by a full-width 254-bit scalar, including canonical point/scalar decoding, subgroup validation and compressed output. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 24,
+      "alias_target": "Prim.bls12_381_g1_mul",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g1_mul_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_g1_mul_fast",
+      "representative_fast_source": "curve-cases/bls12_381_g1_mul_fast/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "decompress_g1 + g1_subgroup_check + canonical scalar decode + g1_mul + compressed encoding",
+        "case": "api_bls12_381_g1_mul_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_g1_mul_mops/main.mo",
+        "comparison": "bls12_381_g1_mul",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside."
+      },
+      "closest_pure_motoko_primitive": "decompress_g1 + g1_subgroup_check + canonical scalar decode + g1_mul + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g1_mul_bls12_381",
+          "source": "curve-cases/bls12_381_g1_mul_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.g2Mul",
+      "api": "BLS12381.g2Mul",
+      "function": "g2Mul",
+      "public_name": "g2Mul",
+      "module": "BLS12381",
+      "workload": "bls12_381_g2_mul_fast",
+      "size": "96-byte point + 32-byte scalar",
+      "plugin_case": {
+        "name": "bls12_381_g2_mul_fast",
+        "implementation": "fast"
+      },
+      "notes": "Multiply the compressed generator by a full-width 254-bit scalar, including canonical point/scalar decoding, subgroup validation and compressed output. Historical Mops comparator uses a trusted predecoded point/scalar and encodes output outside timing; no compressed G2 decoder exists.",
+      "kind": "primitive_alias",
+      "declaration_line": 25,
+      "alias_target": "Prim.bls12_381_g2_mul",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g2_mul_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_g2_mul_fast",
+      "representative_fast_source": "curve-cases/bls12_381_g2_mul_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "g2_mul",
+      "counterpart_caveat": "Historical Mops comparator uses a trusted predecoded point/scalar and encodes output outside timing; no compressed G2 decoder exists.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g2_mul_bls12_381",
+          "source": "curve-cases/bls12_381_g2_mul_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.g1Msm",
+      "api": "BLS12381.g1Msm",
+      "function": "g1Msm",
+      "public_name": "g1Msm",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_g1_msm_n8",
+      "size": "8 points (384 bytes) + 8 scalars (256 bytes)",
+      "plugin_case": {
+        "name": "round2_bls12_381_g1_msm_n8",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_g1_msm_n8_mops",
+        "implementation": "mops"
+      },
+      "notes": "Eight distinct points and dense canonical 255-bit public scalars; packed input validation, subgroup checks, MSM and compressed output are measured. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 30,
+      "alias_target": "Prim.bls12_381_g1_msm",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g1_msm_8_fast",
+        "bls12_381_g1_msm_distinct_4_fast",
+        "bls12_381_g1_msm_distinct_16_fast",
+        "bls12_381_g1_msm_distinct_64_fast",
+        "bls12_381_g1_msm_distinct_128_fast",
+        "round2_bls12_381_g1_msm_n0",
+        "round2_bls12_381_g1_msm_n1",
+        "round2_bls12_381_g1_msm_n2",
+        "round2_bls12_381_g1_msm_n3",
+        "round2_bls12_381_g1_msm_n4",
+        "round2_bls12_381_g1_msm_n7",
+        "round2_bls12_381_g1_msm_n8",
+        "round2_bls12_381_g1_msm_n9",
+        "round2_bls12_381_g1_msm_n15",
+        "round2_bls12_381_g1_msm_n16",
+        "round2_bls12_381_g1_msm_n17",
+        "round2_bls12_381_g1_msm_n31",
+        "round2_bls12_381_g1_msm_n32",
+        "round2_bls12_381_g1_msm_n33"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_g1_msm_n8",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_g1_msm_n8/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "packed point/scalar decode + canonical checks + g1_subgroup_check + g1_msm + compressed encoding",
+        "case": "api_bls12_381_g1_msm_n8_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_g1_msm_n8_mops/main.mo",
+        "comparison": "round2_bls12_381_g1_msm_n8",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside."
+      },
+      "closest_pure_motoko_primitive": "packed point/scalar decode + canonical checks + g1_subgroup_check + g1_msm + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g1_msm_8_bls12_381",
+          "source": "curve-cases/bls12_381_g1_msm_8_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g1_msm_distinct_4_bls12_381",
+          "source": "curve-cases/bls12_381_g1_msm_distinct_4_bls12_381/main.mo",
+          "notes": "MSM of 4 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g1_msm_distinct_16_bls12_381",
+          "source": "curve-cases/bls12_381_g1_msm_distinct_16_bls12_381/main.mo",
+          "notes": "MSM of 16 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g1_msm_distinct_64_bls12_381",
+          "source": "curve-cases/bls12_381_g1_msm_distinct_64_bls12_381/main.mo",
+          "notes": "MSM of 64 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g1_msm_distinct_128_bls12_381",
+          "source": "curve-cases/bls12_381_g1_msm_distinct_128_bls12_381/main.mo",
+          "notes": "MSM of 128 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.g2Msm",
+      "api": "BLS12381.g2Msm",
+      "function": "g2Msm",
+      "public_name": "g2Msm",
+      "module": "BLS12381",
+      "workload": "bls12_381_g2_msm_8_fast",
+      "size": "8 points (768 bytes) + 8 scalars (256 bytes)",
+      "plugin_case": {
+        "name": "bls12_381_g2_msm_8_fast",
+        "implementation": "fast"
+      },
+      "notes": "Eight copies of the generator and full-width 254-bit scalars; packed input validation, subgroup checks, MSM and compressed output are measured. Historical Mops comparators use trusted predecoded point/scalar arrays; packed decoding, canonical scalar checks, subgroup checks and output encoding differ.",
+      "kind": "primitive_alias",
+      "declaration_line": 31,
+      "alias_target": "Prim.bls12_381_g2_msm",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_g2_msm_8_fast",
+        "bls12_381_g2_msm_distinct_4_fast",
+        "bls12_381_g2_msm_distinct_16_fast",
+        "bls12_381_g2_msm_distinct_64_fast",
+        "bls12_381_g2_msm_distinct_128_fast",
+        "round2_bls12_381_g2_msm_n3",
+        "round2_bls12_381_g2_msm_n4",
+        "round2_bls12_381_g2_msm_n8",
+        "round2_bls12_381_g2_msm_n32"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_g2_msm_8_fast",
+      "representative_fast_source": "curve-cases/bls12_381_g2_msm_8_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "g2_msm",
+      "counterpart_caveat": "Historical Mops comparators use trusted predecoded point/scalar arrays; packed decoding, canonical scalar checks, subgroup checks and output encoding differ.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_g2_msm_8_bls12_381",
+          "source": "curve-cases/bls12_381_g2_msm_8_bls12_381/main.mo",
+          "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g2_msm_distinct_4_bls12_381",
+          "source": "curve-cases/bls12_381_g2_msm_distinct_4_bls12_381/main.mo",
+          "notes": "MSM of 4 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g2_msm_distinct_16_bls12_381",
+          "source": "curve-cases/bls12_381_g2_msm_distinct_16_bls12_381/main.mo",
+          "notes": "MSM of 16 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g2_msm_distinct_64_bls12_381",
+          "source": "curve-cases/bls12_381_g2_msm_distinct_64_bls12_381/main.mo",
+          "notes": "MSM of 64 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_g2_msm_distinct_128_bls12_381",
+          "source": "curve-cases/bls12_381_g2_msm_distinct_128_bls12_381/main.mo",
+          "notes": "MSM of 128 distinct points (i+1)G and independently SHA256-derived canonical scalars. Native includes compressed-point/subgroup validation; baseline uses trusted affine points and normalizes output after measurement.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.mapToG1",
+      "api": "BLS12381.mapToG1",
+      "function": "mapToG1",
+      "public_name": "mapToG1",
+      "module": "BLS12381",
+      "workload": "bls12_381_map_to_g1_fast",
+      "size": "48-byte field element",
+      "plugin_case": {
+        "name": "bls12_381_map_to_g1_fast",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_map_to_g1_mops",
+        "implementation": "mops"
+      },
+      "notes": "RFC9380 simplified SWU, isogeny and effective cofactor clearing, with canonical field-byte decoding and compressed output. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 34,
+      "alias_target": "Prim.bls12_381_map_to_g1",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_map_to_g1_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_map_to_g1_fast",
+      "representative_fast_source": "curve-cases/bls12_381_map_to_g1_fast/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "canonical field-byte decode + map_fp_to_g1 + compressed encoding",
+        "case": "api_bls12_381_map_to_g1_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_map_to_g1_mops/main.mo",
+        "comparison": "bls12_381_map_to_g1",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside."
+      },
+      "closest_pure_motoko_primitive": "canonical field-byte decode + map_fp_to_g1 + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_map_to_g1_bls12_381",
+          "source": "curve-cases/bls12_381_map_to_g1_bls12_381/main.mo",
+          "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.mapToG2",
+      "api": "BLS12381.mapToG2",
+      "function": "mapToG2",
+      "public_name": "mapToG2",
+      "module": "BLS12381",
+      "workload": "bls12_381_map_to_g2_fast",
+      "size": "96-byte field element (2 x 48 bytes)",
+      "plugin_case": {
+        "name": "bls12_381_map_to_g2_fast",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_map_to_g2_mops",
+        "implementation": "mops"
+      },
+      "notes": "RFC9380 simplified SWU, isogeny and effective cofactor clearing, with canonical real/imaginary field-byte decoding and compressed output. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 35,
+      "alias_target": "Prim.bls12_381_map_to_g2",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_map_to_g2_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_map_to_g2_fast",
+      "representative_fast_source": "curve-cases/bls12_381_map_to_g2_fast/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "canonical real/imaginary field-byte decode + map_fp2_to_g2 + compressed encoding",
+        "case": "api_bls12_381_map_to_g2_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_map_to_g2_mops/main.mo",
+        "comparison": "bls12_381_map_to_g2",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside."
+      },
+      "closest_pure_motoko_primitive": "canonical real/imaginary field-byte decode + map_fp2_to_g2 + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors match #ok and store the returned Blob inside measurement; query assertion is outside.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_map_to_g2_bls12_381",
+          "source": "curve-cases/bls12_381_map_to_g2_bls12_381/main.mo",
+          "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.hashToG1",
+      "api": "BLS12381.hashToG1",
+      "function": "hashToG1",
+      "public_name": "hashToG1",
+      "module": "BLS12381",
+      "workload": "bls12_381_hash_to_g1_fast",
+      "size": "3-byte message + 50-byte DST",
+      "plugin_case": {
+        "name": "bls12_381_hash_to_g1_fast",
+        "implementation": "fast"
+      },
+      "notes": "Complete RFC9380 hash-to-curve of abc with the official test DST, including compressed output. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "primitive_alias",
+      "declaration_line": 38,
+      "alias_target": "Prim.bls12_381_hash_to_g1",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_hash_to_g1_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_hash_to_g1_fast",
+      "representative_fast_source": "curve-cases/bls12_381_hash_to_g1_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.hashToG2",
+      "api": "BLS12381.hashToG2",
+      "function": "hashToG2",
+      "public_name": "hashToG2",
+      "module": "BLS12381",
+      "workload": "bls12_381_hash_to_g2_fast",
+      "size": "3-byte message + 50-byte DST",
+      "plugin_case": {
+        "name": "bls12_381_hash_to_g2_fast",
+        "implementation": "fast"
+      },
+      "notes": "Complete RFC9380 hash-to-curve of abc with the official test DST, including compressed output. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "primitive_alias",
+      "declaration_line": 39,
+      "alias_target": "Prim.bls12_381_hash_to_g2",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_hash_to_g2_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_hash_to_g2_fast",
+      "representative_fast_source": "curve-cases/bls12_381_hash_to_g2_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.pairingCheck",
+      "api": "BLS12381.pairingCheck",
+      "function": "pairingCheck",
+      "public_name": "pairingCheck",
+      "module": "BLS12381",
+      "workload": "bls12_381_pairing_identity_fast",
+      "size": "2 pairs (288 bytes: 2 x (48 + 96))",
+      "plugin_case": {
+        "name": "bls12_381_pairing_identity_fast",
+        "implementation": "fast"
+      },
+      "notes": "Verify e(G1,G2) * e(-G1,G2) = 1, including every packed compressed point decode and subgroup check. Historical Mops comparator receives trusted predecoded points; fast validates every packed compressed point before pairing.",
+      "kind": "primitive_alias",
+      "declaration_line": 43,
+      "alias_target": "Prim.bls12_381_pairing_check",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_pairing_identity_fast",
+        "bls12_381_pairing_nonidentity_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_pairing_identity_fast",
+      "representative_fast_source": "curve-cases/bls12_381_pairing_identity_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "pairing_check",
+      "counterpart_caveat": "Historical Mops comparator receives trusted predecoded points; fast validates every packed compressed point before pairing.",
+      "diagnostic_pure_motoko_cases": [
+        {
+          "name": "bls12_381_pairing_identity_bls12_381",
+          "source": "curve-cases/bls12_381_pairing_identity_bls12_381/main.mo",
+          "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+          "eligible_for_exact_api_ratio": false
+        },
+        {
+          "name": "bls12_381_pairing_nonidentity_bls12_381",
+          "source": "curve-cases/bls12_381_pairing_nonidentity_bls12_381/main.mo",
+          "notes": "Nondegenerate generator pairing e(G1,G2)!=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+          "eligible_for_exact_api_ratio": false
+        }
+      ]
+    },
+    {
+      "id": "BLS12381.verifyIC",
+      "api": "BLS12381.verifyIC",
+      "function": "verifyIC",
+      "public_name": "verifyIC",
+      "module": "BLS12381",
+      "workload": "bls12_381_verify_ic_valid_fast",
+      "size": "96-byte key + 46-byte message + 48-byte signature",
+      "plugin_case": {
+        "name": "bls12_381_verify_ic_valid_fast",
+        "implementation": "fast"
+      },
+      "notes": "Complete valid IC BLS verification, including profile message hashing, point/subgroup validation and pairing. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "primitive_alias",
+      "declaration_line": 46,
+      "alias_target": "Prim.bls12_381_verify_ic",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_verify_ic_valid_fast",
+        "bls12_381_verify_ic_wrong_message_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_verify_ic_valid_fast",
+      "representative_fast_source": "curve-cases/bls12_381_verify_ic_valid_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.verifyEthereum",
+      "api": "BLS12381.verifyEthereum",
+      "function": "verifyEthereum",
+      "public_name": "verifyEthereum",
+      "module": "BLS12381",
+      "workload": "bls12_381_verify_ethereum_valid_fast",
+      "size": "48-byte key + 32-byte message + 96-byte signature",
+      "plugin_case": {
+        "name": "bls12_381_verify_ethereum_valid_fast",
+        "implementation": "fast"
+      },
+      "notes": "Complete valid Ethereum POP-ciphersuite signature verification, including message hashing, point/subgroup validation and pairing. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "primitive_alias",
+      "declaration_line": 49,
+      "alias_target": "Prim.bls12_381_verify_ethereum",
+      "aliases": [],
+      "existing_cases": [
+        "bls12_381_verify_ethereum_valid_fast",
+        "bls12_381_verify_ethereum_wrong_message_fast"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "bls12_381_verify_ethereum_valid_fast",
+      "representative_fast_source": "curve-cases/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.verifyEthereumProof",
+      "api": "BLS12381.verifyEthereumProof",
+      "function": "verifyEthereumProof",
+      "public_name": "verifyEthereumProof",
+      "module": "BLS12381",
+      "workload": "api_bls12_381_verify_ethereum_proof_fast",
+      "size": "48-byte key + 96-byte proof",
+      "plugin_case": {
+        "name": "api_bls12_381_verify_ethereum_proof_fast",
+        "implementation": "fast"
+      },
+      "notes": "Verify one valid Ethereum proof of possession, including key/proof decoding, subgroup validation, hash-to-curve and pairing. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "primitive_alias",
+      "declaration_line": 50,
+      "alias_target": "Prim.bls12_381_verify_ethereum_pop",
+      "aliases": [],
+      "existing_cases": [],
+      "new_cases": [
+        "api_bls12_381_verify_ethereum_proof_fast"
+      ],
+      "representative_fast_case": "api_bls12_381_verify_ethereum_proof_fast",
+      "representative_fast_source": "round2/api-curves/bls/cases/api_bls12_381_verify_ethereum_proof_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.g1Aggregate",
+      "api": "BLS12381.g1Aggregate",
+      "function": "g1Aggregate",
+      "public_name": "g1Aggregate",
+      "module": "BLS12381",
+      "workload": "api_bls12_381_g1_aggregate_n4_fast",
+      "size": "4 points (192 bytes)",
+      "plugin_case": {
+        "name": "api_bls12_381_g1_aggregate_n4_fast",
+        "implementation": "fast"
+      },
+      "native_case": {
+        "name": "api_bls12_381_g1_aggregate_n4_mops",
+        "implementation": "mops"
+      },
+      "notes": "Sum four distinct nonidentity subgroup points; packed-input validation, subgroup checks and compressed output are measured. The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "kind": "primitive_alias",
+      "declaration_line": 53,
+      "alias_target": "Prim.bls12_381_g1_aggregate",
+      "aliases": [],
+      "existing_cases": [],
+      "new_cases": [
+        "api_bls12_381_g1_aggregate_n4_fast"
+      ],
+      "representative_fast_case": "api_bls12_381_g1_aggregate_n4_fast",
+      "representative_fast_source": "round2/api-curves/bls/cases/api_bls12_381_g1_aggregate_n4_fast/main.mo",
+      "pure_motoko_counterpart": {
+        "package": "bls12-381@0.2.0",
+        "api": "decompress_g1 + g1_subgroup_check + g1_add fold + compressed encoding",
+        "case": "api_bls12_381_g1_aggregate_n4_mops",
+        "source": "round2/api-curves/bls/cases/api_bls12_381_g1_aggregate_n4_mops/main.mo",
+        "comparison": "api_bls12_381_g1_aggregate_n4",
+        "caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside."
+      },
+      "closest_pure_motoko_primitive": "decompress_g1 + g1_subgroup_check + g1_add fold + compressed encoding",
+      "counterpart_caveat": "The paired pure Motoko implementation composes pinned Mops primitives. Both sides measure the same input bytes, validation, decoding, operation and compressed output serialization. Immutable input construction is outside measurement. Both actors store Result inside measurement; Result tagging and query assertion are outside.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.g2Aggregate",
+      "api": "BLS12381.g2Aggregate",
+      "function": "g2Aggregate",
+      "public_name": "g2Aggregate",
+      "module": "BLS12381",
+      "workload": "api_bls12_381_g2_aggregate_n4_fast",
+      "size": "4 points (384 bytes)",
+      "plugin_case": {
+        "name": "api_bls12_381_g2_aggregate_n4_fast",
+        "implementation": "fast"
+      },
+      "notes": "Sum four distinct nonidentity subgroup points; packed-input validation, subgroup checks and compressed output are measured. No compressed G2 decoder; replacing the input with 256-byte EIP-2537 affine encodings changes the measured validation/setup semantics.",
+      "kind": "primitive_alias",
+      "declaration_line": 54,
+      "alias_target": "Prim.bls12_381_g2_aggregate",
+      "aliases": [],
+      "existing_cases": [],
+      "new_cases": [
+        "api_bls12_381_g2_aggregate_n4_fast"
+      ],
+      "representative_fast_case": "api_bls12_381_g2_aggregate_n4_fast",
+      "representative_fast_source": "round2/api-curves/bls/cases/api_bls12_381_g2_aggregate_n4_fast/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "g2_add fold + decode_g2",
+      "counterpart_caveat": "No compressed G2 decoder; replacing the input with 256-byte EIP-2537 affine encodings changes the measured validation/setup semantics.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.aggregateVerifyIC",
+      "api": "BLS12381.aggregateVerifyIC",
+      "function": "aggregateVerifyIC",
+      "public_name": "aggregateVerifyIC",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "size": "2 x 96-byte keys + 2 x 32-byte messages + 48-byte signature",
+      "plugin_case": {
+        "name": "round2_bls12_381_aggregate_ic_distinct_n2",
+        "implementation": "fast"
+      },
+      "notes": "Two distinct G2 keys and pairwise-distinct messages; complete IC aggregate verification includes duplicate scan, validation, hashing and pairing. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "motoko_wrapper",
+      "declaration_line": 90,
+      "alias_target": null,
+      "aliases": [],
+      "existing_cases": [
+        "round2_bls12_381_aggregate_ic_distinct_n2",
+        "round2_bls12_381_aggregate_ic_late_duplicate_n2",
+        "round2_bls12_381_aggregate_ic_distinct_n8",
+        "round2_bls12_381_aggregate_ic_late_duplicate_n8",
+        "round2_bls12_381_aggregate_ic_late_duplicate_n127"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_distinct_n2/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.aggregateVerifyEthereum",
+      "api": "BLS12381.aggregateVerifyEthereum",
+      "function": "aggregateVerifyEthereum",
+      "public_name": "aggregateVerifyEthereum",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "size": "2 x 48-byte keys + 2 x 96-byte proofs + 2 x 32-byte messages + 96-byte signature",
+      "plugin_case": {
+        "name": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+        "implementation": "fast"
+      },
+      "notes": "Two distinct keys, valid proofs of possession and distinct messages; every proof check, message hash and aggregate signature verification is measured. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "motoko_wrapper",
+      "declaration_line": 135,
+      "alias_target": null,
+      "aliases": [],
+      "existing_cases": [
+        "round2_bls12_381_aggregate_ethereum_repeated_key_message_n2",
+        "round2_bls12_381_aggregate_ethereum_distinct_n2",
+        "round2_bls12_381_aggregate_ethereum_repeated_key_message_n8",
+        "round2_bls12_381_aggregate_ethereum_distinct_n8"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_distinct_n2/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    },
+    {
+      "id": "BLS12381.fastAggregateVerifyEthereum",
+      "api": "BLS12381.fastAggregateVerifyEthereum",
+      "function": "fastAggregateVerifyEthereum",
+      "public_name": "fastAggregateVerifyEthereum",
+      "module": "BLS12381",
+      "workload": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "size": "2 x 48-byte keys + 2 x 96-byte proofs + 32-byte message + 96-byte signature",
+      "plugin_case": {
+        "name": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+        "implementation": "fast"
+      },
+      "notes": "Two distinct keys and valid proofs of possession for one shared message; every proof check, key aggregation and final signature verification is measured. Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "kind": "motoko_wrapper",
+      "declaration_line": 155,
+      "alias_target": null,
+      "aliases": [],
+      "existing_cases": [
+        "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+        "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8"
+      ],
+      "new_cases": [],
+      "representative_fast_case": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "representative_fast_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/main.mo",
+      "pure_motoko_counterpart": null,
+      "closest_pure_motoko_primitive": "",
+      "counterpart_caveat": "Pinned Mops bls12-381@0.2.0 provides field/group/pairing primitives but no complete hash-to-curve/XMD or IC/Ethereum signature/PoP profile API.",
+      "diagnostic_pure_motoko_cases": []
+    }
+  ]
+}

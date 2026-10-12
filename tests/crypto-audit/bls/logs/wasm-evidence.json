@@ -1,0 +1,226 @@
+{
+  "results": [
+    {
+      "name": "primitives-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/primitives.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.845,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives-compile.log"
+    },
+    {
+      "name": "primitives-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.416,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives-validate.log"
+    },
+    {
+      "name": "primitives-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 4.259,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives-wasm.log"
+    },
+    {
+      "name": "profiles-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/profiles.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.348,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles-compile.log"
+    },
+    {
+      "name": "profiles-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.168,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles-validate.log"
+    },
+    {
+      "name": "profiles-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.147,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles-wasm.log"
+    },
+    {
+      "name": "msm-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/msm.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.482,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm-compile.log"
+    },
+    {
+      "name": "msm-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.217,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm-validate.log"
+    },
+    {
+      "name": "msm-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 8.252,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm-wasm.log"
+    }
+  ],
+  "artifacts": {
+    "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381/plugin.cmxs": "a52c3326998e8cf33c543ec7c74af56b0df976c8c002c5334679d3e53e00ad10",
+    "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381/runtime.wasm": "731ffe0bbc6fa648604fec4e8145f6ec91978d4e6e45eeb6cd4df72193b7de62",
+    "/srv/shared/code/motoko_experiments/plugins/dist/bls12-381/build.json": "f7c1d45e5a859397ef200106f8152e20e7718db6f40219a74c5764816dd5d61f",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/primitives.wasm": "7ee3e731f066456401b6a2d7b10ae9c02f0d9b12d06a1347b7244c4db10c4906",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/profiles.wasm": "2d732f6ff1abdcc4127b416ea842e1f656c7f6ae42eb12b29cd459b3dd5aa800",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/logs/msm.wasm": "12889cbaab9dfdc2f0a4d1a39f5b158bae68ad9bb4e7f277d76ac7df5f7e481d"
+  },
+  "source_sha256": {
+    "plugins/bls12-381/plugin.json": "1e0f5851381bdd52c44dc67c4ec45de0bc263577ab1af4e79bdd3d20139a273a",
+    "plugins/bls12-381/runtime/Cargo.toml": "0ef566b1d4b96287ab607a65271e340aef7fab2d487cf8c0ddcd7927d4e01d2a",
+    "plugins/bls12-381/compiler/bls_pairing.mli": "3c60efafe7367d62844c0dc00d34149a196e6e72cbc965e0cbcfd6e8e34005a2",
+    "plugins/bls12-381/compiler/bls_hash.ml": "c5cb7d8291b439d1f71c9239e10693938c440257f9973f617a09de4b72041af8",
+    "plugins/bls12-381/compiler/reference.ml": "b11625c4c4fb952a0d66ab096a156ab945588249733c9a40a5c1432f45762cda",
+    "plugins/bls12-381/compiler/bls_sha256.mli": "e157067646e5c2d49c8b150787bbe6d2d9e7cca7f6b67a45cc6134f1ee52b9f5",
+    "plugins/bls12-381/compiler/schema.ml": "3869a54977d6e111c4cb70850199a6b1e29462250661a355e8ded6a1a55d4554",
+    "plugins/bls12-381/compiler/register.ml": "f7ec4aa0927f17dd90c23e7bd224d7340f1988291d98347a24833139cd1a32b4",
+    "plugins/bls12-381/compiler/bls_field.mli": "d7db2e8016066384d7f2dac9dc3474385cce97041e66fe7228034f3e3c8f697e",
+    "plugins/bls12-381/compiler/bls_pairing.ml": "268939c6f65c6316dc05cae4048fd99467affd0c9e54b3ddeb9c447b16b0f114",
+    "plugins/bls12-381/compiler/bls_sha256.ml": "909000c48bbaffd1553c71c9bc00134ea130e9c27afdc3784bfdc6571136335a",
+    "plugins/bls12-381/compiler/generator.ml": "8af8eb3c1552ed0ace202f99b2a25322b4716221b95caf2be5c688da812a8c89",
+    "plugins/bls12-381/compiler/bls_group.ml": "d1b9819758e6089f6a88ca3183c3aafb84593abf2c7961ea4b0278a18c07eabe",
+    "plugins/bls12-381/compiler/bls_field.ml": "2ae9b487b7534bf8b7811fcbfcf6d4880277ceb8f7f65a3f0cb7f6a1ef339fc1",
+    "plugins/bls12-381/compiler/bls_hash_constants.mli": "59f9c48412c3354827d1d4ffe14ff96f7651a79a2e41f250914cff36103e3354",
+    "plugins/bls12-381/compiler/z.ml": "d172a97c0ea74fe75305618b85a484214d02317ee5508490ff56f0b3f24b98ba",
+    "plugins/bls12-381/compiler/z.mli": "d92910ef2c8ca40d7076e3b6e1d3bf84aa3dbafd4ce461db47be89fd8942ab16",
+    "plugins/bls12-381/compiler/bls_group.mli": "77fbf6672523573097d9a8832f88bd67b8a015d37d6daf3aca005bf2f24e5d05",
+    "plugins/bls12-381/compiler/bls_hash.mli": "542aeca4156a910eb051d18be5dcc2c1bb7dd662c59dce715b2ecfa4aa8eab51",
+    "plugins/bls12-381/compiler/bls_hash_constants.ml": "c498d1c778ad1d2c707a3a8ba2acd3499d772be1e8f1a83511f9150c77bb8642",
+    "plugins/bls12-381/tests/vectors/generate_profiles.py": "5757c322d416292f5766378676b87fafc5deb418aad303fd460052a497e37ac1",
+    "plugins/bls12-381/tests/vectors/profiles.json": "498c77317643fe5c22bb2b2ca7fa44e58e8e7795dd518235d2cc2597598b82fa",
+    "plugins/bls12-381/tests/reference/group_vectors.ml": "fb3650df7bfd9add37df5b503e88cd34a1315f2d7a5f179f3c87b238694a1f15",
+    "plugins/bls12-381/tests/reference/pairing_vectors.ml": "aa721b016ce1ec0d228b5782ba7aa08e13dee26ceb12a1f958550772d9050fb6",
+    "plugins/bls12-381/tests/reference/hash_vectors.ml": "2f8a8a776a2a7af5f99697843f0583d835895e1b096f0e70de982f4673d8d6d3",
+    "plugins/bls12-381/tests/reference/vectors/BLS12381G1_XMD:SHA-256_SSWU_RO_.json": "9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+    "plugins/bls12-381/tests/reference/vectors/expand_message_xmd_SHA256_38.json": "3b25eccae95ec06a261ea6cedc81520236e74823cfcbe0afe8c02bdf2983f63b",
+    "plugins/bls12-381/tests/reference/vectors/BLS12381G2_XMD:SHA-256_SSWU_RO_.json": "7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+    "plugins/bls12-381/tests/reference/vectors/expand_message_xmd_SHA256_256.json": "80091f7b5a512629b2e0be984f7d292e6fffe1bf988f67a046bc46d37e953259",
+    "plugins/bls12-381/runtime/src/tests.rs": "2a98f63bc503f5d57b1ef3a73d8be1cab09581bfa863e73bd800f62240f6fb31",
+    "plugins/bls12-381/runtime/src/lib.rs": "db6eaf197f4f71a67385e2aaa627b81c5a954ea64bff06854b51b27221eb1059",
+    "plugins/bls12-381/runtime/vectors/rfc9380_g1.json": "9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+    "plugins/bls12-381/runtime/vectors/ethereum.rs": "27bb9e954c9b9bc741c4fa9c477fde9f0296a3542975d66952a6414da9682866",
+    "plugins/bls12-381/runtime/vectors/rfc9380_g2.json": "7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+    "plugins/bls12-381/runtime/vectors/rfc9380.rs": "689a55be9d36deb99835dd255bd03644a430c72f6c715f3780ee1a8e04b6b08a",
+    "plugins/bls12-381/runtime/vectors/pop_py_ecc.json": "e2e9f940f1bb0d92f25db6da0d64034055fb28e3b1ccfefb8bd694e27fa47b1e",
+    "tests/crypto-audit/bls/vectors.json": "9713723791e1f3fd4773c2d34300206b83cf8160862d5151dcc58f528fd9b254",
+    "tests/crypto-audit/bls/generate-msm.py": "4939bac920063c3815ad8914d10bb73093d640ed38dbb2ac227509e72f87af8d",
+    "tests/crypto-audit/bls/msm-vectors.tsv": "0b3ef4e013ed038d0f37bb823fe75b12c9dccffd0ce8f6f17aacb7881e47ce1b",
+    "tests/crypto-audit/bls/generate.py": "d0069fbbbd647f0aae3045ac0fb010256b6fc738b46752f999f7125c02d9928c",
+    "tests/crypto-audit/bls/Cargo.toml": "02333dcd69f1161cb64715fcd0e98deab1f7ce88e00c3bc502456f9f7cba6da1",
+    "tests/crypto-audit/bls/run.py": "03186c23a157e5a8cd60d5707292c73b711dc2a61956881e435008005fdc05b8",
+    "tests/crypto-audit/bls/ethereum-v0.1.2.json": "a936f2d6961e7df245a8716ac7869e06f8ea806582d4f903644753889ccd1b18",
+    "tests/crypto-audit/bls/native.rs": "0e59a219be32d7067f7faad043e56aed847f7ea8baceb4bf7224123036e12362",
+    "tests/crypto-audit/bls/msm.mo": "de57fb5973a426a2686286348e30df3d78cdbc80d48ad6f02bdb6e85a81002cb",
+    "tests/crypto-audit/bls/vectors.tsv": "0bc3c7ef33ae97b37007d22d286c5b2e3244d148799d1b0e97257f6281ece75b",
+    "tests/crypto-audit/bls/rfc9380-g2.json": "7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+    "tests/crypto-audit/bls/primitives.mo": "3f6b3e179a07c2f49b72da7163de74cfcc80688be9c1689d2f2e0a2c3ad16965",
+    "tests/crypto-audit/bls/profiles.mo": "3a571522bc7d6572411d6ac317fa83bbfa03abc325999bc58e96a9c913ccdf0b",
+    "tests/crypto-audit/bls/provenance.json": "9a48c072bc74a4e433661e30d4490fe2bed1f2aedd765f4ad648375377b65ba5",
+    "tests/crypto-audit/bls/rfc9380-g1.json": "9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+    "tests/crypto-audit/bls/msm-provenance.json": "da1600d438086d7d6bb127282310d2351870389df200a6484f0aae36b1bdb141",
+    "packages/fast/src/BLS12381.mo": "f8c36c09288e8e016f0d1e0be1289b0236dcabe45eaab03ec656c30f63313e90"
+  }
+}

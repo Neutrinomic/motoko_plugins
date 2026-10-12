@@ -1,0 +1,306 @@
+{
+  "stage": "curves-bls-maps",
+  "recorded_utc": "2026-10-12T11:58:46.866Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "1a7614144cd6800a136461cc0bae45ae8fb71e87a9953c128212166b0f00a82a",
+  "runner_sha256": "8e4a65148e227c4d657829eb0039ab3d16738913f1217979d79f3039f86b2f89",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bls12_381_map_to_g1_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_map_to_g1",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "99306391252335df0cc818cceedf113db5fea963fd013afccff5b6fadcb22a1a35a586179ffe391d6010796afaf01950",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+      "source": "curve-cases/bls12_381_map_to_g1_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "cba97eca6a9df6cba9b5b2d6af15528f77924e329fb0037f39b808f54e8fe9a1",
+      "wasm": "bls12_381_map_to_g1_fast/fast/main.wasm",
+      "wasm_sha256": "0189b89e60c8f253fd6ec35c4a71fe870dec63f8ede28d824a88bfc6a04026cd",
+      "wasm_bytes": 778391,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11894062,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11894062,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11894062,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_map_to_g1_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_map_to_g1",
+      "plugins": [],
+      "expected_hex": "99306391252335df0cc818cceedf113db5fea963fd013afccff5b6fadcb22a1a35a586179ffe391d6010796afaf01950",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+      "source": "curve-cases/bls12_381_map_to_g1_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "3a2337749d26c69f9d28ec93850de04856e7ee8799f7907da0d2eecc40819512",
+      "wasm": "bls12_381_map_to_g1_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "b875927c5ad7a23fbd95b1d8d1406e5fa1265d085e3d32aa54710195b12b1760",
+      "wasm_bytes": 266459,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 81244183,
+          "allocated_bytes": 3339696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 81244183,
+          "allocated_bytes": 3339696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 81244183,
+          "allocated_bytes": 3339696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "b4cdc2e2aea62e695ba50a1404965f22523c680caba999e840fa377e841ac497",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_hash_to_g1_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_hash_to_g1",
+      "plugins": [
+        "bls12-381"
+      ],
+      "benchmark_kind": "absolute-only",
+      "expected_hex": "83567bc5ef9c690c2ab2ecdf6a96ef1c139cc0b2f284dca0a9a7943388a49a3aee664ba5379a7655d3c68900be2f6903",
+      "notes": "Absolute-only complete RFC9380 hash-to-curve for message abc, official test DST; Mops package has no whole-message hash-to-curve entry point.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+      "source": "curve-cases/bls12_381_hash_to_g1_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "ac76447ef88ee3b17b1895248c36061c183f2e6cdd6ce1d4577d436b4a55bd3a",
+      "wasm": "bls12_381_hash_to_g1_fast/fast/main.wasm",
+      "wasm_sha256": "0e995bbbf5fe54cfc101db848d410d280400a5cc0852c3f0539f54961f1ae9d7",
+      "wasm_bytes": 778533,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 15834341,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "027603709facde5c4541eeec367f9f8b77aa5a462d33014a677093837d4cdf34",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 15834341,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "027603709facde5c4541eeec367f9f8b77aa5a462d33014a677093837d4cdf34",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 15834341,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 48,
+          "output_sha256": "027603709facde5c4541eeec367f9f8b77aa5a462d33014a677093837d4cdf34",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_map_to_g2_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_map_to_g2",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "95a167a9ab4f153abd546b063dd051a5a59a7c02e575607478f831793c2532af3331376f3a678dfcc17cd4503f6cbe2f0098bc417b0850f1943800205caeaaa06c7936ddf8e612491d216ad8d1f9a017d6d7f87fb9263bfe186a80a0797133e6",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+      "source": "curve-cases/bls12_381_map_to_g2_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "e315e83e86e52d83d42cbf40d0af4dbfbb6018398db12583e8260c2ea3491ab4",
+      "wasm": "bls12_381_map_to_g2_fast/fast/main.wasm",
+      "wasm_sha256": "dff2445a21b883cfac87c2a034a845ca056b61a88e8d134b802738846a608eb0",
+      "wasm_bytes": 778492,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 49488489,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 49488489,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 49488489,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_map_to_g2_bls12_381",
+      "family": "bls12-381",
+      "implementation": "bls12-381",
+      "comparison": "bls12_381_map_to_g2",
+      "plugins": [],
+      "expected_hex": "95a167a9ab4f153abd546b063dd051a5a59a7c02e575607478f831793c2532af3331376f3a678dfcc17cd4503f6cbe2f0098bc417b0850f1943800205caeaaa06c7936ddf8e612491d216ad8d1f9a017d6d7f87fb9263bfe186a80a0797133e6",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+      "source": "curve-cases/bls12_381_map_to_g2_bls12_381/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "02363af7c9db29f588e341d99807f211cbc206a93d89f5a21d3d043c91cbfd2a",
+      "wasm": "bls12_381_map_to_g2_bls12_381/bls12-381/main.wasm",
+      "wasm_sha256": "82578e86b95ccb77c33d16c68d2fb1663450a6e80c6d3db19149cb901c3a4b49",
+      "wasm_bytes": 263505,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 496609072,
+          "allocated_bytes": 19298680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 496609072,
+          "allocated_bytes": 19298680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 496609072,
+          "allocated_bytes": 19298680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "c797d7b2cc0dcebd76d958cd3a16b608195576070330c605b8c1d8d6d3747e6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_hash_to_g2_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_hash_to_g2",
+      "plugins": [
+        "bls12-381"
+      ],
+      "benchmark_kind": "absolute-only",
+      "expected_hex": "939cddbccdc5e91b9623efd38c49f81a6f83f175e80b06fc374de9eb4b41dfe4ca3a230ed250fbe3a2acf73a41177fd802c2d18e033b960562aae3cab37a27ce00d80ccd5ba4b7fe0e7a210245129dbec7780ccc7954725f4168aff2787776e6",
+      "notes": "Absolute-only complete RFC9380 hash-to-curve for message abc, official test DST; Mops package has no whole-message hash-to-curve entry point.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+      "source": "curve-cases/bls12_381_hash_to_g2_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "1549474c26a8cdc8fc291a2c3e594be39724b521720ed3d34aca9ec5dcd453e5",
+      "wasm": "bls12_381_hash_to_g2_fast/fast/main.wasm",
+      "wasm_sha256": "17d0bbd69ae5b11fed9cdadf3a71b88e0007525a534ca81d8744edc98bb3a226",
+      "wasm_bytes": 778584,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 65993098,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "dca31d152af8f060cf584184c3c82069836409997ffb4e8f0cfeb2eae57dd15c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 65993098,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "dca31d152af8f060cf584184c3c82069836409997ffb4e8f0cfeb2eae57dd15c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 65993098,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 96,
+          "output_sha256": "dca31d152af8f060cf584184c3c82069836409997ffb4e8f0cfeb2eae57dd15c",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

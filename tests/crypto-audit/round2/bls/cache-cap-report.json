@@ -1,0 +1,173 @@
+{
+  "status": "pass",
+  "snapshot": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped",
+  "runtime_and_plugin_artifacts_unchanged": true,
+  "inputs_unchanged": true,
+  "public_checks_per_backend": 52,
+  "results": [
+    {
+      "name": "cap-cache-cap-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/cache-cap.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 9.984,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-cache-cap-interpreter.log",
+      "log_sha256": "da5f1a3ebf491c8d4d5a37e3e8b9bdb2180c66fa943995f463de254544118181"
+    },
+    {
+      "name": "cap-cache-cap-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/cache-cap.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-cache-cap.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.106,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-cache-cap-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cap-cache-cap-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-cache-cap.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.107,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-cache-cap-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cap-cache-cap-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-cache-cap.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.367,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-cache-cap-wasm.log",
+      "log_sha256": "da5f1a3ebf491c8d4d5a37e3e8b9bdb2180c66fa943995f463de254544118181"
+    },
+    {
+      "name": "cap-profiles-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/profiles.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 17.946,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-profiles-interpreter.log",
+      "log_sha256": "c5fb832fa71147f6d6681b2a8f4492c3a915043baf4ec0d3ac06ee386815fb74"
+    },
+    {
+      "name": "cap-profiles-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/profiles.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.144,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-profiles-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cap-profiles-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.106,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-profiles-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cap-profiles-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/cap-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 2.171,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/cap-profiles-wasm.log",
+      "log_sha256": "c5fb832fa71147f6d6681b2a8f4492c3a915043baf4ec0d3ac06ee386815fb74"
+    }
+  ],
+  "sha256": {
+    "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/plugins/bls12-381/runtime/src/lib.rs": "c7dff4e213b7d2faaf1934c6f67060339a28d53732f1e91a4d8a88cc513a78f0",
+    "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/packages/fast/src/BLS12381.mo": "b6e660e2542eb6f80e54a47b82cbc0a420a5d1cfffc83cc13659a64416339fa4",
+    "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381/runtime.wasm": "96bc83999a1cf41d7f341009da7fffee05f921668d99f78ce454656f995eeff4",
+    "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381/plugin.cmxs": "9f3e7f9416853ea0156b795ebb4750a4ac01f12a6225bf5520da66e38e6f4e49",
+    "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-capped/dist/bls12-381/build.json": "d1e34fda2df8855a55214173b8eb369ecc3a8affe72d735f12b08e5c735219ad",
+    "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88",
+    "/srv/shared/code/motoko_experiments/motoko_sha/src/moc": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+    "/srv/shared/code/motoko_experiments/motoko_sha/rts/mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "/srv/shared/code/motoko_experiments/motoko_sha/rts/mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/run-cache-cap.py": "c44f43cf1de0fbf16d265f43287addd7a60f433ed1943222862549a83132911e",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/generate-cache-cap.py": "2303ca7664af816e9eefc87da0295c6a4d33b1bbbb5ad38766c5e77adf9db6bc",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/cache-cap.mo": "0c86a9ef3c671f2219f44a17f1cbd3607664722ef803a79538a60e0cf10d0b8a",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/cache-cap-provenance.json": "8a177802ad16889aad19e24793a9e33d24e05b0af7ebab34a7827884108acba6",
+    "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/profiles.mo": "0fdea24fbad9bf60b1057667c18b7584f270eee785ee2a4f76dc6d94d18c9eb6"
+  }
+}

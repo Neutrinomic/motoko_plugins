@@ -1,0 +1,623 @@
+{
+  "stage": "round2-api-pure-hash-closest",
+  "expected_case_count": 12,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:33:01.426Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "dc09056147ae35cd347a17f43b6c90d440bf7ba35de23f1b28c8efe7f089a1f0",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-ripemd160-digest-sum-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-digest-sum-1024/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.sum finalizes and consumes/locks mutable state; plugin Digest.sum preserves state for repeat finalization and continued writes. Both return the same digest once. Result array-to-Blob conversion is timed. Cost ratio does not imply equivalent state-preservation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "0f646a5e7d598d5934d38ededc74ba7ae8d35035956fe86a8d29c9ca82f7496c",
+      "wasm": "api-ripemd160-digest-sum-1024/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "4dfc6739bb6c853b1e40b91013be0b0bc58697f4b21638001b67df126607cb00",
+      "wasm_bytes": 287740,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-digest-sum-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-digest-sum-32/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.sum finalizes and consumes/locks mutable state; plugin Digest.sum preserves state for repeat finalization and continued writes. Both return the same digest once. Result array-to-Blob conversion is timed. Cost ratio does not imply equivalent state-preservation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "ca14bf086e3d1030599e6394e1149e99c767b1384a991f8cfd7bf483abb05cdc",
+      "wasm": "api-ripemd160-digest-sum-32/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "9bfc1d3cae520c352b4c72ce63d347d7c8b6167e8d80c6ade2237a5c6385c779",
+      "wasm_bytes": 286745,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-finalize-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-finalize-1024/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.sum finalizes and consumes/locks mutable state; plugin finalize preserves state for repeat finalization and continued writes. Both return the same digest once. Result array-to-Blob conversion is timed. Cost ratio does not imply equivalent state-preservation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "0f646a5e7d598d5934d38ededc74ba7ae8d35035956fe86a8d29c9ca82f7496c",
+      "wasm": "api-ripemd160-finalize-1024/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "4dfc6739bb6c853b1e40b91013be0b0bc58697f4b21638001b67df126607cb00",
+      "wasm_bytes": 287740,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 40253,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-finalize-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-finalize-32/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.sum finalizes and consumes/locks mutable state; plugin finalize preserves state for repeat finalization and continued writes. Both return the same digest once. Result array-to-Blob conversion is timed. Cost ratio does not imply equivalent state-preservation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "ca14bf086e3d1030599e6394e1149e99c767b1384a991f8cfd7bf483abb05cdc",
+      "wasm": "api-ripemd160-finalize-32/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "9bfc1d3cae520c352b4c72ce63d347d7c8b6167e8d80c6ade2237a5c6385c779",
+      "wasm_bytes": 286745,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 33133,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "191206fa8b1b90abd3757378658bbd41c328a0c9c5fbf90582eef7c81e78fb7e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-init-0",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-init-0/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest() constructs mutable object state, while plugin init() returns a canonical immutable Blob. Timed constructor only; finalization for empty-state oracle occurs in query. No allocation/representation equivalence is claimed.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "f35006f6e430e7fc845936753c4eca0d296bda893b82c78387423139cf5c0be4",
+      "wasm": "api-ripemd160-init-0/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "8e3b1362c7690b2adba53c931a620fd1bca9e66f087aab15d6f3c20e619ef121",
+      "wasm_bytes": 286252,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2807,
+          "allocated_bytes": 704,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "865c88e13bcf1d8651fc37ea134a9fb02310883c92532e0ad859511510314f4a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-update-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "4867ece7aa90f56fcb9713b587f4b456594f5866",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-update-1024/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.write mutates its prepared receiver; plugin update returns a new immutable state preserving the input state and validates serialized state. Both append the same bytes to a 17-byte prefix. Required Blob-to-array input conversion is timed; final digest is checked in query. Cost ratio does not imply equivalent mutation/validation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "37d48155f50ba18dfabfdd4e2cd31bec3e02587d6b26a7b91786856141d79622",
+      "wasm": "api-ripemd160-update-1024/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "60a483d4bcf8fed30d345eceda7fc0ee13e800a6efebe345da77dec26cc3678a",
+      "wasm_bytes": 287753,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 541428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e72b5f7f175271fd6a02ac7d01bc0bad616ddafdc6e8196630a7e2efa319f0e1",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 541428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e72b5f7f175271fd6a02ac7d01bc0bad616ddafdc6e8196630a7e2efa319f0e1",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 541428,
+          "allocated_bytes": 8216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e72b5f7f175271fd6a02ac7d01bc0bad616ddafdc6e8196630a7e2efa319f0e1",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-ripemd160-update-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin-closest",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "92dab0f6ebcd97bac9d386471a15b9fa2a9ea1d8",
+      "source": "round2/api-hash-codec/closest/cases/api-ripemd160-update-32/mops-bitcoin-closest/main.mo",
+      "notes": "Closest published code: bitcoin/Ripemd160.Digest.write mutates its prepared receiver; plugin update returns a new immutable state preserving the input state and validates serialized state. Both append the same bytes to a 17-byte prefix. Required Blob-to-array input conversion is timed; final digest is checked in query. Cost ratio does not imply equivalent mutation/validation contracts.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Ripemd160.mo",
+        "source_sha256": "242551b6ba9e68e026a8deed086ade6cc8ef1b85dc590aaf2f32068af5ae6151"
+      },
+      "returncode": 0,
+      "source_sha256": "18263a1affc193400f68750a2756e543a2aac877d63f993c64f989452bbee4c4",
+      "wasm": "api-ripemd160-update-32/mops-bitcoin-closest/main.wasm",
+      "wasm_sha256": "92b374487f35cf4f5e7fffd0ea525dc64d02953a723dde42d96f297deaabc1f2",
+      "wasm_bytes": 286758,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12202,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e759fa955ea99c65427db5d661511315b374397549ba0e3c321b8811c078826d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12202,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e759fa955ea99c65427db5d661511315b374397549ba0e3c321b8811c078826d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12202,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "e759fa955ea99c65427db5d661511315b374397549ba0e3c321b8811c078826d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bech32-convert-8to5-n32",
+      "family": "bech32",
+      "implementation": "mops-bitcoin-private",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c0000",
+      "source": "round2/api-hash-codec/closest/cases/bech32-convert-8to5-n32/mops-bitcoin-private/main.mo",
+      "notes": "Closest published code: exact private convertBits function extracted unchanged from bitcoin0.2.1 Segwit.mo, with attribution and SHA256 pins. Valid 8-to-5 padded conversion matches byte-for-byte; Blob-to-array and array-to-Blob adapters are timed. The plugin additionally validates bit widths and enforces16MiB input/output bounds; published private code assumes valid widths and has no such cap. This is a benchmark-only actor-private extraction, not a public package API.",
+      "attribution": {
+        "package": "bitcoin",
+        "version": "0.2.1",
+        "source": "dependencies/.mops/bitcoin@0.2.1/src/Segwit.mo",
+        "source_sha256": "fa22d183c610ada27e3b5a4a2a62d60591f41598337433a8e1eee0a8b486f6d1",
+        "extraction_sha256": "321a7a7b56e8702f1c8d5220d9674b03a8c448663b9c8665d346bfde183dc950",
+        "extraction_start_line": 178,
+        "extraction_end_line": 222
+      },
+      "returncode": 0,
+      "source_sha256": "bae2e5f9b29f7899a4ad9fcb8c981eb4533b77ed076af35a000b6d94f5828690",
+      "wasm": "bech32-convert-8to5-n32/mops-bitcoin-private/main.wasm",
+      "wasm_sha256": "86a40991adf74b13b672039ba717c952ee0d3a0791d2d7c298a191218cf1e9b8",
+      "wasm_bytes": 250590,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 23292,
+          "allocated_bytes": 1312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 23292,
+          "allocated_bytes": 1312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 23292,
+          "allocated_bytes": 1312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "b304e1a2e7d740bd6b86cd431d0646e143a5606530d1c7e279441e09c60bacaf",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-blake3-finalizexof",
+      "family": "blake3",
+      "implementation": "mops-blake3-composed",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fcec83a98a6a96ea5109d2c179c47a387ffbb404756f6eeae7883b446b70ebb144527c2075ab8ab204c0086bb22b7c93d465efc57f8d917f0b385c6df265e77003b8510296",
+      "source": "round2/api-hash-codec/closest/cases/api-blake3-finalizexof/mops-blake3-composed/main.mo",
+      "notes": "Closest published code composed from two correct public hasherFinalizeSeek calls: bytes13..63 and64..112, concatenated and converted to Blob inside timing. The pinned single call truncates at its first output-block boundary, so it cannot provide100bytes directly. This composition produces identical official-vector output without implementing compression or cryptographic state transitions. Only one1024-byte input chunk is used; this does not repair upstream multi-chunk hashing. State preparation is excluded and finalization preserves its immutable receiver.",
+      "attribution": {
+        "package": "blake3",
+        "version": "0.1.2",
+        "source": "dependencies/.mops/blake3@0.1.2/src/lib.mo",
+        "source_sha256": "7f687c3689d61f6b21f2915a94fb76e82db632fc09cff93c78242afd1cd5f9fe",
+        "composition": "Array.append(hasherFinalizeSeek(state,13,51),hasherFinalizeSeek(state,64,49))"
+      },
+      "returncode": 0,
+      "source_sha256": "1f20f209637ef161e6224805379fa4cd625980b67393ff14fcb88a96589f7184",
+      "wasm": "api-blake3-finalizexof/mops-blake3-composed/main.wasm",
+      "wasm_sha256": "477d108a151542a0450f3c8fd946a60dd60e3d2f8f7e63d6ab6d9c4ef9eca1c8",
+      "wasm_bytes": 300576,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 554232,
+          "allocated_bytes": 49800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 554232,
+          "allocated_bytes": 49800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 554232,
+          "allocated_bytes": 49800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-blake3-xof",
+      "family": "blake3",
+      "implementation": "mops-blake3-composed",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fcec83a98a6a96ea5109d2c179c47a387ffbb404756f6eeae7883b446b70ebb144527c2075ab8ab204c0086bb22b7c93d465efc57f8d917f0b385c6df265e77003b8510296",
+      "source": "round2/api-hash-codec/closest/cases/api-blake3-xof/mops-blake3-composed/main.mo",
+      "notes": "Closest published code composed from two correct public hasherFinalizeSeek calls: bytes13..63 and64..112, concatenated and converted to Blob inside timing. The pinned single call truncates at its first output-block boundary, so it cannot provide100bytes directly. This composition produces identical official-vector output without implementing compression or cryptographic state transitions. Only one1024-byte input chunk is used; this does not repair upstream multi-chunk hashing. One-shot timing includes init and update.",
+      "attribution": {
+        "package": "blake3",
+        "version": "0.1.2",
+        "source": "dependencies/.mops/blake3@0.1.2/src/lib.mo",
+        "source_sha256": "7f687c3689d61f6b21f2915a94fb76e82db632fc09cff93c78242afd1cd5f9fe",
+        "composition": "Array.append(hasherFinalizeSeek(state,13,51),hasherFinalizeSeek(state,64,49))"
+      },
+      "returncode": 0,
+      "source_sha256": "62ac44f2b2d052417ee86243c04e4e4a0bd29006f3f2e3f389abae7a942f98d9",
+      "wasm": "api-blake3-xof/mops-blake3-composed/main.wasm",
+      "wasm_sha256": "829a52d810787e8e394db970b3e05c0fc1e165ba568c56a67f7116c0c000ba9e",
+      "wasm_bytes": 300423,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3774754,
+          "allocated_bytes": 161032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3774754,
+          "allocated_bytes": 161032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3774754,
+          "allocated_bytes": 161032,
+          "reclaimed_bytes": 0,
+          "output_bytes": 100,
+          "output_sha256": "6ffffda4528a3b75fb5c1d463f727d1ded30390edf8b51f77d91a1226ba15b39",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-blake3-derivekey",
+      "family": "blake3",
+      "implementation": "mops-blake3-composed",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "7356cd7720d5b66b6d0697eb3177d9f8d73a4a5c5e968896eb6a689684302706",
+      "source": "round2/api-hash-codec/closest/cases/api-blake3-derivekey/mops-blake3-composed/main.mo",
+      "notes": "Closest published primitives composed with two-phase domain separation: exported Hasher record/DERIVE_KEY_CONTEXT flag hash UTF8context; resulting32-byte key initializes published hasherInitKeyed with exported DERIVE_KEY_MATERIAL flag. All compression, state updates, key decoding and finalization use pinned public functions. The high-level upstream derive_key ignores context and is not used. Official BLAKE3 context/material vectors independently check this bounded composition; context and material each fit a single1024-byte chunk, so no claim is made for broken upstream multi-chunk behavior. The whole derive operation is timed.",
+      "attribution": {
+        "package": "blake3",
+        "version": "0.1.2",
+        "source": "dependencies/.mops/blake3@0.1.2/src/lib.mo",
+        "source_sha256": "7f687c3689d61f6b21f2915a94fb76e82db632fc09cff93c78242afd1cd5f9fe",
+        "composition": "published Hasher/ChunkState records + DERIVE_KEY_CONTEXT/DERIVE_KEY_MATERIAL + hasherInit/hasherInitKeyed/hasherUpdate/hasherFinalize"
+      },
+      "returncode": 0,
+      "source_sha256": "abf69f2129e0d15bd1b68ac81e511d0b9656b3546d7f6ce25b2e6df8ee13b686",
+      "wasm": "api-blake3-derivekey/mops-blake3-composed/main.wasm",
+      "wasm_sha256": "03a4629c257d4c327eae1354b8eb8cfe455978b1594fe8084aa968e662724163",
+      "wasm_bytes": 301496,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3875001,
+          "allocated_bytes": 176104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "f989ddd0bab23e1ba5f1ae83629f1ef52cd40c93117bead70e05f7f3f1cc3d6f",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3875001,
+          "allocated_bytes": 176104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "f989ddd0bab23e1ba5f1ae83629f1ef52cd40c93117bead70e05f7f3f1cc3d6f",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3875001,
+          "allocated_bytes": 176104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "f989ddd0bab23e1ba5f1ae83629f1ef52cd40c93117bead70e05f7f3f1cc3d6f",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-blake3-newderivekey",
+      "family": "blake3",
+      "implementation": "mops-blake3-composed",
+      "comparison": "closest-published-counterpart",
+      "plugins": [],
+      "expected_hex": "2cc39783c223154fea8dfb7c1b1660f2ac2dcbd1c1de8277b0b0dd39b7e50d7d",
+      "source": "round2/api-hash-codec/closest/cases/api-blake3-newderivekey/mops-blake3-composed/main.mo",
+      "notes": "Closest published primitives composed with two-phase domain separation: exported Hasher record/DERIVE_KEY_CONTEXT flag hash UTF8context; resulting32-byte key initializes published hasherInitKeyed with exported DERIVE_KEY_MATERIAL flag. All compression, state updates, key decoding and finalization use pinned public functions. The high-level upstream derive_key ignores context and is not used. Official BLAKE3 context/material vectors independently check this bounded composition; context and material each fit a single1024-byte chunk, so no claim is made for broken upstream multi-chunk behavior. Only derived-state creation is timed; finalization of empty material occurs in query.",
+      "attribution": {
+        "package": "blake3",
+        "version": "0.1.2",
+        "source": "dependencies/.mops/blake3@0.1.2/src/lib.mo",
+        "source_sha256": "7f687c3689d61f6b21f2915a94fb76e82db632fc09cff93c78242afd1cd5f9fe",
+        "composition": "published Hasher/ChunkState records + DERIVE_KEY_CONTEXT/DERIVE_KEY_MATERIAL + hasherInit/hasherInitKeyed/hasherUpdate/hasherFinalize"
+      },
+      "returncode": 0,
+      "source_sha256": "828c7a4273bf9d6a2e0b43bdaa57ccec0d8504dcf6aef3043266d65e25893e70",
+      "wasm": "api-blake3-newderivekey/mops-blake3-composed/main.wasm",
+      "wasm_sha256": "3c9012cff6910838225b6ccdc9adca4dfd820cca7865f3aae2a8892d2138606b",
+      "wasm_bytes": 300369,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 481567,
+          "allocated_bytes": 55336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "cce62186d52f7a96de78baaf622ef892924a12cc4f73f26332a527c595c09ecc",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 481567,
+          "allocated_bytes": 55336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "cce62186d52f7a96de78baaf622ef892924a12cc4f73f26332a527c595c09ecc",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 481567,
+          "allocated_bytes": 55336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "cce62186d52f7a96de78baaf622ef892924a12cc4f73f26332a527c595c09ecc",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

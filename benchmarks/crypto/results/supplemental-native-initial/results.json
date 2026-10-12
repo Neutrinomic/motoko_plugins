@@ -1,0 +1,244 @@
+{
+  "stage": "supplemental-native-initial",
+  "recorded_utc": "2026-10-12T11:56:06.433Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "4f381dfa97ee9484112837ef2bc2be7b4b8d4c64b9966892cd67b9d77d434e1f",
+  "runner_sha256": "8e4a65148e227c4d657829eb0039ab3d16738913f1217979d79f3039f86b2f89",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "sha256-0",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "notes": "",
+      "source": "cases/sha256-0/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "637d9d004eefc4298758ae58e2c5223f537bab3e31853688900a2bf5020838d0",
+      "wasm": "sha256-0/native/main.wasm",
+      "wasm_sha256": "39cdbb9587d2f8640f4cbae71155205af8e319210e837e7b553f16760650702c",
+      "wasm_bytes": 275373,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 445,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 445,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 445,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "sha256-32",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+      "notes": "",
+      "source": "cases/sha256-32/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "6e6c2f11ed4ce846a794cbd13869611cea4def570221fbed46f72ccc203e29ee",
+      "wasm": "sha256-32/native/main.wasm",
+      "wasm_sha256": "a102aa0c1f3b54f5624b3a903bced32f216814ec86345d1aabdcca830f1647bd",
+      "wasm_bytes": 275374,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4966,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "2f287b4d3d4910f6cada9e1bd1b4648099e8c52c81aa4a6aebfa6fc86f19834e",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4966,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "2f287b4d3d4910f6cada9e1bd1b4648099e8c52c81aa4a6aebfa6fc86f19834e",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4966,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "2f287b4d3d4910f6cada9e1bd1b4648099e8c52c81aa4a6aebfa6fc86f19834e",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "sha512-stream4x256",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "incremental-prepared-state",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "State creation outside interval, four Blob chunks update plus sum included; chunk construction excluded.",
+      "source": "cases/sha512-stream4x256/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "9ad43d8d4c2cac7629dffb4a75731b5ddff801e8485bab7fa1d1be61d98172d9",
+      "wasm": "sha512-stream4x256/native/main.wasm",
+      "wasm_sha256": "6992dae3a711c4c14d4d1ce234270c70e4a940104749483e79f75f5b72209906",
+      "wasm_bytes": 268142,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 87123,
+          "allocated_bytes": 1048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 87123,
+          "allocated_bytes": 1048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 87123,
+          "allocated_bytes": 1048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "7cc7b44e9edee0687ff78027f71659cc0620214d30d38a94fe5e460a22591f20",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "ripemd160-stream4x256",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "incremental-prepared-state",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "State creation outside interval, four Blob chunks update plus sum included; chunk construction excluded.",
+      "source": "cases/ripemd160-stream4x256/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "d4ac19f21cb90da2cc0aac19b0e94c24c233b5fb5f65d18740883df998c2fbd7",
+      "wasm": "ripemd160-stream4x256/native/main.wasm",
+      "wasm_sha256": "164548027186145df6443634a77869a44bed51c53117d8ae5ad859c2509da7c9",
+      "wasm_bytes": 257680,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 75141,
+          "allocated_bytes": 560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 75141,
+          "allocated_bytes": 560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 75141,
+          "allocated_bytes": 560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "25511c44ebaa309516e614a80f3e5d8fae2605ea0fe630351ffe28614d5a11f9",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "blake3-stream4x256",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "incremental-prepared-state",
+      "plugins": [
+        "blake3"
+      ],
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "Immutable2816-byte state allocated per update; bounded state size, not allocation-free.",
+      "source": "cases/blake3-stream4x256/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "045a382325666afb4ef43789737493c22ece06e7c071ec633121fe295e930a09",
+      "wasm": "blake3-stream4x256/native/main.wasm",
+      "wasm_sha256": "ce98f651556ab91f7654db96400f283563af097f20b8e2f14a941937385feb52",
+      "wasm_bytes": 279942,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 333237,
+          "allocated_bytes": 11576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 333237,
+          "allocated_bytes": 11576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 333237,
+          "allocated_bytes": 11576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "ed416f877edc2401e13a2eef6ee144085bd4d76cd13aae09b166871270749266",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

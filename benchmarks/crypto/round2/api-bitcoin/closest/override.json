@@ -1,0 +1,34 @@
+{
+  "Bitcoin/Address.taprootSecretKey": {
+    "id": "Bitcoin/Address.taprootSecretKey",
+    "native_case": {
+      "name": "closest-bitcoin-address-taproot-secret-key-composed",
+      "implementation": "mops-bitcoin"
+    },
+    "native_source": "round2/api-bitcoin/closest/actors/closest-bitcoin-address-taproot-secret-key-composed/mops-bitcoin/main.mo",
+    "plugin_case": {
+      "name": "api-bitcoin-address-taprootsecretkey",
+      "implementation": "native"
+    },
+    "contract": "closest-variable-time-secret-composition",
+    "equivalent_api_contract": false,
+    "visible_footnote": "Bitcoin-secret-composed",
+    "notes": "Published bitcoin 0.2.1 Jacobi/Common scalar and curve primitives plus Hash.taggedHash compose the complete empty-tree BIP341 secret-key tweak. Both public-key derivation and the existing even-Y secret-tweak composition execute inside timing; scalar lengths/ranges, root length and nonzero result are checked. Pure Motoko Nat/NAF secret arithmetic is variable-time reference code; it does not share the native constant-time security contract. Output scalar bytes match the independent affine oracle exactly."
+  },
+  "Bitcoin/Transaction.TaprootHasher.signatureHash": {
+    "id": "Bitcoin/Transaction.TaprootHasher.signatureHash",
+    "native_case": {
+      "name": "closest-bitcoin-taproot-prepared-cold-vs-uncached",
+      "implementation": "mops-bitcoin"
+    },
+    "native_source": "round2/api-bitcoin/closest/actors/closest-bitcoin-taproot-prepared-cold-vs-uncached/mops-bitcoin/main.mo",
+    "plugin_case": {
+      "name": "api-bitcoin-transaction-taproothasher-signaturehash",
+      "implementation": "native"
+    },
+    "contract": "closest-uncached-versus-prepared-cold",
+    "equivalent_api_contract": false,
+    "visible_footnote": "Bitcoin-uncached",
+    "notes": "Closest published bitcoin 0.2.1 createTaprootKeySpendSignatureHash one-shot operation versus the plugin prepared hasher first cold signatureHash call. Both compute input 0 SIGHASH_DEFAULT on the identical ten-input/two-output transaction, with equal 34-byte spent scripts and no annex. Package transaction/script parsing and native prepareTaproot occur outside timing. Native lazy common hashes are cold and included; the pure package recomputes its common hashes per call and exposes no retained cache. Any ratio describes uncached package operation versus prepared-cold plugin operation, not equivalent reusable-hasher APIs."
+  }
+}

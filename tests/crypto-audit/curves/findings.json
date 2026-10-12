@@ -1,0 +1,65 @@
+{
+  "scope": "Independent review of secp256k1 and P256 native kernels, code generators, interpreter references, and public modules",
+  "findings": [
+    {
+      "id": "CURVE-001",
+      "severity": "high",
+      "component": "secp256k1 compiler predicate generation",
+      "issue": "A redundant Bool.from_rts_int32 followed compile_comparison, which already returns i64. Verification generated an invalid Wasm operand type.",
+      "resolution": "Owner independently removed the extra extension immediately before the auditor reported it.",
+      "status": "resolved and verified on final shared dist artifacts"
+    },
+    {
+      "id": "CURVE-002",
+      "severity": "high",
+      "component": "Both ECDSA signPrehash kernels",
+      "issue": "ecdsa 0.16.9 forwards the unreduced prehash into RFC6979 nonce derivation. Digests at least the scalar order therefore disagree with RFC6979 bits2octets and the interpreter.",
+      "discovery": "Implementation agents' independent boundary vectors; audit independently checks 18 cases per curve using Python integer/hashlib arithmetic.",
+      "resolution": "Both kernels reduce the 32-byte digest modulo the scalar order before invoking the upstream signer.",
+      "status": "resolved and verified on final shared dist artifacts"
+    },
+    {
+      "id": "CURVE-003",
+      "severity": "medium",
+      "component": "Optimized secp256k1 ECDSA signer",
+      "issue": "Bypassing SigningKey removed its Drop zeroization for the temporary NonZeroScalar copy; NonZeroScalar supports Zeroize but has no Drop.",
+      "resolution": "Owner explicitly zeroizes the temporary scalar after invoking the upstream signer and before propagating errors. The new secret-tweak operation also clears its temporary scalar, encoded bytes and ABI scratch.",
+      "status": "resolved and verified on final shared dist artifacts"
+    }
+  ],
+  "review": {
+    "encoding": "Strict SEC1 key lengths/tags, field bounds, on-curve validation, nonzero ECDSA components, canonical DER and exact consumption reviewed.",
+    "native_abi": "Operation-sized outputs initialize every byte including errors, input getters are resolved after output allocation, and pointer borrow intervals contain no GC safepoints.",
+    "boolean_status": "P256 i64 status 0/1 matches the SDK's vanilla Bool; secp256k1 comparison conversion reviewed against actual compiler source.",
+    "state": "Runtime kernels have no mutable retained state, callbacks, OS imports or native allocation. Wasm imports inspected: shared memory and PIC/stack globals only.",
+    "reference": "Portable Num.Big_int arithmetic with no reference subprocesses; deterministic nonce retry, low-S policy, Schnorr even-Y lift and signature equations reviewed.",
+    "limits": "Tests and review are not a formal proof or side-channel certification. Interpreter big-integer arithmetic is variable-time. Cross-message GC validation belongs to the shared crypto-gc integration suite. Rare RFC6979 nonce rejection is reviewed in the upstream and reference loops; the audit does not claim to force a rejected HMAC candidate."
+  },
+  "vector_sources": [
+    "https://github.com/C2SP/wycheproof/blob/878e5366008753df2064d40c49f8e2f50f9c6af7/testvectors_v1/ecdsa_secp256k1_sha256_test.json",
+    "https://github.com/C2SP/wycheproof/blob/878e5366008753df2064d40c49f8e2f50f9c6af7/testvectors_v1/ecdsa_secp256r1_sha256_test.json",
+    "https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv",
+    "https://www.rfc-editor.org/rfc/rfc6979.html#appendix-A.2.5"
+  ],
+  "reproduction": "From ../motoko_sha: nix develop --command python3 ../plugins/tests/crypto-audit/curves/run_audit.py --motoko . --secp ABS_STAGED_DIST/secp256k1 --p256 ABS_STAGED_DIST/p256",
+  "outcome": {
+    "passed": true,
+    "unresolved_findings": 0,
+    "native_tests": 15,
+    "wycheproof_vectors": 960,
+    "rfc6979_boundary_vectors": 36,
+    "bip340_vectors": 19,
+    "independent_secret_tweak_cases": 24,
+    "motoko_fixtures": 5,
+    "engines": [
+      "source interpreter",
+      "IR interpreter",
+      "lowered IR interpreter",
+      "Wasm runtime",
+      "Wasm validation"
+    ],
+    "evidence": "evidence.json",
+    "artifact_scope": "Final shared dist/secp256k1 and dist/p256",
+    "evidence_sha256": "9bf674e62efd0f37fbf9675dba05705ba57d2b11b7b32e2775c928e440b5e6c6"
+  }
+}

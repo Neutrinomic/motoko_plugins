@@ -1,0 +1,12 @@
+# Closest published code for previously blank table cells
+
+`override.json` is keyed by the unchanged API inventory row ID. Apply its `native_case` and explanatory `notes` to the original rows. `cases.json` contains twelve additional pure Motoko actors. The original fixtures, manifests and source pins remain unchanged.
+
+The user requested the closest available code even when public contracts differ. These comparisons expose those differences explicitly:
+
+- RIPEMD initialization uses the published mutable `Digest` constructor instead of the plugin's immutable Blob state. Update mutates that receiver instead of preserving the input state. Finalization consumes and locks the receiver instead of supporting repeated finalization and continued writes. Input and result representation conversions are timed. Queries check the same independent hashlib digest bytes as the existing plugin fixtures.
+- Bech32 bit conversion uses the exact private `convertBits` function from pinned Bitcoin 0.2.1, copied without modification into the benchmark actor. Source hash, function hash and line attribution are in each manifest entry. The retained extraction makes comparison straightforward. Blob adapters are timed. The valid-input fixture does not compare the plugin's additional bit-width and allocation-limit checks.
+- Long BLAKE3 XOF concatenates two public seek calls, `(13, 51)` and `(64, 49)`. Each lies within one output block handled correctly by the pinned package. The concatenation and Blob conversion are timed. One-shot XOF additionally includes initialization and input update.
+- BLAKE3 derivation composes exported immutable states, exported domain flags and published hash operations. The context is hashed with `DERIVE_KEY_CONTEXT`; its digest initializes the key/CV, replacing the keyed flag with `DERIVE_KEY_MATERIAL`. Compression, padding, key decoding, input update and output generation remain in the pinned package. This avoids its broken high-level helper that ignores context. The official context and material each fit a supported single input chunk; the benchmark makes no claim about upstream multi-chunk correctness.
+
+All BLAKE3 outputs use the retained official vectors. All twelve actors compile against the locked dependencies. Exact output verification and fresh-canister measurement are performed by the parent harness before table cells are populated. Until then, compilation alone does not establish successful execution.

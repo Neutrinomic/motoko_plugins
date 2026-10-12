@@ -1,0 +1,278 @@
+{
+  "status": "passed_no_unresolved_findings",
+  "scope": [
+    "BLAKE3",
+    "SHA512/SHA384",
+    "RIPEMD160",
+    "HMAC-SHA256/SHA512",
+    "Base58/Base58Check",
+    "Bech32/Bech32m/Segwit"
+  ],
+  "fixed_findings": [
+    {
+      "id": "HC-001",
+      "plugin": "sha512",
+      "severity": "low",
+      "issue": "Short canonical SHA512/SHA384 states accepted arbitrary chaining words or a mode flip before any full block had been compressed.",
+      "resolution": "Both Rust and OCaml decoders require the selected algorithm IV when total bytes is below128.",
+      "independent_regressions": [
+        "audit_sha_short_states_require_matching_iv",
+        "public-audit.mo malformed short-state cases"
+      ],
+      "qualification": "Serialized hash states are not authenticated; this enforces cheap format invariants, not arbitrary-state authenticity."
+    }
+  ],
+  "peer_reported_fixes_independently_rechecked": [
+    {
+      "plugin": "blake3",
+      "issue": "Interpreter converted unsigned Nat64 seek through signed-range conversion.",
+      "resolution": "Wrapping conversion preserves all64 bits.",
+      "evidence": "Public UINT64_MAX invalid-seek case passes source, IR, lowered IR and Wasm; owner additionally added valid high-seek vectors."
+    },
+    {
+      "plugin": "hmac-sha2",
+      "issue": "Owner positive state fixture had accepted failure output because expected counter was one byte too short.",
+      "resolution": "Owner corrected expected counters to92/156 and reran without accepting outputs.",
+      "evidence": "Our independent public fixture had predetermined success output and all HMAC oracle comparisons passed on every backend; root check-expectations verifies owner fixtures separately."
+    }
+  ],
+  "independent_tests": {
+    "native": {
+      "passed": 9,
+      "failed": 0,
+      "seconds": 6.61,
+      "hash_openssl_cases": 120,
+      "hash_stream_strides": [
+        1,
+        13,
+        55,
+        63,
+        64,
+        111,
+        127,
+        128,
+        129,
+        1021
+      ],
+      "hmac_openssl_cases": 364,
+      "hmac_stream_strides": [
+        1,
+        63,
+        64,
+        127,
+        128,
+        129
+      ],
+      "blake3_official_cases": 35,
+      "blake3_modes": 3,
+      "blake3_stream_strides": [
+        7,
+        61,
+        257,
+        997,
+        1024,
+        1027
+      ],
+      "base58_bitcoin_core_cases": 21,
+      "bech32_bitstring_model_cases": 16896
+    },
+    "public": {
+      "fixtures": 1,
+      "backends": [
+        "source",
+        "IR",
+        "lowered IR",
+        "Wasm/Wasmtime with RTS sanity checks"
+      ],
+      "runner_seconds": 25.524054426,
+      "success_marker": "hash-codec independent audit ok",
+      "expected_output_was_predetermined": true,
+      "accept_outputs_used": false,
+      "rts_sanity_checks": true
+    },
+    "additional_checks": [
+      "Guarded and deliberately unaligned output buffers",
+      "Inputs and previous state remain immutable",
+      "Fixed-size canonical streaming states and unused zero tails",
+      "Malformed state rejected before subsequent valid calls",
+      "Maximum encoded length accepts empty update but rejects overflow",
+      "Key/context/mode separation and non-consuming sums",
+      "Prepared HMAC key reuse and independent stream objects",
+      "Base58 leading zeros, strict UTF8 byte offsets, input/output caps",
+      "Official BIP350 valid and invalid witness addresses, checksum variants, padding"
+    ]
+  },
+  "reviewed_design": {
+    "state_bytes": {
+      "blake3": 2816,
+      "sha512": 216,
+      "ripemd160": 104,
+      "hmac_sha256": 136,
+      "hmac_sha512": 272
+    },
+    "persistent_native_state": "none",
+    "streaming": "Updates process new bytes and copy bounded state; no accumulated message buffers.",
+    "ownership": "Public Blob inputs are borrowed only for synchronous runtime calls; outputs are fresh SDK-managed buffers copied into Motoko values.",
+    "performance_candidates": "Final audit covers accepted empty-hash outputs, RIPEMD32-byte specialization and Bech32 lookup table; rejected SHA512/HMAC unrolled experiments are absent from final source."
+  },
+  "limitations": [
+    "HMAC malformed low-level states intentionally trap; independent native harness avoids invoking aborting extern-C paths. Owner Motoko trap fixtures cover them.",
+    "Generic Segwit accepts custom HRPs by design; Bitcoin network checking belongs to the composed Address module.",
+    "This suite audits hash/codec boundaries and deterministic correctness; curve/signature audits are separate."
+  ],
+  "commands": {
+    "native_only": [
+      "python3",
+      "tests/crypto-audit/hash-codec/run.py",
+      "--motoko",
+      "../motoko_sha",
+      "--native-only"
+    ],
+    "full": [
+      "python3",
+      "tests/crypto-audit/hash-codec/run.py",
+      "--motoko",
+      "../motoko_sha",
+      "--plugin",
+      "sha256=dist/sha256",
+      "--plugin",
+      "blake3=dist/blake3",
+      "--plugin",
+      "sha512=dist/sha512",
+      "--plugin",
+      "ripemd160=dist/ripemd160",
+      "--plugin",
+      "hmac-sha2=dist/hmac-sha2",
+      "--plugin",
+      "base58=dist/base58",
+      "--plugin",
+      "bech32=dist/bech32"
+    ]
+  },
+  "evidence_report": "_build/crypto-audit/hash-codec/run-y4iqfyh0/report.json",
+  "compiler_sha256": {
+    "/srv/shared/code/motoko_experiments/motoko_sha/src/moc": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+    "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88"
+  },
+  "artifacts": {
+    "sha256": {
+      "directory": "dist/sha256",
+      "sha256": {
+        "build.json": "4db772add2be10406194b145a79f33f3da234166631f5a0dcafd5efd2a478a11",
+        "plugin.cmxs": "7502a4db40c5e20bd78718afff5018e01021ba10b2f4120187091965a8b4a197",
+        "runtime.wasm": "0d8a6c3e6a1fdc20d7878da83b1d8c066e31a06049c305db80c149dabad0bf9c"
+      }
+    },
+    "blake3": {
+      "directory": "dist/blake3",
+      "sha256": {
+        "build.json": "bd42b0cc06966add728c938ef52b8a6ae23ea9873563de49464a4c26f100b6a1",
+        "plugin.cmxs": "9f516bd8ec7c41cb4749e4d127e4a8049bf429030a178e324025bab8953a962b",
+        "runtime.wasm": "f44a68bd50f0e5f5ffe081b5cd47c9c49da1d9c0241439dfc84332ca807f64f5"
+      }
+    },
+    "sha512": {
+      "directory": "dist/sha512",
+      "sha256": {
+        "build.json": "a0553d474e9f13546530e64a0663c6c6f31370446a052ef63b96a838ad0c2a1a",
+        "plugin.cmxs": "42bc6b21bf8cd3e9d0995feb72bac628cdc6f91b7a1a9e7ed7e1e8d4036c51b0",
+        "runtime.wasm": "f17e94f9bc242d238ae928133f7820abc586212fbb7f85da4d945ee75fb02a14"
+      }
+    },
+    "ripemd160": {
+      "directory": "dist/ripemd160",
+      "sha256": {
+        "build.json": "d2d8dfd07324f12046913799e188cea06da0bb5b5ecc20b2ad0a1bb23496b4e1",
+        "plugin.cmxs": "d4aff300aeae4f9a15ab491e843477f34c776ca4527cec285e742207afe33ce6",
+        "runtime.wasm": "a4ccc5a0eef19e8bbbbce81d64df43a5e3139a4d44cf5456a2f2773e6ec0ca5d"
+      }
+    },
+    "hmac-sha2": {
+      "directory": "dist/hmac-sha2",
+      "sha256": {
+        "build.json": "f2d594f7823216088b2c0857eee78319b8081de95c4a4539a4d7880564a7eb62",
+        "plugin.cmxs": "175159c8efccc855b0d545da6fb4a344cac7e2277294916af3acadb0a90b6c21",
+        "runtime.wasm": "038d0e4aed5e76672c910ef94cc2687dcc76690c9221143f800d0fd167b69dce"
+      }
+    },
+    "base58": {
+      "directory": "dist/base58",
+      "sha256": {
+        "build.json": "15bca9b5c9deebde51f95588c324d8487171b4c01cdc917f456f2756d2481d9b",
+        "plugin.cmxs": "6f93a742b92745693560b1c05293afc58f971de2bd1e038e2c554cab6fd5cfd0",
+        "runtime.wasm": "097d2320b008cb00b19b3241546f823160fd5bc5c834d2c1cf440fe19062aa04"
+      }
+    },
+    "bech32": {
+      "directory": "dist/bech32",
+      "sha256": {
+        "build.json": "cc98694e6dad214eca79c3292e2c3f74d680034375275f77cc293825fbe164c7",
+        "plugin.cmxs": "40fd17e9044042cb620f4cce400fe3a839d828f3bf256444d5370d4fa3f40723",
+        "runtime.wasm": "abaa1ee9283f8d83e9cfb99a353b1ff8ed30f47cfa35f2ac868227c216b176bd"
+      }
+    }
+  },
+  "audited_source_sha256": {
+    "plugins/base58/runtime/src/lib.rs": "b7fb23de687fed5897bb50c62c58a840f81ec4073e028e9cac37e05d441b7446",
+    "plugins/base58/compiler/generator.ml": "53d773d89c99d6a8dc1f11768038eb610da59ba65edce9a01d21cd06c471b756",
+    "plugins/base58/compiler/reference.ml": "1eb82dd3a7c97017991c546726f8fd2d3fee0e023cc60d48d61246dda4d9fc62",
+    "plugins/base58/compiler/register.ml": "4798e508c5387490447bd6a69ea15be18786edf9b2d587161d0d4d6890e40a64",
+    "plugins/base58/compiler/schema.ml": "a9647e2514bf2622ddc2be49f4a3ea7d86225221cd8708dbab92f567caf8be06",
+    "plugins/bech32/runtime/src/lib.rs": "26ea764c88c49c4c321cf60e3283a7e92496b540967c9afbf0782792ee1b1f06",
+    "plugins/bech32/compiler/generator.ml": "407ec4b2c9021e9b852bd5608e5276f52296d366327a9d1cdebc2856e73c32e7",
+    "plugins/bech32/compiler/reference.ml": "76ab83f187d090fce4954ad5c763a0aca85eeda6795082fd66e3087393b02168",
+    "plugins/bech32/compiler/reference.mli": "c3c9a57fef53e8ce2ecec0f9807b103afba5dfb7b8349d31c8b480dc470b4fcf",
+    "plugins/bech32/compiler/register.ml": "d0a47baf6505f980e330833c8e6d8139159915a2735ea58a77091c4f8ecea03b",
+    "plugins/bech32/compiler/schema.ml": "1ab4aa3282b52533485ac94aa5947badfb36d178c11d74c7f27dc1b6b7532642",
+    "plugins/blake3/runtime/src/lib.rs": "0b347df4b51a51b53c02be2c6e456ed4efe667b13a0c5874478849e51043749a",
+    "plugins/blake3/compiler/reference.ml": "a449ebe5815a319ece2f378abbbd8f242c96be03fc4f64ed70c7aef8335a0bda",
+    "plugins/blake3/compiler/reference.mli": "f56d2427dcbfb4d64fc8887d3893d4fd5a2763dcbfab399a3e6d3dad72e959e4",
+    "plugins/blake3/compiler/register.ml": "0bb0766277b38f45dc5c9cc6a37a08a73d1bfe222182049feb420c6cec7bec4f",
+    "plugins/hmac-sha2/runtime/src/lib.rs": "f41e7463e9bfabfb16963de484427d1281bbf7096b2ff5aa390806ae9d48e929",
+    "plugins/hmac-sha2/compiler/hmac_reference.ml": "53cb08b25b49c5327bb2b4a890c837b336235fce4055d84fba0fd9596c148833",
+    "plugins/hmac-sha2/compiler/hmac_reference.mli": "8571828f28cc5ff83a0a110cbf480c1c8794ea793ec36346feaeb1fff981c4e9",
+    "plugins/hmac-sha2/compiler/register.ml": "1c1a26c610a63bc2fe61b16504b7f77405c8619edb962b1dd54a46089b84d77e",
+    "plugins/hmac-sha2/compiler/sha256_core.ml": "c85f1fed2b4b9b637b70159320952d08d21a7a8342c8e80c43243fa146850f25",
+    "plugins/hmac-sha2/compiler/sha256_reference.ml": "909000c48bbaffd1553c71c9bc00134ea130e9c27afdc3784bfdc6571136335a",
+    "plugins/hmac-sha2/compiler/sha256_reference.mli": "e157067646e5c2d49c8b150787bbe6d2d9e7cca7f6b67a45cc6134f1ee52b9f5",
+    "plugins/hmac-sha2/compiler/sha512_reference.ml": "bbb61563d36ea8ad68f00d16dca6ec20dff468e681039b27f8eea4a95ed71cb5",
+    "plugins/hmac-sha2/compiler/sha512_reference.mli": "3af0524e27645aea656405af81ce5f1cf90e7f4c031e658ef236bfeaa8eeea06",
+    "plugins/ripemd160/runtime/src/lib.rs": "3cce32df46efef2b3810cae744da8965c00829379e9f407b4819d0bf2e0f1fac",
+    "plugins/ripemd160/compiler/register.ml": "b941fa0ec61c06b5a574936624f2ccbe42568304c3fe72fe98cde3f4aba14252",
+    "plugins/ripemd160/compiler/ripemd160_reference.ml": "d5fd85545c6dfc28f6832a763fec88830c87c9b33b2740782c2929cf7f185b89",
+    "plugins/ripemd160/compiler/ripemd160_reference.mli": "22bb0e174c9336a71f2b1e059e8d695aaae856b1d38cc8b67cb61aeeaef66916",
+    "plugins/sha256/runtime/src/lib.rs": "3075fbac11f627825828d84ab9ec993dcc015bd0abd41da6e0c2408aacb33f78",
+    "plugins/sha256/compiler/register.ml": "2ff60c676ef92f501570e6e6660226e721d351b62405a502c2b078e6af9eaf19",
+    "plugins/sha256/compiler/sha256_reference.ml": "909000c48bbaffd1553c71c9bc00134ea130e9c27afdc3784bfdc6571136335a",
+    "plugins/sha256/compiler/sha256_reference.mli": "e157067646e5c2d49c8b150787bbe6d2d9e7cca7f6b67a45cc6134f1ee52b9f5",
+    "plugins/sha512/runtime/src/lib.rs": "c971c3b4eff1d3b39fcb4ef5171bcfc635f1627846f8e787a42ce047235623c1",
+    "plugins/sha512/compiler/register.ml": "59ed87da6cf8ebd09c4ba446a89fcdbf4fad943dc816883b06caf637202f4a2b",
+    "plugins/sha512/compiler/sha512_reference.ml": "bbb61563d36ea8ad68f00d16dca6ec20dff468e681039b27f8eea4a95ed71cb5",
+    "plugins/sha512/compiler/sha512_reference.mli": "3af0524e27645aea656405af81ce5f1cf90e7f4c031e658ef236bfeaa8eeea06",
+    "packages/fast/src/BLAKE3.mo": "2dc77b9555c34823bfacb8055d8238d717a701c0a72d034702b07e7a0c959b09",
+    "packages/fast/src/Base58.mo": "c2d44a5afe16603e3a56990ab6fd30a297f23fc57905ffe4000b2877bd50411d",
+    "packages/fast/src/Base58Check.mo": "3abbe07cbfed4047981f0445114e8f536a1d10252031765111d9c0d227d567b8",
+    "packages/fast/src/Bech32.mo": "88b4e16b430b21d2c9e75a35fbe62f2143eaad642e60e936e2b7a1477ccbdca1",
+    "packages/fast/src/HMAC.mo": "d98bba208e6eb0ada77eb0fdb73e177865154cda40c8d3d3b1ec4e0c5980939c",
+    "packages/fast/src/RIPEMD160.mo": "3d55a0c13a5831efef341b6eefe7000b8a9d35d2b00bacbb4a8bc8d3a9fc53d6",
+    "packages/fast/src/SHA256.mo": "c1bb093285230a594ad37d756e67fe41148e548716e0efaff28df325f961aa80",
+    "packages/fast/src/SHA512.mo": "898202f11688c01407d574452e83111013927f43bc10b001969639ff74647195",
+    "packages/fast/src/Segwit.mo": "669fd8e7f45ca10b1ac6efa63a066a8a26c2b9cad9394070dec2cffe13aa4f76"
+  },
+  "vector_provenance": "vector-provenance.json",
+  "final_shared_build": {
+    "status": "passed",
+    "earlier_isolated_evidence_report": "_build/crypto-audit/hash-codec/run-lyds6c27/report.json",
+    "runtime_bytes_match_earlier_audit": {
+      "sha256": true,
+      "blake3": true,
+      "sha512": true,
+      "ripemd160": true,
+      "hmac-sha2": true,
+      "base58": true,
+      "bech32": true
+    },
+    "compiler_plugins": "Fresh root dist artifacts were executed by source, IR, lowered IR and Wasm audit backends.",
+    "rebuild_performed_by_auditor": false
+  }
+}

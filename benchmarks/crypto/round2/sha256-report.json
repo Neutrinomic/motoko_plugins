@@ -1,0 +1,114 @@
+{
+  "status": "recommended for audited promotion",
+  "candidate_root": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/sha256-final",
+  "production_changed": false,
+  "changed_files": {
+    "plugins/sha256/runtime/src/lib.rs": "981af382272002639ada6ed997248b4e41be79bc5a7760c70b6a3233e09ea6de",
+    "plugins/sha256/tests/run/sha256.mo": "bc56857d6cbd57c5ce758f36433bffe9c528800a8257dc5c4defe7626d8aed90",
+    "packages/fast/tests/run/sha256.mo": "cbd13d66d29b3250ec3a9524eff23309d59fcedf8fa339bbb880faa0d8f740c3"
+  },
+  "runtime_sha256": "1ac37ddbda7f90b3154bef3214882079b97d00e53a6494a5a24791c9b6759a78",
+  "baseline_runtime_bytes": 29350,
+  "candidate_runtime_bytes": 29453,
+  "algorithm": "Share a constant-padding compressor between 32-byte digests and 33-byte compressed SEC1 public keys. All input bits remain variable. The general and 64-byte paths preserve their algorithms.",
+  "retained_measurements": {
+    "sha256-33": {
+      "before_instructions": 5802,
+      "after_instructions": 5018,
+      "reduction_percent": 13.512581868321268
+    },
+    "sha256-32": {
+      "before_instructions": 4966,
+      "after_instructions": 5014,
+      "regression_percent": 0.9665726943213854
+    },
+    "sha256-64": {
+      "before_instructions": 8322,
+      "after_instructions": 8329
+    },
+    "other_workloads_instruction_delta": 2,
+    "allocated_bytes_per_operation": 56,
+    "allocation_delta": 0,
+    "canister_wasm_delta_bytes": 103
+  },
+  "comparisons": [
+    "benchmarks/crypto/round2/comparisons/sha256-final.json",
+    "benchmarks/crypto/round2/comparisons/sha256-final-extra.json"
+  ],
+  "correctness": {
+    "owner_native_hashlib_vectors": 1080,
+    "public_hashlib_assertions": 158,
+    "public_test_runner_fixtures": 5,
+    "public_engines": [
+      "source",
+      "IR",
+      "lowered IR",
+      "Wasm"
+    ],
+    "ash_tests": 5,
+    "accept_mode": false,
+    "independent_auditor": "/root/audit_crypto_round2",
+    "independent_auditor_report": "1,845 hashlib vectors, 16 alignments, read-only guard pages; debug and ASan checks passed."
+  },
+  "benchmark_protocol": {
+    "workloads": 38,
+    "trials_each_stage": 3,
+    "fresh_canister_each_trial": true,
+    "separate_query_checks_exact_hashlib_output": true,
+    "input_prepared_before_counter": true,
+    "sizes_bytes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      16,
+      20,
+      31,
+      32,
+      33,
+      34,
+      48,
+      54,
+      55,
+      56,
+      57,
+      63,
+      64,
+      65,
+      80,
+      96,
+      111,
+      112,
+      119,
+      120,
+      127,
+      128,
+      129,
+      191,
+      192,
+      193,
+      255,
+      256,
+      257,
+      1024,
+      4096,
+      16384,
+      65536
+    ]
+  },
+  "rejected_candidates": [
+    {
+      "name": "sha256-fixed33",
+      "reason": "A separate 33-byte kernel saves 14.05% but adds 7,544 canister bytes; the shared kernel has similar benefit for 103 bytes."
+    },
+    {
+      "name": "sha256-firstblock",
+      "reason": "Peeling the first generic compression saves only 74\u201379 instructions and adds 7,635 canister bytes."
+    },
+    {
+      "name": "sha256-indexed",
+      "reason": "An indexed pointer loop grows by 36 bytes and regresses generic inputs by 0.49\u20130.82%."
+    }
+  ]
+}

@@ -1,0 +1,484 @@
+{
+  "snapshot": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final",
+  "baseline": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/baseline",
+  "phase": "all",
+  "inputs_unchanged": true,
+  "results": [
+    {
+      "name": "native",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/target",
+        "audit_",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 19.994,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/native.log",
+      "log_sha256": "af9fea3d705c38ee6a80dc95030b87e8f39e3f38fdae992830fe09097d76329c"
+    },
+    {
+      "name": "existing-primitives-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/primitives.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 9.914,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-primitives-interpreter.log",
+      "log_sha256": "fdda15ad4dd9560d219aa2731c49066d40fe74ca7e313ae5da7dab2fc2f23348"
+    },
+    {
+      "name": "existing-primitives-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/primitives.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.277,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-primitives-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-primitives-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.053,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-primitives-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-primitives-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-primitives.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.79,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-primitives-wasm.log",
+      "log_sha256": "fdda15ad4dd9560d219aa2731c49066d40fe74ca7e313ae5da7dab2fc2f23348"
+    },
+    {
+      "name": "existing-profiles-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/profiles.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 5.6,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-profiles-interpreter.log",
+      "log_sha256": "4c51490fc0cbb65f22d38334b092bfba888f27ba4acabc2c6d73cf9a48e0f2a3"
+    },
+    {
+      "name": "existing-profiles-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/profiles.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.099,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-profiles-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-profiles-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.106,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-profiles-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-profiles-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.873,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-profiles-wasm.log",
+      "log_sha256": "4c51490fc0cbb65f22d38334b092bfba888f27ba4acabc2c6d73cf9a48e0f2a3"
+    },
+    {
+      "name": "existing-msm-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/msm.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 22.756,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-msm-interpreter.log",
+      "log_sha256": "3ce4a5c852a39e74221d72388b51369ca03eb4493b13bf62cdaece3aeff21638"
+    },
+    {
+      "name": "existing-msm-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/bls/msm.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.183,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-msm-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-msm-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.173,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-msm-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "existing-msm-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/existing-msm.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 6.041,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/existing-msm-wasm.log",
+      "log_sha256": "3ce4a5c852a39e74221d72388b51369ca03eb4493b13bf62cdaece3aeff21638"
+    },
+    {
+      "name": "sorting-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/sorting.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 7.703,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/sorting-interpreter.log",
+      "log_sha256": "3af2be7ab8e7a091e98626560f35fb919fe48545197cb77c6e201260a8516ee4"
+    },
+    {
+      "name": "sorting-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/sorting.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/sorting.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.082,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/sorting-compile.log",
+      "log_sha256": "23e53ed68425422c3c754f120e45140960d6574657a2f89a30de25b18fe159ed"
+    },
+    {
+      "name": "sorting-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/sorting.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.104,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/sorting-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "sorting-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/sorting.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.564,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/sorting-wasm.log",
+      "log_sha256": "1595564138a5501c604b76f7f877a631f1625b4b67bcdccafc3e729dccbb85ba"
+    },
+    {
+      "name": "profiles-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/profiles.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 17.825,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/profiles-interpreter.log",
+      "log_sha256": "c5fb832fa71147f6d6681b2a8f4492c3a915043baf4ec0d3ac06ee386815fb74"
+    },
+    {
+      "name": "profiles-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/profiles.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.144,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/profiles-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "profiles-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.102,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/profiles-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "profiles-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/profiles.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 2.16,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/profiles-wasm.log",
+      "log_sha256": "c5fb832fa71147f6d6681b2a8f4492c3a915043baf4ec0d3ac06ee386815fb74"
+    },
+    {
+      "name": "regressions-interpreter",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-r",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/regressions.mo"
+      ],
+      "exit_code": 0,
+      "seconds": 25.417,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/regressions-interpreter.log",
+      "log_sha256": "90d1827f42d115f65ab0340d2bc8f22222a4412c3980714ef846a4dfaaa30dde"
+    },
+    {
+      "name": "regressions-compile",
+      "command": [
+        "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+        "--package",
+        "fast",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/packages/fast/src",
+        "--plugin",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final/dist/bls12-381",
+        "--sanity-checks",
+        "-wasi-system-api",
+        "-c",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/regressions.mo",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/regressions.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 1.229,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/regressions-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "regressions-validate",
+      "command": [
+        "wasm-validate",
+        "--enable-memory64",
+        "--enable-multi-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/regressions.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 0.354,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/regressions-validate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "regressions-wasm",
+      "command": [
+        "wasmtime",
+        "run",
+        "-C",
+        "cache=n",
+        "-W",
+        "nan-canonicalization=y",
+        "-W",
+        "memory64",
+        "-W",
+        "multi-memory",
+        "-W",
+        "bulk-memory",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit-round2/bls/regressions.wasm"
+      ],
+      "exit_code": 0,
+      "seconds": 5.939,
+      "log": "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/bls/evidence/regressions-wasm.log",
+      "log_sha256": "90d1827f42d115f65ab0340d2bc8f22222a4412c3980714ef846a4dfaaa30dde"
+    }
+  ],
+  "all_passed": true,
+  "assertions": {
+    "existing_native": 206,
+    "new_native": 87,
+    "existing_public": 230,
+    "sort": 1279,
+    "profiles": 37,
+    "new_public": 87
+  },
+  "limitations": [
+    "Independent functional and code audit; no formal proof or hardware side-channel measurement."
+  ]
+}

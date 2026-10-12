@@ -1,0 +1,1854 @@
+{
+  "api_rows": [
+    {
+      "id": "BLAKE3.deriveKey",
+      "module": "BLAKE3",
+      "function": "deriveKey",
+      "workload": "isolated deriveKey",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-derivekey",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-derivekey/native/main.mo",
+        "source_sha256": "2d75c94bee3079081e61c16752e3be5e5e1fbc0f6f0be4be808d359fcafc8d5a"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart: Mops blake3 0.1.2 ignores the derivation context.",
+      "public_function": "BLAKE3.deriveKey",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.digest",
+      "module": "BLAKE3",
+      "function": "digest",
+      "workload": "unkeyed digest",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "blake3-1024",
+        "implementation": "native",
+        "source": "cases/blake3-1024/native/main.mo",
+        "source_sha256": "9a43a4b774ecbd5c6f59e98cd0d3b437ed6c091eb87603825e9ad810a840b875"
+      },
+      "native_case": {
+        "name": "blake3-1024",
+        "implementation": "mops-blake3",
+        "source": "cases/blake3-1024/mops-blake3/main.mo",
+        "source_sha256": "ef3c2d91eabe12095f78c13064a1543cb21c39c6a8019c3061a03bfcfa38a76e"
+      },
+      "notes": "",
+      "public_function": "BLAKE3.digest",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.finalize",
+      "module": "BLAKE3",
+      "function": "finalize",
+      "workload": "isolated finalize",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalize",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-finalize/native/main.mo",
+        "source_sha256": "6a0b59918ad18da032a75c90091fec8e90862571956ad335e7681284412ce9d9"
+      },
+      "native_case": {
+        "name": "api-blake3-finalize",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-finalize/mops-blake3/main.mo",
+        "source_sha256": "9fbe1bebb7aef7e376f6b8365e8892f065faa408d9e9cd144934c5b8385ab0ad"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state.",
+      "public_function": "BLAKE3.finalize",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.finalizeXof",
+      "module": "BLAKE3",
+      "function": "finalizeXof",
+      "workload": "isolated finalizeXof",
+      "size": "1024-byte input; seek 13; output 100 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalizexof",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-finalizexof/native/main.mo",
+        "source_sha256": "ae7159d5b333e56d59038efdc14130d681ca690a0b20ac2e58ae293adf68cb0b"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart for this 100-byte seek: Mops blake3 0.1.2 truncates output at the first 64-byte block boundary.",
+      "public_function": "BLAKE3.finalizeXof",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.finalizeXof:seek13:length32",
+      "module": "BLAKE3",
+      "function": "finalizeXof",
+      "workload": "short seeked XOF within one output block",
+      "size": "1024-byte input; seek 13; output 32 bytes",
+      "plugin_case": {
+        "name": "api-blake3-finalizexof-seek13-length32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-finalizexof-seek13-length32/native/main.mo",
+        "source_sha256": "c5b327183f69eb69587e7c77d082b407a88682502268aa4668fb8a378ed4cbdd"
+      },
+      "native_case": {
+        "name": "api-blake3-finalizexof-seek13-length32",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-finalizexof-seek13-length32/mops-blake3/main.mo",
+        "source_sha256": "c8836846283bc30dc909b6a93f4961ed50a4018571a3c20c013df0f11758af07"
+      },
+      "notes": "Closest correct published counterpart: immutable Mops Hasher API. One-shot xof includes init/update/finalize; finalizeXof prepares state outside measurement. Does not establish correctness for multi-block XOF.",
+      "representative": true,
+      "public_function": "BLAKE3.finalizeXof",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.keyedHash",
+      "module": "BLAKE3",
+      "function": "keyedHash",
+      "workload": "keyed digest",
+      "size": "32-byte key; 1024 bytes",
+      "plugin_case": {
+        "name": "blake3-keyed-1024",
+        "implementation": "native",
+        "source": "cases/blake3-keyed-1024/native/main.mo",
+        "source_sha256": "cd573de68fc0d28558320e10b4c0fa7615db1a0d039e908fa32f75d5a592a78e"
+      },
+      "native_case": {
+        "name": "blake3-keyed-1024",
+        "implementation": "mops-blake3",
+        "source": "cases/blake3-keyed-1024/mops-blake3/main.mo",
+        "source_sha256": "4c38822923bcb04b79cb22791e28c3171025cc582a376b7044e0850db160ac2e"
+      },
+      "notes": "Valid 32-byte key. Plugin returns a checked Result; Mops accepts valid key directly.",
+      "public_function": "BLAKE3.keyedHash",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.new",
+      "module": "BLAKE3",
+      "function": "new",
+      "workload": "isolated new",
+      "size": "empty state",
+      "plugin_case": {
+        "name": "api-blake3-new",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-new/native/main.mo",
+        "source_sha256": "3a891d01c78afc5a32442bba05413744323cdf62e7ffc41903dc2bcc6c54e15c"
+      },
+      "native_case": {
+        "name": "api-blake3-new",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-new/mops-blake3/main.mo",
+        "source_sha256": "b072a0b4d28e3364176de40a65c8142725d0d8a86ddebe79dd2521a57f81caf3"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state.",
+      "public_function": "BLAKE3.new",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.newDeriveKey",
+      "module": "BLAKE3",
+      "function": "newDeriveKey",
+      "workload": "isolated newDeriveKey",
+      "size": "empty state",
+      "plugin_case": {
+        "name": "api-blake3-newderivekey",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-newderivekey/native/main.mo",
+        "source_sha256": "c50b0dfa3cb09597c3a2d8b0f404e3ae49d69c3bf5e3ed2b8d4c018afb04dd5c"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart: Mops blake3 0.1.2 ignores the derivation context.",
+      "public_function": "BLAKE3.newDeriveKey",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.newKeyed",
+      "module": "BLAKE3",
+      "function": "newKeyed",
+      "workload": "isolated newKeyed",
+      "size": "32-byte key; empty state",
+      "plugin_case": {
+        "name": "api-blake3-newkeyed",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-newkeyed/native/main.mo",
+        "source_sha256": "22a0c1477bf9d615fb8cbcaddb952482ccc2e5b8b9d6b2c7aa0fa94b40432623"
+      },
+      "native_case": {
+        "name": "api-blake3-newkeyed",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-newkeyed/mops-blake3/main.mo",
+        "source_sha256": "e30c6f0e61dcea1b0b0636ce522d9edf781aa790d0ca840745ab80647017d6db"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state.",
+      "public_function": "BLAKE3.newKeyed",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.update",
+      "module": "BLAKE3",
+      "function": "update",
+      "workload": "isolated update",
+      "size": "1024 bytes",
+      "plugin_case": {
+        "name": "api-blake3-update",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-update/native/main.mo",
+        "source_sha256": "373eefb79cd487a63f2229443ae65ebc809bca1090bf7b418392360660c3669a"
+      },
+      "native_case": {
+        "name": "api-blake3-update",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-update/mops-blake3/main.mo",
+        "source_sha256": "2853487b19f18a8f48d3fa82918752e2c983d2d1511402292a04469cc8fa622d"
+      },
+      "notes": "Mops immutable Hasher API, single chunk; Blob/array conversion included. Finalization preserves state.",
+      "public_function": "BLAKE3.update",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.xof",
+      "module": "BLAKE3",
+      "function": "xof",
+      "workload": "isolated xof",
+      "size": "1024-byte input; seek 13; output 100 bytes",
+      "plugin_case": {
+        "name": "api-blake3-xof",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-xof/native/main.mo",
+        "source_sha256": "f85f0e06ee7d5bd10dbb3b7a359a469a177ffa68229d183a46fb44ed7c956f25"
+      },
+      "native_case": null,
+      "notes": "No correct pinned native counterpart for this 100-byte seek: Mops blake3 0.1.2 truncates output at the first 64-byte block boundary.",
+      "public_function": "BLAKE3.xof",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "BLAKE3.xof:seek13:length32",
+      "module": "BLAKE3",
+      "function": "xof",
+      "workload": "short seeked XOF within one output block",
+      "size": "1024-byte input; seek 13; output 32 bytes",
+      "plugin_case": {
+        "name": "api-blake3-xof-seek13-length32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-blake3-xof-seek13-length32/native/main.mo",
+        "source_sha256": "da4b9b6a3c7df5323c86cfced8677fa2aa3a216440274d4b02c252a6242831fc"
+      },
+      "native_case": {
+        "name": "api-blake3-xof-seek13-length32",
+        "implementation": "mops-blake3",
+        "source": "round2/api-hash-codec/cases/api-blake3-xof-seek13-length32/mops-blake3/main.mo",
+        "source_sha256": "22ae9354453709f7b672196d41b2ff92575e430aa580a2b1d9f9d8488770e2ad"
+      },
+      "notes": "Closest correct published counterpart: immutable Mops Hasher API. One-shot xof includes init/update/finalize; finalizeXof prepares state outside measurement. Does not establish correctness for multi-block XOF.",
+      "representative": true,
+      "public_function": "BLAKE3.xof",
+      "source_module": "packages/fast/src/BLAKE3.mo"
+    },
+    {
+      "id": "Base58.decode",
+      "module": "Base58",
+      "function": "decode",
+      "workload": "Bitcoin Base58 decode",
+      "size": "82 bytes",
+      "plugin_case": {
+        "name": "base58-decode-82",
+        "implementation": "native",
+        "source": "cases/base58-decode-82/native/main.mo",
+        "source_sha256": "84dab86fc61f5c33faf991ec50b55ea9b62451eff25446bd413450869ab58979"
+      },
+      "native_case": {
+        "name": "base58-decode-82",
+        "implementation": "mops-bitcoin",
+        "source": "cases/base58-decode-82/mops-bitcoin/main.mo",
+        "source_sha256": "9dcc3ae45b2e48f8738c85543b2b9f4efbbfe99a87d79ce21bc412f329ab48cc"
+      },
+      "notes": "Valid alphabet, leading-zero preservation, Blob/array representation conversions included.",
+      "public_function": "Base58.decode",
+      "source_module": "packages/fast/src/Base58.mo"
+    },
+    {
+      "id": "Base58.encode",
+      "module": "Base58",
+      "function": "encode",
+      "workload": "Bitcoin Base58 encode",
+      "size": "82 bytes",
+      "plugin_case": {
+        "name": "base58-encode-82",
+        "implementation": "native",
+        "source": "cases/base58-encode-82/native/main.mo",
+        "source_sha256": "75d5cf6a66cdab069a17bfde543ef10d4c9cbe8134ef8702d4d30db6fe162652"
+      },
+      "native_case": {
+        "name": "base58-encode-82",
+        "implementation": "mops-bitcoin",
+        "source": "cases/base58-encode-82/mops-bitcoin/main.mo",
+        "source_sha256": "62d07fa8a555418188cf40b19e1d6bc7c9ab58376949874f443899981cdf326c"
+      },
+      "notes": "Valid alphabet, leading-zero preservation, Blob/array representation conversions included.",
+      "public_function": "Base58.encode",
+      "source_module": "packages/fast/src/Base58.mo"
+    },
+    {
+      "id": "Base58Check.decode",
+      "module": "Base58Check",
+      "function": "decode",
+      "workload": "checksummed Bitcoin extended-key sized payload",
+      "size": "78-byte payload; 4-byte checksum",
+      "plugin_case": {
+        "name": "api-base58check-decode-78",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-base58check-decode-78/native/main.mo",
+        "source_sha256": "85806d7a8d6d75d1a77858bec3d021b7c295ec41bb5768cca3d9a8d23f0235c4"
+      },
+      "native_case": {
+        "name": "api-base58check-decode-78",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/cases/api-base58check-decode-78/mops-bitcoin/main.mo",
+        "source_sha256": "0e327a54056f99270be277db74f659a84b164e224e93988e4d319eac569105d0"
+      },
+      "notes": "Both paths check the four-byte checksum. Valid input avoids unrelated malformed-character error-policy differences.",
+      "public_function": "Base58Check.decode",
+      "source_module": "packages/fast/src/Base58Check.mo"
+    },
+    {
+      "id": "Base58Check.encode",
+      "module": "Base58Check",
+      "function": "encode",
+      "workload": "checksummed Bitcoin extended-key sized payload",
+      "size": "78-byte payload; 4-byte checksum",
+      "plugin_case": {
+        "name": "api-base58check-encode-78",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-base58check-encode-78/native/main.mo",
+        "source_sha256": "ff4b85a06e0c5e5e744de2463183d5753a5bd2e65869f77764ad8caff2bfec77"
+      },
+      "native_case": {
+        "name": "api-base58check-encode-78",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/cases/api-base58check-encode-78/mops-bitcoin/main.mo",
+        "source_sha256": "be52bc5d0e9299637c2c2a4392857486e813a4301e5cd652d54b4d28cee9f1f3"
+      },
+      "notes": "Both paths generate the four-byte checksum. Valid input avoids unrelated malformed-character error-policy differences.",
+      "public_function": "Base58Check.encode",
+      "source_module": "packages/fast/src/Base58Check.mo"
+    },
+    {
+      "id": "Bech32.convertBits",
+      "module": "Bech32",
+      "function": "convertBits",
+      "workload": "8-bit to padded 5-bit groups",
+      "size": "32 input bytes; 52 output groups",
+      "plugin_case": {
+        "name": "bech32-convert-8to5-n32",
+        "implementation": "native",
+        "source": "round2/bech32-workloads/bech32-convert-8to5-n32/main.mo",
+        "source_sha256": "3641e501b1375561b0fc34b8e88dc76985c4805c02875b1ba3905c2741da7014"
+      },
+      "native_case": null,
+      "notes": "Pinned bitcoin Segwit bit conversion is private; no independently callable native counterpart is exposed.",
+      "public_function": "Bech32.convertBits",
+      "source_module": "packages/fast/src/Bech32.mo"
+    },
+    {
+      "id": "Bech32.decode",
+      "module": "Bech32",
+      "function": "decode",
+      "workload": "Bech32m decode",
+      "size": "2-byte HRP; 53 groups",
+      "plugin_case": {
+        "name": "bech32m-decode-53",
+        "implementation": "native",
+        "source": "cases/bech32m-decode-53/native/main.mo",
+        "source_sha256": "7e43cb6f10eaa26932ed902b314ac403c0c5fbc051a03f7c221701ec50b38e55"
+      },
+      "native_case": {
+        "name": "bech32m-decode-53",
+        "implementation": "mops-bitcoin",
+        "source": "cases/bech32m-decode-53/mops-bitcoin/main.mo",
+        "source_sha256": "56e7e7f5e498f64259dfa3b8b204065643a40f785efa66d7a90c15864d641f7a"
+      },
+      "notes": "Valid lowercase BIP350 checksummed payload; both APIs validate checksum on decode.",
+      "public_function": "Bech32.decode",
+      "source_module": "packages/fast/src/Bech32.mo"
+    },
+    {
+      "id": "Bech32.encode",
+      "module": "Bech32",
+      "function": "encode",
+      "workload": "Bech32m encode",
+      "size": "2-byte HRP; 53 groups",
+      "plugin_case": {
+        "name": "bech32m-encode-53",
+        "implementation": "native",
+        "source": "cases/bech32m-encode-53/native/main.mo",
+        "source_sha256": "6548daa1c72965124f43c1468755a92b291845e9d4985740bf315e26bbd39203"
+      },
+      "native_case": {
+        "name": "bech32m-encode-53",
+        "implementation": "mops-bitcoin",
+        "source": "cases/bech32m-encode-53/mops-bitcoin/main.mo",
+        "source_sha256": "2c825518edfa32d4095bc86bc2fdf9bf73acdfdcbd0423beca62d107a2453f82"
+      },
+      "notes": "Valid lowercase BIP350 checksummed payload; both APIs validate checksum on decode.",
+      "public_function": "Bech32.encode",
+      "source_module": "packages/fast/src/Bech32.mo"
+    },
+    {
+      "id": "HMAC.SHA256",
+      "module": "HMAC",
+      "function": "SHA256",
+      "workload": "constructor",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha256-constructor",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-constructor/native/main.mo",
+        "source_sha256": "9fc3098c9f43b8b664159c9e65df4ff3f269bce6f82d488ceaaf822e2e10170d"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-constructor",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-constructor/mops-sha2-composed/main.mo",
+        "source_sha256": "dc9c0756a5af2bc814d06680602ab25090f81d9ddbd108a6d1879a0f9a301df5"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA256",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA256.reset",
+      "module": "HMAC",
+      "function": "SHA256.reset",
+      "workload": "reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-reset",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-reset/native/main.mo",
+        "source_sha256": "4568b89aa5d40e74f67ca9119f148be1174f451c3a70e1ca2f777e82c5bc29e2"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-reset",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-reset/mops-sha2-composed/main.mo",
+        "source_sha256": "097998efd46c507d6a3baf1fee1627df46446a4a374c5d30b99d764ad9b1f776"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA256.reset",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA256.sum",
+      "module": "HMAC",
+      "function": "SHA256.sum",
+      "workload": "sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-sum",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-sum/native/main.mo",
+        "source_sha256": "c88869311b744a4405da2e35d75a206e2b54f428141b772c73922c4e43ffb5d5"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-sum",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-sum/mops-sha2-composed/main.mo",
+        "source_sha256": "908c90f74c90dcad98b1366f9d55023b28ae1c3a98ef7ee2a719c22b761c72b5"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA256.sum",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA256.write",
+      "module": "HMAC",
+      "function": "SHA256.write",
+      "workload": "write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-write",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-write/native/main.mo",
+        "source_sha256": "9f9a25893102f9cb95394e3797c8ef3768bb169aee5950edf462f36723c745d6"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-write",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-write/mops-sha2-composed/main.mo",
+        "source_sha256": "ac604cd38f2a346029570972bf16c3f4332b8fb64cf06a0b9afd106f52bdde7b"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA256.write",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA512",
+      "module": "HMAC",
+      "function": "SHA512",
+      "workload": "constructor",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha512-constructor",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-constructor/native/main.mo",
+        "source_sha256": "34060d280a1903ea13f89ce0d1d626422f6a19b2b3cca8157afa21e364999d85"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-constructor",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-constructor/mops-sha2-composed/main.mo",
+        "source_sha256": "1725ac04457327abdb04d31fb7cc3112fb8323358819016aa1d25e431957834d"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA512",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA512.reset",
+      "module": "HMAC",
+      "function": "SHA512.reset",
+      "workload": "reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-reset",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-reset/native/main.mo",
+        "source_sha256": "27d7dfc6a4c0a92d596244ea37be7f95854e2b5c8355ffc5afe9bfa980455a15"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-reset",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-reset/mops-sha2-composed/main.mo",
+        "source_sha256": "3b4fdf6037f0d644a8570cd3f3c84f9d943a5a8d4e38c1c36f990dfeeb998ec2"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA512.reset",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA512.sum",
+      "module": "HMAC",
+      "function": "SHA512.sum",
+      "workload": "sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-sum",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-sum/native/main.mo",
+        "source_sha256": "c6a6144ba70062a8402c9fba58dff820dbcce550eac4c6ce863280910aabf5fd"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-sum",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-sum/mops-sha2-composed/main.mo",
+        "source_sha256": "b8dcaedb1cc95cfd341f374f1228ba36f4606231268ff777b7bd2ba1c88d2bd5"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA512.sum",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.SHA512.write",
+      "module": "HMAC",
+      "function": "SHA512.write",
+      "workload": "write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-write",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-write/native/main.mo",
+        "source_sha256": "f099a228015c4b5800a2556f9c0fc5da24c06779b897bac3e09b53b7a8084aea"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-write",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-write/mops-sha2-composed/main.mo",
+        "source_sha256": "40e29c490c9d418dae8ba2a43f7ade4e841c2880c7967197cf77c01b735b5285"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.SHA512.write",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256",
+      "module": "HMAC",
+      "function": "prepareSha256",
+      "workload": "prepare",
+      "size": "32-byte key",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepare",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepare/native/main.mo",
+        "source_sha256": "5beb3ed977515ee4b908af4f6a0388460b7255199f967fd0825b5738c107bdd3"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepare",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepare/mops-sha2-composed/main.mo",
+        "source_sha256": "0857ebbd1282de1df9526086868900232355d54c3d9a02a2dc508e6839432a17"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256.digest",
+      "module": "HMAC",
+      "function": "prepareSha256.digest",
+      "workload": "prepared digest",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-digest",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-digest/native/main.mo",
+        "source_sha256": "820aa05c8dafb3deaccd74657d8dc8d1c86650c13f72b75156cef7f16fb50430"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-digest",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-digest/mops-sha2-composed/main.mo",
+        "source_sha256": "d3efff07d289c2da87dfe0a56e93d2426d6480545368572d85a1862a7b7df2d2"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256.digest",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256.stream",
+      "module": "HMAC",
+      "function": "prepareSha256.stream",
+      "workload": "prepared stream",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-stream",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-stream/native/main.mo",
+        "source_sha256": "5875eb3ea0340e0bfd351945b6a32886ec85df133809d1412f4b9d80a261fe8a"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-stream",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-stream/mops-sha2-composed/main.mo",
+        "source_sha256": "538b544ce698eddb9ea10c3dd4345ddedefc6fb2d438b87e2cf2e33418f2649b"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256.stream",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.reset",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.reset",
+      "workload": "prepared reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-reset",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-reset/native/main.mo",
+        "source_sha256": "333995ed0015c8d67b105552a4370cafe386acded00a9537306fa9fe81b0a802"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-reset",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-reset/mops-sha2-composed/main.mo",
+        "source_sha256": "3f5e7bb139e7a43ddbadc4c95d3a62887a5b295dfcdeeeaec4473a0f475b2aa6"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256.stream.reset",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.sum",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.sum",
+      "workload": "prepared sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-sum",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-sum/native/main.mo",
+        "source_sha256": "90a712d92cfd7c47095aa10d33aa820e7dcc77ee2b3a205be9f394955fb1d52a"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-sum",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-sum/mops-sha2-composed/main.mo",
+        "source_sha256": "b2ebb77404c7da3c823413fa3b0f4c383fa95c0b3ba6bfa92b421f49d19fb4d5"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256.stream.sum",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha256.stream.write",
+      "module": "HMAC",
+      "function": "prepareSha256.stream.write",
+      "workload": "prepared write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha256-prepared-write",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-write/native/main.mo",
+        "source_sha256": "bbba6e774c69c8188de765dde73eca526144181df9dc365feed5de189b975862"
+      },
+      "native_case": {
+        "name": "api-hmac-sha256-prepared-write",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-write/mops-sha2-composed/main.mo",
+        "source_sha256": "b58c6f2edb5ae171cdaa97adc5b59da25b2544a67377113bfa07236758d99c64"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha256.stream.write",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512",
+      "module": "HMAC",
+      "function": "prepareSha512",
+      "workload": "prepare",
+      "size": "32-byte key",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepare",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepare/native/main.mo",
+        "source_sha256": "d3679b5de8c2ff4100efba3242cf064f4c8fddefb8722c45514b751ce8d251cf"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepare",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepare/mops-sha2-composed/main.mo",
+        "source_sha256": "3a067af21640f334c0024e355263b00d6d61e1d2ae84c41e23bdafebe9aeedee"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512.digest",
+      "module": "HMAC",
+      "function": "prepareSha512.digest",
+      "workload": "prepared digest",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-digest",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-digest/native/main.mo",
+        "source_sha256": "25b3ae82b9f2c098766e4872616f87ba60bc8cedc6bc3923cf3a2e9be0b66156"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-digest",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-digest/mops-sha2-composed/main.mo",
+        "source_sha256": "3ef4eecf265423c5ff2597ba84fc4e3c129a80701c8736f6a0cc3d434912aa1f"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512.digest",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512.stream",
+      "module": "HMAC",
+      "function": "prepareSha512.stream",
+      "workload": "prepared stream",
+      "size": "32-byte key; empty stream",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-stream",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-stream/native/main.mo",
+        "source_sha256": "508d3f4390490cf6b39e514fb506491ac8c2f66b3a1c2c3e7d621562d9656cc1"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-stream",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-stream/mops-sha2-composed/main.mo",
+        "source_sha256": "8100c718140698fcd1c3e726bdd7b0656dc361177b9bcaf30f0ff12b85d6a3c8"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512.stream",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.reset",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.reset",
+      "workload": "prepared reset",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-reset",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-reset/native/main.mo",
+        "source_sha256": "b9e0a5a030cdf0dae91e86b119bfc6b59bc5cea10915a911b31dba0a7ff4fa25"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-reset",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-reset/mops-sha2-composed/main.mo",
+        "source_sha256": "2a7f355f04149e38c076bb524922fb0f48b44d8fbf0425e145afbf6f736cf141"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512.stream.reset",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.sum",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.sum",
+      "workload": "prepared sum",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-sum",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-sum/native/main.mo",
+        "source_sha256": "374b1e0856d67b872050c3d28a6648fe657cdbbe650ca75e01249cbdf4889fb1"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-sum",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-sum/mops-sha2-composed/main.mo",
+        "source_sha256": "e83aa0cd23d822c7e0c8c222ce4c320c1e394a5820a3cbda2eb497316fadaa3e"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512.stream.sum",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.prepareSha512.stream.write",
+      "module": "HMAC",
+      "function": "prepareSha512.stream.write",
+      "workload": "prepared write",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "api-hmac-sha512-prepared-write",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-write/native/main.mo",
+        "source_sha256": "ea312a881183b0a6bd4cd88ff769605e5d07364140a04f1653882f55b5a7fcd4"
+      },
+      "native_case": {
+        "name": "api-hmac-sha512-prepared-write",
+        "implementation": "mops-sha2-composed",
+        "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-write/mops-sha2-composed/main.mo",
+        "source_sha256": "620229906a4aff5bb938454ef1c071357ee49d0b17fc660b5588adc672f78300"
+      },
+      "notes": "Equivalent pure Motoko composition over pinned sha2 state snapshots; key/state setup excluded except constructor and prepare. Reset follows a 1024-byte write outside timing.",
+      "public_function": "HMAC.prepareSha512.stream.write",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.sha256",
+      "module": "HMAC",
+      "function": "sha256",
+      "workload": "authenticate one message",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "hmac-sha256-1024",
+        "implementation": "native",
+        "source": "cases/hmac-sha256-1024/native/main.mo",
+        "source_sha256": "98866551eddef3bade7b716351de72495fb0418e963f406b0864bc2c3d2fc281"
+      },
+      "native_case": {
+        "name": "hmac-sha256-1024",
+        "implementation": "mops-bitcoin",
+        "source": "cases/hmac-sha256-1024/mops-bitcoin/main.mo",
+        "source_sha256": "2cc8dd047140f844b51257021613638bc16a9db93d28af4958fdc908598e8d1b"
+      },
+      "notes": "Direct Mops Hmac construction, write and one consuming sum implement this one-shot operation.",
+      "public_function": "HMAC.sha256",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "HMAC.sha512",
+      "module": "HMAC",
+      "function": "sha512",
+      "workload": "authenticate one message",
+      "size": "32-byte key; 1024-byte message",
+      "plugin_case": {
+        "name": "hmac-sha512-1024",
+        "implementation": "native",
+        "source": "cases/hmac-sha512-1024/native/main.mo",
+        "source_sha256": "d716bc365f88d0c68dab8a1b97c31f0a7dc78dfa1085e4279e2e2059e063b9a1"
+      },
+      "native_case": {
+        "name": "hmac-sha512-1024",
+        "implementation": "mops-bitcoin",
+        "source": "cases/hmac-sha512-1024/mops-bitcoin/main.mo",
+        "source_sha256": "79a527053e83a92801d4417d9fc364150bf69f611d21c7b4c54112193d29f520"
+      },
+      "notes": "Direct Mops Hmac construction, write and one consuming sum implement this one-shot operation.",
+      "public_function": "HMAC.sha512",
+      "source_module": "packages/fast/src/HMAC.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest.reset:reset:1024",
+      "module": "RIPEMD160",
+      "function": "Digest.reset",
+      "public_function": "RIPEMD160.Digest.reset",
+      "workload": "reset",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-reset-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-reset-1024/native/main.mo",
+        "source_sha256": "c62e17dc4e188342dc50a811d8e65feb797321799af60b5dc714eb65df2ed41c"
+      },
+      "native_case": {
+        "name": "api-ripemd160-digest-reset-1024",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-reset-1024/mops-bitcoin/main.mo",
+        "source_sha256": "7554c2c055f57ea0e8d8bbcc537523cb778694208e5e91d6c52e6207430461d0"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest.sum:sum:1024",
+      "module": "RIPEMD160",
+      "function": "Digest.sum",
+      "public_function": "RIPEMD160.Digest.sum",
+      "workload": "sum",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-sum-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-sum-1024/native/main.mo",
+        "source_sha256": "5b16702e286eb5393a8fd2979e8d78cd37148f5b3d0f31f3b9da4134478d6b41"
+      },
+      "native_case": null,
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Bitcoin RIPEMD Digest.sum consumes and locks state; no public clone/share operation exists, so no equivalent non-destructive native Motoko counterpart is claimed.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest.sum:sum:32",
+      "module": "RIPEMD160",
+      "function": "Digest.sum",
+      "public_function": "RIPEMD160.Digest.sum",
+      "workload": "sum",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-sum-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-sum-32/native/main.mo",
+        "source_sha256": "d417a447aa422ee35b78c050ed7964d4f9b676c6708f0a92e7e45d973216146d"
+      },
+      "native_case": null,
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Bitcoin RIPEMD Digest.sum consumes and locks state; no public clone/share operation exists, so no equivalent non-destructive native Motoko counterpart is claimed.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest.write:write:1024",
+      "module": "RIPEMD160",
+      "function": "Digest.write",
+      "public_function": "RIPEMD160.Digest.write",
+      "workload": "write",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-write-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-1024/native/main.mo",
+        "source_sha256": "9c5f4dec40942e89006649fddb16e888e3f620f885475a032aeea9b2292fb495"
+      },
+      "native_case": {
+        "name": "api-ripemd160-digest-write-1024",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-1024/mops-bitcoin/main.mo",
+        "source_sha256": "3ebe5551d14f7610794335b0cffb724ad9f2823e53a308668a828c2e76b468ec"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest.write:write:32",
+      "module": "RIPEMD160",
+      "function": "Digest.write",
+      "public_function": "RIPEMD160.Digest.write",
+      "workload": "write",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-write-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-32/native/main.mo",
+        "source_sha256": "11af440ed48d7bb8c015c6c589d85e442b8f1c3977d5797503e9103acd5be7c2"
+      },
+      "native_case": {
+        "name": "api-ripemd160-digest-write-32",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-32/mops-bitcoin/main.mo",
+        "source_sha256": "c5ceab884b3f00253edc5b6a1fb302ea43e5fc2bc227004537e18c129dddc7f4"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.Digest:constructor:0",
+      "module": "RIPEMD160",
+      "function": "Digest",
+      "public_function": "RIPEMD160.Digest",
+      "workload": "constructor",
+      "size": 0,
+      "plugin_case": {
+        "name": "api-ripemd160-digest-constructor-0",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-constructor-0/native/main.mo",
+        "source_sha256": "871b170975f11109a31e5c7fbbc6f3ee7e0221e1779b83bbf755e7b72f7b7dea"
+      },
+      "native_case": {
+        "name": "api-ripemd160-digest-constructor-0",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-constructor-0/mops-bitcoin/main.mo",
+        "source_sha256": "b71400a3d0a694dc3d1f15eb27413184478768e6b4787e2d66a1e10e50952cd3"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.digest:one-shot:0",
+      "module": "RIPEMD160",
+      "function": "digest",
+      "public_function": "RIPEMD160.digest",
+      "workload": "one-shot",
+      "size": 0,
+      "plugin_case": {
+        "name": "ripemd160-0",
+        "implementation": "native",
+        "source": "cases/ripemd160-0/native/main.mo",
+        "source_sha256": "7dada0a530779317592db7fc5d8a63a321ebdb5a1c0da18bcebff8b5280047ab"
+      },
+      "native_case": {
+        "name": "ripemd160-0",
+        "implementation": "mops-bitcoin",
+        "source": "cases/ripemd160-0/mops-bitcoin/main.mo",
+        "source_sha256": "d6ac78acc8127c4c1383b52cf24a3f383f36d4897821c094dc32544a371ac1dc"
+      },
+      "notes": "Existing exact-output one-shot fixture. Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.digest:one-shot:1024",
+      "module": "RIPEMD160",
+      "function": "digest",
+      "public_function": "RIPEMD160.digest",
+      "workload": "one-shot",
+      "size": 1024,
+      "plugin_case": {
+        "name": "ripemd160-1024",
+        "implementation": "native",
+        "source": "cases/ripemd160-1024/native/main.mo",
+        "source_sha256": "f431cacc4b0fd5a28d172a8b1273e341173b51f7a147896e920604899e7c489d"
+      },
+      "native_case": {
+        "name": "ripemd160-1024",
+        "implementation": "mops-bitcoin",
+        "source": "cases/ripemd160-1024/mops-bitcoin/main.mo",
+        "source_sha256": "1d16f71aceaa854e094eb82187901b33f407017bb76217cb08711b0137b6b9ed"
+      },
+      "notes": "Existing exact-output one-shot fixture. Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.digest:one-shot:16384",
+      "module": "RIPEMD160",
+      "function": "digest",
+      "public_function": "RIPEMD160.digest",
+      "workload": "one-shot",
+      "size": 16384,
+      "plugin_case": {
+        "name": "ripemd160-16384",
+        "implementation": "native",
+        "source": "cases/ripemd160-16384/native/main.mo",
+        "source_sha256": "fc448b85d3c875db2b49c859f89df13bb5094803ad8f51e24857238d9077edae"
+      },
+      "native_case": {
+        "name": "ripemd160-16384",
+        "implementation": "mops-bitcoin",
+        "source": "cases/ripemd160-16384/mops-bitcoin/main.mo",
+        "source_sha256": "e4c9e1e0fc1a5dcbc71fd41aa4fc196a3a81d5a95c2840f11eb6823fe43cb50f"
+      },
+      "notes": "Existing exact-output one-shot fixture. Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.digest:one-shot:32",
+      "module": "RIPEMD160",
+      "function": "digest",
+      "public_function": "RIPEMD160.digest",
+      "workload": "one-shot",
+      "size": 32,
+      "plugin_case": {
+        "name": "ripemd160-32",
+        "implementation": "native",
+        "source": "cases/ripemd160-32/native/main.mo",
+        "source_sha256": "8fbaa3de0824d51c84e1d13746b3957d05172dcc02da0b2b742afe445bdb4eb1"
+      },
+      "native_case": {
+        "name": "ripemd160-32",
+        "implementation": "mops-bitcoin",
+        "source": "cases/ripemd160-32/mops-bitcoin/main.mo",
+        "source_sha256": "38acfa93c8cfb240c54e2afb341ecbb1c4ee9c7ccc1be27a3c04fc57d7082986"
+      },
+      "notes": "Existing exact-output one-shot fixture. Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.digest:one-shot:64",
+      "module": "RIPEMD160",
+      "function": "digest",
+      "public_function": "RIPEMD160.digest",
+      "workload": "one-shot",
+      "size": 64,
+      "plugin_case": {
+        "name": "ripemd160-64",
+        "implementation": "native",
+        "source": "cases/ripemd160-64/native/main.mo",
+        "source_sha256": "8d06c27cf1c1331316c20ffc1da6e7d10c4c560b2932c2ad78f8717b0a891f7e"
+      },
+      "native_case": {
+        "name": "ripemd160-64",
+        "implementation": "mops-bitcoin",
+        "source": "cases/ripemd160-64/mops-bitcoin/main.mo",
+        "source_sha256": "9b43d15424aafe75e5a053e1b22be63e6237dd4cdd61ca6c77979a872fb1ac22"
+      },
+      "notes": "Existing exact-output one-shot fixture. Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.finalize:immutable-state-finalize:1024",
+      "module": "RIPEMD160",
+      "function": "finalize",
+      "public_function": "RIPEMD160.finalize",
+      "workload": "immutable-state-finalize",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-ripemd160-finalize-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-finalize-1024/native/main.mo",
+        "source_sha256": "9525eaf17b23fbb6487b4805824a708d7988af544741ec467619043468bb6396"
+      },
+      "native_case": null,
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.finalize:immutable-state-finalize:32",
+      "module": "RIPEMD160",
+      "function": "finalize",
+      "public_function": "RIPEMD160.finalize",
+      "workload": "immutable-state-finalize",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-ripemd160-finalize-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-finalize-32/native/main.mo",
+        "source_sha256": "683f777dfd348f28acae5815547f6a8082132c8ebf76518f7f5dfb573f4cb413"
+      },
+      "native_case": null,
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.init:immutable-state-init:0",
+      "module": "RIPEMD160",
+      "function": "init",
+      "public_function": "RIPEMD160.init",
+      "workload": "immutable-state-init",
+      "size": 0,
+      "plugin_case": {
+        "name": "api-ripemd160-init-0",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-init-0/native/main.mo",
+        "source_sha256": "237016f883fee201ff5901044c29d1d1f384fa76805ed427b535ae5002ffcd06"
+      },
+      "native_case": null,
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.update:immutable-state-update:1024",
+      "module": "RIPEMD160",
+      "function": "update",
+      "public_function": "RIPEMD160.update",
+      "workload": "immutable-state-update",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-ripemd160-update-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-update-1024/native/main.mo",
+        "source_sha256": "7a797d1057e1d54a00901c80e601b5e5191a024d57a699b81308285fdd3e78b4"
+      },
+      "native_case": null,
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. Update appends to a prepared 17-byte prefix; query also verifies the original state.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "RIPEMD160.update:immutable-state-update:32",
+      "module": "RIPEMD160",
+      "function": "update",
+      "public_function": "RIPEMD160.update",
+      "workload": "immutable-state-update",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-ripemd160-update-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-update-32/native/main.mo",
+        "source_sha256": "450e4b22684910fccb71fa0d50f0f66c9a6eda493affe5cfffd04687031d37af"
+      },
+      "native_case": null,
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. Update appends to a prepared 17-byte prefix; query also verifies the original state.",
+      "source_module": "packages/fast/src/RIPEMD160.mo"
+    },
+    {
+      "id": "SHA256.digest:one-shot:0",
+      "module": "SHA256",
+      "function": "digest",
+      "public_function": "SHA256.digest",
+      "workload": "one-shot",
+      "size": 0,
+      "plugin_case": {
+        "name": "sha256-0",
+        "implementation": "native",
+        "source": "cases/sha256-0/native/main.mo",
+        "source_sha256": "637d9d004eefc4298758ae58e2c5223f537bab3e31853688900a2bf5020838d0"
+      },
+      "native_case": {
+        "name": "sha256-0",
+        "implementation": "mops-sha2",
+        "source": "cases/sha256-0/mops-sha2/main.mo",
+        "source_sha256": "29e66d5fb7d951f42a61bbf583183d7302ece4f46f95d0063e4b694e3b7d4b2e"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA256.mo"
+    },
+    {
+      "id": "SHA256.digest:one-shot:1024",
+      "module": "SHA256",
+      "function": "digest",
+      "public_function": "SHA256.digest",
+      "workload": "one-shot",
+      "size": 1024,
+      "plugin_case": {
+        "name": "sha256-1024",
+        "implementation": "native",
+        "source": "cases/sha256-1024/native/main.mo",
+        "source_sha256": "f49354bef5f7810e4405942c5982cf9b7726d91c02ac8dec842a1cf014066d7c"
+      },
+      "native_case": {
+        "name": "sha256-1024",
+        "implementation": "mops-sha2",
+        "source": "cases/sha256-1024/mops-sha2/main.mo",
+        "source_sha256": "de8df4653db2e34268570af6457148c9d3895cfbff1e56289733859061ec924f"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA256.mo"
+    },
+    {
+      "id": "SHA256.digest:one-shot:16384",
+      "module": "SHA256",
+      "function": "digest",
+      "public_function": "SHA256.digest",
+      "workload": "one-shot",
+      "size": 16384,
+      "plugin_case": {
+        "name": "sha256-16384",
+        "implementation": "native",
+        "source": "cases/sha256-16384/native/main.mo",
+        "source_sha256": "d78f66927828c3af8f4ec404440e775a7dddb4bef7f8f65c9c5d05c47bacd0d2"
+      },
+      "native_case": {
+        "name": "sha256-16384",
+        "implementation": "mops-sha2",
+        "source": "cases/sha256-16384/mops-sha2/main.mo",
+        "source_sha256": "f1b40ed40f1e1259c460392ea98674325c009cbd4d03165ad251fbb6d6092eae"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA256.mo"
+    },
+    {
+      "id": "SHA256.digest:one-shot:32",
+      "module": "SHA256",
+      "function": "digest",
+      "public_function": "SHA256.digest",
+      "workload": "one-shot",
+      "size": 32,
+      "plugin_case": {
+        "name": "sha256-32",
+        "implementation": "native",
+        "source": "cases/sha256-32/native/main.mo",
+        "source_sha256": "6e6c2f11ed4ce846a794cbd13869611cea4def570221fbed46f72ccc203e29ee"
+      },
+      "native_case": {
+        "name": "sha256-32",
+        "implementation": "mops-sha2",
+        "source": "cases/sha256-32/mops-sha2/main.mo",
+        "source_sha256": "46b4530c5415a0399ae5d3359b58f61cd098eb23a1fc869e1874dcec4ac96295"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA256.mo"
+    },
+    {
+      "id": "SHA256.digest:one-shot:64",
+      "module": "SHA256",
+      "function": "digest",
+      "public_function": "SHA256.digest",
+      "workload": "one-shot",
+      "size": 64,
+      "plugin_case": {
+        "name": "sha256-64",
+        "implementation": "native",
+        "source": "cases/sha256-64/native/main.mo",
+        "source_sha256": "bb5be64da3e6a8d7c7b79a5b960489ca17dbbfe78eb3d9a78af143485143434d"
+      },
+      "native_case": {
+        "name": "sha256-64",
+        "implementation": "mops-sha2",
+        "source": "cases/sha256-64/mops-sha2/main.mo",
+        "source_sha256": "a35154a0c187b22749a3d4ae7a292ff0d585f31f9fc4df5ec16068d893870528"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA256.mo"
+    },
+    {
+      "id": "SHA512.Digest.reset:reset:1024",
+      "module": "SHA512",
+      "function": "Digest.reset",
+      "public_function": "SHA512.Digest.reset",
+      "workload": "reset",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha512-digest-reset-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-reset-1024/native/main.mo",
+        "source_sha256": "5a2663f65490b505740d8160e61c44cbdf69ae5ef0f9b34e3c92b38619558318"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-reset-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-reset-1024/mops-sha2/main.mo",
+        "source_sha256": "2ad1c0580876bd95f4ad1731d7e71156e960ef8698186bf845accf3a7a755cda"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest.sum:sum:1024",
+      "module": "SHA512",
+      "function": "Digest.sum",
+      "public_function": "SHA512.Digest.sum",
+      "workload": "sum",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha512-digest-sum-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-1024/native/main.mo",
+        "source_sha256": "b64d5a1bec760d152db1ce07014e851e0a211fb2d271b573f6703ee9abee7534"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-sum-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-1024/mops-sha2/main.mo",
+        "source_sha256": "ca27a716c4433aff3f6a6b456bea150dded91c9a0c14bb9dc2e86c4a9e5b160c"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest.sum:sum:32",
+      "module": "SHA512",
+      "function": "Digest.sum",
+      "public_function": "SHA512.Digest.sum",
+      "workload": "sum",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-sha512-digest-sum-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-32/native/main.mo",
+        "source_sha256": "9bb33c85c5113ebd606f1b695cf105830bdca75409b468272d574158b59daeaa"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-sum-32",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-32/mops-sha2/main.mo",
+        "source_sha256": "e7639cfeecb6a344924b9dc770b04d8f4c5a2d57ef404e68721be6785e23f454"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest.write:write:1024",
+      "module": "SHA512",
+      "function": "Digest.write",
+      "public_function": "SHA512.Digest.write",
+      "workload": "write",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha512-digest-write-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-1024/native/main.mo",
+        "source_sha256": "5b3dc936c410aa9efa744efe66bec4fe60193d02193dd02bf444d51ad548d1c6"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-write-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-1024/mops-sha2/main.mo",
+        "source_sha256": "e2dfcfa8248c57d18fe86b6a895332888fd77711bc09d801f70c67e1c8503c4b"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest.write:write:32",
+      "module": "SHA512",
+      "function": "Digest.write",
+      "public_function": "SHA512.Digest.write",
+      "workload": "write",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-sha512-digest-write-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-32/native/main.mo",
+        "source_sha256": "01218c03163344bf6f8428743e0f27d216f4e93b1907054a346843eeac0d20d5"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-write-32",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-32/mops-sha2/main.mo",
+        "source_sha256": "8eba474273f11ca03780cce2f3c3fbfd120b3a65329ed3b17b3c586f8d59b9a3"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384.reset:reset:1024",
+      "module": "SHA512",
+      "function": "Digest384.reset",
+      "public_function": "SHA512.Digest384.reset",
+      "workload": "reset",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha384-digest384-reset-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-reset-1024/native/main.mo",
+        "source_sha256": "fc6a31f857c9989fa9bdf4088b659c82a3729f3a111891572970324c79bec111"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-reset-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-reset-1024/mops-sha2/main.mo",
+        "source_sha256": "0d48ceb29452a3a3bf80598f6a66ea20f7d41739d4f5943126694b366f943f20"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384.sum:sum:1024",
+      "module": "SHA512",
+      "function": "Digest384.sum",
+      "public_function": "SHA512.Digest384.sum",
+      "workload": "sum",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha384-digest384-sum-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-1024/native/main.mo",
+        "source_sha256": "c024be8360503de69174425aa5a9eca9ca08ff845352ddbc265e49e5ea88365d"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-sum-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-1024/mops-sha2/main.mo",
+        "source_sha256": "a463b403a540f28f431df6fa01fdee9b2e2236b1aa380593d181fdc9ef309310"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384.sum:sum:32",
+      "module": "SHA512",
+      "function": "Digest384.sum",
+      "public_function": "SHA512.Digest384.sum",
+      "workload": "sum",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-sha384-digest384-sum-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-32/native/main.mo",
+        "source_sha256": "0c66ad20bfb04140e027bf0e4834f49faffe699f1def9dcaaead4193dfcec2b8"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-sum-32",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-32/mops-sha2/main.mo",
+        "source_sha256": "d6b13e84ab62f861cd57b50615c82e75090bd92f088f530489dedfe4620eb8b1"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384.write:write:1024",
+      "module": "SHA512",
+      "function": "Digest384.write",
+      "public_function": "SHA512.Digest384.write",
+      "workload": "write",
+      "size": 1024,
+      "plugin_case": {
+        "name": "api-sha384-digest384-write-1024",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-1024/native/main.mo",
+        "source_sha256": "bf0414aea1408a7df1fe692b59d780da6640d5c384aadc29c46dbc86e65a4748"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-write-1024",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-1024/mops-sha2/main.mo",
+        "source_sha256": "b172f09c2fb24397437f602dacc3c426e0f7878e74f9f1b567d85edfb4352b9d"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384.write:write:32",
+      "module": "SHA512",
+      "function": "Digest384.write",
+      "public_function": "SHA512.Digest384.write",
+      "workload": "write",
+      "size": 32,
+      "plugin_case": {
+        "name": "api-sha384-digest384-write-32",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-32/native/main.mo",
+        "source_sha256": "5f1cdcc48a34f15768d0834d7b893993133ca9c5003f44d9738b0ce196ab4783"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-write-32",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-32/mops-sha2/main.mo",
+        "source_sha256": "ac43db8be48a028d0f2aa446f7f977a4be206e3cabdefd0fad17052712a2678f"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest384:constructor:0",
+      "module": "SHA512",
+      "function": "Digest384",
+      "public_function": "SHA512.Digest384",
+      "workload": "constructor",
+      "size": 0,
+      "plugin_case": {
+        "name": "api-sha384-digest384-constructor-0",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-constructor-0/native/main.mo",
+        "source_sha256": "3724f6fb6c0ec53c56dfc251b194c503d5ae8a539698e1c309b1eb229408fa7f"
+      },
+      "native_case": {
+        "name": "api-sha384-digest384-constructor-0",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-constructor-0/mops-sha2/main.mo",
+        "source_sha256": "2802fc98182b978b86915ad1d7d920af7ef10f293e45e554964d5c7c3e3b69c7"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.Digest:constructor:0",
+      "module": "SHA512",
+      "function": "Digest",
+      "public_function": "SHA512.Digest",
+      "workload": "constructor",
+      "size": 0,
+      "plugin_case": {
+        "name": "api-sha512-digest-constructor-0",
+        "implementation": "native",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-constructor-0/native/main.mo",
+        "source_sha256": "3b6f442cadde1b94f2558b7a40dc56e794f036b6eac72a0b117d6a63b1b75ccd"
+      },
+      "native_case": {
+        "name": "api-sha512-digest-constructor-0",
+        "implementation": "mops-sha2",
+        "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-constructor-0/mops-sha2/main.mo",
+        "source_sha256": "00c52ba1d1927695325be5a6f89c692035bd8cdd0a488282b553da352642dd5f"
+      },
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest384:one-shot:0",
+      "module": "SHA512",
+      "function": "digest384",
+      "public_function": "SHA512.digest384",
+      "workload": "one-shot",
+      "size": 0,
+      "plugin_case": {
+        "name": "sha384-0",
+        "implementation": "native",
+        "source": "cases/sha384-0/native/main.mo",
+        "source_sha256": "b033bd5beb0078e206884cc8e226be9e4d9862a973159bbeda2c7988865241f4"
+      },
+      "native_case": {
+        "name": "sha384-0",
+        "implementation": "mops-sha2",
+        "source": "cases/sha384-0/mops-sha2/main.mo",
+        "source_sha256": "2380f079c751d9a9c288ef789578e4b6fb97efe1bea31c4c46ba74800e31f235"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest384:one-shot:1024",
+      "module": "SHA512",
+      "function": "digest384",
+      "public_function": "SHA512.digest384",
+      "workload": "one-shot",
+      "size": 1024,
+      "plugin_case": {
+        "name": "sha384-1024",
+        "implementation": "native",
+        "source": "cases/sha384-1024/native/main.mo",
+        "source_sha256": "7a23e7719e8da956ae1dc4aaed3e5b39302fb6e47422defbba2d280227d95e17"
+      },
+      "native_case": {
+        "name": "sha384-1024",
+        "implementation": "mops-sha2",
+        "source": "cases/sha384-1024/mops-sha2/main.mo",
+        "source_sha256": "c8d0aee1018ce2e8fd01f7336997221a0ad8f992d64ce16c32eae59ef8dc9228"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest384:one-shot:16384",
+      "module": "SHA512",
+      "function": "digest384",
+      "public_function": "SHA512.digest384",
+      "workload": "one-shot",
+      "size": 16384,
+      "plugin_case": {
+        "name": "sha384-16384",
+        "implementation": "native",
+        "source": "cases/sha384-16384/native/main.mo",
+        "source_sha256": "1941e656fbe8a0a8839edc7928fdc53193b17ede5784eb149cca2453a24e545d"
+      },
+      "native_case": {
+        "name": "sha384-16384",
+        "implementation": "mops-sha2",
+        "source": "cases/sha384-16384/mops-sha2/main.mo",
+        "source_sha256": "0ad6ead9abe9d046a496273b5f15bbdcd6b4adbb0e196aa0b263b4d6ee1903e1"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest384:one-shot:32",
+      "module": "SHA512",
+      "function": "digest384",
+      "public_function": "SHA512.digest384",
+      "workload": "one-shot",
+      "size": 32,
+      "plugin_case": {
+        "name": "sha384-32",
+        "implementation": "native",
+        "source": "cases/sha384-32/native/main.mo",
+        "source_sha256": "7c54ac08171e0cd34e10dd7c8a4be14a49a8664da240b5adf919819fc7cf72af"
+      },
+      "native_case": {
+        "name": "sha384-32",
+        "implementation": "mops-sha2",
+        "source": "cases/sha384-32/mops-sha2/main.mo",
+        "source_sha256": "d43ac21929660b0f95e5a496321982b6bee2c3ab189ede4df2a2ff79cf305de3"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest384:one-shot:64",
+      "module": "SHA512",
+      "function": "digest384",
+      "public_function": "SHA512.digest384",
+      "workload": "one-shot",
+      "size": 64,
+      "plugin_case": {
+        "name": "sha384-64",
+        "implementation": "native",
+        "source": "cases/sha384-64/native/main.mo",
+        "source_sha256": "e5056d7a9fc2cfcb905408c1502b95ba7b34e091f1e5eb33377d9b80746fbddc"
+      },
+      "native_case": {
+        "name": "sha384-64",
+        "implementation": "mops-sha2",
+        "source": "cases/sha384-64/mops-sha2/main.mo",
+        "source_sha256": "d0cf1ebf37016259ede5ed1c799592498aedb1b0123efd9a59aaf1fd91319fd3"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest:one-shot:0",
+      "module": "SHA512",
+      "function": "digest",
+      "public_function": "SHA512.digest",
+      "workload": "one-shot",
+      "size": 0,
+      "plugin_case": {
+        "name": "sha512-0",
+        "implementation": "native",
+        "source": "cases/sha512-0/native/main.mo",
+        "source_sha256": "facadd2fed21e4ea1d6e235a874dd90a39318061d44c5cffff6376c4d79861ff"
+      },
+      "native_case": {
+        "name": "sha512-0",
+        "implementation": "mops-sha2",
+        "source": "cases/sha512-0/mops-sha2/main.mo",
+        "source_sha256": "9fb1f15b38e255ab4cf9f42481720fa5d64f84e63b5d9f6ea0bd58f3eb970a9a"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest:one-shot:1024",
+      "module": "SHA512",
+      "function": "digest",
+      "public_function": "SHA512.digest",
+      "workload": "one-shot",
+      "size": 1024,
+      "plugin_case": {
+        "name": "sha512-1024",
+        "implementation": "native",
+        "source": "cases/sha512-1024/native/main.mo",
+        "source_sha256": "2d1d15366a3966ae5c343ad9ad18ed05608faa0b7ff1dde9941ffd48783d04cf"
+      },
+      "native_case": {
+        "name": "sha512-1024",
+        "implementation": "mops-sha2",
+        "source": "cases/sha512-1024/mops-sha2/main.mo",
+        "source_sha256": "aeb7d12930be20c9fa250acc33f87fbd0336d5e843db63f5f343750c2b61b1d3"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest:one-shot:16384",
+      "module": "SHA512",
+      "function": "digest",
+      "public_function": "SHA512.digest",
+      "workload": "one-shot",
+      "size": 16384,
+      "plugin_case": {
+        "name": "sha512-16384",
+        "implementation": "native",
+        "source": "cases/sha512-16384/native/main.mo",
+        "source_sha256": "6fda1866a9c183894d59bbe38390b3c55f5f1f1ef29e785ff58e9499ebc2c6da"
+      },
+      "native_case": {
+        "name": "sha512-16384",
+        "implementation": "mops-sha2",
+        "source": "cases/sha512-16384/mops-sha2/main.mo",
+        "source_sha256": "05bc7c932f6a46783425b9d911ec56835ff00be120fe1f85a48b5af8c3f89c6a"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest:one-shot:32",
+      "module": "SHA512",
+      "function": "digest",
+      "public_function": "SHA512.digest",
+      "workload": "one-shot",
+      "size": 32,
+      "plugin_case": {
+        "name": "sha512-32",
+        "implementation": "native",
+        "source": "cases/sha512-32/native/main.mo",
+        "source_sha256": "61c08787201552b0acdaaaa4fc5d0ac491704630bf093006c90f059ad86bdafe"
+      },
+      "native_case": {
+        "name": "sha512-32",
+        "implementation": "mops-sha2",
+        "source": "cases/sha512-32/mops-sha2/main.mo",
+        "source_sha256": "da2f59161cd0c3dd2654d99779d6b72cc6d8e6b7a78291770feba25aba83df18"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "SHA512.digest:one-shot:64",
+      "module": "SHA512",
+      "function": "digest",
+      "public_function": "SHA512.digest",
+      "workload": "one-shot",
+      "size": 64,
+      "plugin_case": {
+        "name": "sha512-64",
+        "implementation": "native",
+        "source": "cases/sha512-64/native/main.mo",
+        "source_sha256": "c7a78a52a72231aa1022d896cbf22503de79349f9ca362607f1cc1536f9d0fbd"
+      },
+      "native_case": {
+        "name": "sha512-64",
+        "implementation": "mops-sha2",
+        "source": "cases/sha512-64/mops-sha2/main.mo",
+        "source_sha256": "02d08564be551e8f16039ee9489408a993a993faf5bf92fe745ece40fd983ea3"
+      },
+      "notes": "Existing exact-output one-shot fixture. ",
+      "source_module": "packages/fast/src/SHA512.mo"
+    },
+    {
+      "id": "Segwit.decode",
+      "module": "Segwit",
+      "function": "decode",
+      "workload": "Taproot v1 witness program decode",
+      "size": "32-byte program; 62-character address",
+      "plugin_case": {
+        "name": "bech32-segwit-decode-v1-program32",
+        "implementation": "native",
+        "source": "round2/bech32-workloads/bech32-segwit-decode-v1-program32/main.mo",
+        "source_sha256": "e74951f17e9eec323b0ce0024857fc8b39f8234a3c19ab753d4963d1f2e30077"
+      },
+      "native_case": {
+        "name": "bech32-segwit-decode-v1-program32",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/cases/bech32-segwit-decode-v1-program32/mops-bitcoin/main.mo",
+        "source_sha256": "f7bb7ff5edaf44bd4423f89347c829ba7163cd10dcb69bffc59eea77ab921072"
+      },
+      "notes": "Native Mops encoder additionally checks its output by decoding it. Both decoders validate every field; output query retains HRP, version and program.",
+      "public_function": "Segwit.decode",
+      "source_module": "packages/fast/src/Segwit.mo"
+    },
+    {
+      "id": "Segwit.encode",
+      "module": "Segwit",
+      "function": "encode",
+      "workload": "Taproot v1 witness program encode",
+      "size": "32-byte program; 62-character address",
+      "plugin_case": {
+        "name": "bech32-segwit-encode-v1-program32",
+        "implementation": "native",
+        "source": "round2/bech32-workloads/bech32-segwit-encode-v1-program32/main.mo",
+        "source_sha256": "df1574120cb140d8c67eaff129d8f930e6ce757904f36fb453dcab3a10882b93"
+      },
+      "native_case": {
+        "name": "bech32-segwit-encode-v1-program32",
+        "implementation": "mops-bitcoin",
+        "source": "round2/api-hash-codec/cases/bech32-segwit-encode-v1-program32/mops-bitcoin/main.mo",
+        "source_sha256": "ae45ce5a573e318db56bcd450022f95ac646fc01636fc28d56f3ca115c99e30d"
+      },
+      "notes": "Native Mops encoder additionally checks its output by decoding it. Both decoders validate every field; output query retains HRP, version and program.",
+      "public_function": "Segwit.encode",
+      "source_module": "packages/fast/src/Segwit.mo"
+    }
+  ],
+  "callable_count": 60,
+  "workload_rows": 86,
+  "case_count": 160,
+  "module_source_sha256": {
+    "SHA256": "c1bb093285230a594ad37d756e67fe41148e548716e0efaff28df325f961aa80",
+    "SHA512": "898202f11688c01407d574452e83111013927f43bc10b001969639ff74647195",
+    "RIPEMD160": "3d55a0c13a5831efef341b6eefe7000b8a9d35d2b00bacbb4a8bc8d3a9fc53d6",
+    "BLAKE3": "2dc77b9555c34823bfacb8055d8238d717a701c0a72d034702b07e7a0c959b09",
+    "HMAC": "d98bba208e6eb0ada77eb0fdb73e177865154cda40c8d3d3b1ec4e0c5980939c",
+    "Base58": "c2d44a5afe16603e3a56990ab6fd30a297f23fc57905ffe4000b2877bd50411d",
+    "Base58Check": "3abbe07cbfed4047981f0445114e8f536a1d10252031765111d9c0d227d567b8",
+    "Bech32": "88b4e16b430b21d2c9e75a35fbe62f2143eaad642e60e936e2b7a1477ccbdca1",
+    "Segwit": "669fd8e7f45ca10b1ac6efa63a066a8a26c2b9cad9394070dec2cffe13aa4f76"
+  },
+  "missing_native_counterpart_rows": 12,
+  "notes": "Native means pure Motoko; internal implementation label native means plugin-backed. Preserve this distinction when rendering table headings. Missing counterpart cells remain empty, with explanatory row notes."
+}

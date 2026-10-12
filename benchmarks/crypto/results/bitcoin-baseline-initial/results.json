@@ -1,0 +1,233 @@
+{
+  "stage": "bitcoin-baseline-initial",
+  "recorded_utc": "2026-10-12T11:48:07.422Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "b40b4b809064e48a2308d0c22d37a7164170720b9faa7e1138bc47849af17019",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bitcoin-hash160-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "751e76e8199196d454941c45d1b3a323f1433bd6",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-hash160-pubkey/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "d6478e1a4d20af5be7584516cfc241f6cb6c0ca50265bf7af0f71286b286c05b",
+      "wasm": "bitcoin-hash160-pubkey/mops-bitcoin/main.wasm",
+      "wasm_sha256": "5033f54b98198a85125f4ee774a7b51a65ea8dc1e267eef6f07bf32a50c03598",
+      "wasm_bytes": 533576,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 84381,
+          "allocated_bytes": 5216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 84381,
+          "allocated_bytes": 5216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 84381,
+          "allocated_bytes": 5216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-sha256d-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "b1cd0a4eb6d1cea5eb288fb4474ac403eab044004cc48f12bcb4ca8346d487e1",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-sha256d-pubkey/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "f605159d0664095ef7a145f663b8d854fd96c4de9d687ff16c2a5596e1ced21a",
+      "wasm": "bitcoin-sha256d-pubkey/mops-bitcoin/main.wasm",
+      "wasm_sha256": "a6b85a73e2e4326e0ce4714a0eb341043c7744064b832a3b2eecccd5691b569a",
+      "wasm_bytes": 491988,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 75362,
+          "allocated_bytes": 8048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 75362,
+          "allocated_bytes": 8048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 75362,
+          "allocated_bytes": 8048,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Baseline does not validate key; valid vector is equivalent output.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/mops-bitcoin/main.mo",
+      "returncode": 1,
+      "source_sha256": "e2541b2ea43aec0a5744f8eaca3419665cf388dd5617d8ad70ae0862f60ead81",
+      "error": "Compilation failed; see bitcoin-p2pkh/mops-bitcoin/compile.log",
+      "measurements": []
+    },
+    {
+      "name": "bitcoin-p2wpkh",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-p2wpkh/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "4d7276ed97866f02e3fe8868571c99f6c30ee045fd12d5743d357dc1ded90f19",
+      "wasm": "bitcoin-p2wpkh/mops-bitcoin/main.wasm",
+      "wasm_sha256": "047d299dd40ebca8d999616a05fc06e6aca107d1daab8ed0262b6fa764e891b9",
+      "wasm_bytes": 559657,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 222766,
+          "allocated_bytes": 11880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 222766,
+          "allocated_bytes": 11880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 222766,
+          "allocated_bytes": 11880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip32-child0",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-bip32-child0/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "ae8d6343915a5a8bc475ed8a33d6d70763e2dbfd4f4a857556a4a2203188d4d3",
+      "wasm": "bitcoin-bip32-child0/mops-bitcoin/main.wasm",
+      "wasm_sha256": "fc623b2898c0535841be3b893cd5eba130acd67694aa3982edc418a38a493302",
+      "wasm_bytes": 804926,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 147502352,
+          "allocated_bytes": 6361912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 147502352,
+          "allocated_bytes": 6361912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 147502352,
+          "allocated_bytes": 6361912,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip86-receive-address",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "62633170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a7775647078716b6564726372",
+      "notes": "Equivalent empty-tree BIP86 composition using public taggedHash + tweakPublicKey because tweakFromKeyAndHash rejects empty roots. Scalar-order guard explicitly matches BIP341.",
+      "source": "bitcoin-cases/bitcoin-bip86-receive-address/mops-bitcoin/main.mo",
+      "returncode": 0,
+      "source_sha256": "f16b1f5ac646f26c2cc2cc3299e465cd46258662653691432ce910b0f0f99063",
+      "wasm": "bitcoin-bip86-receive-address/mops-bitcoin/main.wasm",
+      "wasm_sha256": "30e26c4fe892312c72d91187aad998fde99bd357b1e40a52e1c33407e4b2b110",
+      "wasm_bytes": 829014,
+      "measurements": [
+        {
+          "trial": 0,
+          "error": "Error: run: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ktuww-x7777-77777-aaaga-cai: Canister called `ic0.trap` with message: 'parse'\\nCanister Backtrace:\\nic_trap\\n$lambda\\nrun\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "error": "Error: run: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister kuvqc-2h777-77777-aaagq-cai: Canister called `ic0.trap` with message: 'parse'\\nCanister Backtrace:\\nic_trap\\n$lambda\\nrun\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "error": "Error: run: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister k5w36-mp777-77777-aaaha-cai: Canister called `ic0.trap` with message: 'parse'\\nCanister Backtrace:\\nic_trap\\n$lambda\\nrun\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 6,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

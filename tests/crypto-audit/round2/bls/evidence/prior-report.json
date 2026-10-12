@@ -1,0 +1,82 @@
+{
+  "status": "pass",
+  "promotion_gate": "approved for the exact source and artifact hashes below",
+  "unresolved_findings": [],
+  "candidate": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/bls-final",
+  "baseline": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/baseline",
+  "sources": {
+    "plugins/bls12-381/runtime/src/lib.rs": "c7dff4e213b7d2faaf1934c6f67060339a28d53732f1e91a4d8a88cc513a78f0",
+    "plugins/bls12-381/runtime/src/tests.rs": "44e062ebdc5531047a9384b01107e587634b5aa38b6e0dbdbcb0847aa00980b9",
+    "plugins/bls12-381/README.md": "343d5dce8be77ee1bce65066ce9dec9e22b33287d34c4c94aec194a48104e2d1",
+    "packages/fast/src/BLS12381.mo": "c02a69a4b4193314c4293943a7f08404190aa6ba616c5457241e36477c69b908",
+    "packages/fast/tests/run/crypto-bls-round2.mo": "7a31d69279d0ab770c856c162e30454bb6c438dc4c079b4352db133d3b4c77cf",
+    "packages/fast/tests/run/ok/crypto-bls-round2.tc.ok": "4a94d2a56642d040ffeacdf9feaf504fdbbf2eebb74f70fc9ab84e22031d1eda"
+  },
+  "artifacts": {
+    "dist/bls12-381/build.json": "d1e34fda2df8855a55214173b8eb369ecc3a8affe72d735f12b08e5c735219ad",
+    "dist/bls12-381/plugin.cmxs": "9f3e7f9416853ea0156b795ebb4750a4ac01f12a6225bf5520da66e38e6f4e49",
+    "dist/bls12-381/runtime.wasm": "96bc83999a1cf41d7f341009da7fffee05f921668d99f78ce454656f995eeff4"
+  },
+  "build_manifest_selected_sources_verified": 30,
+  "compiler": {
+    "wrapper": "/srv/shared/code/motoko_experiments/motoko_sha/bin/moc",
+    "wrapper_sha256": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88",
+    "actual_binary": "/srv/shared/code/motoko_experiments/motoko_sha/src/moc",
+    "actual_binary_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+    "matches_plugin_build": true,
+    "release_rts_sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "debug_rts_sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+  },
+  "execution": {
+    "commands": 25,
+    "all_exit_codes_zero": true,
+    "inputs_unchanged": true,
+    "native_guarded_abi_vectors": 293,
+    "native_retained_vectors": 206,
+    "new_regression_vectors": 87,
+    "public_checks_per_backend": 1635,
+    "backends": [
+      "actual Motoko source interpreter",
+      "compiled and validated memory64 Wasm"
+    ],
+    "public_checks_breakdown": {
+      "retained_primitive_profile_msm": 230,
+      "duplicate_sort_cases": 1279,
+      "additional_sort_shape_assertions": 2,
+      "new_profile_cases": 37,
+      "new_regressions": 87
+    }
+  },
+  "integer_model_review": {
+    "unique_scalars": 91697,
+    "exact_reconstructions": 458485,
+    "bit255_carry_cases": 10876,
+    "transcript_sha256": "b620f4bebcd5ce2d5f2fbfbbaa489526f83bb212db0c1e7d20084e6189d262c8"
+  },
+  "review": {
+    "canonical_and_subgroup_validation": "Every untrusted point still uses the strict subgroup decoder; only the complete canonical identity encoding is specialized.",
+    "pairing_grouping": "Both operands of every original term decode in original order before any identity removal or equal-G2 grouping. Independent tests cover malformed neutral operands, nonadjacent repetitions, cancellation then resumption, cross-group cancellation, and 128-item batches.",
+    "proof_reuse": "Only byte-identical key/proof pairs previously verified successfully within this same call are reused. Different proofs, invalid first/last proofs, identities and signature-domain substitutions remain rejected.",
+    "message_reuse": "Ethereum repeated messages reuse only their deterministic same-call hash after proof validation; IC basic aggregation still requires exact-byte distinctness before crypto.",
+    "sorting": "The bounded length-then-byte total-order merge sort agrees with an independent quadratic exact-equality oracle across threshold sizes, uneven runs, duplicates in all positions, empty/long common-prefix messages and deterministic generated inputs.",
+    "msm": "Small Straus2/3 and signed Booth thresholds retain canonical scalar checks and original point-before-scalar error order. Independent full-width and carry fixtures agree with py_ecc expectations; integer reconstruction checks windows3/4/5/6 and byte/table/bucket bounds.",
+    "empty_operations": "Empty MSM validates both batch lengths before returning the canonical identity; aggregate validates its packed batch before the shortcut.",
+    "secret_timing_contract": "Scalar-dependent branches and table indexes are confined to documented public-scalar MSM. Single-scalar multiplication dispatch is unchanged. No secret constant-time claim is made for MSM.",
+    "abi": "Compiler callbacks, dependencies and ABI are unchanged. Guarded tests retain unaligned output, input immutability, null empty inputs and unchanged output on error."
+  },
+  "reproduce": [
+    "cd ../motoko_sha && nix develop --command python3 ../plugins/tests/crypto-audit/round2/bls/run.py --motoko . --snapshot ../plugins/_build/crypto-optimization-round2/bls-final --baseline ../plugins/_build/crypto-optimization-round2/baseline",
+    "python3 tests/crypto-audit/round2/bls/recoding.py"
+  ],
+  "retained_evidence": [
+    "evidence/all-report.json",
+    "retention-manifest.json",
+    "recoding-report.json",
+    "vector-provenance.json",
+    "evidence/final-source-hashes.json"
+  ],
+  "limits": [
+    "Functional and source audit, not formal verification or empirical side-channel proof.",
+    "Performance conclusions belong to the separate benchmark report."
+  ]
+}

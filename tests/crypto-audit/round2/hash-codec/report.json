@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "findings": [],
+  "scope": "Independent central review of six selected hash/codec performance candidates and existing SHA256 specialization, followed by final shared artifact validation and the complete crypto benchmark table review.",
+  "retention_manifest": "retention-manifest.json",
+  "review": {
+    "base58": [
+      "All MaybeUninit reads restricted to initialized limb prefix; every prefix extension writes first.",
+      "Encode accumulation <58^5*2^32 <2^62; decode accumulation <2^32*58^5 <2^62; carry fits next32bitlimb.",
+      "Leadingzeroes, scalar<=8byte/<=10digit transitions, exactcapacity, invalidbyteindex and length-versus-character error precedence retained.",
+      "1657 independent Python bigint vectors,16alignments, outputguards, read-onlyinputpages and inaccessibleendpages;8testsdebug+ASanpassed."
+    ],
+    "blake3": [
+      "Private direct exports signatures match compiler call stack/results; inputs evaluated once and pointers obtained after output allocation. Fixedoutputswrite32initializedbytes.",
+      "StateView preserves exact canonicalvalidation and slice bounds; borrowed immutable byte arrays have alignment1 and never escape synchronous kernel.",
+      "Removed encoder clear is backed by unconditional fulloutput initialization in blake3_run; errors and emptyXOF still validate in prior precedence.",
+      "Copied independent native harness changed only op0/1/2routing; checked every assertion/oracle/publicfixture byteidentical. Exactcandidate9native+4publicengine report passed."
+    ],
+    "bech32": [
+      "Feedback table equals fivegeneratorXOR; fusedscans retain errororder/lastseparator/casenormalization.",
+      "8\u21945 blocks consume/write40bits; remainder restarts atbyteboundary; samewidthcopy and emptyoutput follow widthvalidation.",
+      "u32 bitcount bounded15,8bitrangecheck vacuous; scratch remains fullyinitialized and errors discarded by unchangedgenerator.",
+      "Independentfinalnative+ASan report covers262144polymod,408280encode,9205900decode,203806conversions; provenance verified."
+    ],
+    "hash_state": "See evidence/hash-state-report.json for independent HMAC34144comparison11test execution and reviewed exact-dependency SHA512/RIPEMD reports.",
+    "sha256": "See evidence/sha256-native-report.json: independent 1845 hashlib vectors, 16 alignment offsets, read-only guard pages; five tests in debug and ASan passed. Retained by the orchestrator and included in final-shared-report.json."
+  },
+  "evidence": [
+    {
+      "retained": "evidence/base58-native-report.json",
+      "original": "_build/crypto-optimization-round2/central-audit/base58/durable-replay/report.json",
+      "sha256": "8182dd8257abf92d9ecdcfe9f836b521b3a9b8fcbaf3ad6879908647321078bc"
+    },
+    {
+      "retained": "evidence/hash-state-report.json",
+      "original": "_build/crypto-optimization-round2/central-audit/hash-state/report.json",
+      "sha256": "a7f7a2e891ac9198c7be60512992338be219434dfe1529de1fd5042e66967beb"
+    },
+    {
+      "retained": "evidence/hash-state-provenance.json",
+      "original": "_build/crypto-optimization-round2/central-audit/hash-state/provenance.json",
+      "sha256": "371010d43cdb21b5af43f3888c310ffdbaf8b0e13573c2bfec92cafbaafed5e7"
+    },
+    {
+      "retained": "evidence/sha512-independent-report.json",
+      "original": "_build/crypto-optimization-round2/sha512-audit/combined-v1/report.json",
+      "sha256": "640e07f9ad67cfd1f157d989af5c324200870dda691d9d6345cee844bb6df01d"
+    },
+    {
+      "retained": "evidence/ripemd-independent-report.json",
+      "original": "_build/crypto-optimization-round2/ripemd160-state-v2/audit.json",
+      "sha256": "99f3851dd99c99bdbfd32de37f890a1e9b682b5693277ea0ef64c01ec5c7246d"
+    },
+    {
+      "retained": "evidence/ripemd-raw-state-report.json",
+      "original": "_build/crypto-optimization-round2/ripemd160-state-audit/audit-summary.json",
+      "sha256": "23166a39c40cb4f376f10bbfcd2884943792347a9523a8dab2b4a7ad9255b7b3"
+    },
+    {
+      "retained": "evidence/hmac-independent-findings.json",
+      "original": "_build/crypto-optimization-round2/hmac-audit/findings.json",
+      "sha256": "34c6f428361bb3cefc50f9d79a3057bd82264f379f69dfe10583b3c66e99ca17"
+    },
+    {
+      "retained": "evidence/bech32-independent-report.txt",
+      "original": "_build/crypto-optimization-round2/bech32-audit/report.txt",
+      "sha256": "aec34e49289846b70866416473db864144ec05c6477221b5f3658e2f3de1a982"
+    },
+    {
+      "retained": "evidence/blake3-independent-report.json",
+      "original": "_build/crypto-optimization-round2/blake3-c/_build/crypto-audit/hash-codec/run-p9x6sqjc/report.json",
+      "sha256": "9c7a3b6972bf3d346b1afe568d6c1af17acec84767548bfb0c2f36f119b4e1e2"
+    },
+    {
+      "retained": "evidence/sha256-native-report.json",
+      "original": "_build/crypto-optimization-round2/central-audit/sha256/replay/report.json",
+      "sha256": "90c1c63214bf8ff23683ff6f94c399e50c11a63f87f9df280af63d5f75c39fac"
+    }
+  ],
+  "reproduce_base58": "python3 tests/crypto-audit/round2/hash-codec/base58/run.py --candidate . --out _build/crypto-audit/round2/base58",
+  "limitations": [
+    "Reports retain original private candidate paths and exact hashes intentionally; they do not claim execution of subsequently rebuilt shared artifacts.",
+    "Native sanitizer execution uses x86_64 Rust; public candidate Wasm correctness evidence is separately retained from compiler tests.",
+    "The final benchmark table review is recorded separately in benchmark-table-audit.json and benchmark-semantic-review.json."
+  ],
+  "reproduce_sha256": "python3 tests/crypto-audit/round2/hash-codec/sha256/run.py --candidate . --out _build/crypto-audit/round2/sha256",
+  "final_shared_validation": "final-shared-report.json",
+  "final_benchmark_validation": "benchmark-table-audit.json",
+  "final_benchmark_semantic_review": "benchmark-semantic-review.json"
+}

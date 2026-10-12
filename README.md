@@ -680,10 +680,32 @@ available as historical evidence.
 | [Mutable set](plugins/mutable-set/) | `Set.contains`, `Set.add`, `Set.remove` | Core-compatible mutable Set API, with key-only B-tree nodes and native scalar comparisons |
 | [Pure set](plugins/pure-set/) | `pure/Set`: `contains`, `add`, `remove` | Persistent key-only AVL trees with shared subtrees, rank/select, and split/join |
 | [SHA-256](plugins/sha256/) | `SHA256.digest(bytes)` | One-shot SHA-256 with direct Blob access |
+| [BLAKE3](plugins/blake3/) | `BLAKE3.digest`, `keyedHash`, `deriveKey` | BLAKE3 hashing, streaming snapshots, and seekable extended output |
+| [SHA-512](plugins/sha512/) | `SHA512.digest`, `digest384`, `Digest` | SHA-512 and SHA-384 with bounded streaming state |
+| [RIPEMD-160](plugins/ripemd160/) | `RIPEMD160.digest`, `Digest` | RIPEMD-160 and incremental hashing for Bitcoin HASH160 |
+| [HMAC](plugins/hmac-sha2/) | `HMAC.sha256`, `sha512`, `prepareSha512` | HMAC-SHA256/SHA512, reusable keys, and streaming |
+| [secp256k1](plugins/secp256k1/) | `Secp256k1.signPrehash`, `verifyPrehash`, `schnorrVerify` | Bitcoin curve operations, deterministic ECDSA, BIP340 Schnorr, and key tweaks |
+| [P-256](plugins/p256/) | `P256.signPrehash`, `verifyPrehash`, `publicKey` | NIST P-256 keys, deterministic ECDSA, and signature encoding |
+| [Base58](plugins/base58/) | `Base58.encode`, `decode`; `Base58Check` | Bitcoin Base58 and composed double-SHA256 checksums |
+| [Bech32](plugins/bech32/) | `Bech32.encode`, `decode`; `Segwit` | Bech32/Bech32m, bit conversion, and validated witness addresses |
+| [BLS12-381](plugins/bls12-381/) | `BLS12381.g1Mul`, `pairingCheck`, `verifyIC`, `verifyEthereum` | Group arithmetic, MSM, hash-to-curve, and distinct IC/Ethereum BLS profiles |
 
 The compiler support is proposed in
 [Motoko PR #6443](https://github.com/caffeinelabs/motoko/pull/6443).
 This repository is independent of the compiler checkout. It is not a submodule.
+
+The cryptographic primitives compose in `mo:fast/Bitcoin/Hash`, `Bip32`,
+`Address`, `Script`, and `Transaction`. These Motoko modules provide public
+BIP32 derivation, legacy/SegWit/Taproot addresses, transaction serialization,
+legacy/BIP143/BIP341 signature hashes, and local Taproot key-path signing. The [package guide](packages/fast/)
+lists the plugins required by each module. Benchmarks compare the actual Mops
+implementations and complete Bitcoin workflows, with independent expected
+outputs. The [crypto API benchmark table](benchmark_crypto.md) covers every
+public crypto function and Bitcoin helper, with native Motoko counterparts
+where available. The [optimization report](benchmarks/crypto/round2/RESULTS.md)
+records improvements, regressions, allocation and code-size tradeoffs against
+the previous plugin implementations; [full evidence](benchmarks/crypto/)
+includes the pinned inputs and reproduction commands.
 
 ## Build and use
 
@@ -795,7 +817,7 @@ plugins/
   sha256/
     ...
 packages/fast/        Mops package metadata, README, and license
-  src/                CandidX, JSON, CBOR, SHA256, Map, Set modules
+  src/                codec, hash, cryptography, Bitcoin, Map, Set modules
     pure/             persistent Map and Set libraries
   tests/              public import, rejection, and trap checks
     ash/              public API and GC canister tests on PocketIC
@@ -825,8 +847,8 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-The [public module suite](packages/fast/tests/ash/) adds **202 Ash checks** across
-the eight plugins and shared Core/Fast API consumers: reference models,
+The [public module suite](packages/fast/tests/ash/) contains **273 Ash checks** across
+seventeen plugins and shared Core/Fast API consumers: reference models,
 independent codec/hash vectors, malformed inputs, boundary cases, structural sharing,
 composition, and incremental GC. Run from this repository with an Ash toolchain
 using the matching compiler:

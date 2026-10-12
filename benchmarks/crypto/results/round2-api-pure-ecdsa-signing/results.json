@@ -1,0 +1,114 @@
+{
+  "stage": "round2-api-pure-ecdsa-signing",
+  "expected_case_count": 2,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:29:18.393Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "c024d312a6a4842b31d3cbd237615edcda5a78854739adcb9b40ade5f6291ae4",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api-secp256k1-signPrehash-prepared-nonce-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa-prepared-nonce",
+      "comparison": "secp256k1_sign_rfc6979",
+      "plugins": [],
+      "source": "round2/api-curves/closest-signing/cases/api-secp256k1-signPrehash-prepared-nonce-ecdsa/main.mo",
+      "expected_hex": "385cd1a83f1e9b94a03b6a704abaed20879541ff0af652704b55d1bd0473d8536938f2a4e0b4167e44c697f45390f12e2891edef3030ab6fcc32877ddf519ae8",
+      "operations_per_sample": 1,
+      "notes": "Closest available pure Motoko counterpart has a different API contract: ecdsa@8.0.1 PrivateKey.signHashed consumes a prepared nonce; the plugin derives RFC6979/HMAC-SHA256 nonce inside signPrehash. Nonce derivation and 32-byte nonce Blob construction happen offline in the independent Python oracle and are outside pure timing. Nonce iterator creation, byte decoding and reduction inside signHashed are measured, as are secret decoding/range validation, digest-length validation, ECDSA arithmetic, compact signature serialization and Blob construction. Reusable curve construction is outside. No equal-contract speedup is asserted. Pure scalar multiplication is variable-time; no equivalent side-channel property is asserted. Secp256k1 output explicitly serializes original R and min(original S,n-original S) to match native low-S.",
+      "benchmark_kind": "closest-different-contract",
+      "footnote": "ECDSA-prepared-nonce",
+      "footnote_id": "ECDSA-prepared-nonce",
+      "equivalent_api_contract": false,
+      "returncode": 0,
+      "source_sha256": "fdc5475e6a720dcac4995b07dbd632861637aaa27426cf190ac7e5e76dc01688",
+      "wasm": "api-secp256k1-signPrehash-prepared-nonce-ecdsa/ecdsa-prepared-nonce/main.wasm",
+      "wasm_sha256": "f666b072e3fcc2222d094310563c28ff7e6b309b175547ee4fc5a36f9e080a02",
+      "wasm_bytes": 676114,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 76010180,
+          "allocated_bytes": 6002504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 76010180,
+          "allocated_bytes": 6002504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 76010180,
+          "allocated_bytes": 6002504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "0016d6db31eb0e82482dd7554dbf8d94d9da9f1c775638e7cac93eb221e7a0c6",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api-p256-signPrehash-prepared-nonce-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa-prepared-nonce",
+      "comparison": "p256_sign_rfc6979",
+      "plugins": [],
+      "source": "round2/api-curves/closest-signing/cases/api-p256-signPrehash-prepared-nonce-ecdsa/main.mo",
+      "expected_hex": "4304eef8b664375abd59a86fbe10e682b1e30276fe1f9efa71a9001d8a8e3da37d33976a24a49d93115167b94823a227beefb2755c3fe023492e8ff387041a86",
+      "operations_per_sample": 1,
+      "notes": "Closest available pure Motoko counterpart has a different API contract: ecdsa@8.0.1 PrivateKey.signHashed consumes a prepared nonce; the plugin derives RFC6979/HMAC-SHA256 nonce inside signPrehash. Nonce derivation and 32-byte nonce Blob construction happen offline in the independent Python oracle and are outside pure timing. Nonce iterator creation, byte decoding and reduction inside signHashed are measured, as are secret decoding/range validation, digest-length validation, ECDSA arithmetic, compact signature serialization and Blob construction. Reusable curve construction is outside. No equal-contract speedup is asserted. Pure scalar multiplication is variable-time; no equivalent side-channel property is asserted. P256 output serializes Signature.original_r/original_s via toBytes(#raw), preserving RFC6979 S exactly.",
+      "benchmark_kind": "closest-different-contract",
+      "footnote": "ECDSA-prepared-nonce",
+      "footnote_id": "ECDSA-prepared-nonce",
+      "equivalent_api_contract": false,
+      "returncode": 0,
+      "source_sha256": "395f148105866bf24f699582ff00faabaf7e2533292d6d0362447a2f963e30f3",
+      "wasm": "api-p256-signPrehash-prepared-nonce-ecdsa/ecdsa-prepared-nonce/main.wasm",
+      "wasm_sha256": "4aaa4ff259e14aa534dce7552cef33d2381dd7e155525987a332105ce2498ef3",
+      "wasm_bytes": 675950,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 182163354,
+          "allocated_bytes": 13290216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 182163354,
+          "allocated_bytes": 13290216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 182163354,
+          "allocated_bytes": 13290216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

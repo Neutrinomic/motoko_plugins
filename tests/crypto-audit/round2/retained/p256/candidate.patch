@@ -1,0 +1,754 @@
+--- a/plugins/p256/README.md
++++ b/plugins/p256/README.md
+@@ -46,8 +46,9 @@
+ explicitly zeroized after the upstream signing primitive returns. Generated code allocates
+ managed output Blobs and constructs typed result variants through the SDK.
+ Fixed-size operations write directly to their result payload. DER encoding
+-uses a zero-initialized 72-byte scratch Blob and copies only the encoded bytes
+-to its exact-sized result. Verification needs only its result variant.
++uses a zero-initialized 72-byte scratch Blob. A 72-byte encoding returns that
++managed Blob directly; shorter encodings copy only the encoded bytes to an
++exact-sized result. Verification needs only its result variant.
+ 
+ Portable OCaml interpreter semantics share the generic curve implementation
+ with secp256k1 through `compiler/p256_curve.ml` and `.mli` symlinks. The builder
+@@ -56,13 +57,27 @@
+ variable-time arbitrary-precision arithmetic for interpreter correctness; the
+ canister runtime uses the separate RustCrypto implementation.
+ 
++Public-key derivation uses a fixed-base comb with 64 iterations and a full,
++constant-time scan of all 15 table entries on each iteration. Its public table
++is independently checked against Python arithmetic and exact OpenSSL scalar
++multiplication. Secret bytes and the copied scalar are explicitly zeroized.
++Verification combines the two public scalar multiplications with width-5
++nonadjacent forms and performs one affine normalization. Its variable-time
++branches depend only on the supplied public key, digest and signature. Signing
++retains the upstream constant-time nonce multiplication. Targeted source and
++emitted-Wasm inspection found no secret-dependent branch or address in the
++added comb loop; this review is not a formal constant-time proof.
++
+ Validation includes exact RFC6979 A.2.5 SHA-256 signatures, all 484 cases in a
+ pinned Wycheproof P-256/SHA-256 corpus, SEC1/scalar/DER edge cases, and unaligned
+ pointer/sentinel tests. Exact prehash boundary signatures are independently
+ checked against Python RFC6979 and OpenSSL deterministic ECDSA. Public Motoko
+ fixtures exercise interpreter and Wasm
+ semantics; the Ash suite exercises public aliases, validation precedence,
+-retained values, and representative Wycheproof flags. See
++retained values, representative Wycheproof flags, and a 72-byte DER output
++retained across asynchronous continuations and observed garbage collection.
++Native differential tests additionally compare 1,284 comb inputs and 147
++verification linear combinations with upstream arithmetic. See
+ [vector provenance](tests/vectors/README.md) and
+ [public API coverage](../../packages/fast/tests/ash/coverage/P256.md).
+ 
+@@ -73,18 +88,33 @@
+ 
+ ## Performance
+ 
+-The fixed benchmark key and digest use 11,201,615 IC instructions for public-key
+-derivation and 22,609,363 for verification, about 14.3× fewer than the Mops
+-`ecdsa` baseline. Deterministic signing uses 13,457,023 instructions and allocates
+-120 bytes. Three independent PocketIC trials per case return the exact expected
+-bytes; setup and output validation are outside the measured operation.
++The second performance pass compares the delivered implementation with the
++combined comb, verification and DER allocation changes. All 25 cases passed
++exact-output checks in three fresh PocketIC canisters per case with the same
++fixtures and toolchain; setup and output validation are outside measurement.
+ 
+-Signing skips `SigningKey`'s eager computation of a cached verifying key and
+-calls the same upstream RFC6979 primitive directly on the secret scalar. Against
+-the corrected baseline with matching dependency versions, this reduces signing
+-from 24,655,157 to 13,457,023 instructions (45.4%) with unchanged allocation.
+-The benchmark canister grows from 330,742 to 331,388 bytes (+646 bytes).
+-These numbers describe the recorded inputs and toolchain, not every key/digest.
+-See the [corrected baseline](../../benchmarks/crypto/results/curves-p256-fixed-baseline/results.json)
+-and [optimized results](../../benchmarks/crypto/results/curves-p256-candidate/results.json)
++| Operation | Delivered instructions | Current instructions | Reduction | Allocation change |
++| --- | ---: | ---: | ---: | ---: |
++| Compressed public key | 11,201,615 | 5,207,139 | 53.51% | None |
++| Compressed-key verification | 22,609,363 | 12,873,756 | 43.06% | None |
++| Uncompressed-key verification, low S | 22,046,908 | 12,311,308 | 44.16% | None |
++| DER encoding, both integers padded | 6,404 | 6,077 | 5.11% | 224 → 128 bytes |
++| RFC6979 signing | 13,457,023 | 13,458,880 | −0.014% | None |
++
++The tested zero/order digest verification cases improve by 49.41%. Ordinary
++DER encoding costs five more instructions, while SEC1 conversions cost 47–54
++more (0.01–0.28%). Other allocation counts are unchanged. Benchmark canisters
++grow by 4,768 bytes, or 4,780 bytes for DER-encoding fixtures; the runtime object
++grows by 4,887 bytes. These numbers describe the recorded inputs and toolchain,
++not every key or digest. See the [strict comparison](../../benchmarks/crypto/round2/comparisons/p256-combined.json),
++[delivered baseline](../../benchmarks/crypto/results/round2-p256-hotspots-baseline/results.json),
++and [current results](../../benchmarks/crypto/results/round2-p256-combined/results.json)
+ for exact source, artifact and toolchain provenance.
++
++The earlier signing improvement remains in place: signing skips `SigningKey`'s
++eager computation of an unused cached verifying key and calls the same upstream
++RFC6979 primitive directly on the secret scalar. Against the corrected baseline
++with matching dependency versions, this reduced signing from 24,655,157 to
++13,457,023 instructions (45.4%) with unchanged allocation. See the
++[corrected signing baseline](../../benchmarks/crypto/results/curves-p256-fixed-baseline/results.json)
++and [first-pass results](../../benchmarks/crypto/results/curves-p256-candidate/results.json).
+--- a/plugins/p256/compiler/register.ml
++++ b/plugins/p256/compiler/register.ml
+@@ -37,7 +37,9 @@
+         [-1,"invalidSecretKey"; -2,"invalidPublicKey"; -3,"invalidDigest"]
+         (B.Variant.inject env "invalidSignature" (B.Tuple.compile_unit env)) in
+       let payload = if O.boolean then status
+-        else if O.variable then result ^^ B.Blob.payload_ptr_unskewed env ^^ status ^^ B.Blob.of_ptr_size env
++        else if O.variable then status ^^ B.compile_eq_const (Int64.of_int O.capacity) ^^
++          B.E.if1 I64Type result
++            (result ^^ B.Blob.payload_ptr_unskewed env ^^ status ^^ B.Blob.of_ptr_size env)
+         else result in
+       P.{ representation = Managed; code =
+         G.concat (List.map2 (fun argument (set,_) -> argument ^^ set) arguments locals) ^^
+--- a/plugins/p256/runtime/src/lib.rs
++++ b/plugins/p256/runtime/src/lib.rs
+@@ -5,9 +5,17 @@
+ #![cfg_attr(not(test), feature(simd_wasm64))]
+ 
+ use ecdsa::hazmat::{DigestPrimitive, SignPrimitive};
+-use p256::ecdsa::{Signature, VerifyingKey, signature::hazmat::PrehashVerifier};
+-use p256::elliptic_curve::{bigint::U256, ops::Reduce, sec1::ToEncodedPoint, zeroize::Zeroize};
+-use p256::{NistP256, PublicKey, Scalar, SecretKey};
++use p256::ecdsa::Signature;
++use p256::elliptic_curve::subtle::{ConditionallySelectable, ConstantTimeEq};
++use p256::elliptic_curve::{
++    bigint::U256,
++    group::Group,
++    ops::{Invert, Reduce},
++    point::AffineCoordinates,
++    sec1::ToEncodedPoint,
++    zeroize::Zeroize,
++};
++use p256::{NistP256, ProjectivePoint, PublicKey, Scalar, SecretKey};
+ 
+ const INVALID_SECRET_KEY: i64 = -1;
+ const INVALID_PUBLIC_KEY: i64 = -2;
+@@ -44,9 +52,148 @@
+     }
+ }
+ 
++const GENERATOR_COMB: [[u8; 65]; 15] = [
++    [
++        0x04, 0x6b, 0x17, 0xd1, 0xf2, 0xe1, 0x2c, 0x42, 0x47, 0xf8, 0xbc, 0xe6, 0xe5, 0x63, 0xa4,
++        0x40, 0xf2, 0x77, 0x03, 0x7d, 0x81, 0x2d, 0xeb, 0x33, 0xa0, 0xf4, 0xa1, 0x39, 0x45, 0xd8,
++        0x98, 0xc2, 0x96, 0x4f, 0xe3, 0x42, 0xe2, 0xfe, 0x1a, 0x7f, 0x9b, 0x8e, 0xe7, 0xeb, 0x4a,
++        0x7c, 0x0f, 0x9e, 0x16, 0x2b, 0xce, 0x33, 0x57, 0x6b, 0x31, 0x5e, 0xce, 0xcb, 0xb6, 0x40,
++        0x68, 0x37, 0xbf, 0x51, 0xf5,
++    ],
++    [
++        0x04, 0x0f, 0xa8, 0x22, 0xbc, 0x28, 0x11, 0xaa, 0xa5, 0x84, 0x92, 0x59, 0x2e, 0x32, 0x6e,
++        0x25, 0xde, 0x29, 0x49, 0x3b, 0xaa, 0xad, 0x65, 0x1f, 0x7e, 0x90, 0xe7, 0x5c, 0xb4, 0x8e,
++        0x14, 0xdb, 0x63, 0xbf, 0xf4, 0x4a, 0xe8, 0xf5, 0xdb, 0xa8, 0x0d, 0x6f, 0x4a, 0xd4, 0xbc,
++        0xb3, 0xdf, 0x18, 0x8b, 0x34, 0xb1, 0xa6, 0x50, 0x50, 0xfe, 0x82, 0xf5, 0xe4, 0x11, 0x24,
++        0x54, 0x5f, 0x46, 0x2e, 0xe7,
++    ],
++    [
++        0x04, 0x30, 0x0a, 0x4b, 0xbc, 0x89, 0xd6, 0x72, 0x6f, 0xb2, 0x57, 0xc0, 0xde, 0x95, 0xe0,
++        0x27, 0x89, 0xe9, 0x6c, 0x98, 0xfd, 0x0d, 0x35, 0xf1, 0xfa, 0x93, 0x39, 0x1c, 0xe2, 0x09,
++        0x79, 0x92, 0xaf, 0x72, 0xaa, 0xc7, 0xe0, 0xd0, 0x9b, 0x46, 0x44, 0x7f, 0x1d, 0xdb, 0x25,
++        0xff, 0x1e, 0x3c, 0x6f, 0x5b, 0xb1, 0xee, 0xad, 0xa9, 0xd8, 0x06, 0xa5, 0xaa, 0x54, 0xa2,
++        0x91, 0xc0, 0x81, 0x27, 0xa0,
++    ],
++    [
++        0x04, 0x44, 0x7d, 0x73, 0x9b, 0xee, 0xdb, 0x5e, 0x67, 0xfb, 0x98, 0x2f, 0xd5, 0x88, 0xc6,
++        0x76, 0x6e, 0xfc, 0x35, 0xff, 0x7d, 0xc2, 0x97, 0xea, 0xc3, 0x57, 0xc8, 0x4f, 0xc9, 0xd7,
++        0x89, 0xbd, 0x85, 0x2d, 0x48, 0x25, 0xab, 0x83, 0x41, 0x31, 0xee, 0xe1, 0x2e, 0x9d, 0x95,
++        0x3a, 0x4a, 0xaf, 0xf7, 0x3d, 0x34, 0x9b, 0x95, 0xa7, 0xfa, 0xe5, 0x00, 0x0c, 0x7e, 0x33,
++        0xc9, 0x72, 0xe2, 0x5b, 0x32,
++    ],
++    [
++        0x04, 0xef, 0x95, 0x19, 0x32, 0x8a, 0x9c, 0x72, 0xff, 0xdd, 0xc6, 0x06, 0x8b, 0xb9, 0x1d,
++        0xfc, 0x60, 0xef, 0x7f, 0xbd, 0x2b, 0x1a, 0x0a, 0x11, 0xb7, 0x13, 0x94, 0x9c, 0x93, 0x2a,
++        0x1d, 0x36, 0x7f, 0x61, 0x1e, 0x9f, 0xc3, 0x7d, 0xbb, 0x2c, 0x9b, 0xc1, 0xee, 0x98, 0x07,
++        0x02, 0x2c, 0x21, 0x9c, 0x23, 0x18, 0x3b, 0x08, 0x95, 0xca, 0x17, 0x40, 0x19, 0x60, 0x35,
++        0xa7, 0x73, 0x76, 0xd8, 0xa8,
++    ],
++    [
++        0x04, 0x55, 0x06, 0x63, 0x79, 0x7b, 0x51, 0xf5, 0xd8, 0x7d, 0xea, 0x64, 0x82, 0xe1, 0x12,
++        0x38, 0xbf, 0x29, 0x36, 0xdf, 0x5e, 0xc6, 0xc9, 0xbc, 0x36, 0xca, 0xe2, 0xb1, 0x92, 0x0b,
++        0x57, 0xf4, 0xbc, 0x15, 0x71, 0x64, 0x84, 0x8a, 0xec, 0xb8, 0x51, 0x0a, 0xfa, 0x40, 0x01,
++        0x8d, 0x9d, 0x50, 0xe5, 0x9f, 0xb3, 0xd5, 0x76, 0xdb, 0xde, 0xfb, 0xe1, 0x44, 0xff, 0xe2,
++        0x16, 0x34, 0x8a, 0x96, 0x4c,
++    ],
++    [
++        0x04, 0xeb, 0x5d, 0x77, 0x45, 0xb2, 0x11, 0x41, 0xea, 0xa2, 0xe8, 0xf4, 0x83, 0xf4, 0x3e,
++        0x43, 0x91, 0x7c, 0xcd, 0x84, 0xe7, 0x0d, 0x71, 0x5f, 0x26, 0xe4, 0x8e, 0xca, 0xff, 0xfc,
++        0x5c, 0xde, 0x01, 0xea, 0xfd, 0x72, 0xeb, 0xdb, 0xec, 0xc1, 0x7b, 0x09, 0x90, 0xe6, 0xa1,
++        0x58, 0x00, 0x6c, 0xee, 0x85, 0xf2, 0x2c, 0xfe, 0x28, 0x44, 0xb6, 0x45, 0xca, 0xc9, 0x17,
++        0xe2, 0x73, 0x1a, 0x34, 0x79,
++    ],
++    [
++        0x04, 0xa6, 0xd3, 0x96, 0x77, 0xa7, 0x84, 0x92, 0x76, 0x27, 0x36, 0xff, 0x83, 0x44, 0x31,
++        0x5f, 0xc5, 0x96, 0x43, 0x95, 0x91, 0xa3, 0xc6, 0xb9, 0x4a, 0x6c, 0xf2, 0x0f, 0xfb, 0x31,
++        0x37, 0x28, 0xbe, 0x67, 0x4f, 0x84, 0x74, 0x9b, 0x0b, 0x88, 0x16, 0x66, 0xb8, 0xba, 0xbd,
++        0x2d, 0x27, 0xec, 0xdf, 0x82, 0x4a, 0x92, 0x0c, 0x22, 0x84, 0x05, 0x9b, 0xf2, 0xba, 0xb8,
++        0x33, 0xc3, 0x57, 0xf5, 0xf4,
++    ],
++    [
++        0x04, 0x4e, 0x76, 0x9e, 0x76, 0x72, 0xc9, 0xdd, 0xad, 0x31, 0x85, 0x5f, 0x7d, 0xb8, 0xc7,
++        0xfe, 0xdb, 0x74, 0xe0, 0x2f, 0x08, 0x02, 0x03, 0xa5, 0x6b, 0x2d, 0xf4, 0x8c, 0x04, 0x67,
++        0x7c, 0x8a, 0x3e, 0x42, 0xb9, 0x90, 0x82, 0xde, 0x83, 0x06, 0x63, 0x1e, 0xc0, 0x05, 0x72,
++        0x06, 0x94, 0x72, 0x81, 0xfb, 0x9a, 0xe1, 0x6f, 0x3b, 0x91, 0x22, 0xa5, 0xa4, 0xc3, 0x61,
++        0x65, 0xb8, 0x24, 0xbb, 0xb0,
++    ],
++    [
++        0x04, 0x78, 0x87, 0x8e, 0xf6, 0x1c, 0x6c, 0xe0, 0x4d, 0x7f, 0xdc, 0x1c, 0xa0, 0x08, 0xa1,
++        0xc4, 0x78, 0xd1, 0xf8, 0x9e, 0x79, 0x9c, 0x0c, 0xe1, 0x31, 0x6e, 0xf9, 0x51, 0x50, 0xdd,
++        0xa8, 0x68, 0xb9, 0xb6, 0xcb, 0x3f, 0x5d, 0x7b, 0x72, 0xc3, 0x21, 0xde, 0x53, 0x14, 0x2c,
++        0x12, 0x30, 0x9d, 0xef, 0x6a, 0xce, 0x57, 0x0e, 0xbd, 0xe0, 0x8d, 0x4f, 0x9c, 0x62, 0xb9,
++        0x12, 0x1f, 0xe0, 0xd9, 0x76,
++    ],
++    [
++        0x04, 0x0c, 0x88, 0xbc, 0x4d, 0x71, 0x6b, 0x12, 0x87, 0x59, 0x5c, 0x52, 0x20, 0x81, 0x2f,
++        0xfc, 0xae, 0x5b, 0x82, 0xdd, 0x5b, 0xd5, 0x4f, 0xb4, 0x96, 0x7f, 0x99, 0x1e, 0xd2, 0xc3,
++        0x1a, 0x35, 0x73, 0xdd, 0x5d, 0xde, 0xa3, 0xf3, 0x90, 0x1d, 0xc6, 0x18, 0xd1, 0xb5, 0xb3,
++        0x9c, 0x04, 0xe6, 0xaa, 0x7c, 0x81, 0x81, 0xf4, 0xdf, 0x25, 0x64, 0xf3, 0x3a, 0x57, 0xbf,
++        0x63, 0x5f, 0x48, 0xac, 0xa8,
++    ],
++    [
++        0x04, 0x68, 0xf3, 0x44, 0xaf, 0x6b, 0x31, 0x74, 0x66, 0xef, 0xe0, 0xa4, 0x23, 0x08, 0x3e,
++        0x49, 0xf3, 0x43, 0xa0, 0xa2, 0x8c, 0x42, 0xba, 0x79, 0x2f, 0xe9, 0x6a, 0x79, 0xfb, 0x3e,
++        0x72, 0xad, 0x0c, 0x31, 0xb9, 0xc4, 0x05, 0xf8, 0x54, 0x0a, 0x20, 0x60, 0x4e, 0xd9, 0x3c,
++        0x24, 0xd6, 0x7f, 0xf3, 0x66, 0x8b, 0xfc, 0x22, 0x71, 0xf5, 0xc6, 0x26, 0xcd, 0xfe, 0x17,
++        0xdb, 0x3f, 0xb2, 0x4d, 0x4a,
++    ],
++    [
++        0x04, 0x40, 0x52, 0xbf, 0x4b, 0x6f, 0x46, 0x1d, 0xb9, 0x66, 0x3c, 0x62, 0xc3, 0xed, 0xba,
++        0xd7, 0xa0, 0x0d, 0x1a, 0x10, 0x14, 0x4e, 0xc3, 0x9c, 0x28, 0xd3, 0x6b, 0x47, 0x89, 0xa2,
++        0x58, 0x2e, 0x7f, 0xfe, 0xcf, 0x4d, 0x51, 0x90, 0xb0, 0xfc, 0x61, 0x86, 0x2b, 0xe6, 0xbd,
++        0x71, 0xd7, 0x0c, 0xc8, 0xe7, 0x24, 0xf3, 0x39, 0x99, 0xbf, 0xcc, 0x5b, 0x23, 0x5a, 0x27,
++        0xc3, 0x18, 0x8d, 0x25, 0xeb,
++    ],
++    [
++        0x04, 0x1e, 0xdd, 0xba, 0xe2, 0xc8, 0x02, 0xe4, 0x1a, 0x12, 0x32, 0x02, 0xa8, 0xf6, 0x2b,
++        0xff, 0x7a, 0xaf, 0xdf, 0x5c, 0xc0, 0x85, 0x26, 0xa7, 0xa4, 0x74, 0x34, 0x6c, 0x10, 0xa1,
++        0xd4, 0xcf, 0xac, 0x43, 0x10, 0x4d, 0x86, 0x56, 0x0e, 0xbc, 0xfc, 0x0c, 0x45, 0xf4, 0x52,
++        0x73, 0xdb, 0x33, 0xa0, 0x36, 0xe0, 0x6b, 0x7e, 0x4c, 0x70, 0x19, 0x17, 0x8f, 0xa0, 0xaf,
++        0x2d, 0xd6, 0x03, 0xf8, 0x44,
++    ],
++    [
++        0x04, 0xb4, 0x8e, 0x26, 0xb4, 0x84, 0xf7, 0xa2, 0x1c, 0x0a, 0x4a, 0x46, 0xfb, 0x6a, 0xaf,
++        0x36, 0x3a, 0x66, 0xb0, 0xde, 0x32, 0x25, 0xc4, 0x74, 0x4b, 0x96, 0x15, 0xb5, 0x11, 0x0d,
++        0x1d, 0x78, 0xe5, 0xfa, 0xc0, 0x15, 0x40, 0x4d, 0x4d, 0x3d, 0xab, 0x64, 0x13, 0x1b, 0xcd,
++        0xfe, 0xd6, 0xf6, 0x68, 0xc0, 0x04, 0xe4, 0x04, 0x8b, 0x7b, 0x0f, 0x98, 0x06, 0xeb, 0xb0,
++        0xf6, 0x21, 0xa0, 0x1b, 0x2d,
++    ],
++];
++
++// Fixed-base comb: entry bits select G, 2^64 G, 2^128 G, 2^192 G.
++// All scalar-dependent selection scans the complete table in fixed time.
++fn generator_comb(scalar: &Scalar) -> ProjectivePoint {
++    let mut table = [ProjectivePoint::IDENTITY; 16];
++    for i in 1..16 {
++        table[i] =
++            ProjectivePoint::from(PublicKey::from_sec1_bytes(&GENERATOR_COMB[i - 1]).unwrap());
++    }
++    let mut bytes = scalar.to_bytes();
++    let mut result = ProjectivePoint::IDENTITY;
++    for bit in (0..64).rev() {
++        result = result.double();
++        let mut digit = 0u8;
++        for column in 0..4 {
++            let pos = bit + 64 * column;
++            digit |= ((bytes[31 - pos / 8] >> (pos & 7)) & 1) << column;
++        }
++        let mut selected = ProjectivePoint::IDENTITY;
++        for i in 1..16 {
++            selected.conditional_assign(&table[i], digit.ct_eq(&(i as u8)));
++        }
++        result += selected;
++    }
++    bytes.zeroize();
++    result
++}
++
+ fn public_key(input: &[u8], compressed: bool, output: &mut [u8]) -> Result<usize, i64> {
+     let key = secret(input)?;
+-    let point = key.public_key().to_encoded_point(compressed);
++    let mut scalar = key.to_nonzero_scalar();
++    let point = generator_comb(scalar.as_ref())
++        .to_affine()
++        .to_encoded_point(compressed);
++    scalar.zeroize();
+     output[..point.len()].copy_from_slice(point.as_bytes());
+     Ok(point.len())
+ }
+@@ -80,11 +227,91 @@
+     Ok(64)
+ }
+ 
++// Verification scalars are derived exclusively from the public key, digest and
++// signature. Direct table indexing and zero-digit branches below therefore do
++// not depend on secret data. Signing nonce multiplication uses upstream
++// constant-time arithmetic; public-key derivation uses the separate comb.
++fn verification_lincomb(u1: &Scalar, q: &ProjectivePoint, u2: &Scalar) -> ProjectivePoint {
++    fn table(point: &ProjectivePoint) -> [ProjectivePoint; 8] {
++        let mut points = [ProjectivePoint::IDENTITY; 8];
++        points[0] = *point;
++        let twice = point.double();
++        for i in 1..8 {
++            points[i] = points[i - 1] + twice;
++        }
++        points
++    }
++    // Width-5 nonadjacent digits: each odd digit is in [-15,15] and is
++    // followed by at least four zero digits. The extra bit holds a final carry.
++    // Everything here depends exclusively on public verification scalars.
++    fn nonadjacent(scalar: &Scalar) -> [i8; 257] {
++        let bytes = scalar.to_bytes();
++        let mut digits = [0i8; 257];
++        let mut position = 0;
++        let mut carry = 0u8;
++        while position < 257 {
++            let mut window = carry;
++            for offset in 0..5 {
++                let bit = position + offset;
++                if bit < 256 {
++                    window += ((bytes[31 - bit / 8] >> (bit % 8)) & 1) << offset;
++                }
++            }
++            if window & 1 == 0 {
++                position += 1;
++                continue;
++            }
++            if window < 16 {
++                digits[position] = window as i8;
++                carry = 0;
++            } else {
++                digits[position] = window as i8 - 32;
++                carry = 1;
++            }
++            position += 5;
++        }
++        digits
++    }
++    let generator = table(&ProjectivePoint::GENERATOR);
++    let public_key = table(q);
++    let left = nonadjacent(u1);
++    let right = nonadjacent(u2);
++    let mut result = ProjectivePoint::IDENTITY;
++    for bit in (0..257).rev() {
++        result = result.double();
++        let a = left[bit];
++        let b = right[bit];
++        if a > 0 {
++            result += generator[a as usize / 2];
++        } else if a < 0 {
++            result -= generator[(-a) as usize / 2];
++        }
++        if b > 0 {
++            result += public_key[b as usize / 2];
++        } else if b < 0 {
++            result -= public_key[(-b) as usize / 2];
++        }
++    }
++    result
++}
++
+ fn verify_prehash(key: &[u8], hash: &[u8], sig: &[u8]) -> Result<bool, i64> {
+-    let key = VerifyingKey::from(public(key)?);
++    let key = public(key)?;
+     digest(hash)?;
+     let sig = signature(sig)?;
+-    Ok(key.verify_prehash(hash, &sig).is_ok())
++    // Same ECDSA equation and canonical input checks as upstream verify_prehash;
++    // simultaneous multiplication shares the two scalars' point doublings.
++    let z = <Scalar as Reduce<U256>>::reduce_bytes(hash.into());
++    let (r, s) = sig.split_scalars();
++    let s_inv = *s.invert_vartime();
++    let u1 = z * s_inv;
++    let u2 = *r * s_inv;
++    let point =
++        verification_lincomb(&u1, &ProjectivePoint::from(*key.as_affine()), &u2).to_affine();
++    if bool::from(point.is_identity()) {
++        return Ok(false);
++    }
++    Ok(*r == <Scalar as Reduce<U256>>::reduce_bytes(&point.x()))
+ }
+ 
+ fn signature_to_der(input: &[u8], output: &mut [u8]) -> Result<usize, i64> {
+@@ -408,4 +635,66 @@
+             assert_eq!(verify_prehash(&hex(PUBLIC), &hex(hash), &out), Ok(true));
+         }
+     }
+-}
++
++    #[test]
++    fn verification_lincomb_matches_upstream() {
++        let values = [
++            "0000000000000000000000000000000000000000000000000000000000000000",
++            "0000000000000000000000000000000000000000000000000000000000000001",
++            "0000000000000000000000000000000000000000000000000000000000000002",
++            "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550",
++            "8000000000000000000000000000000000000000000000000000000000000000",
++            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
++            "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
++        ];
++        let keys = [
++            ProjectivePoint::GENERATOR,
++            -ProjectivePoint::GENERATOR,
++            ProjectivePoint::from(*public(&hex(PUBLIC)).unwrap().as_affine()),
++        ];
++        for key in keys {
++            for a in values {
++                for b in values {
++                    let a = <Scalar as Reduce<U256>>::reduce_bytes(hex(a).as_slice().into());
++                    let b = <Scalar as Reduce<U256>>::reduce_bytes(hex(b).as_slice().into());
++                    assert_eq!(
++                        verification_lincomb(&a, &key, &b),
++                        ProjectivePoint::GENERATOR * a + key * b
++                    );
++                }
++            }
++        }
++    }
++    #[test]
++    fn comb_matches_upstream() {
++        use sha2::{Digest, Sha256};
++        let mut before_order =
++            hex("ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551");
++        before_order[31] -= 1;
++        let mut cases = vec![vec![0; 32], vec![1; 32], vec![255; 32], before_order];
++        for bit in 0..256 {
++            let mut bytes = vec![0; 32];
++            bytes[31 - bit / 8] = 1 << (bit & 7);
++            cases.push(bytes);
++        }
++        for i in 0u32..1024 {
++            cases.push(Sha256::digest(i.to_be_bytes()).to_vec());
++        }
++        for bytes in cases {
++            let scalar = <Scalar as Reduce<U256>>::reduce_bytes(bytes.as_slice().into());
++            let expected = (ProjectivePoint::GENERATOR * scalar).to_affine();
++            assert_eq!(generator_comb(&scalar).to_affine(), expected);
++            for compressed in [false, true] {
++                let mut actual = [0u8; 65];
++                let result = public_key(&scalar.to_bytes(), compressed, &mut actual);
++                if scalar == Scalar::ZERO {
++                    assert_eq!(result, Err(INVALID_SECRET_KEY));
++                } else {
++                    let encoded = expected.to_encoded_point(compressed);
++                    assert_eq!(result, Ok(encoded.len()));
++                    assert_eq!(&actual[..encoded.len()], encoded.as_bytes());
++                }
++            }
++        }
++    }
++}
+--- a/plugins/p256/tests/vectors/README.md
++++ b/plugins/p256/tests/vectors/README.md
+@@ -39,3 +39,16 @@
+ in [section 3.2](https://www.rfc-editor.org/rfc/rfc6979.html#section-3.2).
+ For these equal-width P-256/SHA256 values, this is reduction modulo `n`.
+ Consequently digest `n` and digest zero must produce identical signatures.
++
++`generate-p256-comb.py` independently constructs the 15 nonzero combinations
++of `G`, `2^64 G`, `2^128 G` and `2^192 G` with Python integer arithmetic. It
++parses the runtime's encoded table and requires every point to equal both this
++construction and OpenSSL's public-key derivation for the exact table scalar.
++Regenerate the proof from this directory with
++`python3 generate-p256-comb.py --output p256-comb-proof.json`; supply
++`--openssl /path/to/openssl` when needed. `p256-comb-proof.json` records the
++runtime and generator hashes, exact coefficients, encoded points and OpenSSL
++version. This checks table values; it does not establish constant-time behavior.
++The native runtime also compares the comb against upstream multiplication for
++1,284 zero/boundary, single-bit and deterministic SHA-256-derived scalars, and
++checks compressed and uncompressed SEC1 outputs.
+--- /dev/null
++++ b/plugins/p256/tests/vectors/generate-p256-comb.py
+@@ -0,0 +1,101 @@
++#!/usr/bin/env python3
++"""Generate the P256 comb and independently check runtime constants with OpenSSL.
++
++Run with an OpenSSL executable on PATH, or pass --openssl /path/to/openssl.
++This script does not modify runtime sources; JSON evidence is printed to stdout
++unless --output is provided. Point arithmetic below uses Python integers rather
++than RustCrypto. OpenSSL independently derives every encoded table point from
++its exact private scalar, so validation checks its value and curve membership.
++"""
++
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import re
++import subprocess
++
++P = 2**256 - 2**224 + 2**192 + 2**96 - 1
++G = (
++    int("6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296", 16),
++    int("4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5", 16),
++)
++
++
++def add(a, b):
++    if a is None:
++        return b
++    if b is None:
++        return a
++    x, y = a
++    u, v = b
++    if x == u:
++        if (y + v) % P == 0:
++            return None
++        slope = (3 * x * x - 3) * pow(2 * y, -1, P) % P
++    else:
++        slope = (v - y) * pow(u - x, -1, P) % P
++    z = (slope * slope - x - u) % P
++    return z, (slope * (x - z) - y) % P
++
++
++def generate():
++    basis = [G]
++    for _ in range(3):
++        point = basis[-1]
++        for _ in range(64):
++            point = add(point, point)
++        basis.append(point)
++    points = []
++    for index in range(1, 16):
++        point = None
++        for column in range(4):
++            if index >> column & 1:
++                point = add(point, basis[column])
++        points.append(bytes([4]) + point[0].to_bytes(32, "big") + point[1].to_bytes(32, "big"))
++    return points
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--openssl", default="openssl")
++    parser.add_argument("--runtime", type=Path,
++                        default=Path(__file__).resolve().parents[2] / "runtime/src/lib.rs")
++    parser.add_argument("--output", type=Path)
++    args = parser.parse_args()
++    points = generate()
++    source = args.runtime.read_bytes()
++    table = source.decode().split("const GENERATOR_COMB: [[u8; 65]; 15] = [", 1)[1].split("];", 1)[0]
++    actual = bytes(int(value, 16) for value in re.findall(r"0x([0-9a-fA-F]{2})\b", table))
++    assert actual == b"".join(points), "Runtime table differs from independent Python result"
++    spki_prefix = bytes.fromhex("3059301306072a8648ce3d020106082a8648ce3d030107034200")
++    coefficients = []
++    for index, point in enumerate(points, 1):
++        coefficient = sum(((index >> column) & 1) << (64 * column) for column in range(4))
++        scalar = coefficient.to_bytes(32, "big")
++        coefficients.append(scalar.hex())
++        private_key = bytes.fromhex("30310201010420") + scalar + bytes.fromhex("a00a06082a8648ce3d030107")
++        derived = subprocess.run(
++            [args.openssl, "pkey", "-inform", "DER", "-pubout", "-outform", "DER"],
++            input=private_key, capture_output=True, check=True,
++        ).stdout
++        assert derived == spki_prefix + point, f"OpenSSL derived a different table point {index}"
++    version = subprocess.check_output([args.openssl, "version"], text=True).strip()
++    report = {
++        "basis": "G,2^64G,2^128G,2^192G",
++        "runtime_sha256": hashlib.sha256(source).hexdigest(),
++        "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
++        "openssl": version,
++        "validated": "All 15 constants match independent Python arithmetic and OpenSSL exact-scalar public-key derivation",
++        "coefficients": coefficients,
++        "points": [point.hex() for point in points],
++    }
++    encoded = json.dumps(report, indent=2) + "\n"
++    if args.output:
++        args.output.write_text(encoded)
++    else:
++        print(encoded, end="")
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/plugins/p256/tests/vectors/p256-comb-proof.json
+@@ -0,0 +1,41 @@
++{
++  "basis": "G,2^64G,2^128G,2^192G",
++  "runtime_sha256": "af64ec5dc9e5c109e4127aa92b9fcbbdf33700f043689e6945b253219e81ef16",
++  "generator_sha256": "34d1a8fd563506f1fc43854b6e732052194db1ca98c13f2e2fdad1b330933f21",
++  "openssl": "OpenSSL 3.6.3 9 Jun 2026 (Library: OpenSSL 3.6.3 9 Jun 2026)",
++  "validated": "All 15 constants match independent Python arithmetic and OpenSSL exact-scalar public-key derivation",
++  "coefficients": [
++    "0000000000000000000000000000000000000000000000000000000000000001",
++    "0000000000000000000000000000000000000000000000010000000000000000",
++    "0000000000000000000000000000000000000000000000010000000000000001",
++    "0000000000000000000000000000000100000000000000000000000000000000",
++    "0000000000000000000000000000000100000000000000000000000000000001",
++    "0000000000000000000000000000000100000000000000010000000000000000",
++    "0000000000000000000000000000000100000000000000010000000000000001",
++    "0000000000000001000000000000000000000000000000000000000000000000",
++    "0000000000000001000000000000000000000000000000000000000000000001",
++    "0000000000000001000000000000000000000000000000010000000000000000",
++    "0000000000000001000000000000000000000000000000010000000000000001",
++    "0000000000000001000000000000000100000000000000000000000000000000",
++    "0000000000000001000000000000000100000000000000000000000000000001",
++    "0000000000000001000000000000000100000000000000010000000000000000",
++    "0000000000000001000000000000000100000000000000010000000000000001"
++  ],
++  "points": [
++    "046b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c2964fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5",
++    "040fa822bc2811aaa58492592e326e25de29493baaad651f7e90e75cb48e14db63bff44ae8f5dba80d6f4ad4bcb3df188b34b1a65050fe82f5e41124545f462ee7",
++    "04300a4bbc89d6726fb257c0de95e02789e96c98fd0d35f1fa93391ce2097992af72aac7e0d09b46447f1ddb25ff1e3c6f5bb1eeada9d806a5aa54a291c08127a0",
++    "04447d739beedb5e67fb982fd588c6766efc35ff7dc297eac357c84fc9d789bd852d4825ab834131eee12e9d953a4aaff73d349b95a7fae5000c7e33c972e25b32",
++    "04ef9519328a9c72ffddc6068bb91dfc60ef7fbd2b1a0a11b713949c932a1d367f611e9fc37dbb2c9bc1ee9807022c219c23183b0895ca1740196035a77376d8a8",
++    "04550663797b51f5d87dea6482e11238bf2936df5ec6c9bc36cae2b1920b57f4bc157164848aecb8510afa40018d9d50e59fb3d576dbdefbe144ffe216348a964c",
++    "04eb5d7745b21141eaa2e8f483f43e43917ccd84e70d715f26e48ecafffc5cde01eafd72ebdbecc17b0990e6a158006cee85f22cfe2844b645cac917e2731a3479",
++    "04a6d39677a78492762736ff8344315fc596439591a3c6b94a6cf20ffb313728be674f84749b0b881666b8babd2d27ecdf824a920c2284059bf2bab833c357f5f4",
++    "044e769e7672c9ddad31855f7db8c7fedb74e02f080203a56b2df48c04677c8a3e42b99082de8306631ec0057206947281fb9ae16f3b9122a5a4c36165b824bbb0",
++    "0478878ef61c6ce04d7fdc1ca008a1c478d1f89e799c0ce1316ef95150dda868b9b6cb3f5d7b72c321de53142c12309def6ace570ebde08d4f9c62b9121fe0d976",
++    "040c88bc4d716b1287595c5220812ffcae5b82dd5bd54fb4967f991ed2c31a3573dd5ddea3f3901dc618d1b5b39c04e6aa7c8181f4df2564f33a57bf635f48aca8",
++    "0468f344af6b317466efe0a423083e49f343a0a28c42ba792fe96a79fb3e72ad0c31b9c405f8540a20604ed93c24d67ff3668bfc2271f5c626cdfe17db3fb24d4a",
++    "044052bf4b6f461db9663c62c3edbad7a00d1a10144ec39c28d36b4789a2582e7ffecf4d5190b0fc61862be6bd71d70cc8e724f33999bfcc5b235a27c3188d25eb",
++    "041eddbae2c802e41a123202a8f62bff7aafdf5cc08526a7a474346c10a1d4cfac43104d86560ebcfc0c45f45273db33a036e06b7e4c7019178fa0af2dd603f844",
++    "04b48e26b484f7a21c0a4a46fb6aaf363a66b0de3225c4744b9615b5110d1d78e5fac015404d4d3dab64131bcdfed6f668c004e4048b7b0f9806ebb0f621a01b2d"
++  ]
++}
+--- a/packages/fast/tests/ash/P256.mo
++++ b/packages/fast/tests/ash/P256.mo
+@@ -2,6 +2,7 @@
+ import P256 "mo:fast/P256";
+ import Array "mo:core/Array";
+ import Blob "mo:core/Blob";
++import Prim "mo:⛔";
+ 
+ // RFC 6979 A.2.5 and pinned C2SP Wycheproof vectors; see coverage/P256.md.
+ // SHA-256 digests are fixed independent answers, so this suite loads only P256.
+@@ -202,6 +203,56 @@
+       };
+       assert P256.signPrehash(secret, order) == P256.signPrehash(secret, zero);
+     })
++  };
++
++  public func test_der72_retained_across_await_and_forced_gc() : async Test.Metrics {
++    // Both RFC6979 sample scalars require DER sign padding, yielding exactly
++    // 72 bytes. This exercises returning the complete managed output buffer.
++    let saved = switch (P256.signatureToDer(sampleSignature)) {
++      case (#ok bytes) bytes;
++      case (#err _) Prim.trap("unexpected DER conversion error");
++    };
++    let aliases = [saved, saved];
++    func verifySaved() {
++      assert saved.size() == 72 and saved == sampleDer;
++      assert aliases[0] == sampleDer and aliases[1] == sampleDer;
++      assert P256.signatureFromDer(saved) == #ok sampleSignature;
++    };
++    verifySaved();
++    let different72 = concat(maxScalar, maxScalar);
++    let minimal = concat(one, one);
++    let reclaimedBefore = Prim.rts_reclaimed();
++    var round = 0;
++    while (round < 9) {
++      // Distinct full-capacity outputs, short outputs and error paths must
++      // never overwrite the retained buffer. The GC skips its active 64-MiB
++      // allocation partition; nine 8-MiB batches make the partition holding
++      // saved eligible for evacuation, without retaining the pressure data.
++      switch (P256.signatureToDer(different72)) {
++        case (#ok bytes) assert bytes.size() == 72 and bytes != saved;
++        case (#err _) assert false;
++      };
++      assert P256.signatureToDer(minimal) == #ok "\30\06\02\01\01\02\01\01";
++      assert P256.signatureToDer("") == #err(#invalidSignature);
++      var pressure = 0;
++      while (pressure < 8) {
++        ignore Prim.Array_init<Nat>(131_072, round + pressure);
++        pressure += 1;
++      };
++      await async {};
++      verifySaved();
++      round += 1;
++    };
++    var settle = 0;
++    while (settle < 4) {
++      await async {};
++      verifySaved();
++      settle += 1;
++    };
++    // This confirms collection occurred while the managed Blob survived in
++    // continuation locals and aliases, rather than merely testing allocation.
++    assert Prim.rts_reclaimed() > reclaimedBefore + 4 * 1024 * 1024;
++    Test.test(verifySaved)
+   };
+ 
+   type Vector = { id : Nat; publicKey : Blob; digest : Blob; der : Blob; compact : ?Blob; valid : Bool };
+--- a/packages/fast/tests/ash/P256.ash.json
++++ b/packages/fast/tests/ash/P256.ash.json
+@@ -10,7 +10,8 @@
+       "mocArgs": [
+         "--plugin",
+         "../../../../dist/p256",
+-        "--sanity-checks"
++        "--sanity-checks",
++        "--force-gc"
+       ]
+     }
+   ]
+--- a/packages/fast/tests/ash/coverage/P256.md
++++ b/packages/fast/tests/ash/coverage/P256.md
+@@ -1,8 +1,9 @@
+ # P256 test coverage
+ 
+-The 14 Ash methods import `mo:fast/P256` and load only the `p256` plugin.
++The 15 Ash methods import `mo:fast/P256` and load only the `p256` plugin.
+ SHA-256 message digests are committed independent values, so the suite does not
+ implicitly rely on the SHA256 plugin. Core supplies ordinary Blob/Array helpers.
++The checked-in Ash configuration enables `--force-gc` and `--sanity-checks`.
+ 
+ | Ash test | Behavior checked |
+ | --- | --- |
+@@ -10,6 +11,7 @@
+ | `test_rfc6979_sha256_signatures_and_high_s_verification` | Exact RFC 6979 SHA-256 signatures for `sample` and `test`; signing preserves the specified high S; both high and low S verify; wrong digest and a different valid public key return `#ok(false)`. |
+ | `test_rfc6979_digest_reduction_boundaries` | Independent exact signatures for prehash values zero, order minus one, order and 2²⁵⁶ minus one. Requires the order and zero digests to produce the same signature, exercising RFC6979 `bits2octets` reduction before nonce generation. |
+ | `test_der_conversion_and_explicit_normalization` | Exact DER including required positive INTEGER padding, compact conversion, shortest valid encoding, low-S normalization and idempotence, S/order boundaries. |
++| `test_der72_retained_across_await_and_forced_gc` | The RFC sample's exact 72-byte DER output and aliases survive 13 asynchronous continuations, distinct later 72-byte outputs, short outputs, error paths, and confirmed collection of over 4 MiB. This exercises returning the already allocated managed output buffer at its full capacity. |
+ | `test_secret_key_ranges_and_digest_lengths` | Empty, short, long, zero, order and overflowing secret keys; empty/31/33-byte digests; zero, order and maximal 256-bit digests remain valid inputs. |
+ | `test_strict_sec1_rejects_invalid_points` | Missing/truncated/oversized encodings, infinity, wrong tags, hybrid encoding of a valid point, off-curve coordinates and coordinates outside the field. |
+ | `test_signature_scalar_ranges_and_error_precedence` | Signature lengths and zero/order/overflowing R or S across conversion, normalization and verification; key-before-digest-before-signature validation; recovery after errors. |
+@@ -50,21 +52,39 @@
+ Each Wycheproof method contains at most 13 vectors. Ash metrics include test
+ setup, conversions and assertions; they are correctness evidence rather than
+ isolated performance measurements. The alias/retention test is not a proof of
+-GC reclamation or constant-time execution. The suite does not simulate upgrades
+-or interrupted calls.
++GC reclamation or constant-time execution. The separate DER72 GC test observes
++reclamation while preserving one managed output, but does not prove arbitrary
++GC schedules or reclamation of every plugin object. The suite does not simulate
++upgrades or interrupted calls.
++
++The DER72 test allocates 72 MiB of disposable arrays in nine batches. The SDK's
++incremental collector uses 64-MiB partitions and excludes the active allocation
++partition from evacuation; crossing that boundary is necessary to exercise
++collection of the partition containing the saved output. Pressure data is not
++retained. Nine allocation continuations and four settling continuations check
++the saved Blob, its aliases and its exact compact decoding throughout. The
++test's returned metrics measure only its final validation closure, excluding
++the allocation pressure and asynchronous collection phases.
+ 
+ ## Validation
+ 
+-On 2026-10-12, all **14 Ash methods passed** on PocketIC using the source Ash
+-checkout at `/srv/shared/code/ash` and the staged P256 artifacts built against
+-Motoko `2.0.0-14-g92b1bdecb`. The isolated Ash configuration pointed at the public
+-source files above and enabled `--sanity-checks`. No methods failed or skipped.
+-The largest correctness batch used approximately 265 million instructions.
++On 2026-10-12, all **15 Ash methods passed** on PocketIC using the source Ash
++checkout at `/srv/shared/code/ash` and the private round-2 candidate
++`_build/crypto-optimization-round2/p256-combined`, built against Motoko
++`2.0.0-14-g92b1bdecb`. The isolated Ash configuration pointed at this candidate's
++source and artifacts and enabled `--force-gc --sanity-checks`, matching the
++checked-in configuration. No methods failed or skipped. The largest correctness
++batch used approximately 147 million instructions. The DER72 retention test
++passed its assertion that more than 4 MiB had been reclaimed while the saved
++output remained intact.
++
++Execution evidence is in `_build/p256-ash-round2/ash.log`, using
++`bun /srv/shared/code/ash/src/index.ts test _build/p256-ash-round2/P256.ash.json --verbose`.
+ 
+ Artifact SHA-256 values for that run:
+ 
+-- `plugin.cmxs`: `bff3094819613c23afeb6cccef84949c068bfdeda8e88d7157ef8cc566d1b614`
+-- `runtime.wasm`: `96b1faae152dfdd99a46f0b3508b9c3709de0f228c54250c4da12af2bfe37226`
++- `plugin.cmxs`: `e08b0987cb80beb26448900fe6c7c75a8e6a7b6e4153ea09e02f3f652c9a1c74`
++- `runtime.wasm`: `83803f3d2462cb866e730fad94d73073cffdb574333a48301917e52c529c1c84`
+ 
+ The new digest-reduction regression was also run against the preceding runtime
+ (`2f26e5b6ec3a72bf75d5b26ead5d7ddedd3d86eb9b86f7e93488c527716b7199`):

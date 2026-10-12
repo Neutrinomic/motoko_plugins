@@ -1,0 +1,83 @@
+{
+  "upstream": "round2/curve-hotspots/fixtures/curve-inputs.json",
+  "upstream_sha256": "221232682bebb7f8842bca8a18e1049abb904c59f38fb46800ae3e7e6d689f2c",
+  "oracle_source": "benchmarks/crypto/generate-curves.py",
+  "oracle_sha256": "0c482636d28ce22a8ecb70c1a0fe6dd34cc289a1efa6c8ebd013d0d41ed29ea4",
+  "cases": [
+    {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "inputs": {
+        "left": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "right": "049f7f7d213f7a495bd12ccb4efa4482be4ea9f1f8fd812ff0fab95857093c876ebd22d455fe65a09eb0d0578004e9890e127ed99fc9ec6db01b0f91ebc730808d"
+      },
+      "expression": "C.pointAdd(left, right)",
+      "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.pointMultiply(key, scalar)",
+      "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-x-only-compressed",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094"
+      },
+      "expression": "C.xOnlyPublicKey(key)",
+      "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "inputs": {
+        "key": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakPublicKey(key, tweak)",
+      "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "inputs": {
+        "scalar": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.baseMultiply(scalar)",
+      "expected_hex": "039193c50bbcb78cc870c74b2fbab8c0d77c29e9661d2cf575610da3505e22b3c7",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "inputs": {
+        "key": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakXOnlyPublicKey(key, tweak)",
+      "expected_hex": "03464ba5b8c027406a45d4570cce4d9b7f9a6829cf8f7056aadd86208ec50d3d7c",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "inputs": {
+        "secret": "d5aec6eb32a867bcf75a4266720fb2c8839c4e7808540fce0952afc3decd955f",
+        "tweak": "fb336395b014f175e8b640b3dd415edb5385bf6b3057c0aa0ff5129dce418f35"
+      },
+      "expression": "C.tweakXOnlySecretKey(secret, tweak)",
+      "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+      "expected_result": "ok",
+      "result_type": "Blob"
+    }
+  ]
+}

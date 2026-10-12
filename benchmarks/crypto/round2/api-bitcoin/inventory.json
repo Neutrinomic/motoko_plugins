@@ -1,0 +1,738 @@
+{
+  "callable_count": 47,
+  "native_cases": 47,
+  "baseline_cases": 40,
+  "api_rows": [
+    {
+      "id": "Bitcoin/Hash.hash160",
+      "module": "Bitcoin/Hash",
+      "function": "hash160",
+      "workload": "SHA256 followed by RIPEMD160",
+      "size": "32-byte message",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-hash160",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-hash160",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Hash.sha256d",
+      "module": "Bitcoin/Hash",
+      "function": "sha256d",
+      "workload": "Double SHA256",
+      "size": "32-byte message",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-sha256d",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-sha256d",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Hash.digest256",
+      "module": "Bitcoin/Hash",
+      "function": "digest256",
+      "workload": "Double SHA256 compatibility alias",
+      "size": "32-byte message",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-digest256",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-digest256",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Hash.taggedHash",
+      "module": "Bitcoin/Hash",
+      "function": "taggedHash",
+      "workload": "Compute BIP340 tagged SHA256",
+      "size": "8-byte TapTweak tag + 32-byte message",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-taggedhash",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-taggedhash",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Hash.taggedHasher",
+      "module": "Bitcoin/Hash",
+      "function": "taggedHasher",
+      "workload": "Construct cached-tag hash closure",
+      "size": "8-byte TapTweak tag; 32-byte check message outside timing",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-taggedhasher",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-taggedhasher",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Measure closure construction only; invoke it outside measurement to verify retained tag state. Reusable tagged-hash closure composed from public pure-Motoko SHA256 APIs; construction times only tag digest and closure allocation."
+    },
+    {
+      "id": "Bitcoin/Hash.taggedHasher.call",
+      "module": "Bitcoin/Hash",
+      "function": "taggedHasher.call",
+      "workload": "Invoke cached-tag hash closure",
+      "size": "32-byte message; 8-byte tag prepared outside timing",
+      "plugin_case": {
+        "name": "api-bitcoin-hash-taggedhasher-call",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-hash-taggedhasher-call",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Measure returned closure invocation; tag preparation outside measurement. Equivalent reusable-tag closure composition from public SHA256 APIs; tag digest prepared outside timing."
+    },
+    {
+      "id": "Bitcoin/Address.hrp",
+      "module": "Bitcoin/Address",
+      "function": "hrp",
+      "workload": "Select regtest human-readable address prefix",
+      "size": "1 regtest network variant",
+      "plugin_case": {
+        "name": "api-bitcoin-address-hrp",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-hrp",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter maps published bitcoin network variants to BIP173 human-readable prefixes; package exports no named hrp helper."
+    },
+    {
+      "id": "Bitcoin/Address.encode",
+      "module": "Bitcoin/Address",
+      "function": "encode",
+      "workload": "Encode mainnet witness-v0 address",
+      "size": "20-byte program",
+      "plugin_case": {
+        "name": "api-bitcoin-address-encode",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-encode",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Address.decode",
+      "module": "Bitcoin/Address",
+      "function": "decode",
+      "workload": "Decode mainnet witness-v0 address and check network",
+      "size": "42-character address / 20-byte program",
+      "plugin_case": {
+        "name": "api-bitcoin-address-decode",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-decode",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Segwit decode plus expected-network check; same successful witness branch as native Address.decode."
+    },
+    {
+      "id": "Bitcoin/Address.p2pkh",
+      "module": "Bitcoin/Address",
+      "function": "p2pkh",
+      "workload": "Validate compressed key and derive mainnet P2PKH address",
+      "size": "33-byte compressed SEC1 public key",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2pkh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2pkh",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Baseline composition includes compressed point decode and on-curve validation inside timing, matching native validation on this canonical compressed fixture."
+    },
+    {
+      "id": "Bitcoin/Address.p2wpkh",
+      "module": "Bitcoin/Address",
+      "function": "p2wpkh",
+      "workload": "Validate compressed key and derive mainnet P2WPKH address",
+      "size": "33-byte compressed SEC1 public key",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2wpkh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2wpkh",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Baseline composition includes compressed point decode and on-curve validation inside timing, matching native validation on this canonical compressed fixture."
+    },
+    {
+      "id": "Bitcoin/Address.p2sh",
+      "module": "Bitcoin/Address",
+      "function": "p2sh",
+      "workload": "HASH160 redeem script and encode mainnet P2SH address",
+      "size": "34-byte redeem script",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2sh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2sh",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Compose published hash and address-encoding APIs on the same script bytes."
+    },
+    {
+      "id": "Bitcoin/Address.p2wsh",
+      "module": "Bitcoin/Address",
+      "function": "p2wsh",
+      "workload": "SHA256 witness script and encode mainnet P2WSH address",
+      "size": "34-byte witness script",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2wsh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2wsh",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Compose published hash and address-encoding APIs on the same script bytes."
+    },
+    {
+      "id": "Bitcoin/Address.taprootOutputKey",
+      "module": "Bitcoin/Address",
+      "function": "taprootOutputKey",
+      "workload": "Compute empty-tree Taproot output key and parity",
+      "size": "32-byte internal x-only key",
+      "plugin_case": {
+        "name": "api-bitcoin-address-taprootoutputkey",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-taprootoutputkey",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Public taggedHash+tweakPublicKey composition supports absent root; explicit scalar-order guard matches BIP341."
+    },
+    {
+      "id": "Bitcoin/Address.taprootSecretKey",
+      "module": "Bitcoin/Address",
+      "function": "taprootSecretKey",
+      "workload": "Derive empty-tree Taproot signing scalar",
+      "size": "32-byte full-width internal secret",
+      "plugin_case": {
+        "name": "api-bitcoin-address-taprootsecretkey",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Full-width local internal secret, empty Taproot tree; independent affine scalar oracle. bitcoin 0.2.1 exposes public Taproot tweaks but no secret-key tweak API; no complete equivalent composed public API."
+    },
+    {
+      "id": "Bitcoin/Address.signTaprootKeyPath",
+      "module": "Bitcoin/Address",
+      "function": "signTaprootKeyPath",
+      "workload": "Tweak internal secret and BIP340-sign supplied key-path digest",
+      "size": "32-byte secret + 32-byte digest + 32-byte auxiliary randomness",
+      "plugin_case": {
+        "name": "api-bitcoin-address-signtaprootkeypath",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Full local secret tweak and BIP340 signing of supplied digest; no extra prehash. No Schnorr API in bitcoin 0.2.1. bitcoin 0.2.1 and ecdsa 8.0.1 expose no BIP340 Schnorr signing implementation."
+    },
+    {
+      "id": "Bitcoin/Address.p2trOutput",
+      "module": "Bitcoin/Address",
+      "function": "p2trOutput",
+      "workload": "Validate and encode tweaked mainnet Taproot output key",
+      "size": "32-byte tweaked x-only key",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2troutput",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2troutput",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Output point membership validation included in both implementations."
+    },
+    {
+      "id": "Bitcoin/Address.p2tr",
+      "module": "Bitcoin/Address",
+      "function": "p2tr",
+      "workload": "Tweak empty-tree internal key and encode mainnet Taproot address",
+      "size": "32-byte internal x-only key",
+      "plugin_case": {
+        "name": "api-bitcoin-address-p2tr",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-p2tr",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Address.scriptPubKey",
+      "module": "Bitcoin/Address",
+      "function": "scriptPubKey",
+      "workload": "Decode and network-check P2PKH address, build locking script",
+      "size": "34-character address / 25-byte output script",
+      "plugin_case": {
+        "name": "api-bitcoin-address-scriptpubkey",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-address-scriptpubkey",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Baseline network validation+address script helper+raw script serialization; one-byte CompactSize removed inside measured adapter for this 25-byte script."
+    },
+    {
+      "id": "Bitcoin/Bip32.fromPublicKey",
+      "module": "Bitcoin/Bip32",
+      "function": "fromPublicKey",
+      "workload": "Validate and construct depth-zero mainnet extended public key",
+      "size": "33-byte compressed key + 32-byte chain code",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-frompublickey",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-frompublickey-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "All returned node metadata verified by serialization outside timing; validates compressed point inside public API. Pure Motoko adapter uses published package primitives. Measured canonical SEC1 decoding and normalization; fromPublicKey also checks chain-code length. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.fingerprint",
+      "module": "Bitcoin/Bip32",
+      "function": "fingerprint",
+      "workload": "Validate compressed key and compute HASH160 fingerprint",
+      "size": "33-byte compressed SEC1 public key / 4-byte result",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-fingerprint",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-fingerprint-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured canonical SEC1 decoding and normalization; fromPublicKey also checks chain-code length. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.parse",
+      "module": "Bitcoin/Bip32",
+      "function": "parse",
+      "workload": "Parse and validate official BIP32 vector-2 root xpub",
+      "size": "111-character xpub / 78-byte payload",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-parse",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-parse",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Published mainnet xpub vector; pure-Motoko derived objects retain validated parent. Output serialization outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.deriveChild",
+      "module": "Bitcoin/Bip32",
+      "function": "deriveChild",
+      "workload": "Derive nonhardened child zero from official BIP32 vector-2 root",
+      "size": "78-byte parent payload / 1 child index / depth 1",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-derivechild",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-derivechild-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.derivePath",
+      "module": "Bitcoin/Bip32",
+      "function": "derivePath",
+      "workload": "Derive two nonhardened children from official BIP32 vector-2 root",
+      "size": "78-byte parent payload / indices [0,1] / depth 2",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-derivepath",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-derivepath-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.deriveTextPath",
+      "module": "Bitcoin/Bip32",
+      "function": "deriveTextPath",
+      "workload": "Parse textual path and derive two nonhardened children",
+      "size": "78-byte parent payload + m/0/1 (5 bytes) / depth 2",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-derivetextpath",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-derivetextpath-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.serialize",
+      "module": "Bitcoin/Bip32",
+      "function": "serialize",
+      "workload": "Serialize official BIP32 vector-2 root xpub",
+      "size": "78-byte node payload / depth zero",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-serialize",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-serialize-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured chain-code/fingerprint lengths, root metadata, compressed key length and canonical SEC1 point validation precede the package operation. Path depth and strict nonhardened text policy are checked where applicable. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Bip32.parsePath",
+      "module": "Bitcoin/Bip32",
+      "function": "parsePath",
+      "workload": "Parse strict nonhardened textual path",
+      "size": "m/0/1 (5 UTF-8 bytes) / 2 indices",
+      "plugin_case": {
+        "name": "api-bitcoin-bip32-parsepath",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-bip32-parsepath-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter enforces strict nonhardened syntax, at most 255 path components and the same 2^31 index bound before returning package-parsed indices. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.pushData",
+      "module": "Bitcoin/Script",
+      "function": "pushData",
+      "workload": "Build minimally encoded PUSHDATA1",
+      "size": "80-byte data / 82-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-pushdata",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-pushdata-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.p2pkh",
+      "module": "Bitcoin/Script",
+      "function": "p2pkh",
+      "workload": "Build P2PKH locking script",
+      "size": "20-byte public-key hash / 25-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-p2pkh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-p2pkh-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.p2sh",
+      "module": "Bitcoin/Script",
+      "function": "p2sh",
+      "workload": "Build P2SH locking script",
+      "size": "20-byte script hash / 23-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-p2sh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-p2sh-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.witnessProgram",
+      "module": "Bitcoin/Script",
+      "function": "witnessProgram",
+      "workload": "Build future witness-v2 locking script",
+      "size": "32-byte program / 34-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-witnessprogram",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-witnessprogram-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.p2wpkh",
+      "module": "Bitcoin/Script",
+      "function": "p2wpkh",
+      "workload": "Build witness-v0 P2WPKH locking script",
+      "size": "20-byte key hash / 22-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-p2wpkh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-p2wpkh-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.p2wsh",
+      "module": "Bitcoin/Script",
+      "function": "p2wsh",
+      "workload": "Build witness-v0 P2WSH locking script",
+      "size": "32-byte script hash / 34-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-p2wsh",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-p2wsh-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.p2tr",
+      "module": "Bitcoin/Script",
+      "function": "p2tr",
+      "workload": "Build witness-v1 Taproot locking script",
+      "size": "32-byte output key / 34-byte script",
+      "plugin_case": {
+        "name": "api-bitcoin-script-p2tr",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-p2tr-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter checks applicable data lengths and witness version constraints, constructs Script instructions and removes the serializer CompactSize prefix inside timing. PUSHDATA1/2/4 and minimal integer pushes are selected from input length/value. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.tapLeafHash",
+      "module": "Bitcoin/Script",
+      "function": "tapLeafHash",
+      "workload": "Compute BIP341 current-version TapLeaf commitment",
+      "size": "34-byte tapscript / leaf version 0xc0",
+      "plugin_case": {
+        "name": "api-bitcoin-script-tapleafhash",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-tapleafhash-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter validates raw-script length and even leaf version, then composes package CompactSize and tagged-hash APIs on raw script bytes. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Script.tapBranchHash",
+      "module": "Bitcoin/Script",
+      "function": "tapBranchHash",
+      "workload": "Sort child commitments and compute BIP341 TapBranch hash",
+      "size": "2 x 32-byte child hashes",
+      "plugin_case": {
+        "name": "api-bitcoin-script-tapbranchhash",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-script-tapbranchhash-validated",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " Pure Motoko adapter uses published package primitives. Measured adapter validates both 32-byte child commitments before lexicographic sorting and package tagged hashing. Distinct validated case identity; output encoding remains outside timing."
+    },
+    {
+      "id": "Bitcoin/Transaction.serialize",
+      "module": "Bitcoin/Transaction",
+      "function": "serialize",
+      "workload": "Serialize complete legacy transaction",
+      "size": "10 inputs / 2 outputs / 494 wire bytes",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-serialize",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-serialize",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": " "
+    },
+    {
+      "id": "Bitcoin/Transaction.parse",
+      "module": "Bitcoin/Transaction",
+      "function": "parse",
+      "workload": "Parse complete legacy transaction",
+      "size": "494 wire bytes / 10 inputs / 2 outputs",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-parse",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-parse",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Parse all ten inputs/two outputs; reserialization only in output query. Same valid wire transaction; serializers verify all parsed fields outside timing. Malformed-input contracts differ."
+    },
+    {
+      "id": "Bitcoin/Transaction.txid",
+      "module": "Bitcoin/Transaction",
+      "function": "txid",
+      "workload": "Serialize without witness and compute display-order transaction ID",
+      "size": "10 inputs / 2 outputs / 494 wire bytes",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-txid",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-txid",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Ten-input transaction has no witness; txid and wtxid therefore match. Existing serializer workloads retain larger cases. "
+    },
+    {
+      "id": "Bitcoin/Transaction.wtxid",
+      "module": "Bitcoin/Transaction",
+      "function": "wtxid",
+      "workload": "Serialize with witness option and compute display-order transaction ID",
+      "size": "10 inputs / 2 outputs / empty witness stacks / 494 wire bytes",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-wtxid",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-wtxid",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Ten-input transaction has no witness; txid and wtxid therefore match. Existing serializer workloads retain larger cases. "
+    },
+    {
+      "id": "Bitcoin/Transaction.signatureHashLegacy",
+      "module": "Bitcoin/Transaction",
+      "function": "signatureHashLegacy",
+      "workload": "Compute one complete legacy SIGHASH_ALL digest",
+      "size": "10 inputs / 2 outputs / input index 0 / 25-byte scriptCode",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-signaturehashlegacy",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-signaturehashlegacy",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API. "
+    },
+    {
+      "id": "Bitcoin/Transaction.signatureHashSegwitV0",
+      "module": "Bitcoin/Transaction",
+      "function": "signatureHashSegwitV0",
+      "workload": "Compute one complete BIP143 SIGHASH_ALL digest",
+      "size": "10 inputs / 2 outputs / input index 0 / 25-byte scriptCode",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-signaturehashsegwitv0",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API. bitcoin 0.2.1 has legacy and Taproot sighashes but no BIP143/Segwit-v0 implementation."
+    },
+    {
+      "id": "Bitcoin/Transaction.signatureHashTaproot",
+      "module": "Bitcoin/Transaction",
+      "function": "signatureHashTaproot",
+      "workload": "Compute one complete BIP341 key-path DEFAULT digest",
+      "size": "10 inputs / 2 outputs / input index 0 / equal 34-byte spent scripts",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-signaturehashtaproot",
+        "implementation": "native"
+      },
+      "native_case": {
+        "name": "api-bitcoin-transaction-signaturehashtaproot",
+        "implementation": "mops-bitcoin"
+      },
+      "notes": "Ten inputs, one complete public sighash call. Legacy ALL / BIP143 ALL / Taproot DEFAULT key path without annex. Equal prevout scripts fit Mops restricted API. "
+    },
+    {
+      "id": "Bitcoin/Transaction.prepareSegwitV0",
+      "module": "Bitcoin/Transaction",
+      "function": "prepareSegwitV0",
+      "workload": "Validate transaction and construct lazy BIP143 hasher",
+      "size": "10 inputs / 2 outputs; check digest outside timing",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-preparesegwitv0",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Measure reusable hasher creation/validation only; first digest invoked outside timing to verify returned state. bitcoin 0.2.1 has neither BIP143 nor a reusable BIP143 hasher constructor."
+    },
+    {
+      "id": "Bitcoin/Transaction.SegwitV0Hasher.signatureHash",
+      "module": "Bitcoin/Transaction",
+      "function": "SegwitV0Hasher.signatureHash",
+      "workload": "Compute first cold BIP143 digest from prepared hasher",
+      "size": "10 inputs / 2 outputs / input index 0 / ALL / 25-byte scriptCode",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-segwitv0hasher-signaturehash",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "First cold returned-method invocation, including lazy common hashes; prepare/validate outside timing. No prewarmed caches. bitcoin 0.2.1 has neither BIP143 nor a reusable BIP143 hasher method."
+    },
+    {
+      "id": "Bitcoin/Transaction.prepareTaproot",
+      "module": "Bitcoin/Transaction",
+      "function": "prepareTaproot",
+      "workload": "Validate transaction and prevouts, construct lazy BIP341 hasher",
+      "size": "10 inputs / 2 outputs / 10 spent outputs; check digest outside timing",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-preparetaproot",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "Measure reusable hasher creation/validation only; first digest invoked outside timing to verify returned state. bitcoin 0.2.1 has one-shot Taproot hashing but no reusable hasher constructor; one-shot costs are measured separately."
+    },
+    {
+      "id": "Bitcoin/Transaction.TaprootHasher.signatureHash",
+      "module": "Bitcoin/Transaction",
+      "function": "TaprootHasher.signatureHash",
+      "workload": "Compute first cold BIP341 digest from prepared hasher",
+      "size": "10 inputs / 2 outputs / input index 0 / DEFAULT / 34-byte spent scripts",
+      "plugin_case": {
+        "name": "api-bitcoin-transaction-taproothasher-signaturehash",
+        "implementation": "native"
+      },
+      "native_case": null,
+      "notes": "First cold returned-method invocation, including lazy common hashes; prepare/validate outside timing. No prewarmed caches. bitcoin 0.2.1 has one-shot Taproot hashing but no retained common-hash API; one-shot costs are measured separately."
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "cases": [
+    {
+      "name": "bitcoin-hash160-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "751e76e8199196d454941c45d1b3a323f1433bd6",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-hash160-pubkey/native/main.mo"
+    },
+    {
+      "name": "bitcoin-hash160-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "751e76e8199196d454941c45d1b3a323f1433bd6",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-hash160-pubkey/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bitcoin-sha256d-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "b1cd0a4eb6d1cea5eb288fb4474ac403eab044004cc48f12bcb4ca8346d487e1",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-sha256d-pubkey/native/main.mo"
+    },
+    {
+      "name": "bitcoin-sha256d-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "b1cd0a4eb6d1cea5eb288fb4474ac403eab044004cc48f12bcb4ca8346d487e1",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-sha256d-pubkey/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Native validates SEC1 curve membership; baseline hashes SEC1 bytes without validation. Full public API cost includes extra native checking.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/native/main.mo"
+    },
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Baseline does not validate key; valid vector is equivalent output.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bitcoin-p2wpkh",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "Native validates compressed SEC1 curve membership; baseline composition starts from trusted bytes.",
+      "source": "bitcoin-cases/bitcoin-p2wpkh/native/main.mo"
+    },
+    {
+      "name": "bitcoin-p2wpkh",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-p2wpkh/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "native-prevalidated",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Explicit payload API performs HASH160+address encode on trusted public-key bytes, matching Mops validation semantics; curve membership validation intentionally outside this API contract.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/native-prevalidated/main.mo"
+    },
+    {
+      "name": "bitcoin-p2wpkh",
+      "family": "bitcoin-composition",
+      "implementation": "native-prevalidated",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "Explicit payload API performs HASH160+address encode on trusted public-key bytes, matching Mops validation semantics; curve membership validation intentionally outside this API contract.",
+      "source": "bitcoin-cases/bitcoin-p2wpkh/native-prevalidated/main.mo"
+    },
+    {
+      "name": "bitcoin-bip32-child0",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "BIP32 official vector2. Parse outside measurement; deriveChild and serialized xpub complete output inside.",
+      "source": "bitcoin-cases/bitcoin-bip32-child0/native/main.mo"
+    },
+    {
+      "name": "bitcoin-bip32-child0",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-bip32-child0/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bitcoin-bip86-receive-address",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "62633170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a7775647078716b6564726372",
+      "notes": "Complete published BIP86 account parse, two public child derivations, empty-tree TapTweak and Bech32m address. All conversion, validation and serialization included.",
+      "source": "bitcoin-cases/bitcoin-bip86-receive-address/native/main.mo"
+    },
+    {
+      "name": "bitcoin-bip86-receive-address",
+      "family": "bitcoin-composition",
+      "implementation": "mops-bitcoin",
+      "comparison": "complete-public-api",
+      "plugins": [],
+      "expected_hex": "62633170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a7775647078716b6564726372",
+      "notes": "Equivalent empty-tree BIP86 composition using public taggedHash + tweakPublicKey because tweakFromKeyAndHash rejects empty roots. Scalar-order guard explicitly matches BIP341.",
+      "source": "bitcoin-cases/bitcoin-bip86-receive-address/mops-bitcoin/main.mo"
+    }
+  ]
+}

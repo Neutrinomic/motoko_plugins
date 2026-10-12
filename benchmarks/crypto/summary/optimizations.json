@@ -1,0 +1,392 @@
+[
+  {
+    "experiment": "BLAKE3 empty constant",
+    "decision": "accepted",
+    "before": {
+      "stage": "blake3-native-initial",
+      "name": "blake3-0",
+      "implementation": "native",
+      "instructions": 3078,
+      "allocated_bytes": 56,
+      "wasm_bytes": 275294,
+      "wasm_sha256": "3a0321b396f411367cbaa84b9eb6facf4f746a7685b6deec6efbec726db754d0"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "blake3-0",
+      "implementation": "native",
+      "instructions": 643,
+      "allocated_bytes": 56,
+      "wasm_bytes": 275399,
+      "wasm_sha256": "938a676aa1a8ce82737f6bce4125ad72326132ccee1516152a207376ffba03a9"
+    },
+    "instruction_reduction_percent": 79.10981156595192,
+    "instruction_ratio": 4.786936236391913,
+    "canister_wasm_delta_bytes": 105,
+    "notes": ""
+  },
+  {
+    "experiment": "SHA512 empty constant",
+    "decision": "accepted",
+    "before": {
+      "stage": "sha512-empty-original",
+      "name": "sha512-0",
+      "implementation": "native",
+      "instructions": 8192,
+      "allocated_bytes": 88,
+      "wasm_bytes": 265430,
+      "wasm_sha256": "0244c0419e789a025695d3e6ab5d56117bfe030d7498b16a4e53852b34c1523f"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "sha512-0",
+      "implementation": "native",
+      "instructions": 481,
+      "allocated_bytes": 88,
+      "wasm_bytes": 265698,
+      "wasm_sha256": "c0badfb36e6a178c8603d785f799876ae5bb84440e0acdeec506e63e98f3921d"
+    },
+    "instruction_reduction_percent": 94.12841796875,
+    "instruction_ratio": 17.031185031185032,
+    "canister_wasm_delta_bytes": 268,
+    "notes": ""
+  },
+  {
+    "experiment": "RIPEMD160 HASH160-sized input",
+    "decision": "accepted",
+    "before": {
+      "stage": "ripemd-short-native-initial",
+      "name": "ripemd160-32",
+      "implementation": "native",
+      "instructions": 4327,
+      "allocated_bytes": 48,
+      "wasm_bytes": 254940,
+      "wasm_sha256": "ac80f07fc985ff9654a7c3241fb8f61f951c50ff1056954aafbe72ad64897b2d"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "ripemd160-32",
+      "implementation": "native",
+      "instructions": 3845,
+      "allocated_bytes": 48,
+      "wasm_bytes": 255371,
+      "wasm_sha256": "ade93735a69b2a78f9c63e176d120e00ce41f7364b4511fca808f408551c71fb"
+    },
+    "instruction_reduction_percent": 11.139357522532933,
+    "instruction_ratio": 1.1253576072821847,
+    "canister_wasm_delta_bytes": 431,
+    "notes": "Fixed32-byte specialization; general inputs incur19 extra dispatch instructions."
+  },
+  {
+    "experiment": "Bech32 decode ASCII table",
+    "decision": "accepted",
+    "before": {
+      "stage": "bech32-native-initial",
+      "name": "bech32-decode-53",
+      "implementation": "native",
+      "instructions": 13083,
+      "allocated_bytes": 344,
+      "wasm_bytes": 251697,
+      "wasm_sha256": "e521d96f2ffe30157dc0f804c6a2e3ff8822dab1ea4cf4fac10f37a7a8ed0856"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "bech32-decode-53",
+      "implementation": "native",
+      "instructions": 12611,
+      "allocated_bytes": 344,
+      "wasm_bytes": 251472,
+      "wasm_sha256": "487a6beb421d092b81b84819df188c90873217e0be9bf6c3d8931eef0b9a60ef"
+    },
+    "instruction_reduction_percent": 3.607735228923026,
+    "instruction_ratio": 1.0374276425342954,
+    "canister_wasm_delta_bytes": -225,
+    "notes": ""
+  },
+  {
+    "experiment": "secp256k1 RFC6979 sign",
+    "decision": "accepted",
+    "before": {
+      "stage": "curves-native-initial",
+      "name": "secp256k1_sign_rfc6979_fast",
+      "implementation": "fast",
+      "instructions": 13798772,
+      "allocated_bytes": 120,
+      "wasm_bytes": 446105,
+      "wasm_sha256": "d0f51331fc4aa57c9b33ce66231fca6ffa2880f4c11f17bccb27a5be77566ec0"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "secp256k1_sign_rfc6979_fast",
+      "implementation": "fast",
+      "instructions": 7452214,
+      "allocated_bytes": 120,
+      "wasm_bytes": 448051,
+      "wasm_sha256": "36464740954f4c2cc755ec755a59aef8ddeeff3e99e54e83d9a0516045066865"
+    },
+    "instruction_reduction_percent": 45.99364349233396,
+    "instruction_ratio": 1.8516338902774396,
+    "canister_wasm_delta_bytes": 1946,
+    "notes": "Avoid unused cached verifying-key derivation."
+  },
+  {
+    "experiment": "P256 RFC6979 sign",
+    "decision": "accepted",
+    "before": {
+      "stage": "curves-p256-fixed-baseline",
+      "name": "p256_sign_rfc6979_fast",
+      "implementation": "fast",
+      "instructions": 24655157,
+      "allocated_bytes": 120,
+      "wasm_bytes": 330742,
+      "wasm_sha256": "6bd5e69df5af8b63601f39d1843e86b90ec8b6a955c005f44b403ec6e674a088"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "p256_sign_rfc6979_fast",
+      "implementation": "fast",
+      "instructions": 13457023,
+      "allocated_bytes": 120,
+      "wasm_bytes": 331388,
+      "wasm_sha256": "33ac690b2b1d9e760cdd3aaf7924fe713b4cc5b7f28c8fc60243c3ab3cd5c6fc"
+    },
+    "instruction_reduction_percent": 45.41903342980132,
+    "instruction_ratio": 1.8321405113151699,
+    "canister_wasm_delta_bytes": 646,
+    "notes": "Matched nonce-fix baseline; avoid unused cached verifying-key derivation."
+  },
+  {
+    "experiment": "BLS G1 window MSM128",
+    "decision": "accepted",
+    "before": {
+      "stage": "curves-bls-expanded-native-initial",
+      "name": "bls12_381_g1_msm_distinct_128_fast",
+      "implementation": "fast",
+      "instructions": 6469588358,
+      "allocated_bytes": 104,
+      "wasm_bytes": 782192,
+      "wasm_sha256": "c690b1d5270aef7ebaa98d342a3111c7ebef4c52c9a1ba91dc3f22a0137f4bd0"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "bls12_381_g1_msm_distinct_128_fast",
+      "implementation": "fast",
+      "instructions": 2407422749,
+      "allocated_bytes": 18560,
+      "wasm_bytes": 788716,
+      "wasm_sha256": "92b8907faf894191b93c1d598bae76b3d8754bac22065442220127c2c4a3d9ed"
+    },
+    "instruction_reduction_percent": 62.788625554157704,
+    "instruction_ratio": 2.687350346210424,
+    "canister_wasm_delta_bytes": 6524,
+    "notes": "Larger temporary allocation buys fewer scalar-multiplication instructions."
+  },
+  {
+    "experiment": "BLS G2 window MSM128",
+    "decision": "accepted",
+    "before": {
+      "stage": "curves-bls-expanded-native-initial",
+      "name": "bls12_381_g2_msm_distinct_128_fast",
+      "implementation": "fast",
+      "instructions": 21158305273,
+      "allocated_bytes": 152,
+      "wasm_bytes": 788389,
+      "wasm_sha256": "ea347f07988dc712a8aba27ab06cc167a12c9944e30a88722b4ee7662959a47f"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "bls12_381_g2_msm_distinct_128_fast",
+      "implementation": "fast",
+      "instructions": 7476866125,
+      "allocated_bytes": 30896,
+      "wasm_bytes": 794913,
+      "wasm_sha256": "524bdc368ba3aa83bcb40b9474676bb4edb1da3c5cd5466c0b97c21d1b91d7f0"
+    },
+    "instruction_reduction_percent": 64.66226369017754,
+    "instruction_ratio": 2.829836046181715,
+    "canister_wasm_delta_bytes": 6524,
+    "notes": "Larger temporary allocation buys fewer scalar-multiplication instructions."
+  },
+  {
+    "experiment": "HMAC256 prepared key",
+    "decision": "api-reuse",
+    "before": {
+      "stage": "final-native",
+      "name": "hmac-sha256-64",
+      "implementation": "native",
+      "instructions": 27819,
+      "allocated_bytes": 56,
+      "wasm_bytes": 282556,
+      "wasm_sha256": "9c50fbe9ed81fe25e13d28c739cda0f59fb1882a34b25b23c160b8d4f0f4f848"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "hmac-sha256-prepared-64",
+      "implementation": "native",
+      "instructions": 17812,
+      "allocated_bytes": 56,
+      "wasm_bytes": 284632,
+      "wasm_sha256": "f97c49a02f20c2284bf3d06ec2f94546a98fbee79dc28b412e0a8ca45ebb2b2e"
+    },
+    "instruction_reduction_percent": 35.971817822351625,
+    "instruction_ratio": 1.561812261396811,
+    "canister_wasm_delta_bytes": 2076,
+    "notes": "Key preparation excluded only in the reusable-key API."
+  },
+  {
+    "experiment": "HMAC512 prepared key",
+    "decision": "api-reuse",
+    "before": {
+      "stage": "final-native",
+      "name": "hmac-sha512-64",
+      "implementation": "native",
+      "instructions": 33004,
+      "allocated_bytes": 88,
+      "wasm_bytes": 282557,
+      "wasm_sha256": "28d6019b7e6efa197ebea6f3f499ed0e8e0560db61cfbc3d3962b42933a1e466"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "hmac-sha512-prepared-64",
+      "implementation": "native",
+      "instructions": 19620,
+      "allocated_bytes": 88,
+      "wasm_bytes": 284634,
+      "wasm_sha256": "2616aa1083c9d74eaa9b61a0ff9b0451022b3768a755ff0a1b31aa06a8163649"
+    },
+    "instruction_reduction_percent": 40.55266028360198,
+    "instruction_ratio": 1.6821610601427115,
+    "canister_wasm_delta_bytes": 2077,
+    "notes": "Key preparation excluded only in the reusable-key API."
+  },
+  {
+    "experiment": "BIP143 prepared100-input batch",
+    "decision": "api-reuse",
+    "before": {
+      "stage": "final-native",
+      "name": "bitcoin-bip143-all-cache-100-inputs",
+      "implementation": "native",
+      "instructions": 398305644,
+      "allocated_bytes": 18044824,
+      "wasm_bytes": 331258,
+      "wasm_sha256": "f05f95488521b031f1c2441b2c7a08162b14db03580e85b42992ceeeda85747b"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "bitcoin-bip143-all-cache-100-inputs",
+      "implementation": "native-prepared",
+      "instructions": 14840351,
+      "allocated_bytes": 596312,
+      "wasm_bytes": 331301,
+      "wasm_sha256": "c492432489810cb875affe1c35ee1a9ccfcf823b620639c7bb5e99c3718af77d"
+    },
+    "instruction_reduction_percent": 96.27412987399194,
+    "instruction_ratio": 26.83936815241095,
+    "canister_wasm_delta_bytes": 43,
+    "notes": "Both measure whole100-input batch; prepared creation and cold hashing included."
+  },
+  {
+    "experiment": "Taproot prepared100-input batch",
+    "decision": "api-reuse",
+    "before": {
+      "stage": "final-native",
+      "name": "bitcoin-taproot-default-cache-100-inputs",
+      "implementation": "native",
+      "instructions": 600914344,
+      "allocated_bytes": 24248024,
+      "wasm_bytes": 336707,
+      "wasm_sha256": "5b7c48957d1eb1a20197fd583c31e1c504dd5d406b2cd9948e571c4db3ecee4d"
+    },
+    "after": {
+      "stage": "final-native",
+      "name": "bitcoin-taproot-default-cache-100-inputs",
+      "implementation": "native-prepared",
+      "instructions": 16982261,
+      "allocated_bytes": 620328,
+      "wasm_bytes": 336776,
+      "wasm_sha256": "4286c75d46b489b040d38e5990f5af2b40b4361881ce79319a48acd582108ecf"
+    },
+    "instruction_reduction_percent": 97.17392983383336,
+    "instruction_ratio": 35.384825613032326,
+    "canister_wasm_delta_bytes": 69,
+    "notes": "Both measure whole100-input batch; prepared creation and cold hashing included."
+  },
+  {
+    "experiment": "SHA512 unrolled1KiB",
+    "decision": "rejected",
+    "before": {
+      "stage": "hashes-codec-native-initial",
+      "name": "sha512-1024",
+      "implementation": "native",
+      "instructions": 61170,
+      "allocated_bytes": 88,
+      "wasm_bytes": 265431,
+      "wasm_sha256": "dabcda320d5f20491a2c1253e24439164bf95767bfe34bf8896dc37a907802ad"
+    },
+    "after": {
+      "stage": "sha512-native-candidate",
+      "name": "sha512-1024",
+      "implementation": "native",
+      "instructions": 59919,
+      "allocated_bytes": 88,
+      "wasm_bytes": 308057,
+      "wasm_sha256": "c5fa72a59b08f5d6c662162eedcbd5ed4c197ab372eb82945bfdae3c0fef7ac8"
+    },
+    "instruction_reduction_percent": 2.0451201569396726,
+    "instruction_ratio": 1.0208781855504931,
+    "canister_wasm_delta_bytes": 42626,
+    "notes": "Modest instruction saving rejected for Wasm growth and maintenance cost."
+  },
+  {
+    "experiment": "HMAC256 unrolled1KiB",
+    "decision": "rejected",
+    "before": {
+      "stage": "hmac-native-initial",
+      "name": "hmac-sha256-1024",
+      "implementation": "native",
+      "instructions": 101934,
+      "allocated_bytes": 56,
+      "wasm_bytes": 282556,
+      "wasm_sha256": "8e1485c1c8248a0c704612a21dca33c753eadec8016f227f608ebeacc1d064d4"
+    },
+    "after": {
+      "stage": "hmac-unrolled256-candidate",
+      "name": "hmac-sha256-1024",
+      "implementation": "native",
+      "instructions": 99286,
+      "allocated_bytes": 56,
+      "wasm_bytes": 290856,
+      "wasm_sha256": "6cb614470e56de729c6da26d7eae0efa0de6c56d366ef9e8d09697c379957564"
+    },
+    "instruction_reduction_percent": 2.597759334471328,
+    "instruction_ratio": 1.0266704268476925,
+    "canister_wasm_delta_bytes": 8300,
+    "notes": "Modest instruction saving rejected for Wasm growth."
+  },
+  {
+    "experiment": "HMAC256 forceinline1KiB",
+    "decision": "rejected",
+    "before": {
+      "stage": "hmac-native-initial",
+      "name": "hmac-sha256-1024",
+      "implementation": "native",
+      "instructions": 101934,
+      "allocated_bytes": 56,
+      "wasm_bytes": 282556,
+      "wasm_sha256": "8e1485c1c8248a0c704612a21dca33c753eadec8016f227f608ebeacc1d064d4"
+    },
+    "after": {
+      "stage": "hmac-unrolled256-inline",
+      "name": "hmac-sha256-1024",
+      "implementation": "native",
+      "instructions": 98180,
+      "allocated_bytes": 56,
+      "wasm_bytes": 420351,
+      "wasm_sha256": "fa4ec630408d1f50699f76914b31e78b2da24482e8318a084a90a859b8ed3bc4"
+    },
+    "instruction_reduction_percent": 3.682775129005045,
+    "instruction_ratio": 1.0382358932572826,
+    "canister_wasm_delta_bytes": 137795,
+    "notes": "Larger code expansion rejected despite a small instruction saving."
+  }
+]

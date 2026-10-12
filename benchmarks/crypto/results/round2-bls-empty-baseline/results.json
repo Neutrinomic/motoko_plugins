@@ -1,0 +1,163 @@
+{
+  "stage": "round2-bls-empty-baseline",
+  "expected_case_count": 3,
+  "complete": true,
+  "recorded_utc": "2026-10-12T13:08:06.755Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "a2e8314450d992a65475bd610e925c858a7342d1315b101a1e63897f46e3b94c",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "api_bls12_381_g2Msm_empty_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "api_function": "g2Msm",
+      "comparison": "api_bls12_381_g2Msm_empty",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-empty/cases/api_bls12_381_g2Msm_empty_fast/main.mo",
+      "expected_hex": "00c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "operations_per_sample": 1,
+      "notes": "Empty packed Blob inputs. One direct public operation and Result storage are measured. Result tagging and checking are outside measurement.",
+      "fixture_provenance": "Empty group sum/MSM is infinity. IETF compressed infinity is C0 followed by 47 (G1) or 95 (G2) zero bytes, prefixed by 00 for #ok.",
+      "source_sha256": "ca4fa18aa2cafa5f6dd02dba3daeb848a02a689e6746d380efe5f5014d8e584f",
+      "returncode": 0,
+      "wasm": "api_bls12_381_g2Msm_empty_fast/fast/main.wasm",
+      "wasm_sha256": "6d133cd287c3839449032705ec42edf856a8efc456aaf1ac6e39c7359c69d75a",
+      "wasm_bytes": 780944,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3917474,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3917474,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3917474,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api_bls12_381_g1Aggregate_empty_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "api_function": "g1Aggregate",
+      "comparison": "api_bls12_381_g1Aggregate_empty",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-empty/cases/api_bls12_381_g1Aggregate_empty_fast/main.mo",
+      "expected_hex": "00c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "operations_per_sample": 1,
+      "notes": "Empty packed Blob inputs. One direct public operation and Result storage are measured. Result tagging and checking are outside measurement.",
+      "fixture_provenance": "Empty group sum/MSM is infinity. IETF compressed infinity is C0 followed by 47 (G1) or 95 (G2) zero bytes, prefixed by 00 for #ok.",
+      "source_sha256": "f041c300f78e5421d3f6edc2789d1ab973f0380f0d18ccb760b117f673d3e81e",
+      "returncode": 0,
+      "wasm": "api_bls12_381_g1Aggregate_empty_fast/fast/main.wasm",
+      "wasm_sha256": "0e85941f582ae5df65d0bef90042b2422aa7343f1c3d3aa4cc91f8c398c64f98",
+      "wasm_bytes": 780855,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3850799,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 49,
+          "output_sha256": "f4d251b3456b966b45ae90bb5813814c86a0d2b46632c3881de691f05f1f56e4",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3850799,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 49,
+          "output_sha256": "f4d251b3456b966b45ae90bb5813814c86a0d2b46632c3881de691f05f1f56e4",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3850799,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 49,
+          "output_sha256": "f4d251b3456b966b45ae90bb5813814c86a0d2b46632c3881de691f05f1f56e4",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "api_bls12_381_g2Aggregate_empty_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "api_function": "g2Aggregate",
+      "comparison": "api_bls12_381_g2Aggregate_empty",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round2/api-curves/bls-empty/cases/api_bls12_381_g2Aggregate_empty_fast/main.mo",
+      "expected_hex": "00c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "operations_per_sample": 1,
+      "notes": "Empty packed Blob inputs. One direct public operation and Result storage are measured. Result tagging and checking are outside measurement.",
+      "fixture_provenance": "Empty group sum/MSM is infinity. IETF compressed infinity is C0 followed by 47 (G1) or 95 (G2) zero bytes, prefixed by 00 for #ok.",
+      "source_sha256": "17b4a1a702a43682ec28331743acc7b46e0ded6af18735be7dd74894009be80a",
+      "returncode": 0,
+      "wasm": "api_bls12_381_g2Aggregate_empty_fast/fast/main.wasm",
+      "wasm_sha256": "8dea19502ef8528f6654e6796b73e284010fc81bd12f71313dbe11077484a694",
+      "wasm_bytes": 780906,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3916832,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 3916832,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 3916832,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 97,
+          "output_sha256": "3f5cb6f9457e0401e362479eeb932152d0bb1385fed8128239cdd3e726a8f615",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

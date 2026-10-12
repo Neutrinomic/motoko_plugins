@@ -1,0 +1,93 @@
+Independent Bech32 round-two audit
+
+Result: no concrete defects found in candidate1, candidate2, or candidate3.
+
+Audited source SHA256:
+  baseline lib.rs:   26ea764c88c49c4c321cf60e3283a7e92496b540967c9afbf0782792ee1b1f06
+  candidate1 lib.rs: 2a5a6fd7a7bb8726ed813a0024cde6053875cb329616341541a7f81739499f0b
+  candidate2 lib.rs: 536957f464962be93bd9d42d91f93552a572a4ef2738d1db3d85df312034aa9a
+  candidate3 lib.rs: 35dff7164f937b74f544bd177bf48a83852b2ab54ad7f2f5e8ea753ec594faad
+  conversion_tests: 26369f7765b0cf741954aea8af0e3e93d7c6b1078336220a325b7c6903b422e1
+
+Independent deterministic corpus, run separately for each candidate:
+  262,144 polymod step cases against baseline and direct generator contribution oracle.
+  408,280 encode cases against baseline.
+  9,205,900 decode cases against baseline.
+  203,706 conversion cases against baseline, including independent bit-index oracle.
+  Candidate3 adds 100 empty-input/invalid-width/noncanonical-pad cases: 203,806 total.
+
+Coverage includes:
+  Encode HRP/data lengths 0..100, all modes including noncanonical nonzero mode values,
+  lower/upper/mixed case, invalid printable/Unicode bytes, out-of-range data, and
+  competing invalid inputs. Decode includes every possible byte mutation at every
+  position of 240 independently varied valid encodings and their uppercase forms,
+  truncations, separator boundaries, combined failures, UTF-8 sequences, random ASCII,
+  and arbitrary byte arrays. Conversions cover all 64 width pairs with 0..257-element
+  zero/maximum/random inputs, strict/padded behavior, all single-byte values, invalid
+  widths, noncanonical true padding flags, selected longer inputs, and 16 MiB bounds.
+
+Checks:
+  Exact public error code and successful output equality with baseline.
+  Independent bit-index conversion output and error model, avoiding accumulator logic.
+  Guard bytes before/after scratch/output remain intact.
+  Input buffers remain unchanged.
+  All 90 encode/decode scratch bytes are independent of their initial contents.
+  Successful 90-byte scratch contents agree entirely with baseline, including tails.
+  Failure scratch need not equal baseline: fused encode may write canonicalized HRP
+  before later validation fails. Scratch is fully initialized, and the unchanged
+  generator discards it on errors, so this difference has no public semantic effect.
+
+Static review:
+  The feedback table computes the same XOR combination of generators for all five
+  high bits. The explicit index mask preserves the prior function's behavior even for
+  arbitrary u32 states outside normal 30-bit polymod state.
+  Encode order remains HRP length, HRP empty/printable, combined length, case, data.
+  Decode order remains length, printable bytes, case, separator, checksum length,
+  alphabet, checksum. Last separator behavior and uppercase normalization agree.
+  Each fast conversion group consumes/writes exactly 40 bits; restarting the generic
+  accumulator for the remainder preserves bit alignment. Same-width copies write
+  exactly the validated length, with fresh disjoint output allocated by the generator.
+  The from=8 range-check elision is valid for u8 inputs.
+  Length limits make intermediate arithmetic safe; both bounds are checked before
+  validation scans or writes. Inputs are immutable and no raw pointers escape a call.
+  Encode/decode initialize the entire scratch before any validation path.
+  Generator validation ends before allocation; input pointers are reacquired after
+  allocation. Allocation follows the SDK no-GC-safepoint contract.
+  Candidate2's empty-input early return preserves all validated empty conversions;
+  its nibble key is injective on validated widths 1..8.
+  Candidate3 returns empty size only AFTER width validation; all valid empty inputs
+  produce zero size under either padding mode. Its u32 width casts preserve values
+  1..8 exactly. Live accumulator bits are at most (to - 1) + from <= 15, so using
+  u32 for the bit count and shift operands does not alter results or create overflow.
+
+A separate read-only reviewer independently examined unsafe copying, bounds, zero-size
+pointers, aliasing and allocation lifetimes and found no defects.
+
+Additional execution:
+  Candidate2's and candidate3's entire corpora also pass AddressSanitizer with leak
+  detection and Rust debug assertions enabled; no diagnostics. Outputs:
+  results2-asan.txt and results3-asan.txt.
+
+Harness construction and limits:
+  generate.py copies each source implementation into an owned harness module and
+  removes only crate-level no_std/feature attributes, no_mangle attributes, and the
+  Wasm-only panic handler/test modules. It exposes step through a forwarding function.
+  The audit is native x86_64 Rust, not a direct execution of the built Wasm artifact.
+  Public Motoko/Wasm/Ash validation and performance measurement belong to the parent.
+  Safety conclusions assume callers honor exported unsafe function contracts,
+  particularly validated conversion arguments and non-overlapping readable/writable
+  buffers. No production sources or candidate files were changed.
+
+Reproduction from repository root:
+  python3 _build/crypto-optimization-round2/bech32-audit/generate.py
+  rustc --edition=2024 -O _build/crypto-optimization-round2/bech32-audit/driver.rs -o _build/crypto-optimization-round2/bech32-audit/audit
+  _build/crypto-optimization-round2/bech32-audit/audit
+  rustc --edition=2024 -O _build/crypto-optimization-round2/bech32-audit/driver2.rs -o _build/crypto-optimization-round2/bech32-audit/audit2
+  _build/crypto-optimization-round2/bech32-audit/audit2
+  RUSTC_BOOTSTRAP=1 rustc --edition=2024 -O -C debug-assertions=yes -Z sanitizer=address _build/crypto-optimization-round2/bech32-audit/driver2.rs -o _build/crypto-optimization-round2/bech32-audit/audit2-asan
+  ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 _build/crypto-optimization-round2/bech32-audit/audit2-asan
+
+Compiler: rustc 1.91.1 (ed61e7d7e 2025-11-07).
+
+Candidate3 reproduction uses driver3.rs/audit3 in the commands above.
+Candidate3 source hash and all other audited source hashes were rechecked after runs.

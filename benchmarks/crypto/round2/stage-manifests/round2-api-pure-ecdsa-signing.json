@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "name": "api-secp256k1-signPrehash-prepared-nonce-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa-prepared-nonce",
+      "comparison": "secp256k1_sign_rfc6979",
+      "plugins": [],
+      "source": "round2/api-curves/closest-signing/cases/api-secp256k1-signPrehash-prepared-nonce-ecdsa/main.mo",
+      "expected_hex": "385cd1a83f1e9b94a03b6a704abaed20879541ff0af652704b55d1bd0473d8536938f2a4e0b4167e44c697f45390f12e2891edef3030ab6fcc32877ddf519ae8",
+      "operations_per_sample": 1,
+      "notes": "Closest available pure Motoko counterpart has a different API contract: ecdsa@8.0.1 PrivateKey.signHashed consumes a prepared nonce; the plugin derives RFC6979/HMAC-SHA256 nonce inside signPrehash. Nonce derivation and 32-byte nonce Blob construction happen offline in the independent Python oracle and are outside pure timing. Nonce iterator creation, byte decoding and reduction inside signHashed are measured, as are secret decoding/range validation, digest-length validation, ECDSA arithmetic, compact signature serialization and Blob construction. Reusable curve construction is outside. No equal-contract speedup is asserted. Pure scalar multiplication is variable-time; no equivalent side-channel property is asserted. Secp256k1 output explicitly serializes original R and min(original S,n-original S) to match native low-S.",
+      "benchmark_kind": "closest-different-contract",
+      "footnote": "ECDSA-prepared-nonce",
+      "footnote_id": "ECDSA-prepared-nonce",
+      "equivalent_api_contract": false
+    },
+    {
+      "name": "api-p256-signPrehash-prepared-nonce-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa-prepared-nonce",
+      "comparison": "p256_sign_rfc6979",
+      "plugins": [],
+      "source": "round2/api-curves/closest-signing/cases/api-p256-signPrehash-prepared-nonce-ecdsa/main.mo",
+      "expected_hex": "4304eef8b664375abd59a86fbe10e682b1e30276fe1f9efa71a9001d8a8e3da37d33976a24a49d93115167b94823a227beefb2755c3fe023492e8ff387041a86",
+      "operations_per_sample": 1,
+      "notes": "Closest available pure Motoko counterpart has a different API contract: ecdsa@8.0.1 PrivateKey.signHashed consumes a prepared nonce; the plugin derives RFC6979/HMAC-SHA256 nonce inside signPrehash. Nonce derivation and 32-byte nonce Blob construction happen offline in the independent Python oracle and are outside pure timing. Nonce iterator creation, byte decoding and reduction inside signHashed are measured, as are secret decoding/range validation, digest-length validation, ECDSA arithmetic, compact signature serialization and Blob construction. Reusable curve construction is outside. No equal-contract speedup is asserted. Pure scalar multiplication is variable-time; no equivalent side-channel property is asserted. P256 output serializes Signature.original_r/original_s via toBytes(#raw), preserving RFC6979 S exactly.",
+      "benchmark_kind": "closest-different-contract",
+      "footnote": "ECDSA-prepared-nonce",
+      "footnote_id": "ECDSA-prepared-nonce",
+      "equivalent_api_contract": false
+    }
+  ]
+}

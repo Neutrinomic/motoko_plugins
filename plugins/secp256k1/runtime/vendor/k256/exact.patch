@@ -1,0 +1,83 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -227,3 +227,6 @@
+     "once_cell?/std",
+ ]
+ test-vectors = ["hex-literal"]
++
++# Keep upstream development targets outside the enclosing plugin workspace.
++[workspace]
+--- a/src/schnorr/signing.rs
++++ b/src/schnorr/signing.rs
+@@ -137,16 +137,17 @@
+ impl From<NonZeroScalar> for SigningKey {
+     #[inline]
+     fn from(mut secret_key: NonZeroScalar) -> SigningKey {
+-        let odd = (ProjectivePoint::GENERATOR * *secret_key)
+-            .to_affine()
+-            .y
+-            .normalize()
+-            .is_odd();
++        let mut public_point = (ProjectivePoint::GENERATOR * *secret_key).to_affine();
++        let odd = public_point.y.normalize().is_odd();
+ 
+         secret_key.conditional_assign(&-secret_key, odd);
++        public_point.conditional_assign(&-public_point, odd);
+ 
+         let verifying_key = VerifyingKey {
+-            inner: PublicKey::from_secret_scalar(&secret_key),
++            // A nonzero scalar times the prime-order generator is nonidentity.
++            // Negating both the scalar and point preserves their correspondence.
++            inner: PublicKey::from_affine(public_point)
++                .expect("nonzero secret scalar produces a nonidentity point"),
+         };
+ 
+         SigningKey {
+@@ -250,6 +251,47 @@
+ 
+ impl ZeroizeOnDrop for SigningKey {}
+ 
++#[cfg(test)]
++mod constructor_tests {
++    use super::*;
++
++    #[test]
++    fn reused_point_matches_recomputed_normalized_public_key() {
++        let mut even_points = 0;
++        let mut odd_points = 0;
++
++        for value in 1..=32 {
++            let scalar = Scalar::from(value as u64);
++            for scalar in [scalar, -scalar] {
++                let original = NonZeroScalar::new(scalar).unwrap();
++                let original_public = PublicKey::from_secret_scalar(&original);
++                let odd = original_public.as_affine().y.normalize().is_odd();
++                if bool::from(odd) {
++                    odd_points += 1;
++                } else {
++                    even_points += 1;
++                }
++
++                // The previous constructor derived the public key again after
++                // normalizing the secret scalar. Keep that path as a reference.
++                let mut normalized = original;
++                normalized.conditional_assign(&-normalized, odd);
++                let expected_public = PublicKey::from_secret_scalar(&normalized);
++                let actual = SigningKey::from(original);
++                assert_eq!(actual.to_bytes(), normalized.to_bytes());
++                assert_eq!(actual.verifying_key().as_affine(), expected_public.as_affine());
++
++                let opposite = SigningKey::from(-original);
++                assert_eq!(actual.to_bytes(), opposite.to_bytes());
++                assert_eq!(actual.verifying_key(), opposite.verifying_key());
++            }
++        }
++
++        assert_eq!(even_points, 32);
++        assert_eq!(odd_points, 32);
++    }
++}
++
+ #[cfg(feature = "serde")]
+ impl Serialize for SigningKey {
+     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>

@@ -1,0 +1,35 @@
+error[M0050]: literal of type
+  Nat
+does not have expected type
+  Blob
+    ┌─ blake3-arguments.mo:3:27
+  3 │  ignore Prim.blake3_digest(42);
+    │                            ^^ 
+error[M0096]: expression of type
+  Text
+cannot produce expected type
+  Blob
+    ┌─ blake3-arguments.mo:4:31
+  4 │  ignore Prim.blake3_keyed_hash("not bytes" : Text, "" : Blob);
+    │                                ^^^^^^^^^^^^^^^^^^ 
+error[M0096]: expression of type
+  Blob
+cannot produce expected type
+  Text
+    ┌─ blake3-arguments.mo:5:31
+  5 │  ignore Prim.blake3_derive_key("" : Blob, "" : Blob);
+    │                                ^^^^^^^^^ 
+error[M0096]: expression of type
+  Nat32
+cannot produce expected type
+  Nat64
+    ┌─ blake3-arguments.mo:6:35
+  6 │  ignore Prim.blake3_xof("" : Blob, 0 : Nat32, 32 : Nat64);
+    │                                    ^^^^^^^^^ 
+error[M0096]: expression of type
+  Nat64
+cannot produce expected type
+  Nat32
+    ┌─ blake3-arguments.mo:6:46
+  6 │  ignore Prim.blake3_xof("" : Blob, 0 : Nat32, 32 : Nat64);
+    │                                               ^^^^^^^^^^ 

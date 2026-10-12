@@ -1,0 +1,1836 @@
+{
+  "cases": [
+    {
+      "name": "api-base58check-decode-78",
+      "family": "base58",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-base58check-decode-78/mops-bitcoin/main.mo",
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d",
+      "notes": "Python integer-radix + hashlib double-SHA256 oracle. Valid Base58 alphabet; both paths verify/produce all four checksum bytes; payload conversion included."
+    },
+    {
+      "name": "api-base58check-decode-78",
+      "family": "base58",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "base58",
+        "sha256"
+      ],
+      "source": "round2/api-hash-codec/cases/api-base58check-decode-78/native/main.mo",
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d",
+      "notes": "Python integer-radix + hashlib double-SHA256 oracle. Valid Base58 alphabet; both paths verify/produce all four checksum bytes; payload conversion included."
+    },
+    {
+      "name": "api-base58check-encode-78",
+      "family": "base58",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-base58check-encode-78/mops-bitcoin/main.mo",
+      "expected_hex": "31337035336b466963734651574b726d7958486d354b4a646e7052314a744131326566444d52557a31567963454a55507a5945616b7969437a386d326958397a4a6a4e63724d6662536f33764d796a794a39716d4c646738654b3677674163595872586439784c434352654b703433",
+      "notes": "Python integer-radix + hashlib double-SHA256 oracle. Valid Base58 alphabet; both paths verify/produce all four checksum bytes; payload conversion included."
+    },
+    {
+      "name": "api-base58check-encode-78",
+      "family": "base58",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "base58",
+        "sha256"
+      ],
+      "source": "round2/api-hash-codec/cases/api-base58check-encode-78/native/main.mo",
+      "expected_hex": "31337035336b466963734651574b726d7958486d354b4a646e7052314a744131326566444d52557a31567963454a55507a5945616b7969437a386d326958397a4a6a4e63724d6662536f33764d796a794a39716d4c646738654b3677674163595872586439784c434352654b703433",
+      "notes": "Python integer-radix + hashlib double-SHA256 oracle. Valid Base58 alphabet; both paths verify/produce all four checksum bytes; payload conversion included."
+    },
+    {
+      "name": "api-blake3-derivekey",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-derivekey/native/main.mo",
+      "expected_hex": "7356cd7720d5b66b6d0697eb3177d9f8d73a4a5c5e968896eb6a689684302706",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-finalize",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-finalize/mops-blake3/main.mo",
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "Uses public immutable Hasher API so update preserves the input state, matching mo:fast semantics. Valid single-chunk official vector; representation conversions inside API timing."
+    },
+    {
+      "name": "api-blake3-finalize",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-finalize/native/main.mo",
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-finalizexof",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-finalizexof/native/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fcec83a98a6a96ea5109d2c179c47a387ffbb404756f6eeae7883b446b70ebb144527c2075ab8ab204c0086bb22b7c93d465efc57f8d917f0b385c6df265e77003b8510296",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-finalizexof-seek13-length32",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-finalizexof-seek13-length32/mops-blake3/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fc",
+      "notes": "Official BLAKE3 vector bytes13..44. One1024-byte input chunk and seek output fully within first64-byte output block are correct in the pinned Mops implementation. Immutable state preserved; output conversion included."
+    },
+    {
+      "name": "api-blake3-finalizexof-seek13-length32",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-finalizexof-seek13-length32/native/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fc",
+      "notes": "Official BLAKE3 vector bytes13..44. One1024-byte input chunk and seek output fully within first64-byte output block are correct in the pinned Mops implementation. Immutable state preserved; output conversion included."
+    },
+    {
+      "name": "api-blake3-new",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-new/mops-blake3/main.mo",
+      "expected_hex": "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262",
+      "notes": "Uses public immutable Hasher API so update preserves the input state, matching mo:fast semantics. Valid single-chunk official vector; representation conversions inside API timing."
+    },
+    {
+      "name": "api-blake3-new",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-new/native/main.mo",
+      "expected_hex": "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-newderivekey",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-newderivekey/native/main.mo",
+      "expected_hex": "2cc39783c223154fea8dfb7c1b1660f2ac2dcbd1c1de8277b0b0dd39b7e50d7d",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-newkeyed",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-newkeyed/mops-blake3/main.mo",
+      "expected_hex": "92b2b75604ed3c761f9d6f62392c8a9227ad0ea3f09573e783f1498a4ed60d26",
+      "notes": "Uses public immutable Hasher API so update preserves the input state, matching mo:fast semantics. Valid single-chunk official vector; representation conversions inside API timing."
+    },
+    {
+      "name": "api-blake3-newkeyed",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-newkeyed/native/main.mo",
+      "expected_hex": "92b2b75604ed3c761f9d6f62392c8a9227ad0ea3f09573e783f1498a4ed60d26",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-update",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-update/mops-blake3/main.mo",
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "Uses public immutable Hasher API so update preserves the input state, matching mo:fast semantics. Valid single-chunk official vector; representation conversions inside API timing."
+    },
+    {
+      "name": "api-blake3-update",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-update/native/main.mo",
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-xof",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-xof/native/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fcec83a98a6a96ea5109d2c179c47a387ffbb404756f6eeae7883b446b70ebb144527c2075ab8ab204c0086bb22b7c93d465efc57f8d917f0b385c6df265e77003b8510296",
+      "notes": "Official BLAKE3 corpus oracle. Sole public call measured; output state interpretation and digest serialization excluded."
+    },
+    {
+      "name": "api-blake3-xof-seek13-length32",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-blake3-xof-seek13-length32/mops-blake3/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fc",
+      "notes": "Official BLAKE3 vector bytes13..44. One1024-byte input chunk and seek output fully within first64-byte output block are correct in the pinned Mops implementation. Immutable state preserved; output conversion included."
+    },
+    {
+      "name": "api-blake3-xof-seek13-length32",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "round2/api-hash-codec/cases/api-blake3-xof-seek13-length32/native/main.mo",
+      "expected_hex": "89744ac00df831c10daa55189b5d121c855af71cf8107265ecdaf8505b95d8fc",
+      "notes": "Official BLAKE3 vector bytes13..44. One1024-byte input chunk and seek output fully within first64-byte output block are correct in the pinned Mops implementation. Immutable state preserved; output conversion included."
+    },
+    {
+      "name": "api-hmac-sha256-constructor",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-constructor/mops-sha2-composed/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-constructor",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-constructor/native/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepare",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepare/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepare",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepare/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-digest",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-digest/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-digest",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-digest/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-reset",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-reset/mops-sha2-composed/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-reset",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-reset/native/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-stream",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-stream/mops-sha2-composed/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-stream",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-stream/native/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-sum",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-sum/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-sum",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-sum/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-write",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-write/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-prepared-write",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-prepared-write/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-reset",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-reset/mops-sha2-composed/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-reset",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-reset/native/main.mo",
+      "expected_hex": "d38b42096d80f45f826b44a9d5607de72496a415d3f4a1a8c88e3bb9da8dc1cb",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-sum",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-sum/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-sum",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-sum/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-write",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-write/mops-sha2-composed/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha256-write",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha256-write/native/main.mo",
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-constructor",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-constructor/mops-sha2-composed/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-constructor",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-constructor/native/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepare",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepare/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepare",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepare/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-digest",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-digest/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-digest",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-digest/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-reset",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-reset/mops-sha2-composed/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-reset",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-reset/native/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-stream",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-stream/mops-sha2-composed/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-stream",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-stream/native/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-sum",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-sum/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-sum",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-sum/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-write",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-write/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-prepared-write",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-prepared-write/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-reset",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-reset/mops-sha2-composed/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-reset",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-reset/native/main.mo",
+      "expected_hex": "b04a70f45e9529968060f0026344d5f4da59f1c3ce228245f6bb088d7b8aa9fc8f5f3c2a48027e48338de0fbec7d9d8fed963ae333d2b9c5704e2e95864ec78b",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-sum",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-sum/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-sum",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-sum/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-write",
+      "family": "hmac-sha2",
+      "implementation": "mops-sha2-composed",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-write/mops-sha2-composed/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-hmac-sha512-write",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "isolated-public-call",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "source": "round2/api-hash-codec/cases/api-hmac-sha512-write/native/main.mo",
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One public call timed. Pure Motoko reference composes pinned sha2 public share/unshare snapshots to retain reusable-key and non-destructive sum semantics; all oracle bytes use Python hmac."
+    },
+    {
+      "name": "api-ripemd160-digest-constructor-0",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-constructor-0/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-constructor-0",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-constructor-0/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-reset-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-reset-1024/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-reset-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-reset-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-sum-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-sum-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-sum-32",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-sum-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-write-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-1024/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-write-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-write-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Required public Blob-to-array input conversion is included.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-32/mops-bitcoin/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-digest-write-32",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-digest-write-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-finalize-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-finalize-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-finalize-32",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-finalize-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-init-0",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-init-0/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-update-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "4867ece7aa90f56fcb9713b587f4b456594f5866",
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. Update appends to a prepared 17-byte prefix; query also verifies the original state.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-update-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-ripemd160-update-32",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "92dab0f6ebcd97bac9d386471a15b9fa2a9ea1d8",
+      "notes": "Only the named raw-state call and result assignment are timed; state construction and digest inspection are excluded. Bitcoin RIPEMD has no public immutable-state equivalent. Update appends to a prepared 17-byte prefix; query also verifies the original state.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-ripemd160-update-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-constructor-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-constructor-0/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-constructor-0",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-constructor-0/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-reset-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-reset-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-reset-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-reset-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-sum-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-sum-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-sum-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-sum-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-sum-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-write-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-write-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-write-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha384-digest384-write-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha384-digest384-write-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-constructor-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-constructor-0/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-constructor-0",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-constructor-0/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-reset-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-reset-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-reset-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Reset a stream after 1024 bytes; query checks the empty-message digest.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-reset-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-sum-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-sum-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-sum-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. The pure Motoko sum mutates its receiver. The timed adapter constructs a clone with share/unshare and sums it, preserving the original state like the plugin API. Query checks that original state still hashes identically.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-sum-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. Query repeats sum to verify the measured sum preserved the stream.",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-sum-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-write-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-1024/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-write-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-1024/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-write-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "isolated-public-method",
+      "plugins": [],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-32/mops-sha2/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "api-sha512-digest-write-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "isolated-public-method",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "Only the named call and result assignment are timed; input/state preparation and output verification are outside counters. ",
+      "source": "round2/api-hash-codec/sha-ripemd/cases/api-sha512-digest-write-32/native/main.mo",
+      "oracle": "Python hashlib / OpenSSL, independent of both Motoko implementations"
+    },
+    {
+      "name": "base58-decode-82",
+      "family": "base58",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f5051",
+      "notes": "Result array-to-Blob conversion included.",
+      "source": "cases/base58-decode-82/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "base58-decode-82",
+      "family": "base58",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "base58"
+      ],
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f5051",
+      "notes": "",
+      "source": "cases/base58-decode-82/native/main.mo"
+    },
+    {
+      "name": "base58-encode-82",
+      "family": "base58",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "31337035336b466963734651574b726d7958486d354b4a646e7052314a744131326566444d52557a31567963454a55507a5945616b7969437a386d326958397a4a6a4e63724d6662536f33764d796a794a39716d4c646738654b3677674163595872586439784c4343516342454b41",
+      "notes": "",
+      "source": "cases/base58-encode-82/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "base58-encode-82",
+      "family": "base58",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "base58"
+      ],
+      "expected_hex": "31337035336b466963734651574b726d7958486d354b4a646e7052314a744131326566444d52557a31567963454a55507a5945616b7969437a386d326958397a4a6a4e63724d6662536f33764d796a794a39716d4c646738654b3677674163595872586439784c4343516342454b41",
+      "notes": "",
+      "source": "cases/base58-encode-82/native/main.mo"
+    },
+    {
+      "name": "bech32-convert-8to5-n32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-convert-8to5-n32/main.mo",
+      "expected_hex": "0505190b1601020d121b0f12101c0d1a000d06090b1711070e021c1004121c141b1413061f0e0001090a091d18090b0e161c0000",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "convertBits",
+      "shape": "8to5-n32",
+      "from_bits": 8,
+      "to_bits": 5,
+      "pad": true,
+      "input_groups": 32,
+      "output_groups": 52
+    },
+    {
+      "name": "bech32-segwit-decode-v1-program32",
+      "family": "bech32",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/bech32-segwit-decode-v1-program32/mops-bitcoin/main.mo",
+      "expected_hex": "6263000179be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "notes": "Paired against official-secp-generator witness program checked by existing independent Python BIP173/BIP350 oracle. Both paths validate witness version, program length and checksum variant; the native encode implementation additionally round-trips through decode."
+    },
+    {
+      "name": "bech32-segwit-decode-v1-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-decode-v1-program32/main.mo",
+      "expected_hex": "6263000179be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-decode",
+      "shape": "v1-program32",
+      "witness_version": 1,
+      "hrp": "bc",
+      "program_bytes": 32,
+      "address_chars": 62
+    },
+    {
+      "name": "bech32-segwit-encode-v1-program32",
+      "family": "bech32",
+      "implementation": "mops-bitcoin",
+      "comparison": "isolated-public-call",
+      "plugins": [],
+      "source": "round2/api-hash-codec/cases/bech32-segwit-encode-v1-program32/mops-bitcoin/main.mo",
+      "expected_hex": "6263317030786c78766c68656d6a613663346471763232756170637471757066686c786d3968387a336b3265373271346b3968637a3776717a6b356a6a30",
+      "notes": "Paired against official-secp-generator witness program checked by existing independent Python BIP173/BIP350 oracle. Both paths validate witness version, program length and checksum variant; the native encode implementation additionally round-trips through decode."
+    },
+    {
+      "name": "bech32-segwit-encode-v1-program32",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "round2-same-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "source": "round2/bech32-workloads/bech32-segwit-encode-v1-program32/main.mo",
+      "expected_hex": "6263317030786c78766c68656d6a613663346471763232756170637471757066686c786d3968387a336b3265373271346b3968637a3776717a6b356a6a30",
+      "notes": "Independent Python BIP checksum/bitstring oracle. Input setup in configure; only API call, unwrap and assignment measured. Result serialization is query-only.",
+      "operation": "segwit-encode",
+      "shape": "v1-program32",
+      "witness_version": 1,
+      "hrp": "bc",
+      "program_bytes": 32,
+      "address_chars": 62
+    },
+    {
+      "name": "bech32m-decode-53",
+      "family": "bech32",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f000102030405060708090a0b0c0d0e0f1011121314",
+      "notes": "",
+      "source": "cases/bech32m-decode-53/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bech32m-decode-53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "expected_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f000102030405060708090a0b0c0d0e0f1011121314",
+      "notes": "",
+      "source": "cases/bech32m-decode-53/native/main.mo"
+    },
+    {
+      "name": "bech32m-encode-53",
+      "family": "bech32",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "62633171707a7279397838676632747664773073336a6e35346b686365366d7561376c71707a7279397838676632747664773073336a6e35746866757766",
+      "notes": "",
+      "source": "cases/bech32m-encode-53/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "bech32m-encode-53",
+      "family": "bech32",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "bech32"
+      ],
+      "expected_hex": "62633171707a7279397838676632747664773073336a6e35346b686365366d7561376c71707a7279397838676632747664773073336a6e35746866757766",
+      "notes": "",
+      "source": "cases/bech32m-encode-53/native/main.mo"
+    },
+    {
+      "name": "blake3-1024",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "",
+      "source": "cases/blake3-1024/mops-blake3/main.mo"
+    },
+    {
+      "name": "blake3-1024",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "blake3"
+      ],
+      "expected_hex": "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7",
+      "notes": "",
+      "source": "cases/blake3-1024/native/main.mo"
+    },
+    {
+      "name": "blake3-keyed-1024",
+      "family": "blake3",
+      "implementation": "mops-blake3",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "",
+      "source": "cases/blake3-keyed-1024/mops-blake3/main.mo"
+    },
+    {
+      "name": "blake3-keyed-1024",
+      "family": "blake3",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "blake3"
+      ],
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "",
+      "source": "cases/blake3-keyed-1024/native/main.mo"
+    },
+    {
+      "name": "hmac-sha256-1024",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "One-shot includes key preparation and Blob-to-array conversions.",
+      "source": "cases/hmac-sha256-1024/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "hmac-sha256-1024",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "34aa85f63c4a1511734880a0f02422df8d01509ae49a66e28a866fbdab29720d",
+      "notes": "",
+      "source": "cases/hmac-sha256-1024/native/main.mo"
+    },
+    {
+      "name": "hmac-sha512-1024",
+      "family": "hmac-sha2",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "One-shot includes key preparation and Blob-to-array conversions.",
+      "source": "cases/hmac-sha512-1024/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "hmac-sha512-1024",
+      "family": "hmac-sha2",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "hmac-sha2"
+      ],
+      "expected_hex": "84ece359077da7547c3933ce9076607b316a5a56b71c5b8c46b9a1b05b24b2046edd54fbed28dc5c4001661765453faec2c07d0372031d63dc4675fc2ecc0ee1",
+      "notes": "",
+      "source": "cases/hmac-sha512-1024/native/main.mo"
+    },
+    {
+      "name": "ripemd160-0",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source": "cases/ripemd160-0/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "ripemd160-0",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+      "notes": "",
+      "source": "cases/ripemd160-0/native/main.mo"
+    },
+    {
+      "name": "ripemd160-1024",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source": "cases/ripemd160-1024/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "ripemd160-1024",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "26fb75887f84c923390d4e6cc817b521cf35387b",
+      "notes": "",
+      "source": "cases/ripemd160-1024/native/main.mo"
+    },
+    {
+      "name": "ripemd160-16384",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "19ff495e50d9b0a757305b02b72691f6f12cb7a2",
+      "notes": "Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source": "cases/ripemd160-16384/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "ripemd160-16384",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "19ff495e50d9b0a757305b02b72691f6f12cb7a2",
+      "notes": "",
+      "source": "cases/ripemd160-16384/native/main.mo"
+    },
+    {
+      "name": "ripemd160-32",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source": "cases/ripemd160-32/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "ripemd160-32",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "e6babb9619d7a81272711fc546a16b211dd93957",
+      "notes": "",
+      "source": "cases/ripemd160-32/native/main.mo"
+    },
+    {
+      "name": "ripemd160-64",
+      "family": "ripemd160",
+      "implementation": "mops-bitcoin",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "2581f5e9f957b44b0fa24d31996de47409dd1e0f",
+      "notes": "Blob to array input and array to Blob result conversions included for equivalent public Blob API.",
+      "source": "cases/ripemd160-64/mops-bitcoin/main.mo"
+    },
+    {
+      "name": "ripemd160-64",
+      "family": "ripemd160",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "ripemd160"
+      ],
+      "expected_hex": "2581f5e9f957b44b0fa24d31996de47409dd1e0f",
+      "notes": "",
+      "source": "cases/ripemd160-64/native/main.mo"
+    },
+    {
+      "name": "sha256-0",
+      "family": "sha256",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "notes": "",
+      "source": "cases/sha256-0/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha256-0",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "notes": "",
+      "source": "cases/sha256-0/native/main.mo"
+    },
+    {
+      "name": "sha256-1024",
+      "family": "sha256",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "2bce1ba628720664be4b9fdd77aae0678e5f0f3f02fc6ff641ec879094f6a404",
+      "notes": "",
+      "source": "cases/sha256-1024/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha256-1024",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "2bce1ba628720664be4b9fdd77aae0678e5f0f3f02fc6ff641ec879094f6a404",
+      "notes": "",
+      "source": "cases/sha256-1024/native/main.mo"
+    },
+    {
+      "name": "sha256-16384",
+      "family": "sha256",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "4348e3b98e8a327b34ced39c1da9e67cdb4cd5e48e4d7960607a3ae403d35f0c",
+      "notes": "",
+      "source": "cases/sha256-16384/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha256-16384",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "4348e3b98e8a327b34ced39c1da9e67cdb4cd5e48e4d7960607a3ae403d35f0c",
+      "notes": "",
+      "source": "cases/sha256-16384/native/main.mo"
+    },
+    {
+      "name": "sha256-32",
+      "family": "sha256",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+      "notes": "",
+      "source": "cases/sha256-32/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha256-32",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+      "notes": "",
+      "source": "cases/sha256-32/native/main.mo"
+    },
+    {
+      "name": "sha256-64",
+      "family": "sha256",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "fdeab9acf3710362bd2658cdc9a29e8f9c757fcf9811603a8c447cd1d9151108",
+      "notes": "",
+      "source": "cases/sha256-64/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha256-64",
+      "family": "sha256",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha256"
+      ],
+      "expected_hex": "fdeab9acf3710362bd2658cdc9a29e8f9c757fcf9811603a8c447cd1d9151108",
+      "notes": "",
+      "source": "cases/sha256-64/native/main.mo"
+    },
+    {
+      "name": "sha384-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "",
+      "source": "cases/sha384-0/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha384-0",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+      "notes": "",
+      "source": "cases/sha384-0/native/main.mo"
+    },
+    {
+      "name": "sha384-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "",
+      "source": "cases/sha384-1024/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha384-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "bd7443454c828292bdc435a095d5f71aa8724ec2ff6a0e08d25a11e0e417c6a903f566e9bdbb7b6cbfbfdc55c53ac766",
+      "notes": "",
+      "source": "cases/sha384-1024/native/main.mo"
+    },
+    {
+      "name": "sha384-16384",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "525572cec4a7ae281c5f7a31fe5a7b55b00249757ae12ec500f5dca9a9ad45cdcf9b4279721149e380834b2e14f7f1fb",
+      "notes": "",
+      "source": "cases/sha384-16384/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha384-16384",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "525572cec4a7ae281c5f7a31fe5a7b55b00249757ae12ec500f5dca9a9ad45cdcf9b4279721149e380834b2e14f7f1fb",
+      "notes": "",
+      "source": "cases/sha384-16384/native/main.mo"
+    },
+    {
+      "name": "sha384-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "",
+      "source": "cases/sha384-32/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha384-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "e7112491faeefd57786da73f367b25a6f5769f5c98fa7b704d8d37747724a647371989e8b0fe8d3cb23f9eedd528456b",
+      "notes": "",
+      "source": "cases/sha384-32/native/main.mo"
+    },
+    {
+      "name": "sha384-64",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "9f2c9eb7116b3d7a4ba84a74a4d4eff8a5efcf54b6d7b662693c38577914c73a214766f0a175339bb0895a863824fc0a",
+      "notes": "",
+      "source": "cases/sha384-64/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha384-64",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "9f2c9eb7116b3d7a4ba84a74a4d4eff8a5efcf54b6d7b662693c38577914c73a214766f0a175339bb0895a863824fc0a",
+      "notes": "",
+      "source": "cases/sha384-64/native/main.mo"
+    },
+    {
+      "name": "sha512-0",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "",
+      "source": "cases/sha512-0/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha512-0",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+      "notes": "",
+      "source": "cases/sha512-0/native/main.mo"
+    },
+    {
+      "name": "sha512-1024",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "",
+      "source": "cases/sha512-1024/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha512-1024",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "9af3eed7e9dd11428bb922c6830c32065154532303781f8ea4f20792d616703884d564ebfd2bfa65faed8fc8fd91d9e1d3f12897fbb1e2247632db70ce30573e",
+      "notes": "",
+      "source": "cases/sha512-1024/native/main.mo"
+    },
+    {
+      "name": "sha512-16384",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "7b44b9db91a7c2fc297ed21471c4aa8524f16a56e7bdc0edaed54016c685976016b1d9820d398fa993296665ca192eef09b636c7616da3192708a1b40f2e1272",
+      "notes": "",
+      "source": "cases/sha512-16384/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha512-16384",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "7b44b9db91a7c2fc297ed21471c4aa8524f16a56e7bdc0edaed54016c685976016b1d9820d398fa993296665ca192eef09b636c7616da3192708a1b40f2e1272",
+      "notes": "",
+      "source": "cases/sha512-16384/native/main.mo"
+    },
+    {
+      "name": "sha512-32",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "",
+      "source": "cases/sha512-32/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha512-32",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6fa9d71862a3e5746b571be3d187b0041046f52ebd850c7cbd5fde8ee38473b649",
+      "notes": "",
+      "source": "cases/sha512-32/native/main.mo"
+    },
+    {
+      "name": "sha512-64",
+      "family": "sha512",
+      "implementation": "mops-sha2",
+      "comparison": "blob-public-api",
+      "plugins": [],
+      "expected_hex": "ee4320ebaf3fdb4f2c832b137200c08e235e0fa7bbd0eb1740c7063ba8a0d151da77e003398e1714a955d475b05e3e950b639503b452ec185de4229bc4873949",
+      "notes": "",
+      "source": "cases/sha512-64/mops-sha2/main.mo"
+    },
+    {
+      "name": "sha512-64",
+      "family": "sha512",
+      "implementation": "native",
+      "comparison": "blob-public-api",
+      "plugins": [
+        "sha512"
+      ],
+      "expected_hex": "ee4320ebaf3fdb4f2c832b137200c08e235e0fa7bbd0eb1740c7063ba8a0d151da77e003398e1714a955d475b05e3e950b639503b452ec185de4229bc4873949",
+      "notes": "",
+      "source": "cases/sha512-64/native/main.mo"
+    }
+  ]
+}

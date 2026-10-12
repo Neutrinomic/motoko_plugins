@@ -1,0 +1,32 @@
+[
+  {
+    "api_function": "validateG2",
+    "benchmark_kind": "closest-different-wire",
+    "comparison": "round2_bls12_381_validate_g2_valid",
+    "expected_hex": "0095190c6b7bd37da5764c81e43aa0986aa2514fe39e089239789e6cd8c515cc785d6110c8656080c40a73555c559ac20f12bbdb441b0001211e36f12f6e585b4bc7775341f3c9b845ec4dcd314bd444feb94c9cbf57dfadec91e439b02c77211b",
+    "family": "bls12-381",
+    "fixture_provenance": "py_ecc 8.0.0 independently decodes selected compressed points, checks subgroup/recompression, converts affine coordinates to EIP-2537 form and checks the same aggregate result. Retained inputs/provenance in round2/api-curves/closest/.",
+    "implementation": "mops",
+    "matching_plugin_case": "round2_bls12_381_validate_g2_valid",
+    "name": "closest_bls12_381_validate_g2_mops",
+    "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+    "operations_per_sample": 1,
+    "plugins": [],
+    "source": "round2/api-curves/closest/cases/closest_bls12_381_validate_g2_mops/main.mo"
+  },
+  {
+    "api_function": "g2Aggregate",
+    "benchmark_kind": "closest-different-wire",
+    "comparison": "api_bls12_381_g2_aggregate_n4",
+    "expected_hex": "00a6e5b7ab41f60bf501763e34cb890ef206aa542db65df6f83288ae78af1e611b88a3e5649251092ee0299538151be1f20534e02efd679b70f2b94cfb3f44e94e70fe914d9676ae63c98f5d19653ffe1b36d293784e017c25b1d12a3966853e30",
+    "family": "bls12-381",
+    "fixture_provenance": "py_ecc 8.0.0 independently decodes selected compressed points, checks subgroup/recompression, converts affine coordinates to EIP-2537 form and checks the same aggregate result. Retained inputs/provenance in round2/api-curves/closest/.",
+    "implementation": "mops",
+    "matching_plugin_case": "api_bls12_381_g2_aggregate_n4_fast",
+    "name": "closest_bls12_381_g2_aggregate_n4_mops",
+    "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+    "operations_per_sample": 1,
+    "plugins": [],
+    "source": "round2/api-curves/closest/cases/closest_bls12_381_g2_aggregate_n4_mops/main.mo"
+  }
+]

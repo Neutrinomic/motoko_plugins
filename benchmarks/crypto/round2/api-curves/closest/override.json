@@ -1,0 +1,32 @@
+{
+  "BLS12381.g2Aggregate": {
+    "contract": "closest-different-wire",
+    "equivalent_api_contract": false,
+    "id": "BLS12381.g2Aggregate",
+    "native_case": {
+      "implementation": "mops",
+      "name": "closest_bls12_381_g2_aggregate_n4_mops"
+    },
+    "native_source": "round2/api-curves/closest/cases/closest_bls12_381_g2_aggregate_n4_mops/main.mo",
+    "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+    "plugin_case": {
+      "implementation": "fast",
+      "name": "api_bls12_381_g2_aggregate_n4_fast"
+    }
+  },
+  "BLS12381.validateG2": {
+    "contract": "closest-different-wire",
+    "equivalent_api_contract": false,
+    "id": "BLS12381.validateG2",
+    "native_case": {
+      "implementation": "mops",
+      "name": "closest_bls12_381_validate_g2_mops"
+    },
+    "native_source": "round2/api-curves/closest/cases/closest_bls12_381_validate_g2_mops/main.mo",
+    "notes": "Closest mathematical operation with different input wire formats: plugin consumes canonical 96-byte IETF compressed G2 points; pure Motoko consumes canonical 256-byte EIP-2537 uncompressed G2 points (real then imaginary fields with 16-byte zero padding per field). Both validate curve/subgroup membership and return the same canonical compressed output. Compressed decoding also reconstructs y using a field square root; the uncompressed decoder does not perform that work. Input conversion between formats is independently prepared outside timing; timed pure code starts from its uncompressed Blob and includes Blob-to-array conversion, point validation, optional summation, compressed output and Result construction. Any ratio describes these explicitly different contracts, not equivalent API performance.",
+    "plugin_case": {
+      "implementation": "fast",
+      "name": "round2_bls12_381_validate_g2_valid"
+    }
+  }
+}

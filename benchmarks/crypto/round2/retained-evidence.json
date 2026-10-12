@@ -1,0 +1,358 @@
+{
+  "families": [
+    {
+      "family": "sha256",
+      "stages": [
+        "round2-sha256-final",
+        "round2-sha256-final-extra"
+      ],
+      "change": "Fixed 32/33-byte padding path",
+      "representative": "sha256-33"
+    },
+    {
+      "family": "blake3",
+      "stages": [
+        "round2-blake3-c"
+      ],
+      "change": "Direct output and borrowed streaming state",
+      "representative": "blake3-stream-1024-chunks256"
+    },
+    {
+      "family": "sha512",
+      "stages": [
+        "round2-sha512-combined-v1"
+      ],
+      "change": "Batched upstream compression and state copies",
+      "representative": "sha512-stream-64-chunks1"
+    },
+    {
+      "family": "ripemd160",
+      "stages": [
+        "round2-ripemd160-state-v2"
+      ],
+      "change": "Canonical state validation and short updates",
+      "representative": "ripemd160-stream-64-chunks1"
+    },
+    {
+      "family": "hmac-sha2",
+      "stages": [
+        "round2-hmac-directout"
+      ],
+      "change": "Pad/context reuse and direct state output",
+      "representative": "hmac-sha512-stream-k32-n1024-c1"
+    },
+    {
+      "family": "base58",
+      "stages": [
+        "round2-base58-limbs-v3"
+      ],
+      "change": "Grouped-radix limb conversion",
+      "representative": "base58-encode-4096-pattern"
+    },
+    {
+      "family": "bech32",
+      "stages": [
+        "round2-bech32-candidate3"
+      ],
+      "change": "Checksum table and grouped bit conversion",
+      "representative": ""
+    },
+    {
+      "family": "secp256k1",
+      "stages": [
+        "round2-secp-vendor-candidate"
+      ],
+      "change": "Reuse Schnorr constructor results and secret-tweak public point",
+      "representative": "r2-secp256k1-schnorr-sign-message-32"
+    },
+    {
+      "family": "p256",
+      "stages": [
+        "round2-p256-combined"
+      ],
+      "change": "Fixed-base key multiplication and public-input verifier",
+      "representative": "p256_verify_ecdsa_fast"
+    },
+    {
+      "family": "bls12-381",
+      "stages": [
+        "round2-bls-final",
+        "round2-bls-empty-final",
+        "round2-bls-cachecap-aggregates",
+        "round2-bls-long-capped"
+      ],
+      "change": "Pairing/MSM and aggregation reuse",
+      "representative": "bls12_381_pairing_identity_fast"
+    },
+    {
+      "family": "Bitcoin composition",
+      "stages": [
+        "round2-bitcoin-api-v3",
+        "round2-bitcoin-workflows-v3",
+        "round2-bitcoin-extra-v3"
+      ],
+      "change": "Contiguous writers, direct copies and prepared data reuse",
+      "representative": "api-bitcoin-transaction-serialize"
+    }
+  ],
+  "comparisons": [
+    {
+      "family": "sha256",
+      "stage": "round2-sha256-final",
+      "baseline": "round2-sha256-baseline",
+      "cases": 15,
+      "trials": 3,
+      "improved_cases": 0,
+      "unchanged_cases": 0,
+      "regressed_cases": 15,
+      "instruction_reduction_percent_range": [
+        -0.9665726943213881,
+        -0.00016309595260999288
+      ],
+      "comparison": "comparisons/sha256-final.json"
+    },
+    {
+      "family": "sha256",
+      "stage": "round2-sha256-final-extra",
+      "baseline": "round2-sha256-baseline-extra",
+      "cases": 23,
+      "trials": 3,
+      "improved_cases": 1,
+      "unchanged_cases": 0,
+      "regressed_cases": 22,
+      "instruction_reduction_percent_range": [
+        -0.03465603881476209,
+        13.512581868321272
+      ],
+      "comparison": "comparisons/sha256-final-extra.json"
+    },
+    {
+      "family": "blake3",
+      "stage": "round2-blake3-c",
+      "baseline": "round2-blake3-baseline",
+      "cases": 28,
+      "trials": 3,
+      "improved_cases": 28,
+      "unchanged_cases": 0,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.001007015541609757,
+        82.71160822249092
+      ],
+      "comparison": "comparisons/blake3-c.json"
+    },
+    {
+      "family": "sha512",
+      "stage": "round2-sha512-combined-v1",
+      "baseline": "round2-sha512-baseline",
+      "cases": 40,
+      "trials": 3,
+      "improved_cases": 40,
+      "unchanged_cases": 0,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.020250734528082237,
+        36.187951575479985
+      ],
+      "comparison": "comparisons/sha512-combined-v1.json"
+    },
+    {
+      "family": "ripemd160",
+      "stage": "round2-ripemd160-state-v2",
+      "baseline": "round2-ripemd160-baseline",
+      "cases": 20,
+      "trials": 3,
+      "improved_cases": 5,
+      "unchanged_cases": 15,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.0,
+        44.795398601057734
+      ],
+      "comparison": "comparisons/ripemd160-state-v2.json"
+    },
+    {
+      "family": "hmac-sha2",
+      "stage": "round2-hmac-directout",
+      "baseline": "round2-hmac-baseline",
+      "cases": 32,
+      "trials": 3,
+      "improved_cases": 32,
+      "unchanged_cases": 0,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        1.424714547049588,
+        39.19258311799594
+      ],
+      "comparison": "comparisons/hmac-directout.json"
+    },
+    {
+      "family": "base58",
+      "stage": "round2-base58-limbs-v3",
+      "baseline": [
+        "round2-base58-baseline",
+        "round2-base58-baseline-small"
+      ],
+      "cases": 68,
+      "trials": 3,
+      "improved_cases": 66,
+      "unchanged_cases": 0,
+      "regressed_cases": 2,
+      "instruction_reduction_percent_range": [
+        -4.378980891719753,
+        64.71001840292662
+      ],
+      "comparison": "comparisons/base58-limbs-v3.json"
+    },
+    {
+      "family": "bech32",
+      "stage": "round2-bech32-candidate3",
+      "baseline": "round2-bech32-baseline",
+      "cases": 48,
+      "trials": 3,
+      "improved_cases": 48,
+      "unchanged_cases": 0,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        5.272346368715086,
+        72.57425053905544
+      ],
+      "comparison": "comparisons/bech32-candidate3.json"
+    },
+    {
+      "family": "secp256k1",
+      "stage": "round2-secp-vendor-candidate",
+      "baseline": "round2-secp-hotspots-baseline",
+      "cases": 51,
+      "trials": 3,
+      "improved_cases": 27,
+      "unchanged_cases": 21,
+      "regressed_cases": 3,
+      "instruction_reduction_percent_range": [
+        -0.07848677497841461,
+        49.98935492247997
+      ],
+      "comparison": "comparisons/secp-vendor-candidate.json"
+    },
+    {
+      "family": "p256",
+      "stage": "round2-p256-combined",
+      "baseline": "round2-p256-hotspots-baseline",
+      "cases": 25,
+      "trials": 3,
+      "improved_cases": 15,
+      "unchanged_cases": 4,
+      "regressed_cases": 6,
+      "instruction_reduction_percent_range": [
+        -0.28027196761302164,
+        53.51439055886138
+      ],
+      "comparison": "comparisons/p256-combined.json"
+    },
+    {
+      "family": "bls12-381",
+      "stage": "round2-bls-final",
+      "baseline": "round2-bls-hotspots-baseline",
+      "cases": 61,
+      "trials": 3,
+      "improved_cases": 35,
+      "unchanged_cases": 0,
+      "regressed_cases": 26,
+      "instruction_reduction_percent_range": [
+        -3.0995106035889064,
+        99.9649469010464
+      ],
+      "comparison": "comparisons/bls-final.json"
+    },
+    {
+      "family": "bls12-381",
+      "stage": "round2-bls-empty-final",
+      "baseline": "round2-bls-empty-baseline",
+      "cases": 3,
+      "trials": 3,
+      "improved_cases": 3,
+      "unchanged_cases": 0,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        99.9345496613379,
+        99.9813285502567
+      ],
+      "comparison": "comparisons/bls-empty-final.json"
+    },
+    {
+      "family": "bls12-381",
+      "stage": "round2-bls-cachecap-aggregates",
+      "baseline": "round2-bls-hotspots-baseline",
+      "cases": 11,
+      "trials": 3,
+      "improved_cases": 3,
+      "unchanged_cases": 0,
+      "regressed_cases": 8,
+      "instruction_reduction_percent_range": [
+        -3.0995106035889064,
+        97.10930657104507
+      ],
+      "comparison": "comparisons/bls-cachecap-aggregates.json"
+    },
+    {
+      "family": "bls12-381",
+      "stage": "round2-bls-long-capped",
+      "baseline": "round2-bls-long-baseline",
+      "cases": 3,
+      "trials": 3,
+      "improved_cases": 1,
+      "unchanged_cases": 0,
+      "regressed_cases": 2,
+      "instruction_reduction_percent_range": [
+        -0.002861832517297991,
+        7.5059363104453265
+      ],
+      "comparison": "comparisons/bls-long-capped.json"
+    },
+    {
+      "family": "Bitcoin composition",
+      "stage": "round2-bitcoin-api-v3",
+      "baseline": "round2-bitcoin-api-baseline",
+      "cases": 47,
+      "trials": 3,
+      "improved_cases": 33,
+      "unchanged_cases": 14,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.0,
+        83.82146330919701
+      ],
+      "comparison": "comparisons/bitcoin-api-v3.json"
+    },
+    {
+      "family": "Bitcoin composition",
+      "stage": "round2-bitcoin-workflows-v3",
+      "baseline": "round2-bitcoin-baseline",
+      "cases": 30,
+      "trials": 3,
+      "improved_cases": 26,
+      "unchanged_cases": 4,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.0,
+        67.16636827724562
+      ],
+      "comparison": "comparisons/bitcoin-workflows-v3.json"
+    },
+    {
+      "family": "Bitcoin composition",
+      "stage": "round2-bitcoin-extra-v3",
+      "baseline": "round2-bitcoin-extra-baseline",
+      "cases": 22,
+      "trials": 3,
+      "improved_cases": 20,
+      "unchanged_cases": 2,
+      "regressed_cases": 0,
+      "instruction_reduction_percent_range": [
+        0.0,
+        59.05261704184505
+      ],
+      "comparison": "comparisons/bitcoin-extra-v3.json"
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "stage": "bitcoin-native-initial",
+  "recorded_utc": "2026-10-12T11:51:35.938Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "b1a7df9c871aec590c0c4ad369c37ee8f34870483e0d8f91a0696c504a997f70",
+  "runner_sha256": "0c4d4e5f91bcb4e2da1e8de393ed7058845e033e0a9e1eeabdec506af2762390",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "bitcoin-hash160-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "751e76e8199196d454941c45d1b3a323f1433bd6",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-hash160-pubkey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "7df13238e1292720ac4a3505aab18bc0639cb81c19d397c35a2815098d95cbda",
+      "wasm": "bitcoin-hash160-pubkey/native/main.wasm",
+      "wasm_sha256": "249170c37de26091344a87e0444abf211595cabfd83e27b7d1f2d67a9d133e90",
+      "wasm_bytes": 282984,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9892,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 9892,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 9892,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 20,
+          "output_sha256": "ffded88409d93ec2a201c95f2a71e7e09e635b3a1aa08012737a10d9503af006",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-sha256d-pubkey",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160"
+      ],
+      "expected_hex": "b1cd0a4eb6d1cea5eb288fb4474ac403eab044004cc48f12bcb4ca8346d487e1",
+      "notes": "",
+      "source": "bitcoin-cases/bitcoin-sha256d-pubkey/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "49b68fc0efaf62cf76a7887688984e887c18e8abdd4a253fde04ffe1fdfaa092",
+      "wasm": "bitcoin-sha256d-pubkey/native/main.wasm",
+      "wasm_sha256": "282714d30e0f14e5825e477241991846bf13a017a3498a7482015b2c15042341",
+      "wasm_bytes": 274532,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 10532,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 10532,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 10532,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32,
+          "output_sha256": "08d13221e3a7326a34dd45214ba80116dd142e4b5ff3ce66a8dc7bfa0378b795",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-p2pkh",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "314267475a3974634e34726d394b427a446e374b7072517a3837535a323653414d48",
+      "notes": "Native validates SEC1 curve membership; baseline hashes SEC1 bytes without validation. Full public API cost includes extra native checking.",
+      "source": "bitcoin-cases/bitcoin-p2pkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "6d21b7381e74fb654ec7e92d59682d6350d11a2abace74ad01db78108eb324e1",
+      "wasm": "bitcoin-p2pkh/native/main.wasm",
+      "wasm_sha256": "fe64df68ffdbf24d752416887c33556315565c870c28bd7dad04d85d7b794d33",
+      "wasm_bytes": 503021,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 615977,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 615977,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 615977,
+          "allocated_bytes": 1528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 34,
+          "output_sha256": "54546562453e4d2aaeff4fde8735351134bada0e3a3eab73db7a59ec8fc8ec3b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-p2wpkh",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "6263317177353038643671656a7874646734793572337a6172766172793063357877376b763866337434",
+      "notes": "Native validates compressed SEC1 curve membership; baseline composition starts from trusted bytes.",
+      "source": "bitcoin-cases/bitcoin-p2wpkh/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "04992de41975b5dbb6e5784b6a9068a1c875a932efacd99d68931a46c3398b43",
+      "wasm": "bitcoin-p2wpkh/native/main.wasm",
+      "wasm_sha256": "237d5ae31797662ac21d8d664d1bfa34346db9e7e5a442eabec3794cc24d188f",
+      "wasm_bytes": 503119,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 603170,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 603170,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 603170,
+          "allocated_bytes": 1336,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "6cd42dab0217b54fdf5df95b892f055d2a462baa8c0b269e71e4ba6ec65ca66b",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip32-child0",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58"
+      ],
+      "expected_hex": "7870756236394837463564384b5352676d6d644a67324b6870414b38535233446a4d7741646b786a335a757856323743707252394c67706579476d585562433677623745526676726e4b5a6a586f556d6d447a6e657a70625a62376170367231443374674678486d774d6b51545048",
+      "notes": "BIP32 official vector2. Parse outside measurement; deriveChild and serialized xpub complete output inside.",
+      "source": "bitcoin-cases/bitcoin-bip32-child0/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "544be092db02133713567eb1058f2c089fcdd15f6c7eb6c905955272f20e3f97",
+      "wasm": "bitcoin-bip32-child0/native/main.wasm",
+      "wasm_sha256": "860769a73844380bd35acc6f2a60a202ed22d0fe241abb4485ccbc587758b273",
+      "wasm_bytes": 539160,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8266121,
+          "allocated_bytes": 4504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 8266121,
+          "allocated_bytes": 4504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 8266121,
+          "allocated_bytes": 4504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 111,
+          "output_sha256": "95fd9f559ed0a6ff78c7c03168fc5b0735ef8d8393590092a6ba7b23e3e5b409",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "bitcoin-bip86-receive-address",
+      "family": "bitcoin-composition",
+      "implementation": "native",
+      "comparison": "complete-public-api",
+      "plugins": [
+        "sha256",
+        "ripemd160",
+        "hmac-sha2",
+        "secp256k1",
+        "base58",
+        "bech32"
+      ],
+      "expected_hex": "62633170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a7775647078716b6564726372",
+      "notes": "Complete published BIP86 account parse, two public child derivations, empty-tree TapTweak and Bech32m address. All conversion, validation and serialization included.",
+      "source": "bitcoin-cases/bitcoin-bip86-receive-address/native/main.mo",
+      "returncode": 0,
+      "source_sha256": "e909ac5291e5e9095e53e73ee270d1450d143d14c342de77b2f9de5e4a0513c6",
+      "wasm": "bitcoin-bip86-receive-address/native/main.wasm",
+      "wasm_sha256": "5a50bded887027266cf6db94b2daae86c5c96d2b0fe1d024e8dd23486fa255bd",
+      "wasm_bytes": 557255,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 22870954,
+          "allocated_bytes": 9608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 22870954,
+          "allocated_bytes": 9608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 22870954,
+          "allocated_bytes": 9608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 62,
+          "output_sha256": "9aaf84c834e637931510c43511394a7f9432bac2acd54185ea54e7959dd5d802",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

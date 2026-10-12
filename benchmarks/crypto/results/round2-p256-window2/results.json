@@ -1,0 +1,1220 @@
+{
+  "stage": "round2-p256-window2",
+  "expected_case_count": 25,
+  "complete": true,
+  "recorded_utc": "2026-10-12T12:44:10.688Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "db3233a2f9176503dcb995d6f0abd20c82db66967b94c442eb33682e0088f488",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "r2-p256-convert-compressed-to-compressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-convert-compressed-to-compressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-convert-compressed-to-compressed/main.mo",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "3574e8b93ffc58f7c53bb5747f110bf1f2ffbda5573dd1c83ee900e47a60e9dd",
+      "wasm": "r2-p256-convert-compressed-to-compressed/fast/main.wasm",
+      "wasm_sha256": "5ff1af907f95172481de60b4d785ef521733e6dfdd05b4aa9d6df7132e740d10",
+      "wasm_bytes": 333157,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 581673,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 581673,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 581673,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-convert-compressed-to-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-convert-compressed-to-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-convert-compressed-to-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "4d8f5bb59f52632b13d5cc6c86afe60af06e9e00ed493a22738c2331ab2b460f",
+      "wasm": "r2-p256-convert-compressed-to-uncompressed/fast/main.wasm",
+      "wasm_sha256": "5a2a52849d51d4c1d22bc1ed9723341a8977557a455a502aacbf4fd57e2f1ddf",
+      "wasm_bytes": 333313,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 581887,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 581887,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 581887,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-convert-uncompressed-to-compressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-convert-uncompressed-to-compressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-convert-uncompressed-to-compressed/main.mo",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "f53cdad5235224d7c6aaab726ee1bf97a1fdf61418639be493731c24c92e3aa0",
+      "wasm": "r2-p256-convert-uncompressed-to-compressed/fast/main.wasm",
+      "wasm_sha256": "4fdeac4c267667107e5c1cfdcebe357f74ef6cf0ce9bd0efac63ef92167fbaad",
+      "wasm_bytes": 333313,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19267,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19267,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19267,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-convert-uncompressed-to-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-convert-uncompressed-to-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-convert-uncompressed-to-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "af9b90d72454800c406db0de986cd212ee3a62b428c152f7d73f0c52adc07561",
+      "wasm": "r2-p256-convert-uncompressed-to-uncompressed/fast/main.wasm",
+      "wasm_sha256": "fc7d2ba60317ee97312771688f5429a35015532024bae74e65507afaf76f85b2",
+      "wasm_bytes": 333191,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19481,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 19481,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 19481,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-public-key-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-public-key-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-public-key-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "8a1c9a1b2443f0b50a93c7b94f1caa9cdadb48036039a0c7d8660fef2fc7a349",
+      "wasm": "r2-p256-public-key-uncompressed/fast/main.wasm",
+      "wasm_sha256": "ee02962a14600188f42502ff18bdea08b25e4e48d7b3c6da831b6da8db0ecf41",
+      "wasm_bytes": 333312,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11201792,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11201792,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11201792,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65,
+          "output_sha256": "90f427baa1f70749809d4a4d17e4b6644f9eaa0a2c9fd87645d37c0d8b125629",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-compressed-low-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-compressed-low-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-compressed-low-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "a453e8659192795cc7ed212fee9c6d4cbb36400da56c4b8468945356c8d47fda",
+      "wasm": "r2-p256-verify-compressed-low-s/fast/main.wasm",
+      "wasm_sha256": "29516d9eeb0bedc71dd181a79f9824497d3cc4e2f2b57796e9904e302606f18c",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14210776,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14210776,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14210776,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-compressed-high-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-compressed-high-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-compressed-high-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "630ec2a290c86841ef534dd20cb3010c0a5bb54352579f3d06fd792e71169735",
+      "wasm": "r2-p256-verify-compressed-high-s/fast/main.wasm",
+      "wasm_sha256": "24722f6d1a002644e22699b30a95415cb8ef0d074ec476b00c4b06753968a01e",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14212798,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14212798,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14212798,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-compressed-invalid-equation",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-compressed-invalid-equation",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-compressed-invalid-equation/main.mo",
+      "expected_hex": "00",
+      "operations_per_sample": 1,
+      "notes": "Well-formed public key and signature, with the signed digest mutated. A complete verification equation must return #ok(false).",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "a5ec15a481c5d55aa8175aa9978734caabf8b7dc42fd45ca85b5d4115caef157",
+      "wasm": "r2-p256-verify-compressed-invalid-equation/fast/main.wasm",
+      "wasm_sha256": "8ff827c3fd289f4b9a67c12e08bc3569e549b20a33f8c29c0963b9c52f803b5d",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14280066,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14280066,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14280066,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-low-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-uncompressed-low-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-uncompressed-low-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "08f140715488adcd854007a5eb0a3c6215347255784fc8047406c65d86c80e38",
+      "wasm": "r2-p256-verify-uncompressed-low-s/fast/main.wasm",
+      "wasm_sha256": "67f54a5607a457cb439c3784c9f07d69a9768cef7dd572bda37c391c5689e4c6",
+      "wasm_bytes": 333697,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 13648370,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 13648370,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 13648370,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-high-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-uncompressed-high-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-uncompressed-high-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "2c0609585dd06f104ec48be2232ee568671fde6debbf77fc1e1f8a3f6ac8b95f",
+      "wasm": "r2-p256-verify-uncompressed-high-s/fast/main.wasm",
+      "wasm_sha256": "514e6e8f542bc4d4a50c5bd1f184da880361967d31f2a200a22dd2dcce594ec5",
+      "wasm_bytes": 333697,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 13650392,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 13650392,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 13650392,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-uncompressed-invalid-equation",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-uncompressed-invalid-equation",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-uncompressed-invalid-equation/main.mo",
+      "expected_hex": "00",
+      "operations_per_sample": 1,
+      "notes": "Well-formed public key and signature, with the signed digest mutated. A complete verification equation must return #ok(false).",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "c12713318e54a73753c5b077970faa0c272bbaa7993e0890d3d7e17d26e115f9",
+      "wasm": "r2-p256-verify-uncompressed-invalid-equation/fast/main.wasm",
+      "wasm_sha256": "3376010aee550ae6460931da242570e29e2a3c4556bc0713de3a257f39b7186e",
+      "wasm_bytes": 333697,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 13717660,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 13717660,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 13717660,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-digest-zero",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-digest-zero",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-digest-zero/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "Valid independently signed boundary digest, exercising scalar reduction and zero/window boundaries in public verification.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "dfba131bcaa2e5b10a4806c48d33054e595325849f9b2861c90d25640fea1e26",
+      "wasm": "r2-p256-verify-digest-zero/fast/main.wasm",
+      "wasm_sha256": "7f41568907d0d337e96529986333ff3a3a0dc198c1fa644518e9b0c7f916966f",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-digest-order",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-digest-order",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-digest-order/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "Valid independently signed boundary digest, exercising scalar reduction and zero/window boundaries in public verification.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "58e342d299293018dbd793891ef3ca56bb8d9554ebf170482548284bedafec30",
+      "wasm": "r2-p256-verify-digest-order/fast/main.wasm",
+      "wasm_sha256": "e48fcae60c2f2a0b3141a1e991f416754d18a1d230ca4e5fdf55cb062a2ba5b6",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 12162437,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-digest-all-ff",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-digest-all-ff",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-digest-all-ff/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "Valid independently signed boundary digest, exercising scalar reduction and zero/window boundaries in public verification.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "88c81e5a48520f31ee88a599ca1aba06030b9964aecbffdcbac3da769e361d85",
+      "wasm": "r2-p256-verify-digest-all-ff/fast/main.wasm",
+      "wasm_sha256": "db880e94dbe0b3b70d574a956beb42f84472230193fe1929f5429269c1561380",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14067833,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14067833,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14067833,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-key-generator",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-key-generator",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-key-generator/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "b2f639669ccf58a9ae6db67c42991a5fa856401bcbed3c99a68a7ec419ece2b5",
+      "wasm": "r2-p256-verify-key-generator/fast/main.wasm",
+      "wasm_sha256": "2a0d91d704ad2f056af79f663aa248630cc535e90f2c80aab2659ca81dd6e510",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14214097,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14214097,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14214097,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-verify-key-negated-generator",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-key-negated-generator",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-verify-key-negated-generator/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "d6eefe5570c11bd865451064fdef145e6909d26a4ca092901e1557ae8c5a5708",
+      "wasm": "r2-p256-verify-key-negated-generator/fast/main.wasm",
+      "wasm_sha256": "31acc04ece07948fce7c4003e062874333f9faf7de4d186cd5065bb27ff6dfb7",
+      "wasm_bytes": 333663,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14175345,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14175345,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14175345,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-der-encode-ordinary",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-encode-ordinary",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-der-encode-ordinary/main.mo",
+      "expected_hex": "304402202ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380022063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "6b4ff4baac8dc3785f306af44bd0369a7ed013dfb2d8ba20b3c070c12495ac6b",
+      "wasm": "r2-p256-der-encode-ordinary/fast/main.wasm",
+      "wasm_sha256": "91011df9a41eff5adfda4856af52171c13d70bd616da83a457aed48535282ab5",
+      "wasm_bytes": 333402,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6294,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6294,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6294,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 70,
+          "output_sha256": "f84e3a1e7baadfad0d8abc6b41ca398499dc74ce8c247374f5347c64592f35bf",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-der-decode-ordinary",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-decode-ordinary",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-der-decode-ordinary/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "1a9ab2740f8e07f6effba9396be90c4103c832aabe8ab12b95d1280a4c13f83c",
+      "wasm": "r2-p256-der-decode-ordinary/fast/main.wasm",
+      "wasm_sha256": "0d12906454af09df93c4d24cbe6c1c596dd5fb9219f307fa0484bdccc578729a",
+      "wasm_bytes": 333302,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4196,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4196,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4196,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-der-encode-both-integers-padded",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-encode-both-integers-padded",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-der-encode-both-integers-padded/main.mo",
+      "expected_hex": "3046022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "63d7ee0ef953ce398f8180d7561184e27510f84f56ce80b656faaee818c6fbb3",
+      "wasm": "r2-p256-der-encode-both-integers-padded/fast/main.wasm",
+      "wasm_sha256": "d5121fa0f8a805bbd675967b589ee633228f98a8f9618e3ae099d3003e4cb02d",
+      "wasm_bytes": 333404,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6404,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 72,
+          "output_sha256": "bed3113f2eb70e86b0101e215c3b29d0a639fad776c4bffb1e828ffa0e43e1de",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 6404,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 72,
+          "output_sha256": "bed3113f2eb70e86b0101e215c3b29d0a639fad776c4bffb1e828ffa0e43e1de",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 6404,
+          "allocated_bytes": 224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 72,
+          "output_sha256": "bed3113f2eb70e86b0101e215c3b29d0a639fad776c4bffb1e828ffa0e43e1de",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-der-decode-both-integers-padded",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-decode-both-integers-padded",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-der-decode-both-integers-padded/main.mo",
+      "expected_hex": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "94ea37433120bc08f0f90128ad65464258edf778d0e019339789e4b7d582a736",
+      "wasm": "r2-p256-der-decode-both-integers-padded/fast/main.wasm",
+      "wasm_sha256": "0478ecb4bddac3550498076c49a55f3c1e830f3f1f7c7f331b35de12baf86115",
+      "wasm_bytes": 333304,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4216,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "409c63b240eefcc1a88204e057f2b6a282f06e6f334a12ee65f7c0633b98a72d",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 4216,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "409c63b240eefcc1a88204e057f2b6a282f06e6f334a12ee65f7c0633b98a72d",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 4216,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "409c63b240eefcc1a88204e057f2b6a282f06e6f334a12ee65f7c0633b98a72d",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-normalize-low-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-normalize-low-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-normalize-low-s/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "a597ab133b98be2d963495b6de3217cf49d47810f11c7101b7a941bc57627470",
+      "wasm": "r2-p256-normalize-low-s/fast/main.wasm",
+      "wasm_sha256": "4931e068228f72045f08ac15e4101669f87d765fb3f73dc00466183caa588eb2",
+      "wasm_bytes": 333141,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1973,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1973,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1973,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r2-p256-normalize-high-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-normalize-high-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round2/curve-hotspots/cases/r2-p256-normalize-high-s/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "returncode": 0,
+      "source_sha256": "394b9e4ee082cb9ebd2159bbb3e40e27b72f08b245f442cd4e8225897f21e2f7",
+      "wasm": "r2-p256-normalize-high-s/fast/main.wasm",
+      "wasm_sha256": "bca445afa2b56521f1fc47b16dfce5da393292b5d953b96c1c7c2d67d994fd94",
+      "wasm_bytes": 333296,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2138,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2138,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2138,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "12e66b721257374cbbb9007b8b76a57b337a027fcd9ee7c1a94891e3d9da1613",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_public_key_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_public_key_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/p256_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "41f862537e72e1aa3d1d6771f9a4ce925307a2301566357cca07842256e44100",
+      "wasm": "p256_public_key_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "05291283ce326b608d646892996b40fc3d03d936c281a8179c7c44bd1d53af0c",
+      "wasm_bytes": 333092,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11201629,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 11201629,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 11201629,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 33,
+          "output_sha256": "2c2af6fafc00d969d7710cea9c6861c6b2d73a81f0064dc9bccc2d07cb991f6a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_verify_ecdsa_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_verify_ecdsa",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/p256_verify_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "ce8806d6fa6c74c5b7f29c3c8d2776de1998fbc706849434dc7bdba788316839",
+      "wasm": "p256_verify_ecdsa_fast/fast/main.wasm",
+      "wasm_sha256": "6bcd8da95b855992b51aa9bad958647f7f0a186015f692a4ae618ff6cbb74204",
+      "wasm_bytes": 333484,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 14210825,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 14210825,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 14210825,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "p256_sign_rfc6979_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_sign_rfc6979",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "4304eef8b664375abd59a86fbe10e682b1e30276fe1f9efa71a9001d8a8e3da37d33976a24a49d93115167b94823a227beefb2755c3fe023492e8ff387041a86",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "curve-cases/p256_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "returncode": 0,
+      "source_sha256": "065c48041f72b15beecbf421ffe47f61ff4c0a43d088390a3713bccbe2dd00c3",
+      "wasm": "p256_sign_rfc6979_fast/fast/main.wasm",
+      "wasm_sha256": "4ada3de82e7c7c6d13b29fa2a42c44b59a140a71834869e0bc3ccf528316b4dd",
+      "wasm_bytes": 333248,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 13457037,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 13457037,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 13457037,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 64,
+          "output_sha256": "23a60d729a48e2a7d75fae8793632530e96176b33b611b228f92a8f3ec4ea453",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

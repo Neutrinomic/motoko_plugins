@@ -1,0 +1,42 @@
+{
+  "BLS12381.g2Add": {
+    "native_case": {
+      "name": "bls12_381_g2_add_validated_bls12_381",
+      "implementation": "bls12-381",
+      "source": "curve-cases/bls12_381_g2_add_validated_bls12_381/main.mo"
+    },
+    "comparison_contract": "closest-mathematical-counterpart",
+    "visible_footnote": "G2-uncompressed",
+    "counterpart_caveat": "Native uses validated 256-byte EIP-2537 uncompressed point inputs and emits compressed bytes; plugin accepts 96-byte compressed inputs and also recovers missing coordinates."
+  },
+  "BLS12381.g2Mul": {
+    "native_case": {
+      "name": "bls12_381_g2_mul_bls12_381",
+      "implementation": "bls12-381",
+      "source": "curve-cases/bls12_381_g2_mul_bls12_381/main.mo"
+    },
+    "comparison_contract": "closest-mathematical-counterpart",
+    "visible_footnote": "G2-predecoded",
+    "counterpart_caveat": "Native starts from trusted predecoded points/scalars and encodes the mathematical result outside timing; plugin includes packed compressed decoding, scalar/subgroup validation and output encoding."
+  },
+  "BLS12381.g2Msm": {
+    "native_case": {
+      "name": "bls12_381_g2_msm_8_bls12_381",
+      "implementation": "bls12-381",
+      "source": "curve-cases/bls12_381_g2_msm_8_bls12_381/main.mo"
+    },
+    "comparison_contract": "closest-mathematical-counterpart",
+    "visible_footnote": "G2-predecoded",
+    "counterpart_caveat": "Native starts from trusted predecoded points/scalars and encodes the mathematical result outside timing; plugin includes packed compressed decoding, scalar/subgroup validation and output encoding."
+  },
+  "BLS12381.pairingCheck": {
+    "native_case": {
+      "name": "bls12_381_pairing_identity_bls12_381",
+      "implementation": "bls12-381",
+      "source": "curve-cases/bls12_381_pairing_identity_bls12_381/main.mo"
+    },
+    "comparison_contract": "closest-mathematical-counterpart",
+    "visible_footnote": "G2-predecoded",
+    "counterpart_caveat": "Native starts from trusted predecoded points; plugin validates every packed compressed point and subgroup before pairing."
+  }
+}

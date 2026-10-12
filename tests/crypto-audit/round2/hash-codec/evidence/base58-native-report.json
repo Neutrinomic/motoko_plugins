@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "candidate": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/base58-limbs-v3",
+  "source_sha256": "259241b764a8c3ae9939c23bbb35b4927de850c4ac345efa6796b30dff423460",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/srv/shared/code/motoko_experiments/plugins/tests/crypto-audit/round2/hash-codec/base58/generate.py",
+        "--source",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/base58-limbs-v3/plugins/base58/runtime/src/lib.rs",
+        "--out",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay"
+      ],
+      "exit_code": 0,
+      "seconds": 0.283,
+      "log": "generate.log"
+    },
+    {
+      "argv": [
+        "rustc",
+        "--test",
+        "--edition=2024",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native.rs",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native-debug"
+      ],
+      "exit_code": 0,
+      "seconds": 0.271,
+      "log": "compile-debug.log"
+    },
+    {
+      "argv": [
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native-debug"
+      ],
+      "exit_code": 0,
+      "seconds": 2.162,
+      "log": "debug.log"
+    },
+    {
+      "argv": [
+        "rustc",
+        "--test",
+        "--edition=2024",
+        "-O",
+        "-C",
+        "debug-assertions=yes",
+        "-Z",
+        "sanitizer=address",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native.rs",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 0.575,
+      "log": "compile-asan.log"
+    },
+    {
+      "argv": [
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/base58/durable-replay/native-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 0.401,
+      "log": "asan.log"
+    }
+  ],
+  "findings": [],
+  "build_metadata_sha256": "b043a1afd77feb5918f0a32f544fcec27688f8176fe8c2982ef8d3fa001773d3",
+  "artifact_sha256": {
+    "plugin.cmxs": "6ace87fd0682f40254cb60d222d5a41187a57f4b4f6e792606a74961e728a31a",
+    "runtime.wasm": "ac8d24b2cca040e768f35ae973c49e29cf86ddaee99e4f12dc813786c272407f"
+  },
+  "vector_count": 1657,
+  "vector_sha256": "7f2dc168cbc17fdb673fb04a7db3e30c4eeeb7ff7b36e5e14cfca219f9efdf27",
+  "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+  "test_source_sha256": {
+    "run.py": "0a2b545068e9044e898c282c77323d57a57edfbb547cf3ed7afc5f723d72cfd8",
+    "generate.py": "774a432bbce38c606a9c6177e8efdb32a500cc9508d063c7866a503419434e3f",
+    "native.rs": "902875325a50b20626fee88aa8487033513616afecfd1e6b21c033298d042455"
+  },
+  "coverage": [
+    "Independent Python bigint Base58 oracle: 1657 deterministic vectors covering leading zeros, 4-byte/5-digit limbs, scalar boundaries and maximum input size.",
+    "All 16 alignment offsets; exact and insufficient capacities; input immutability and output canaries.",
+    "Every invalid byte at six offsets, competing capacity/maximum-size errors, and oversized alphabet-valid values.",
+    "Read-only input pages and inaccessible pages immediately after inputs/outputs.",
+    "Debug execution and optimized AddressSanitizer execution, including original five runtime tests."
+  ]
+}

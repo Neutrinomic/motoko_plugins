@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "candidate": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/sha256-final",
+  "source_sha256": "981af382272002639ada6ed997248b4e41be79bc5a7760c70b6a3233e09ea6de",
+  "vector_count": 1845,
+  "commands": [
+    {
+      "argv": [
+        "rustc",
+        "--test",
+        "--edition=2024",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native.rs",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native-debug"
+      ],
+      "exit_code": 0,
+      "seconds": 0.355,
+      "log": "compile-debug.log"
+    },
+    {
+      "argv": [
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native-debug"
+      ],
+      "exit_code": 0,
+      "seconds": 0.111,
+      "log": "debug.log"
+    },
+    {
+      "argv": [
+        "rustc",
+        "--test",
+        "--edition=2024",
+        "-O",
+        "-C",
+        "debug-assertions=yes",
+        "-Z",
+        "sanitizer=address",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native.rs",
+        "-o",
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 1.065,
+      "log": "compile-asan.log"
+    },
+    {
+      "argv": [
+        "/srv/shared/code/motoko_experiments/plugins/_build/crypto-optimization-round2/central-audit/sha256/replay/native-asan"
+      ],
+      "exit_code": 0,
+      "seconds": 0.128,
+      "log": "asan.log"
+    }
+  ],
+  "findings": [],
+  "build_metadata_sha256": "a4c9fb6616f98aa8c2bccf685eb11e324c912bc2889f05e480b0b9a062785dfc",
+  "artifact_sha256": {
+    "plugin.cmxs": "7d622a4c9276a813e4abf4bc3ab0eb839d29f30210d8413a27d472d2427555f0",
+    "runtime.wasm": "1ac37ddbda7f90b3154bef3214882079b97d00e53a6494a5a24791c9b6759a78"
+  },
+  "vector_sha256": "771848f394b216afb89842a51e9f11fc71affff346ecb7e5039ef9d9a350cc61",
+  "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+  "test_source_sha256": {
+    "run.py": "fd0931e8c42d1d8ea2b8f5ddf84aaf2a3b5c7a57806649f0214507f49ab7d7d9",
+    "native.rs": "3a5eee7f5aee361b2909cc6eaeaba01d4fe92243415b8c02ebf4999420b4cf86"
+  },
+  "review": [
+    "Shared specialized path called only for lengths32/33, copy32bytes and readbyte32onlywhenlength33.",
+    "Tail big-endian bit counts256/264 correct; padding byte128 at32/33. Merkle64case secondblockbitcount512 unchanged.",
+    "All single-bit inputs and all repeatedbytevalues at32/33/64;16alignment offsets, immutable inputs,outputcanaries,read-onlyinputpages and inaccessibleendpages.",
+    "Debug and optimizedASan5tests pass; original3runtime tests included."
+  ]
+}

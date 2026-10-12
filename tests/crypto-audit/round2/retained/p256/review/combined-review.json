@@ -1,0 +1,32 @@
+{
+  "candidate": "p256-combined",
+  "runtime_source_sha256": "62d91a66f36452d67dba91e93092aceb3ec83368816a60e42fbf333d138cb664",
+  "runtime_wasm_sha256": "83803f3d2462cb866e730fad94d73073cffdb574333a48301917e52c529c1c84",
+  "plugin_cmxs_sha256": "e08b0987cb80beb26448900fe6c7c75a8e6a7b6e4153ea09e02f3f652c9a1c74",
+  "findings": [],
+  "source_checks": {
+    "public_key_comb": "64 fixed iterations; secret-independent addresses; constant-time masked selection; scalar bytes/copy zeroized",
+    "table": "All 15 points equal independent Python arithmetic and exact OpenSSL scalar multiplication",
+    "verification_naf": "257 signed digits; public-input-only indexing; recoding invariant remaining=(scalar>>position)+carry; terminal carry bounded",
+    "verification_group_arithmetic": "Upstream complete addition/doubling; canonical key/signature parsing and digest-length/error precedence preserved; affine normalization occurs once",
+    "DER": "Only 72-byte encoded signatures return scratch directly; shorter results retain exact-length copy; negative status bypasses payload branch",
+    "signing": "Whitespace-normalized sign_prehash identical to baseline; dependencies and Cargo.lock unchanged"
+  },
+  "independent_recoding_checks": {
+    "cases": 135938,
+    "result": "passed",
+    "evidence": "p256-review-naf/recoding-results.json"
+  },
+  "emitted_wasm": {
+    "result": "passed targeted inspection",
+    "public_key_function_wat_sha256": "87588f6a0d0714e808e24237bef989c62a8a6ba5fb298d95a2ced387466926cf",
+    "note": "Combined public-key function is byte-for-byte identical to independently inspected comb candidate function",
+    "evidence": "p256-review-codegen-combined"
+  },
+  "limitations": [
+    "Targeted source and emitted-loop review is not a formal constant-time proof or complete stack-erasure guarantee",
+    "Full execution-engine and GC validation is owned by parent implementation/test agents"
+  ],
+  "documentation_note": "Parent will correct verifier comment to distinguish unchanged signing nonce arithmetic from new public-key comb; this is a source-only correction and artifact hashes must remain unchanged",
+  "shared_production_files_changed_by_reviewer": false
+}
