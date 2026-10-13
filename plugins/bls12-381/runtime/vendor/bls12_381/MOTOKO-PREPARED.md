@@ -37,6 +37,16 @@ compare exact roots and inverses on edge cases and seeded random fields,
 including pure-real/imaginary Fp2 values and both valid and invalid roots.
 No prepared payload, external point format or group-validation rule changes.
 
+## Final exponentiation entry
+
+The six initial Frobenius maps are replaced by one conjugation. Since Fp12 is
+a quadratic extension over Fp6, the p^6 Frobenius fixes the base coefficient
+and negates the extension coefficient for every field value. Tests compare
+both transforms on zero, basis values and general random fields, then compare
+the complete result with the original final-exponentiation formula for
+nonzero values. The remaining formula and nonzero Miller-result invariant
+are unchanged.
+
 ## Payload contract
 
 These hooks implement a private payload for the matching Motoko plugin build.

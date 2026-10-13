@@ -132,13 +132,9 @@ impl MillerLoopResult {
         }
 
         let mut f = self.0;
-        let mut t0 = f
-            .frobenius_map()
-            .frobenius_map()
-            .frobenius_map()
-            .frobenius_map()
-            .frobenius_map()
-            .frobenius_map();
+        // Fp12 is quadratic over Fp6: the p^6 Frobenius fixes the
+        // base field and negates the extension coefficient, for all f.
+        let mut t0 = f.conjugate();
         Gt(f.invert()
             .map(|mut t1| {
                 let mut t2 = t0 * t1;
