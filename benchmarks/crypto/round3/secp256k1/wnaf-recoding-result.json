@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "scope": "Independent Python integer model; not execution of Rust or Wasm",
+  "source": "plugins/secp256k1/runtime/vendor/k256/src/arithmetic/mul.rs",
+  "sourceFragment": "fn wnaf_128_vartime through its closing brace, with trailing LF",
+  "sourceFragmentSha256": "04a197820f8677c8a60d999f06b85fd1e3fe531fbb89d42a901140223f03cea2",
+  "scriptSha256": "71c11df44e82cab3eb24b645d3003910d2164f6746937510a570eeef73c1b5f4",
+  "cases": 180208,
+  "method": {
+    "exhaustiveSmallIntegers": {
+      "minimum": 0,
+      "maximumInclusive": 65535
+    },
+    "powerBoundaries": {
+      "powersInclusive": [
+        0,
+        128
+      ],
+      "offsetsInclusive": [
+        -65,
+        65
+      ],
+      "filter": "0 <= value < 2^128"
+    },
+    "random": {
+      "generator": "Python random.Random.getrandbits",
+      "seed": 87,
+      "bits": 128,
+      "draws": 100000
+    },
+    "combination": "deduplicated union"
+  },
+  "checks": [
+    "exact integer reconstruction",
+    "nonzero digits are odd and between -15 and 15 inclusive",
+    "nonzero positions are separated by at least 5 bits",
+    "every emitted digit fits the 129-slot array"
+  ],
+  "maxNonzeroDigitsObserved": 25,
+  "highestNonzeroPositionObserved": 128
+}

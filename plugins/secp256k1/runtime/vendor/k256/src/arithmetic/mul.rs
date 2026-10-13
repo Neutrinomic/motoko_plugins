@@ -362,6 +362,72 @@ fn lincomb(
     acc
 }
 
+/// Width-five non-adjacent form of a nonnegative scalar smaller than 2^128.
+/// Only used for public verification scalars after the existing GLV split.
+fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
+    let bytes = k.to_bytes();
+    debug_assert!(bytes[..16].iter().all(|&b| b == 0));
+    let lo = u64::from_be_bytes(bytes[24..32].try_into().unwrap());
+    let hi = u64::from_be_bytes(bytes[16..24].try_into().unwrap());
+    let mut digits = [0i8; 129];
+    let mut position = 0;
+    let mut carry = 0;
+    while position < 128 || carry != 0 {
+        let bits = if position < 64 {
+            (lo >> position) | if position > 59 { hi << (64 - position) } else { 0 }
+        } else if position < 128 { hi >> (position - 64) } else { 0 };
+        let window = (bits & 31) as i8 + carry;
+        if window & 1 == 0 {
+            position += 1;
+            continue;
+        }
+        carry = i8::from(window >= 16);
+        digits[position] = window - (carry << 5);
+        position += 5;
+    }
+    digits
+}
+
+impl ProjectivePoint {
+    /// Computes `x*k + y*l` using variable-time public-data arithmetic.
+    ///
+    /// Scalars AND points must be public. Never use this for signing, secret
+    /// key derivation, ECDH, or any secret-dependent multiplication.
+    pub fn lincomb_vartime(x: &Self, k: &Scalar, y: &Self, l: &Scalar) -> Self {
+        let mut tables = [[Self::IDENTITY; 8]; 4];
+        let mut digits = [[0i8; 129]; 4];
+        for (index, (point, scalar)) in [(x, k), (y, l)].into_iter().enumerate() {
+            let (r1, r2) = decompose_scalar(scalar);
+            let sign1 = bool::from(r1.is_high());
+            let sign2 = bool::from(r2.is_high());
+            digits[index * 2] = wnaf_128_vartime(&if sign1 { -r1 } else { r1 });
+            digits[index * 2 + 1] = wnaf_128_vartime(&if sign2 { -r2 } else { r2 });
+            // Build odd multiples once; derive the second table by the cheap
+            // endomorphism instead of another series of projective additions.
+            let double = point.double();
+            let mut odd = *point;
+            for j in 0..8 {
+                tables[index * 2][j] = if sign1 { -odd } else { odd };
+                let endo = odd.endomorphism();
+                tables[index * 2 + 1][j] = if sign2 { -endo } else { endo };
+                if j != 7 { odd += double; }
+            }
+        }
+        let mut acc = Self::IDENTITY;
+        for bit in (0..129).rev() {
+            acc = acc.double();
+            for term in 0..4 {
+                let digit = digits[term][bit];
+                if digit != 0 {
+                    let point = tables[term][(digit.unsigned_abs() as usize - 1) / 2];
+                    acc += if digit < 0 { -point } else { point };
+                }
+            }
+        }
+        acc
+    }
+}
+
 /// Lazily computed basepoint table.
 #[cfg(feature = "precomputed-tables")]
 static GEN_LOOKUP_TABLE: Lazy<[LookupTable; 33]> = Lazy::new(precompute_gen_lookup_table);

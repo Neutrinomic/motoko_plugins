@@ -8,7 +8,7 @@ the archive records upstream commit `5ac8f5d77f11399ff48d87b0554935f6eddda342`.
 `upstream-source.json` records every original file's hash, changed files'
 before/after hashes, and the hash of `exact.patch`.
 
-Four upstream files differ:
+Five upstream files differ:
 
 - `Cargo.toml` adds an empty workspace to keep upstream development targets
   outside the enclosing plugin workspace. Dependencies, features and package
@@ -24,6 +24,19 @@ Four upstream files differ:
   and debug builds. Its products fit in native Wasm `u64` multiplication;
   5x52 uses `u128` products that need software expansion on this target.
   Other targets and scalar arithmetic retain their upstream selection.
+
+- `src/arithmetic/mul.rs` adds an explicitly variable-time `lincomb_vartime`
+  method for **public verification inputs only**. It reuses the existing GLV
+  decomposition and point formulas with width-five non-adjacent digits. Odd
+  multiples are built once per input point; endomorphism images supply the
+  second table. Fixed-size stack arrays bound scratch space. The existing
+  `LinearCombination`, `Mul` and `MulByGenerator` implementations are untouched.
+
+The plugin calls the new method only for ECDSA and BIP340 verification.
+It never calls it for signing, secret key derivation, generic point/scalar
+operations or tweaks. The ECDSA wrapper preserves the upstream verification
+formula, full scalar/point validation, and acceptance of both low and high S.
+BIP340 input-range, identity, parity and X-coordinate checks are unchanged.
 
 The original secret multiplication, scalar conditional assignment, nonce/signing
 implementation, hashing, and `SigningKey` zeroization remain unchanged. Point
@@ -77,3 +90,19 @@ are temporary build locations and are not part of the vendored source.
 The exact upstream delta is `exact.patch`; it can be applied with `patch -p1`
 from an untouched extracted 0.13.4 crate. Additional files in this directory
 are provenance, this document, the patch, and the standalone comparator audit.
+
+## Round-three validation and measurements
+
+The plugin's eight native unit tests include 1,283 direct variable-time versus
+unchanged constant-time linear-combination comparisons over zero, order and
+bit boundaries, deterministic random scalars and identity/equal/opposite
+points. The retained independent recoding model checks 180,208 values and
+pins the exact Rust fragment. Actual Wasm verification additionally uses
+independent published and generated vectors; see the separate audit evidence.
+
+Matched PocketIC measurements and exact source snapshots are retained in
+[`benchmarks/crypto/round3/secp256k1`](../../../../../benchmarks/crypto/round3/secp256k1/).
+The backend-only checkpoint and the subsequent verifier optimization are
+measured separately, including allocations and complete canister Wasm sizes.
+This local patch has regression and independent source review coverage; it
+has not received an external cryptographic audit.

@@ -5,7 +5,7 @@
 
 use k256::{ProjectivePoint, PublicKey, Scalar, SecretKey};
 use k256::ecdsa::{Signature, hazmat::SignPrimitive};
-use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, LinearCombination}};
+use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, Invert}};
 use k256::sha2::{Digest, Sha256};
 use k256::elliptic_curve::zeroize::Zeroize;
 use k256::elliptic_curve::{point::AffineCoordinates, subtle::ConditionallySelectable};
@@ -88,10 +88,15 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             let key = public(a)?;
             let digest: [u8; 32] = b.try_into().map_err(|_| DIGEST)?;
             let sig = signature(c)?;
-            // The generic upstream ECDSA verifier accepts both s and n-s, as
-            // required here, without a normalize-then-reject-high-S roundtrip.
-            Ok(i64::from(k256::ecdsa::hazmat::verify_prehashed::<k256::Secp256k1>(
-                &key.to_projective(), &digest.into(), &sig).is_ok()))
+            // Same upstream verification equation and high-S acceptance; all
+            // inputs to the variable-time multiplication are public here.
+            let z = <Scalar as Reduce<U256>>::reduce_bytes(&digest.into());
+            let (r, s) = sig.split_scalars();
+            let inverse = *s.invert_vartime();
+            let point = ProjectivePoint::lincomb_vartime(
+                &ProjectivePoint::GENERATOR, &(z * inverse),
+                &key.to_projective(), &(*r * inverse));
+            Ok(i64::from(*r == <Scalar as Reduce<U256>>::reduce_bytes(&point.to_affine().x())))
         }
         9 => Ok(write(signature(a)?.to_der().as_bytes(), out)),
         10 => Ok(write(&Signature::from_der(a).map_err(|_| SIGNATURE)?.to_bytes(), out)),
@@ -133,7 +138,7 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             let challenge = Sha256::new().chain_update(tag).chain_update(tag)
                 .chain_update(&c[..32]).chain_update(a).chain_update(b).finalize();
             let e = <Scalar as Reduce<U256>>::reduce_bytes(&challenge);
-            let r = ProjectivePoint::lincomb(&ProjectivePoint::GENERATOR, &s,
+            let r = ProjectivePoint::lincomb_vartime(&ProjectivePoint::GENERATOR, &s,
                 &ProjectivePoint::from(*key.as_affine()), &-e);
             if bool::from(r.is_identity()) { return Ok(0); }
             let point = r.to_affine();
@@ -319,6 +324,33 @@ mod tests {
         let mut trailing = der.clone(); trailing.push(0);
         assert_eq!(run(10, &trailing, &[], &[]), Err(SIGNATURE));
     }
+    #[test]
+    fn public_variable_time_lincomb_matches_constant_time() {
+        use k256::elliptic_curve::ops::LinearCombination;
+        let points = [ProjectivePoint::IDENTITY, ProjectivePoint::GENERATOR,
+            -ProjectivePoint::GENERATOR, ProjectivePoint::GENERATOR * Scalar::from(17u64)];
+        let mut scalars = vec![Scalar::ZERO, Scalar::ONE, -Scalar::ONE];
+        // Boundaries around all bits exercise GLV splitting and NAF carries.
+        for bit in 0..256 {
+            let mut bytes = [0u8; 32];
+            bytes[31 - bit / 8] = 1 << (bit % 8);
+            let value = <Scalar as Reduce<U256>>::reduce_bytes(&bytes.into());
+            scalars.extend([value - Scalar::ONE, value, value + Scalar::ONE]);
+        }
+        for i in 0u64..512 {
+            let hash = Sha256::new().chain_update(b"public-lincomb-differential")
+                .chain_update(i.to_be_bytes()).finalize();
+            scalars.push(<Scalar as Reduce<U256>>::reduce_bytes(&hash));
+        }
+        for (i, k) in scalars.iter().enumerate() {
+            let l = &scalars[(i * 73 + 19) % scalars.len()];
+            let x = &points[i % points.len()];
+            let y = &points[(i / points.len()) % points.len()];
+            assert_eq!(ProjectivePoint::lincomb_vartime(x, k, y, l),
+                ProjectivePoint::lincomb(x, k, y, l), "pair {i}");
+        }
+    }
+
     #[test]
     fn output_initialization_and_no_input_mutation() {
         let mut secret = [1; 34]; secret[0] = 0xa5; secret[33] = 0x5a;
