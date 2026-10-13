@@ -1,0 +1,55 @@
+     Locking 7 packages to latest compatible versions
+      Adding getrandom v0.2.17
+      Adding ppv-lite86 v0.2.21
+      Adding rand v0.8.8 (available: v0.10.3)
+      Adding rand_chacha v0.3.1 (available: v0.10.0)
+      Adding wasi v0.11.1+wasi-snapshot-preview1
+      Adding zerocopy v0.8.62
+      Adding zerocopy-derive v0.8.62
+   Compiling version_check v0.9.5
+   Compiling libc v0.2.190
+   Compiling generic-array v0.14.9
+   Compiling proc-macro2 v1.0.107
+   Compiling typenum v1.20.1
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling cfg-if v1.0.5
+   Compiling zerocopy v0.8.62
+   Compiling getrandom v0.2.17
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling syn v2.0.119
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_core v0.6.4
+   Compiling rand_chacha v0.3.1
+   Compiling cpufeatures v0.2.17
+   Compiling keccak v0.1.6
+   Compiling sha3 v0.10.9
+   Compiling zeroize_derive v1.5.0
+   Compiling sha2 v0.10.9
+   Compiling zeroize v1.9.1
+   Compiling rand v0.8.8
+   Compiling fips204 v0.4.6 (/srv/shared/code/motoko_experiments/plugins/_build/signature-round4/ml-dsa/tests/crypto-audit/round4/ml-dsa/_out/instrumented-fips204)
+error: non-binding let on a type that has a destructor
+   --> src/motoko_prepared.rs:173:9
+    |
+173 |         let _ = reader.vector();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> src/lib.rs:6:9
+    |
+  6 | #![deny(let_underscore_drop, macro_use_extern_crate, meta_variable_misuse, missing_abi)]
+    |         ^^^^^^^^^^^^^^^^^^^
+help: consider binding to an unused variable to avoid immediately dropping the value
+    |
+173 |         let _unused = reader.vector();
+    |              ++++++
+help: consider immediately dropping the value
+    |
+173 -         let _ = reader.vector();
+173 +         drop(reader.vector());
+    |
+
+error: could not compile `fips204` (lib test) due to 1 previous error

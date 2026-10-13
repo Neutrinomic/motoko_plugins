@@ -1,0 +1,61 @@
+{
+  "runtimeSha256": "d2ad769ca27e92e62d74f9e3a185fc5d4459964b5f0525cc817ab64c102af869",
+  "baselineRuntimeSha256": "07ae75432d55ddcbb4741f0d0aa40bb0d086f365d1c68c0648bde3dd20850c3f",
+  "readerVectorStandaloneFunctionPresent": false,
+  "selectedFunctions": {
+    "$_RNvNtCsl148ggKCHvF_7fips20415motoko_prepared4sign": {
+      "bodySha256": "da21ce31f5ce54084c108ae7cb70906e3ff09d7e3259b56a65e59773a721d024",
+      "constantMemoryCopyLengths": [
+        4096,
+        4096,
+        4096
+      ],
+      "totalConstantMemoryCopyBytes": 12288,
+      "unalignedI32LoadSites": 6,
+      "sliceCheckFailureSites": 2
+    },
+    "$mldsa_verify_prepared": {
+      "bodySha256": "1e9ab14c5d9d52469bf20b2acbe8447b07739d55233e70f59b47f52549fb2f13",
+      "constantMemoryCopyLengths": [
+        4096
+      ],
+      "totalConstantMemoryCopyBytes": 4096,
+      "unalignedI32LoadSites": 2,
+      "sliceCheckFailureSites": 0
+    },
+    "$_RNvMs_NtCsl148ggKCHvF_7fips20415motoko_preparedNtB4_6Reader6matrix": {
+      "bodySha256": "07d7dba931f01a320255e1ca1cf52b35ce0b5015ebec04b74ede6b9bd2de83c2",
+      "constantMemoryCopyLengths": [
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        4096,
+        16384
+      ],
+      "totalConstantMemoryCopyBytes": 98304,
+      "unalignedI32LoadSites": 8,
+      "sliceCheckFailureSites": 4
+    }
+  },
+  "review": [
+    "Vector source initializes all 1,024 i32 values and checks one 4,096-byte span. Generated code inlines vector filling and uses unaligned i32 loads; the previous 1,024-byte copy chain is absent from these consumers.",
+    "Unchanged Reader::matrix still contains twenty constant 4,096-byte copies plus one 16,384-byte copy. These static site sizes are not whole-operation dynamic copy totals or performance measurements.",
+    "No managed representation, allocation, forwarding, public-error, nominal type or cryptographic arithmetic change. Existing type/GC evidence remains separately pinned to its original artifact."
+  ]
+}
