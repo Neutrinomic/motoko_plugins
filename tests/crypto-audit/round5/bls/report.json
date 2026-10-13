@@ -1,0 +1,137 @@
+{
+  "baseline": "cf55e909fdb03f863f8e5fd67f9ef6fb15e891c4",
+  "finding": "No production bug found; test-only changes.",
+  "source_review": [
+    "Public module and compiler schema/generator/reference including nominal key authority, shape/batch checks, argument evaluation and status conversion.",
+    "Canonical field/scalar/group decoding, subgroup and infinity rules, maps and XMD domain handling.",
+    "Direct/prepared signature profiles, exact key/proof reuse, duplicate-message checking, key cancellation/grouping and error precedence.",
+    "Prepared payload and streaming pairing contracts, coefficient order, generator selection, identities and synchronous borrowed lifetimes; recent arithmetic audit and coverage inspected."
+  ],
+  "independent_review": "Separate read-only source/test review found no blocker; fixed helper false-output normalization weakness and added direct aggregate domain negatives in response.",
+  "oracle": {
+    "library": "py_ecc 8.0.0",
+    "test_secret_scalar": 5,
+    "fixture_count": 23,
+    "command": "/tmp/bls-reference-py/bin/python tests/crypto-audit/round5/bls/generate.py --check",
+    "result": "PASS; checked all 23 fixtures",
+    "dst_normalization": "RFC9380 5.3.3 for length 256; length 255 remains verbatim."
+  },
+  "artifact_reuse": {
+    "production_sources_unchanged": true,
+    "baseline_manifest_test_only_differences": [
+      "plugins/bls12-381/runtime/src/aggregate_tests.rs",
+      "plugins/bls12-381/runtime/src/tests.rs"
+    ],
+    "runtime_wasm": "ebc5fa2fd9fc6ed3698bd523f5101d4883ef51c0e7bf4783f4b2da64d691972c",
+    "plugin_cmxs": "24170dd83ddbdf6e64991825155e0ad29854efa0b9417267fbfcde1c94f36e68",
+    "moc": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+    "rts": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "rts_debug": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+  },
+  "execution": {
+    "environment": "Frozen SDK nix develop; SDK/bin first on PATH; MOTOKO_CORE frozen Core 2.5.0; CARGO_BUILD_JOBS=2; RUST_TEST_THREADS=2.",
+    "wrapper": "nix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/bls/_build/round5-bls/validate.sh",
+    "exit_code": 0,
+    "native": {
+      "command": "cargo test -p motoko-compute-bls12-381 --locked --offline --release --target-dir _build/round5-bls/target round5 -- --nocapture",
+      "passed": 4,
+      "failed": 0,
+      "seconds": 0.05,
+      "build_seconds": 12.84
+    },
+    "expectation_generation": {
+      "command": "test-runner -b -j2 -a <lane>/packages/fast/tests/fail/crypto-bls-prepared-blob-forge.mo <lane>/packages/fast/tests/fail/crypto-bls-prepared-pop-required.mo",
+      "passed": 2
+    },
+    "public_and_fail": {
+      "command": "test-runner -b -j2 <lane>/packages/fast/tests/run/crypto-bls-protocol.mo <lane>/packages/fast/tests/fail/crypto-bls-prepared-blob-forge.mo <lane>/packages/fast/tests/fail/crypto-bls-prepared-pop-required.mo",
+      "passed": 3,
+      "failed": 0,
+      "seconds": 26.72912785,
+      "public_phases": [
+        "typecheck",
+        "Motoko interpreter",
+        "IR interpreter",
+        "lowered IR interpreter",
+        "compile",
+        "Wasm validation",
+        "Wasm execution"
+      ],
+      "public_result_expectations": 37
+    },
+    "log": "_build/round5-bls/validate.log",
+    "log_sha256": "045b85e7eced41a879dd778323625ca335149f610195d812d09adb7fe91083c4",
+    "warning_note": "31 existing warnings from unchanged vendored bls12_381 (deprecated generic-array and must_use attributes); no new test warnings.",
+    "ash": "Four shared-suite methods added; execution delegated to central integration, not claimed here."
+  },
+  "inputs_sha256": {
+    "packages/fast/tests/ash/BLS12381Protocol.ash.json": "7fb356494e0d7ec2424f572e584afba08f20bcfc21042f012e22deaeeeeb70a6",
+    "packages/fast/tests/ash/BLS12381Protocol.mo": "e39ec9ab310bf6b4436a98da42fcba29e3d54e9e10708121542edf42a585b504",
+    "packages/fast/tests/bls/ProtocolSuite.mo": "b338623bd9e617f4d9fed76da3e32c6805fab85e391cfd773058dd10e817d634",
+    "packages/fast/tests/bls/ProtocolVectors.mo": "e6c8f0421ad685e63af395770e25a2b0270da7af9064b29fbab73c562dd7d484",
+    "packages/fast/tests/fail/crypto-bls-prepared-blob-forge.mo": "a0aabeee95a23adee40da681a6150c46925dd1b948f20ca5a374d6bab81f2394",
+    "packages/fast/tests/fail/crypto-bls-prepared-pop-required.mo": "722858c45c4d315dc8ac1d6fe10268863e7476c07ee05b510a31d3c55b4513f3",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-blob-forge.tc-human.ok": "1c19a5c459af8b8110083b52d2f2ca55da3f48db5dd037218d8bfb0f6d0b0527",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-blob-forge.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-blob-forge.tc.ok": "548a663aeccb30bc61872afaf133d88091056ed8636f9a70232b7a7b599efc24",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-blob-forge.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-pop-required.tc-human.ok": "2543fe9ccb5a0ae5665487af88e2ec9e89354d6bf920c894d4a4440d37b505d7",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-pop-required.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-pop-required.tc.ok": "4e093d808c84133678d256d25891d6e27ec9ba80443abc05a75287d4c682afd9",
+    "packages/fast/tests/fail/ok/crypto-bls-prepared-pop-required.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/run/crypto-bls-protocol.mo": "353e311f46ec576763b5d416f4f5a20c39d0b3cc9a19452aee2d886d59e918bf",
+    "plugins/bls12-381/runtime/src/aggregate_tests.rs": "02f8cf9eeb183aa6e40d0d61293dc81fa652a7536e01721e610994c9e8b1e721",
+    "plugins/bls12-381/runtime/src/round5_tests.rs": "faf3d3206d751d7c4d559d5469361f50a9d6c8dc8177997030d1fcf6a0bfe4c7",
+    "plugins/bls12-381/runtime/src/tests.rs": "805ef027fdef6c00ef612404d78804ff4652da0278a4e8d528d9ae7cba2a503f",
+    "tests/crypto-audit/round5/bls/generate.py": "bc4a19a6bf02a5dc3bdf2d4626c6a9dd7748ac8de5caeedd6dd51c943626dc51",
+    "tests/crypto-audit/round5/bls/vectors.tsv": "88dcd218f0a6c812652d7dc1feadc3852d351f906c49711260167ef2f4f78445"
+  },
+  "public_outputs": {
+    "packages/fast/tests/run/_out/crypto-bls-protocol.comp": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.diff-ir": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.diff-low": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.run": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.run-ir": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.run-low": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.tc": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.valid": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.wasm": {
+      "bytes": 3815973,
+      "sha256": "0fe164dd6826339b512c1b69571b4701863a7761b4cc3937dca81f2a0cd1a580"
+    },
+    "packages/fast/tests/run/_out/crypto-bls-protocol.wasm-run": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "limitations": [
+    "No new actual-GC-pressure evidence.",
+    "Full archived arithmetic/malformed corpora inspected, not rerun in this lane; shared integration runs native workspace coverage.",
+    "No formal proof, total Wasm stack bound or empirical side-channel certification.",
+    "No production runtime rebuild or performance claim, because only test code changed."
+  ]
+}

@@ -27,6 +27,8 @@ fn call(op: u32, a: &[u8], b: &[u8], c: &[u8]) -> Result<Vec<u8>, u32> {
     let size = match op {
         1 | 3 | 5 | 7 | 9 | 11 | 17 => 48,
         2 | 4 | 6 | 8 | 10 | 12 | 18 => 96,
+        22 => PREPARED_IC_BYTES,
+        23 | 24 => PREPARED_ETH_BYTES,
         _ => 1,
     };
     let buffers: Vec<_> = [a, b, c]

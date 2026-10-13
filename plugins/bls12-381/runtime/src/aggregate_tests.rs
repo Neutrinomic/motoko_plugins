@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "round5_tests.rs"]
+mod round5;
+
 #[path = "../vectors/aggregate.rs"]
 mod fixtures;
 
@@ -30,7 +33,7 @@ fn aggregate_call(op: u32, rows: &[AggregateInput<'_>], signature: &[u8]) -> Res
     }
     assert_eq!(output[0], 0x5a);
     assert_eq!(output[2], 0x5a);
-    if status == 0 { Ok(output[1] == 1) }
+    if status == 0 { assert!(output[1] <= 1); Ok(output[1] == 1) }
     else { assert_eq!(output, [0x5a; 3]); Err(status) }
 }
 
