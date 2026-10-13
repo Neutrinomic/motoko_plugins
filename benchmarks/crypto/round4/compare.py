@@ -107,8 +107,9 @@ def markdown(report):
              f'Target: `{PREPARED.cell(report["target_plugin"])}`. Baseline: `{PREPARED.cell(report["baseline"]["stage"])}`; '
              f'candidate: `{PREPARED.cell(report["candidate"]["stage"])}`.', "",
              "Three fresh canisters per case and revision; values are median [min–max]. Positive savings mean fewer instructions. "
-             "Every row measures the whole timed interval: direct/prepared batches contain N calls, prepare measures one factory, "
-             "and cold includes one factory plus N calls. No modeled costs or per-call division are used.", "",
+             "Every row measures the whole timed interval: direct/prepared batches contain N calls, prepare measures one preparation interval, "
+             "and cold includes preparation plus N calls. Preparation intervals may construct multiple keys, as recorded in workload metadata. "
+             "No modeled costs or per-call division are used.", "",
              "| Case | Mode/reuse | Baseline instructions | Candidate instructions | Saving | Speedup |",
              "|---|---|---:|---:|---:|---:|"]
     for row in report["cases"]:
