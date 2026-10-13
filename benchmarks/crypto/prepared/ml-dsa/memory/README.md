@@ -121,3 +121,65 @@ measured `run` method.
 **Status:** source prepared; this experiment has not yet been compiled or run.
 No measured retained-heap or recovery claim is made until its report passes the
 correctness and window-qualification checks above.
+
+## Executed study and post-hoc paired analysis
+
+The original experiment has now run: nine fresh canisters (three modes across
+three trials), with all 36 correctness checks passing and no execution or
+cleanup errors. The original report remains `complete: false`. Every stage
+failed its absolute heap-spread criterion: the last eight measurements span
+122,528 bytes, exceeding the unchanged 4 KiB limit. The earlier status above is
+retained as part of the original protocol description; it is superseded by this
+addendum, not by retroactively passing that protocol.
+
+Every forced-GC call allocated exactly 17,504 bytes in all modes and trials.
+The pinned RTS explains this amount: two 8,208-byte mark-stack tables, a 40-byte
+weak-reference registry container and a 1,048-byte partition-ranking array.
+Completing marking accesses the registry even when the actor has no weak
+references. These temporary objects remain garbage in the current allocation
+partition, which is excluded from evacuation. Repeated forced collection
+therefore cannot produce the absolute-flat-heap window assumed by the original
+protocol. The derivation, source hashes and line excerpts are preserved in
+[`paired-source-evidence.json`](paired-source-evidence.json).
+
+A **separate post-hoc analysis** pairs each prepared sample with the baseline
+at the same trial, stage and forced-GC index. It checks all 24 indices, not a
+selected subset. Every pair has the same allocation increments, zero derived
+evacuation-copy bytes, valid root counts and at least 64 MiB reclaimed during
+each stage. The observed differences are constant at all 24 indices in all
+three trials:
+
+| Prepared kind | Objects | Observed paired heap overhead | Per object | Paired overhead after drop |
+|---|---:|---:|---:|---:|
+| Public key | 32 | 659,200 B | 20,600 B | 0 B |
+| Secret key | 32 | 922,368 B | 28,824 B | 0 B |
+
+These measurements equal the respective private payload sizes plus a 24-byte
+managed Blob header. Dropping the roots and applying the same pressure/GC
+schedule recovers the entire observed paired overhead. Relative to baseline,
+that interval has zero extra allocation and exactly 659,200 / 922,368 bytes of
+extra reclamation, accounting for the disappearing public / secret overhead
+at every matched index. This is **observed paired heap overhead**, not an absolute live-heap measurement: collector phase
+is not exposed, common garbage remains, and paired cancellation does not prove
+all dead objects were reclaimed. The 24 points are a trajectory, not 24
+independent trials. The original study remains unqualified.
+
+[`paired-evidence.json`](paired-evidence.json) records the checks, all paired
+deltas and original artifact hashes. Reproduce the analysis without compiling
+or executing a canister:
+
+```sh
+python3 benchmarks/crypto/prepared/ml-dsa/memory/analyze-paired.py \
+  --report benchmarks/crypto/results/prepared-mldsa-memory/memory.json \
+  --source-evidence benchmarks/crypto/prepared/ml-dsa/memory/paired-source-evidence.json \
+  --out /tmp/mldsa-paired-evidence.json
+```
+
+The analyzer refuses an existing output. Its required inputs—the original
+report, build manifest and archived source file map—are committed, so paired
+arithmetic can be reproduced from a clean checkout. If the locally retained
+Wasm and full build-source archive are present, their hashes are also checked;
+the output distinguishes these checks from unavailable artifacts. The analyzer
+never changes the original report, thresholds, actor or runner. The measured
+report SHA-256 is
+`94c0c591bf5ba3842c354091805566eac96753a9a7b67d63a3a7497e76ed4cc3`.

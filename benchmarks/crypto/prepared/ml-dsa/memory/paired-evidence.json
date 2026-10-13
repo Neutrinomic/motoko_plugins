@@ -1,0 +1,2159 @@
+{
+  "format": "ml-dsa-paired-memory-analysis-v1",
+  "status": "post-hoc-observed-paired-heap-overhead",
+  "postHoc": true,
+  "pairedChecksPassed": true,
+  "originalProtocolPassed": false,
+  "interpretation": "Observed paired heap overhead under the fixed allocation/GC schedule. All 24 matching indices are checked before computing summaries; no absolute-heap threshold is relaxed. Source-derived common allocation is verified against measured increments, not fitted or subtracted as a trend. Present artifacts are hash-verified; missing optional Wasm/full-build artifacts are explicitly recorded, not claimed verified. This is not exact live memory, proof of completed GC, or proof of secure erasure. Samples within each trial are correlated; three deterministic trials show reproducibility, not statistical confidence.",
+  "inputs": {
+    "report": {
+      "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json",
+      "sha256": "94c0c591bf5ba3842c354091805566eac96753a9a7b67d63a3a7497e76ed4cc3"
+    },
+    "sourceEvidence": {
+      "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/prepared/ml-dsa/memory/paired-source-evidence.json",
+      "sha256": "05015514e7bb65d4e6d7cf8afce6d371ec7e4e59d86d8f65e81bb7df64e2f38a"
+    },
+    "analyzer": {
+      "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/prepared/ml-dsa/memory/analyze-paired.py",
+      "sha256": "5eaadd4375ed30fed66c8f540d3d77a0fd6a6151b5cc2f4ead701d993d801967"
+    },
+    "runProvenance": {
+      "runnerSha256": "299bb10f963b7bcb8688784e44e8013a4b5a43fa510d6d9e0026444e0f3fb70f",
+      "buildManifestSha256": "e6048893fdbd68bdedccd90c4a7cf831c2aead297b1748017da9ac4241b2ad8e",
+      "actorSha256": "e435d6e12385d6c956078f68e99a5410eeca54cda86cae8d7b25b7087bf2ec16",
+      "wasmSha256": "d92a1af1a564eee9666920af2955c6d92e7d1c08cb9cdae9d7172f84eb46b2dc",
+      "wasmBytes": 394617,
+      "fixturesSha256": "0eff0497924314afc8f543cfec31c1f4e8a19fa226af86c5e7340d83e9aa7122",
+      "fixtureTcId": 4,
+      "fixtureSourceCommit": "975de31eb83d87039ec88934fdc47d8c312b892d",
+      "fixtureSourceCorpusSha256": "cb0fd2c5c949d87154017e9442b09cae9c651ed11c7f11d7a9c7438c4f33f595",
+      "expectedSignatureSha256": "5fc71d2d72ff846b63a02d5d89eded345d3c32c0af63458cef4fb2bbfa97faa2",
+      "compilerVersion": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+      "compilerSha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+      "nodeVersion": "v24.11.1",
+      "runtimeVersions": {
+        "node": "24.11.1",
+        "acorn": "8.15.0",
+        "ada": "3.3.0",
+        "amaro": "1.1.4",
+        "ares": "1.34.5",
+        "brotli": "1.1.0",
+        "cjs_module_lexer": "2.1.0",
+        "cldr": "46.0",
+        "icu": "76.1",
+        "llhttp": "9.3.0",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.1",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.66.0",
+        "openssl": "3.4.3",
+        "simdjson": "4.0.7",
+        "simdutf": "6.4.0",
+        "sqlite": "3.48.0",
+        "tz": "2024b",
+        "undici": "7.16.0",
+        "unicode": "16.0",
+        "uv": "1.51.0",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.10-node.28",
+        "zlib": "1.3.1",
+        "zstd": "1.5.7"
+      },
+      "rts": {
+        "mo-rts.wasm": {
+          "sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+          "bytes": 203637
+        },
+        "mo-rts-debug.wasm": {
+          "sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+          "bytes": 7636686
+        }
+      },
+      "pocketIcPath": "/home/devbox/.local/bin/pocket-ic",
+      "pocketIcSha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990",
+      "pocketIcVersion": "pocket-ic-server 10.0.0",
+      "nodeExecutableSha256": "eb0e7326b8ca3c18ae3ce878566c8c154b88132c28c794f337f0f69b521d7495",
+      "sdkPackageSha256": "1b9657bd221af91a86ab161ed86815463c645b48180f18607a4e4c97c3843c75",
+      "@icp-sdk/core/candid": {
+        "entryPath": "/srv/shared/code/candidx/ts/node_modules/@icp-sdk/core/lib/cjs/candid/index.js",
+        "entrySha256": "2f06723a6cbdbb8d3d09f01ae471c1cd0170d35ca57d14e512d137d2716fdb27"
+      },
+      "@icp-sdk/core/principal": {
+        "entryPath": "/srv/shared/code/candidx/ts/node_modules/@icp-sdk/core/lib/cjs/principal/index.js",
+        "entrySha256": "96637e1ec315d5ff4288ebef2bbc606bb35b26e358824065f7a8488ef4fdf5e7"
+      },
+      "icpSdk": {
+        "version": "6.1.0",
+        "packageSha256": "fa36afe5d7a03656a57761096faa7a13e8b6479be018f7e57527230ef7854245"
+      }
+    },
+    "verifiedArtifacts": {
+      "sourceArchive": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json.sources.json.gz",
+        "sha256": "c71a2cc49f1e7305ac7e7fc8583c6242c46ebec67eec2c4489eab7d7fe70a135",
+        "bytes": 138318
+      },
+      "wasm": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json.wasm",
+        "sha256": "d92a1af1a564eee9666920af2955c6d92e7d1c08cb9cdae9d7172f84eb46b2dc",
+        "bytes": 394617
+      },
+      "fullBuildSourceArchive": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/sources.tar.gz",
+        "sha256": "5996e9920217e746829a817da1fa6737d086f6aeb41c939d2727c0ae35a54ee5",
+        "bytes": 5208986
+      },
+      "transportTrace": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json.transport.ndjson",
+        "sha256": "4ca42a32c277ca8b1e0ae02b01478e8950b223a2593a8c5851fb577a272bd784",
+        "bytes": 2200598
+      },
+      "serverLog": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "compressedTransportTrace": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/memory.json.transport.ndjson.gz",
+        "compressedSha256": "f6875809f8a6a2e97d825620b13631d9425c932b248aba64298dadf70bf57988",
+        "uncompressedSha256": "4ca42a32c277ca8b1e0ae02b01478e8950b223a2593a8c5851fb577a272bd784"
+      },
+      "buildManifest": {
+        "status": "verified-present-file",
+        "path": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/benchmarks/crypto/results/prepared-mldsa-memory/build.json",
+        "sha256": "e6048893fdbd68bdedccd90c4a7cf831c2aead297b1748017da9ac4241b2ad8e"
+      }
+    }
+  },
+  "checks": {
+    "distinctCanisters": 9,
+    "correctnessOracles": 36,
+    "snapshots": 531,
+    "gcPointsPerStage": 24,
+    "minimumStageReclaimedBytes": 67108864,
+    "gcAllocationIncrementBytes": 17504,
+    "zeroCopyBytesAtEveryGcPoint": true,
+    "constantPairedOverheadAtEveryGcPoint": true,
+    "maximumAbsoluteDropResidualBytes": 0
+  },
+  "originalAbsoluteQualification": {
+    "complete": false,
+    "status": "incomplete-needs-investigation",
+    "stageFailures": [
+      {
+        "trial": 0,
+        "mode": 0,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 0,
+        "mode": 0,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 0,
+        "mode": 1,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 0,
+        "mode": 1,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 0,
+        "mode": 2,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 0,
+        "mode": 2,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 1,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 1,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 2,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 2,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 0,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 1,
+        "mode": 0,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 2,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 40032976,
+            "median": 40094240,
+            "max": 40155504
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 2,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 0,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 0,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 1,
+        "stage": "retained",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39769808,
+            "median": 39831072,
+            "max": 39892336
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      },
+      {
+        "trial": 2,
+        "mode": 1,
+        "stage": "dropped",
+        "originalCriteria": {
+          "meaningfulReclamation": true,
+          "boundedTailHeapSpread": false,
+          "zeroEvacuationCopiesInTail": true
+        },
+        "rawTail": {
+          "heapOccupiedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "allocationMinusReclaimedBytes": {
+            "min": 39110608,
+            "median": 39171872,
+            "max": 39233136
+          },
+          "evacuationCopiesBytes": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          }
+        }
+      }
+    ]
+  },
+  "comparisons": [
+    {
+      "trial": 0,
+      "mode": 1,
+      "name": "public",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 659200
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 659200,
+            "median": 659200.0,
+            "max": 659200
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 660224,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 659200
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 659200,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 659200,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 659200,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 659200,
+      "observedHeapOverheadBytesPerKey": 20600.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 659200,
+          "median": 659200.0,
+          "max": 659200
+        },
+        "heapOverheadChangeBytes": {
+          "min": -659200,
+          "median": -659200.0,
+          "max": -659200
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "mode": 2,
+      "name": "secret",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 922368
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 922368,
+            "median": 922368.0,
+            "max": 922368
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 923392,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 922368
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 922368,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 922368,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 922368,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 922368,
+      "observedHeapOverheadBytesPerKey": 28824.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 922368,
+          "median": 922368.0,
+          "max": 922368
+        },
+        "heapOverheadChangeBytes": {
+          "min": -922368,
+          "median": -922368.0,
+          "max": -922368
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "mode": 1,
+      "name": "public",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 659200
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 659200,
+            "median": 659200.0,
+            "max": 659200
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 660224,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 659200
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 659200,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 659200,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 659200,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 659200,
+      "observedHeapOverheadBytesPerKey": 20600.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 659200,
+          "median": 659200.0,
+          "max": 659200
+        },
+        "heapOverheadChangeBytes": {
+          "min": -659200,
+          "median": -659200.0,
+          "max": -659200
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "mode": 2,
+      "name": "secret",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 922368
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 922368,
+            "median": 922368.0,
+            "max": 922368
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 923392,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 922368
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 922368,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 922368,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 922368,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 922368,
+      "observedHeapOverheadBytesPerKey": 28824.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 922368,
+          "median": 922368.0,
+          "max": 922368
+        },
+        "heapOverheadChangeBytes": {
+          "min": -922368,
+          "median": -922368.0,
+          "max": -922368
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "mode": 1,
+      "name": "public",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 659200
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 659200
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 659200,
+            "median": 659200.0,
+            "max": 659200
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 660224,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 659200
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 659200,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 659200,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 659200,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 659200,
+      "observedHeapOverheadBytesPerKey": 20600.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 659200,
+          "median": 659200.0,
+          "max": 659200
+        },
+        "heapOverheadChangeBytes": {
+          "min": -659200,
+          "median": -659200.0,
+          "max": -659200
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "mode": 2,
+      "name": "secret",
+      "stages": [
+        {
+          "name": "retained",
+          "pairedPoints": [
+            {
+              "label": "retained/gc/1",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/2",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/3",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/4",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/5",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/6",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/7",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/8",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/9",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/10",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/11",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/12",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/13",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/14",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/15",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/16",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/17",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/18",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/19",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/20",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/21",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/22",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/23",
+              "heapOverheadBytes": 922368
+            },
+            {
+              "label": "retained/gc/24",
+              "heapOverheadBytes": 922368
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 922368,
+            "median": 922368.0,
+            "max": 922368
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 923392,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 1024,
+            "endingHeapExcessBytes": 922368
+          }
+        },
+        {
+          "name": "dropped",
+          "pairedPoints": [
+            {
+              "label": "dropped/gc/1",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/2",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/3",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/4",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/5",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/6",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/7",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/8",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/9",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/10",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/11",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/12",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/13",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/14",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/15",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/16",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/17",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/18",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/19",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/20",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/21",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/22",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/23",
+              "heapOverheadBytes": 0
+            },
+            {
+              "label": "dropped/gc/24",
+              "heapOverheadBytes": 0
+            }
+          ],
+          "heapOverheadBytes": {
+            "min": 0,
+            "median": 0.0,
+            "max": 0
+          },
+          "allocationConservation": {
+            "startingHeapExcessBytes": 922368,
+            "stageAllocationExcessBytes": 0,
+            "stageReclamationExcessBytes": 922368,
+            "endingHeapExcessBytes": 0
+          }
+        }
+      ],
+      "retainedHeapOverheadBytes": 922368,
+      "dropResidualBytes": 0,
+      "recoveredHeapOverheadBytes": 922368,
+      "observedHeapOverheadBytesPerKey": 28824.0,
+      "retainedToDroppedConservation": {
+        "matchingIndicesChecked": 24,
+        "allocationExcessChangeBytes": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        },
+        "reclamationExcessChangeBytes": {
+          "min": 922368,
+          "median": 922368.0,
+          "max": 922368
+        },
+        "heapOverheadChangeBytes": {
+          "min": -922368,
+          "median": -922368.0,
+          "max": -922368
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "format": "ml-dsa-prepared-memory-paired-source-evidence-v1",
+  "purpose": "Source explanation for a separate post-hoc observed paired heap overhead analysis. This does not change the original failed absolute-heap protocol or establish exact live heap.",
+  "original_report_path": "benchmarks/crypto/results/prepared-mldsa-memory/memory.json",
+  "original_report_sha256": "94c0c591bf5ba3842c354091805566eac96753a9a7b67d63a3a7497e76ed4cc3",
+  "expected_gc_allocation_increment_bytes": 17504,
+  "expected_keys": 32,
+  "expected_trials": 3,
+  "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "rts_release_sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+  "source_binary_relation": "The measured build pins this release RTS artifact from this SDK worktree; the source excerpts match the recorded SDK commit. This analysis verifies those files and artifact hashes, not a new reproducible RTS build.",
+  "original_provenance": {
+    "runnerSha256": "299bb10f963b7bcb8688784e44e8013a4b5a43fa510d6d9e0026444e0f3fb70f",
+    "buildManifestSha256": "e6048893fdbd68bdedccd90c4a7cf831c2aead297b1748017da9ac4241b2ad8e",
+    "actorSha256": "e435d6e12385d6c956078f68e99a5410eeca54cda86cae8d7b25b7087bf2ec16",
+    "wasmSha256": "d92a1af1a564eee9666920af2955c6d92e7d1c08cb9cdae9d7172f84eb46b2dc",
+    "fixturesSha256": "0eff0497924314afc8f543cfec31c1f4e8a19fa226af86c5e7340d83e9aa7122"
+  },
+  "original_artifact_sha256": {
+    "wasm": "d92a1af1a564eee9666920af2955c6d92e7d1c08cb9cdae9d7172f84eb46b2dc",
+    "sourceArchive": "c71a2cc49f1e7305ac7e7fc8583c6242c46ebec67eec2c4489eab7d7fe70a135",
+    "fullBuildSourceArchive": "5996e9920217e746829a817da1fa6737d086f6aeb41c939d2727c0ae35a54ee5",
+    "serverLog": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transportTrace": "4ca42a32c277ca8b1e0ae02b01478e8950b223a2593a8c5851fb577a272bd784"
+  },
+  "calculation": {
+    "word_bytes": 8,
+    "blob_header_bytes": 24,
+    "ordinary_mark_stack": {
+      "count": 1,
+      "bytes_each": 8208,
+      "expression": "alloc_blob(size_of(StackTable)): 24 + (24 + 2*8 + 1018*8)"
+    },
+    "weak_registry_mark_stack": {
+      "count": 1,
+      "bytes_each": 8208,
+      "expression": "same MarkStack allocation, even when no Weak values are present"
+    },
+    "weak_registry_container": {
+      "count": 1,
+      "bytes_each": 40,
+      "expression": "24 + size_of(MarkStack) = 24 + 2*8"
+    },
+    "partition_ranking_array": {
+      "count": 1,
+      "bytes_each": 1048,
+      "expression": "24 + 128*8"
+    },
+    "sum_bytes": 17504
+  },
+  "explanation": [
+    "The trigger replies without Candid allocation, then forces an incremental_gc call. A trigger can start, advance or finish a cycle; no authoritative cycle counter was recorded.",
+    "Marking starts with a fresh ordinary MarkStack. complete_marking unconditionally accesses the weak-reference registry, lazily constructing another stack and its container even without Weak values.",
+    "Evacuation planning allocates a temporary ranking array with one 8-byte index per partition. This workload uses the initial 128-entry partition table.",
+    "Every allocation above uses managed Blob storage. Temporary GC objects become garbage; the current allocation partition is excluded from evacuation, so repeated forced cycles can increase occupied heap.",
+    "The source-derived 17504 bytes exactly matches each observed total-allocation increment across all modes, stages, trials and 24 forced-trigger positions. Beyond the first trigger in each stage, occupied heap also rises by 17504 bytes with no new reclaim.",
+    "Consequently the original absolute 4096-byte tail-spread criterion fails in every mode. Pairing each prepared sample with its baseline at the same trial/stage/trigger index cancels the observed identical bookkeeping contribution; this remains a post-hoc observational comparison, not exact live-heap measurement."
+  ],
+  "rts_sources": [
+    {
+      "path": "rts/motoko-rts/src/memory.rs",
+      "sha256": "1fb55e4b36389dbf1af84ca5f01d7b01b55399b3fc724e88b44edb6c3a350e75",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 49,
+          "last_line": 60,
+          "text": "/// Allocate a new blob.\n/// Note: After initialization, the post allocation barrier needs to be applied to all mutator objects.\n/// For RTS-internal blobs that can be collected by the next GC run, the post allocation barrier can be omitted.\n#[ic_mem_fn]\npub unsafe fn alloc_blob<M: Memory>(mem: &mut M, tag: Tag, size: Bytes<usize>) -> Value {\n    debug_assert!(is_blob_tag(tag));\n    let ptr = mem.alloc_words(size_of::<Blob>() + size.to_words());\n    // NB. Cannot use `as_blob` here as we didn't write the header yet\n    let blob = ptr.get_ptr() as *mut Blob;\n    (*blob).header.tag = tag;\n    (*blob).header.init_forward(ptr);\n    (*blob).len = size;\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/types.rs",
+      "sha256": "3175db649bebacd15e438cb1383b0e87a26058684d3d299b19e8ce45b5bcd0be",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 547,
+          "last_line": 554,
+          "text": "// Common parts of any object. Other object pointers can be coerced into a pointer to this.\n#[repr(C)] // See the note at the beginning of this module\npub struct Obj {\n    pub tag: Tag,\n    // Cannot use `#[incremental_gc]` as Rust only allows non-macro attributes for fields.\n    /// Forwarding pointer to support object moving in the incremental GC.\n    pub forward: Value,\n}\n"
+        },
+        {
+          "first_line": 723,
+          "last_line": 729,
+          "text": "\n#[repr(C)] // See the note at the beginning of this module\npub struct Blob {\n    pub header: Obj,\n    pub len: Bytes<usize>,\n    // data follows ..\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/gc/incremental/mark_stack.rs",
+      "sha256": "a89b513c86b0900dc8db86ca9f5edb5ff49475f516115d3ef0e9cbb288e9aea3",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 34,
+          "last_line": 58,
+          "text": "#[repr(C)]\npub struct MarkStack {\n    last: *mut StackTable,\n    top: usize, // index of next free entry in the last stack table\n}\n\npub const STACK_TABLE_CAPACITY: usize = 1018;\n\npub const STACK_EMPTY: Value = Value::from_ptr(0);\n\n#[repr(C)]\nstruct StackTable {\n    pub header: Blob,\n    pub previous: *mut StackTable,\n    pub next: *mut StackTable,\n    pub entries: [Value; STACK_TABLE_CAPACITY],\n}\n\nimpl MarkStack {\n    pub unsafe fn new<M: Memory>(mem: &mut M) -> MarkStack {\n        let table = Self::new_table(mem, null_mut());\n        MarkStack {\n            last: table,\n            top: 0,\n        }\n"
+        },
+        {
+          "first_line": 98,
+          "last_line": 103,
+          "text": "    unsafe fn new_table<M: Memory>(mem: &mut M, previous: *mut StackTable) -> *mut StackTable {\n        // No post allocation barrier as this RTS-internal blob will be collected by the GC.\n        let table = alloc_blob(mem, TAG_BLOB_B, size_of::<StackTable>().to_bytes()).as_blob_mut()\n            as *mut StackTable;\n        (*table).previous = previous;\n        (*table).next = null_mut();\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/persistence.rs",
+      "sha256": "4615fc648e56d9c0e55ce4c60d14831e6e50b12effaba3ac1a53b424a9373eb0",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 323,
+          "last_line": 335,
+          "text": "pub(crate) unsafe fn get_weak_ref_registry<M: Memory>(mem: &mut M) -> &'static mut MarkStack {\n    debug_assert!((*PersistentMetadata::get()).weak_ref_registry.get_raw() != 0);\n\n    // Lazy initialization of the weak reference registry.\n    if is_weak_ref_registry_null() {\n        // This can be run during an increment from a version of the RTS without weak reference\n        // support. In this case, the weak reference registry is NULL_POINTER (see the initial migration\n        // in function `initialize_memory`).\n        // We need to properly initialize it so that it can be used if needed.\n        // Also certain assertions in the weak reference code rely on an existing\n        // weak reference registry on which we can call is_empty().\n        initialize_weak_ref_registry(mem);\n    }\n"
+        },
+        {
+          "first_line": 344,
+          "last_line": 365,
+          "text": "unsafe fn initialize_weak_ref_registry<M: Memory>(mem: &mut M) {\n    debug_assert!((*PersistentMetadata::get()).weak_ref_registry == NULL_POINTER);\n    // Allocate a pointer to a MarkStack object explicitly on the heap, through a blob.\n    // No barrier needed, the lifetime of the whole weak reference registry\n    // is just during the GC marking phase. After this it can be garbage collected.\n    // Every GC phase will reinitialize the weak reference registry.\n    let markstack_blob = alloc_blob(mem, TAG_BLOB_B, Bytes(size_of::<MarkStack>()));\n    let markstack_ptr = markstack_blob.as_blob_mut() as *mut MarkStack;\n    // Initialize the MarkStack object inside this pointer.\n    *markstack_ptr = MarkStack::new(mem);\n\n    let metadata = PersistentMetadata::get();\n    // Barrier is not needed here, as object is transitional and\n    // thus marking of previous weak ref object is not needed.\n    (*metadata).weak_ref_registry = Value::from_ptr(markstack_ptr as usize);\n}\n\n/// Clear the weak reference registry in persistent metadata.\n/// This is done only after the marking phase is finished.\npub(crate) unsafe fn clear_weak_ref_registry() {\n    let metadata = PersistentMetadata::get();\n    (*metadata).weak_ref_registry = NULL_POINTER;\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/gc/incremental/phases/mark_increment.rs",
+      "sha256": "55e0d5a31deeaa384c2c05fe26f08cce4127dfbe833181118463dfe8f181ffe6",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 33,
+          "last_line": 45,
+          "text": "\nimpl<'a, M: Memory + 'a> MarkIncrement<'a, M> {\n    pub unsafe fn start_phase(mem: &mut M, state: &mut State, time: &mut BoundedTime) {\n        state.partitioned_heap.start_collection(mem, time);\n        debug_assert!(state.mark_state.is_none());\n        let mark_stack = MarkStack::new(mem);\n\n        state.mark_state = StableOption::Some(MarkState {\n            mark_stack,\n            complete: false,\n        });\n    }\n\n"
+        },
+        {
+          "first_line": 175,
+          "last_line": 187,
+          "text": "    unsafe fn complete_marking(&mut self) {\n        debug_assert!(!*self.complete);\n        *self.complete = true;\n\n        #[cfg(feature = \"ic\")]\n        {\n            // Process all weak references collected during marking.\n            // If the target object is not marked, clear the weak reference.\n            loop {\n                let weak_ref_value = get_weak_ref_registry(self.mem).pop();\n                if weak_ref_value == STACK_EMPTY {\n                    break;\n                }\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/gc/incremental/partitioned_heap.rs",
+      "sha256": "4166cf48f196c461fd01c18d4232a8c6d9da531f8930c18a2dc946ce52ae602c",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 78,
+          "last_line": 83,
+          "text": "pub const PARTITION_SIZE: usize = 64 * 1024 * 1024;\n\n/// Number of entries per partition table.\n/// Tables are linearly linked, allowing the usage of the entire address space.\n/// Maximum contiguous space is `(PARTITION_PER_TABLE - 1) * PARTITION_SIZE`.\nconst PARTITIONS_PER_TABLE: usize = 128; // 8 GB of space for 64 MB partitions and 4 GB for 32 MB partitions.\n"
+        },
+        {
+          "first_line": 510,
+          "last_line": 519,
+          "text": "\nimpl PartitionedHeap {\n    pub fn new(heap_base: usize) -> PartitionedHeap {\n        let number_of_partitions = PARTITIONS_PER_TABLE;\n        let allocation_index = heap_base / PARTITION_SIZE;\n        let mut partition_table = PartitionTable::new(0, heap_base);\n        for index in 0..allocation_index + 1 {\n            partition_table.partitions[index].free = false;\n        }\n        let free_partitions = number_of_partitions - allocation_index - 1;\n"
+        },
+        {
+          "first_line": 726,
+          "last_line": 731,
+          "text": "        let ranked_partitions = self.rank_partitions_by_garbage(mem);\n        for rank in 0..self.number_of_partitions {\n            let index = *ranked_partitions.add(rank);\n            if index != self.allocation_index && self.get_partition(index).is_evacuation_candidate()\n            {\n                let partition = self.mutable_partition(index);\n"
+        },
+        {
+          "first_line": 744,
+          "last_line": 753,
+          "text": "    unsafe fn temporary_array<M: Memory>(mem: &mut M, length: usize) -> *mut usize {\n        // No post allocation barrier as this RTS-internal blob can be collected by the GC.\n        let blob = alloc_blob(mem, TAG_BLOB_B, Words(length).to_bytes());\n        let payload = blob.as_blob_mut().payload_addr();\n        payload as *mut usize\n    }\n\n    unsafe fn rank_partitions_by_garbage<M: Memory>(&self, mem: &mut M) -> *mut usize {\n        let ranked_partitions = Self::temporary_array(mem, self.number_of_partitions);\n        for index in 0..self.number_of_partitions {\n"
+        },
+        {
+          "first_line": 776,
+          "last_line": 796,
+          "text": "    pub unsafe fn complete_collection(&mut self) {\n        for partition in self.partitions() {\n            let marked_size = partition.marked_size;\n            partition.update = false;\n            partition.marked_size = 0;\n            partition.bitmap.release();\n            if partition.to_be_evacuated() {\n                debug_assert!(partition.index != self.allocation_index);\n                debug_assert!(partition.dynamic_size >= marked_size);\n                self.reclaimed += (partition.dynamic_size - marked_size) as u64;\n            }\n            if partition.to_be_evacuated() || partition.temporary {\n                self.precomputed_heap_size -= partition.dynamic_size;\n                partition.free();\n                self.free_partitions += 1;\n            }\n        }\n        self.evacuating = false;\n        self.evacuated_size = 0;\n        self.bitmap_allocation_pointer = 0;\n        debug_assert!(self.gc_running);\n"
+        },
+        {
+          "first_line": 859,
+          "last_line": 874,
+          "text": "    pub fn occupied_size(&self) -> Bytes<usize> {\n        Bytes(self.precomputed_heap_size + self.allocation_partition().dynamic_size)\n    }\n\n    pub fn reclaimed_size(&self) -> Bytes<u64> {\n        Bytes(self.reclaimed)\n    }\n\n    pub fn increase_evacuated_size(&mut self, size: Words<usize>) {\n        self.evacuated_size += size.to_bytes().as_usize();\n    }\n\n    pub fn total_allocated_size(&self) -> Bytes<u64> {\n        debug_assert!(self.evacuated_size <= self.occupied_size().as_usize());\n        let heap_size_without_evacuations = self.occupied_size().as_usize() - self.evacuated_size;\n        Bytes(heap_size_without_evacuations as u64) + self.reclaimed_size()\n"
+        }
+      ]
+    },
+    {
+      "path": "rts/motoko-rts/src/gc/incremental.rs",
+      "sha256": "55a1eac265786b6ae2b0c907c1bedfaf8597ac105cfe882ccfa087b906ecd61d",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 69,
+          "last_line": 79,
+          "text": "unsafe fn incremental_gc<M: Memory>(mem: &mut M) {\n    use self::roots::root_set;\n    let state = get_incremental_gc_state();\n    assert!(state.phase() != Phase::Stop);\n    if state.phase() == Phase::Pause {\n        record_gc_start::<M>();\n    }\n    IncrementalGC::instance(mem, state).empty_call_stack_increment(root_set());\n    if state.phase() == Phase::Pause {\n        record_gc_stop::<M>();\n    }\n"
+        },
+        {
+          "first_line": 91,
+          "last_line": 100,
+          "text": "unsafe fn record_gc_stop<M: Memory>() {\n    use crate::memory::ic::{self, partitioned_memory};\n\n    let heap_size = partitioned_memory::get_heap_size();\n    let static_size = Bytes(ic::get_aligned_heap_base());\n    debug_assert!(heap_size >= static_size);\n    let dynamic_size = heap_size - static_size;\n    let state = get_incremental_gc_state();\n    state.statistics.max_live = ::core::cmp::max(state.statistics.max_live, dynamic_size);\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "src/codegen/compile.ml",
+      "sha256": "bcc433801a346e283900e241de781660620cff7b2d2554641891cf4f0a5f51f6",
+      "matches_sdk_revision": true,
+      "excerpts": [
+        {
+          "first_line": 10485,
+          "last_line": 10513,
+          "text": "  let export_gc_trigger_method env =\n    let name = IC.gc_trigger_method_name in\n    begin match E.mode env with\n    | Flags.ICMode ->\n      Func.define_built_in env name [] [] (fun env ->\n        (* THe GC trigger is also blocked during incremental (de)stabilization.\n           This is checked in `Lifecycle.trans` being called by `message_start` *)\n        message_start env (Type.Shared Type.Write) ^^\n        (* Check that we are called from this or a controller, w/o allocation *)\n        IC.assert_caller_self_or_controller env ^^\n        (* To avoid more failing allocation, don't deserialize args nor serialize reply,\n           i.e. don't even try to do this:\n        Serialization.deserialize env [] ^^\n        Tuple.compile_unit env ^^\n        Serialization.serialize env [] ^^\n        *)\n        (* Instead, just ignore the argument and\n           send a *statically* allocated, nullary reply *)\n        IC.static_nullary_reply env ^^\n        (* Finally, act like\n        message_cleanup env (Type.Shared Type.Write)\n           but *force* collection *)\n        GC.record_mutator_instructions env ^^\n        E.collect_garbage env true ^^\n        GC.record_collector_instructions env ^^\n        Lifecycle.trans env Lifecycle.Idle\n      );\n\n      let fi = E.built_in env name in\n"
+        }
+      ]
+    }
+  ]
+}
