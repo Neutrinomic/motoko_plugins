@@ -41,7 +41,7 @@
     "Raw native trusted-payload entry points require protected factory outputs; arbitrary forged private limb payloads are intentionally outside their contract.",
     "Prepared values are caller-owned local managed Blobs, not a stable wire format; they must be recreated after upgrades."
   ],
-  "approval": "Prepared BLS source, semantics, protected type boundaries and actual compiled-artifact lifecycle approved; performance assessment remains separate.",
+  "approval": "Prepared BLS source, semantics, protected type boundaries, actual compiled-artifact lifecycle and independently checked performance evidence approved; no production findings.",
   "source_sha256": {
     "plugins/bls12-381/compiler/bls_pairing.mli": "3c60efafe7367d62844c0dc00d34149a196e6e72cbc965e0cbcfd6e8e34005a2",
     "plugins/bls12-381/compiler/bls_hash.ml": "c5cb7d8291b439d1f71c9239e10693938c440257f9973f617a09de4b72041af8",
@@ -190,5 +190,21 @@
     "payload_scope": "Payload bytes only, excluding managed headers, arrays, wrappers and scratch.",
     "metrics_caveat": "Ash returns Test.test on an empty final callback; its529 instructions/0B measure that callback, not GC pressure or cryptographic work. The complete async body and reclamation assertion execute before the returned metrics."
   },
-  "evidence_note": "Ash phase captured an earlier draft report.json as ancillary test metadata; its exact bytes are preserved at evidence/ash-final/audit-report-before-finalization.json. This final report replaces that metadata only; compiled test input hashes are retained separately."
+  "evidence_note": "Ash phase captured an earlier draft report.json as ancillary test metadata; its exact bytes are preserved at evidence/ash-final/audit-report-before-finalization.json. This final report replaces that metadata only; compiled test input hashes are retained separately.",
+  "performance_validation": {
+    "status": "pass",
+    "review": "performance-review.json",
+    "review_sha256": "a75dd91321de5577789a4d62b19457b13781288a00a8a0f6282d38c499ab81e9",
+    "reviewer_script": "review-performance.py",
+    "reviewer_script_sha256": "72808a6520db86bf42970051e31a35df66f2eb7b226dbaab9504a1aa83e287a2",
+    "observations": 72,
+    "frozen_inputs_rehashed": 696,
+    "wasm_artifacts_rehashed": 24,
+    "comparison_groups": 8,
+    "modeled_reuse_rows_recomputed": 32,
+    "documentation_correction_commit": "2f544d2",
+    "command": "python3 tests/crypto-audit/prepared/bls12-381/review-performance.py --stage /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/benchmarks/crypto/prepared/results/prepared-bls12-381-final --output tests/crypto-audit/prepared/bls12-381/performance-review.json",
+    "exit_code": 0,
+    "stdout": "PASS: 696 frozen files, 24 Wasm artifacts, 72 observations, 8 groups; all statistics and models match."
+  }
 }

@@ -49,3 +49,26 @@ and retained memory belong in the separate benchmark report.
 `hooks-review/source-review.json` independently checks upstream provenance and
 the narrow vendored coefficient hooks. This is source and functional review,
 not a formal proof or external security certification.
+
+The independent [performance review](performance-review.json) also **passes**.
+`review-performance.py` rehashes 696 frozen inputs and all 24 canister Wasms,
+matches the plugin artifacts and public module to the executed correctness audit,
+and independently recomputes all 72 observations, eight comparison groups and
+32 arithmetic reuse models. Direct and prepared controls use the same improved
+runtime, including the shared generator table. Hot verification saves 4.27–69.74%
+of instructions on these fixtures; preparation is measured separately.
+
+Most workloads first become cheaper on their second modeled use. Eight references
+to one prepared Ethereum key first become cheaper at one use, by only 26,600
+instructions; eight separately prepared equal values need eight uses. The latter
+executes eight factories and retains 1,152 payload bytes instead of 144, with the
+same cryptographic inputs and hot verification cost. Much of the Ethereum
+aggregate gain reuses factory-validated PoPs; each call still verifies its signature.
+Prepared actors add 2,072–17,566 Wasm bytes compared with their direct controls.
+
+The benchmark reported zero reclaimed bytes at every snapshot. Its allocation
+and occupied-heap samples do not establish retained live or peak memory; the
+separate Ash test above establishes collection correctness. The owner corrected
+an obsolete fixture-count sentence and clarified factory caching in `2f544d2`;
+the immutable measured stage and all actor bytes remain unchanged. No production
+or performance-evidence findings remain.
