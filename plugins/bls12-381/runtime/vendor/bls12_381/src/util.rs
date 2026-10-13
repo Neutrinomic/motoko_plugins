@@ -46,14 +46,13 @@ pub const fn mac(a: u64, b: u64, c: u64, carry: u64) -> (u64, u64) {
     // WebAssembly has no widening multiply. Keep the four 32-bit products
     // inline instead of calling the compiler's generic u128 multiply helper.
     const MASK: u64 = 0xffff_ffff;
-    let low = (b & MASK) * (c & MASK);
-    let middle = (b >> 32) * (c & MASK) + (low >> 32);
-    let cross = (b & MASK) * (c >> 32) + (middle & MASK);
+    // Add the low and high halves of each addend to the partial products.
+    // Every sum is bounded by (2^32 - 1)^2 + 2 * (2^32 - 1) = 2^64 - 1.
+    let low = (b & MASK) * (c & MASK) + (a & MASK) + (carry & MASK);
+    let middle = (b >> 32) * (c & MASK) + (low >> 32) + (a >> 32);
+    let cross = (b & MASK) * (c >> 32) + (middle & MASK) + (carry >> 32);
     let high = (b >> 32) * (c >> 32) + (middle >> 32) + (cross >> 32);
-    let low = (cross << 32) | (low & MASK);
-    let (low, carry_a) = low.overflowing_add(a);
-    let (low, carry_b) = low.overflowing_add(carry);
-    (low, high + (carry_a as u64) + (carry_b as u64))
+    ((cross << 32) | (low & MASK), high)
 }
 
 #[test]
