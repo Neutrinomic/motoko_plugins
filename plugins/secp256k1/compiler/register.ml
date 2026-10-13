@@ -65,8 +65,16 @@ module Generator (Operation : sig val operation : operation end) = struct
       let locals = List.mapi (fun i argument ->
         let set, get = new_local env ("secp256k1_arg" ^ string_of_int i) in
         argument ^^ set, get) arguments in
-      let set_output, output = new_local env "secp256k1_output" in
       let set_status, status = new_local env "secp256k1_status" in
+      let output_setup, output_pointer, success =
+        if operation.predicate then
+          G.nop, num 0, status ^^ num 0 ^^ compile_comparison Wasm_exts.Ast.I64Op.Ne
+        else
+          let set_output, output = new_local env "secp256k1_output" in
+          let pointer = output ^^ Blob.payload_ptr_unskewed env in
+          let success = if operation.op = 9 then pointer ^^ status ^^ Blob.of_ptr_size env
+            else output in
+          alloc_blob env (num operation.size) ^^ set_output, pointer, success in
       let args = List.map snd locals in
       let input i = if i < List.length args then List.nth args i else List.hd args in
       let input_pair i =
@@ -77,15 +85,11 @@ module Generator (Operation : sig val operation : operation end) = struct
         E.if1 I64Type (Variant.inject env label (Tuple.compile_unit env)) rest)
         (List.mapi (fun i name -> i, name) errors)
         (E.trap_with env "secp256k1: invalid runtime status") in
-      let success = if operation.predicate then
-          status ^^ num 0 ^^ compile_comparison Wasm_exts.Ast.I64Op.Ne
-        else if operation.op = 9 then output ^^ Blob.payload_ptr_unskewed env ^^ status ^^ Blob.of_ptr_size env
-        else output in
       P.{representation = Managed; code =
         G.concat (List.map fst locals) ^^
-        alloc_blob env (num operation.size) ^^ set_output ^^
+        output_setup ^^
         num operation.op ^^ input_pair 0 ^^ input_pair 1 ^^ input_pair 2 ^^
-        output ^^ Blob.payload_ptr_unskewed env ^^ call env "secp256k1" "secp256k1_call" ^^ set_status ^^
+        output_pointer ^^ call env "secp256k1" "secp256k1_call" ^^ set_status ^^
         status ^^ num 0 ^^ compile_comparison Wasm_exts.Ast.I64Op.LtS ^^
         E.if1 I64Type (Variant.inject env "err" error) (Variant.inject env "ok" success)}
   end

@@ -76,3 +76,33 @@ through source, IR, lowered IR, Wasm execution and Wasm validation, covering
 and constructed ECDSA infinity and rare X-coordinate reduction cases.
 Independent 10x26 versus 5x52 versus BigUint tests passed in debug and release.
 See [the retained audit](../../../../tests/crypto-audit/round3/secp256k1/).
+
+## Final predicate allocation cleanup
+
+The final bridge omits an unused zero-length output Blob for the two predicate
+operations. Their output pointer is null, and the native bridge explicitly
+skips the output copy when its capacity is zero (Rust requires this guard even
+for a zero-length copy). Argument evaluation, validation, typed errors and
+arithmetic are unchanged. This is a plugin compiler-component change; the
+SDK, compiler and RTS were not changed.
+
+| Operation | Final instructions | Final allocated bytes |
+|---|---:|---:|
+| derivePublicKey | 2,517,833 | 128 |
+| verifyPrehash | 2,735,069 | 32 |
+| signPrehash | 3,618,817 | 120 |
+| schnorrSign | 5,099,108 | 120 |
+| schnorrVerify | 2,519,189 | 32 |
+
+Both predicates save 24 allocated bytes per call. Signing changes by only
++2/+3 instructions from the native copy guard; those differences are retained
+rather than rounded away in the raw results. All 21 new measurements pass
+independent exact-output checks. `predicate/` retains the final build,
+source snapshot, three trials per case, native test log and plugin manifest.
+The preceding stages and audit evidence remain immutable checkpoints.
+
+All nine native tests pass, including null-output valid/false/error paths.
+The [independent followup audit](../../../../tests/crypto-audit/round3/secp256k1/predicate/)
+passes nine fixtures through all five execution/validation modes and nine Ash
+methods, including eager argument/error ordering, aliases and retained
+predicate result variants across more than 16 MiB of confirmed GC activity.

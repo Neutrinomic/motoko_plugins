@@ -184,6 +184,7 @@ fn output_capacity(op: usize) -> usize {
 /// # Safety
 /// Each input points to its length of readable memory; output points to fresh
 /// writable bytes of capacity output_capacity(op) and does not alias inputs.
+/// If that capacity is zero (predicates), output is ignored and may be null.
 /// No GC may run here.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn secp256k1_call(
@@ -197,7 +198,10 @@ pub unsafe extern "C" fn secp256k1_call(
     // uninitialized managed Blob. Initialize the entire output on every path.
     let mut bytes = [0u8; 72];
     let result = operation(op, a, b, c, &mut bytes).unwrap_or_else(|error| error);
-    unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, output_capacity(op)) };
+    let capacity = output_capacity(op);
+    if capacity != 0 {
+        unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, capacity) };
+    }
     if op == 16 { bytes.zeroize(); }
     result
 }
@@ -349,6 +353,29 @@ mod tests {
             assert_eq!(ProjectivePoint::lincomb_vartime(x, k, y, l),
                 ProjectivePoint::lincomb(x, k, y, l), "pair {i}");
         }
+    }
+
+    #[test]
+    fn predicates_accept_null_output_without_accessing_it() {
+        let secret = [1u8; 32];
+        let key = run(0, &secret, &[], &[]).unwrap();
+        let digest = [2u8; 32];
+        let signature = run(7, &secret, &digest, &[]).unwrap();
+        let schnorr = run(13, &secret, &digest, &[0; 32]).unwrap();
+        let xonly = run(12, &key, &[], &[]).unwrap();
+        let call = |op, a: &[u8], b: &[u8], c: &[u8]| unsafe {
+            secp256k1_call(op, a.as_ptr(), a.len(), b.as_ptr(), b.len(),
+                c.as_ptr(), c.len(), core::ptr::null_mut())
+        };
+        assert_eq!(call(8, &key, &digest, &signature), 1);
+        assert_eq!(call(8, &key, &[3; 32], &signature), 0);
+        assert_eq!(call(8, &[], &digest, &signature), PUBLIC);
+        assert_eq!(call(8, &key, &[], &signature), DIGEST);
+        assert_eq!(call(8, &key, &digest, &[]), SIGNATURE);
+        assert_eq!(call(14, &xonly, &digest, &schnorr), 1);
+        assert_eq!(call(14, &xonly, &[3; 32], &schnorr), 0);
+        assert_eq!(call(14, &[], &digest, &schnorr), PUBLIC);
+        assert_eq!(call(14, &xonly, &digest, &[]), SIGNATURE);
     }
 
     #[test]
