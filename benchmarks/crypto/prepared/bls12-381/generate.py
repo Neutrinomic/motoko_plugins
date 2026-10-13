@@ -158,7 +158,7 @@ def generate():
             })
     assert len(cases) == 24
     outputs[HERE / 'cases.json'] = json.dumps({
-        'methodology': 'Seven independent valid fixtures; public direct, preparation and prepared calls use the same oracle. Preparation verifies only in bytesResult. Repeated n8 prepares one key and retains eight references.',
+        'methodology': 'Eight comparison groups from seven independent valid inputs; direct, preparation and prepared calls use the same oracle. Preparation rows measure factories, including required PoP verification; bytesResult checks their outputs outside measurement. Repeated-key n8 groups measure one factory with eight references and eight factories producing equal values separately.',
         'cases': cases,
     }, indent=2) + '\n'
     return outputs
