@@ -22,47 +22,60 @@ data.
 
 ## Current signature performance
 
-Prepared keys let Motoko reuse validated key data and precomputed tables through the plugin SDK. The values are opaque, immutable and managed by Motoko's GC. Direct calls remain available for one-off work.
+Round four improves the already delivered plugins with the **same compiler and SDK**: `9f6ebeedc`, compiler ELF `24d8d0b9…`, original RTS, ABI 1. These are PocketIC instruction medians from three fresh canisters per workload and revision; wall-clock timings are not compared.
 
-These are **PocketIC instructions per public operation**, medians of three fresh canisters, with the same prepared-capable compiler and plugin build for each direct/prepared comparison. Preparation is measured separately. Compiler binary: `24d8d0b9…` (`9f6ebeedc`), ABI 1.
+| Direct operation | Delivered plugin | Selected plugin | Fewer instructions |
+|---|---:|---:|---:|
+| Ed25519 verify / 32 B | 2,308,542 | 2,169,138 | **6.04%** |
+| Secp256k1 ECDSA sign | 3,618,719 | 2,295,959 | **36.55%** |
+| Secp256k1 Schnorr sign | 5,099,447 | 2,681,364 | **47.42%** |
+| P256 ECDSA sign | 7,252,878 | 4,791,659 | **33.93%** |
+| RSA-3072 PSS sign / digest | 447,476,438 | 400,505,033 | **10.50%** |
+| ML-DSA-44 verify / ACVP 4 | 3,810,844 | 3,656,399 | **4.05%** |
+| BLS IC single verify | 222,072,725 | 210,673,356 | **5.13%** |
+
+Current public-operation costs follow. Prepared keys are opaque, immutable GC-managed values; preparation is separate from the hot call. ECDSA signing rows use the existing direct APIs; dashes mean no prepared-signing API was measured.
 
 | Operation / input | Direct instructions | Preparation instructions | Prepared instructions | Payload B | Allocated B: direct / preparation / prepared |
 |---|---:|---:|---:|---:|---:|
 | Ed25519 sign / 32-byte message | 1,803,963 | 887,929 | 907,801 | 96 | 120 / 152 / 88 |
-| Ed25519 verify / same message | 2,308,542 | 266,520 | 2,071,444 | 1,056 | 32 / 1,112 / 32 |
-| Secp256k1 ECDSA verify / SHA-256 digest | 2,618,931 | 484,693 | 2,367,381 | 512 | 32 / 568 / 32 |
-| Secp256k1 BIP340 sign / vector 0 | 5,099,447 | 2,517,394 | 2,584,269 | 64 | 120 / 120 / 120 |
-| Secp256k1 BIP340 verify / vector 0 | 2,413,083 | 485,205 | 2,161,197 | 512 | 32 / 568 / 32 |
-| P256 ECDSA verify / SHA-256 digest | 12,541,922 | 19,688,675 | 3,802,871 | 16,320 | 32 / 16,376 / 32 |
-| RSA-3072 PSS sign / digest + salt32 | 447,476,438 | 6,138,602 | 443,550,622 | 1,840 | 440 / 1,896 / 440 |
-| RSA-3072 PSS verify / same digest | 9,822,608 | 3,642,309 | 8,421,716 | 824 | 32 / 880 / 32 |
-| ML-DSA-44 sign / 1-byte message, 59-byte context | 13,193,656 | 5,016,889 | 9,076,804 | 28,800 | 2,480 / 28,856 / 2,480 |
-| ML-DSA-44 verify / same fixture | 3,810,844 | 2,525,559 | 1,920,986 | 20,576 | 32 / 20,632 / 32 |
-| BLS IC single verify | 222,072,725 | 49,992,831 | 172,121,515 | 19,680 | 19,672 / 19,736 / 64 |
-| BLS Ethereum aggregate / 8 distinct keys | 3,285,303,573 | 2,291,247,278 | 994,060,838 | 1,152 | 494,840 / 315,416 / 181,552 |
+| Ed25519 verify / same message | 2,169,138 | 266,515 | 1,933,663 | 1,056 | 32 / 1,112 / 32 |
+| Secp256k1 ECDSA sign / digest | 2,295,959 | — | — | — | 120 / — / — |
+| Secp256k1 ECDSA verify / digest | 2,454,026 | 484,693 | 2,202,476 | 512 | 32 / 568 / 32 |
+| Secp256k1 BIP340 sign / vector 0 | 2,681,364 | 1,308,308 | 1,375,272 | 64 | 120 / 120 / 120 |
+| Secp256k1 BIP340 verify / vector 0 | 2,413,617 | 485,205 | 2,161,731 | 512 | 32 / 568 / 32 |
+| P256 ECDSA sign / digest | 4,791,659 | — | — | — | 120 / — / — |
+| P256 ECDSA verify / digest | 11,961,908 | 19,688,627 | 3,223,424 | 16,320 | 32 / 16,376 / 32 |
+| RSA-3072 PSS sign / digest + salt32 | 400,505,033 | 6,138,602 | 396,540,393 | 1,840 | 440 / 1,896 / 440 |
+| RSA-3072 PSS verify / same digest | 9,162,600 | 3,642,309 | 7,722,884 | 824 | 32 / 880 / 32 |
+| ML-DSA-44 sign / ACVP 4 | 13,039,211 | 4,862,444 | 8,890,133 | 28,800 | 2,480 / 28,856 / 2,480 |
+| ML-DSA-44 verify / ACVP 4 | 3,656,399 | 2,371,114 | 1,787,636 | 20,576 | 32 / 20,632 / 32 |
+| BLS IC single verify | 210,673,356 | 43,312,942 | 167,427,790 | 19,680 | 64 / 19,736 / 64 |
+| BLS Ethereum single verify | 274,974,367 | 11,144,375 | 263,831,154 | 144 | 64 / 200 / 64 |
+| BLS Ethereum aggregate / 8 distinct keys | 3,175,970,967 | 2,199,794,662 | 976,180,848 | 1,152 | 181,112 / 1,688 / 181,552 |
 
-Prepared RSA signing saves only **0.88%**; its private exponentiation still dominates. The **14.26%** verification saving is more useful. Both use the improved direct implementation as their baseline.
+Direct Ed25519 signing is unchanged. Secp256k1 Schnorr verification adds **534 instructions** per direct/prepared call (about 0.02%); other small candidate regressions are retained in the full report. ML-DSA costs depend on its rejection-sampling input; ACVP 4 uses a one-byte message and 59-byte context.
 
-Setup matters. In actual measurements, preparing a P256 key for one check costs **23.49M** instructions versus **12.54M** direct; preparing once for 100 checks costs **399.94M** versus **1,254.17M** direct. ML-DSA verification already wins at two calls: **6.37M including preparation** versus **7.62M** direct. The full report separates these measured cold batches from modeled reuse estimates.
+Setup matters: actual P256 preparation plus one check costs **22.91M** versus **11.96M** direct; preparation plus 100 checks costs **342.00M** versus **1,196.17M** direct. Actual Secp256k1 ECDSA preparation plus ten checks costs **22.51M** versus **24.54M** direct. These are measured batches, not setup-plus-hot estimates.
 
-Fresh `ecdsa@8.0.1` controls use identical input bytes and the new compiler:
+Managed allocation is unchanged outside the measured BLS reductions: IC single verification **19,672 → 64 B**, Ethereum single **39,280 → 64 B**, eight-key proof-of-possession preparation **315,416 → 1,688 B**, and that aggregate's direct verification **494,840 → 181,112 B**. Prepared payload sizes are unchanged. Runtime Wasm grows **26,034 B for Secp256k1**, **14,570 B for P256**, **948 B for RSA**, **585 B for ML-DSA**, and **47,054 B for BLS**; Ed25519 shrinks **1,041 B**. Full linked-canister size changes are in the report.
 
-| Verification | Pure Motoko instructions | Direct / prepared plugin instructions | Motoko instruction ratio: direct / prepared | Allocated B: Motoko / direct / prepared |
+The `ecdsa@8.0.1` library controls below are **reused from the preceding prepared-key run**, not rerun this round. They use the same compiler ELF and exact verification inputs; ratios use the current plugin costs.
+
+| Verification | Reused pure Motoko instructions | Current direct / prepared | Motoko instruction ratio: direct / prepared | Allocated B: Motoko / direct / prepared |
 |---|---:|---:|---:|---:|
-| Secp256k1 ECDSA | 137,009,273 | 2,618,931 / 2,367,381 | **52.31× / 57.87×** | 10,903,256 / 32 / 32 |
-| P256 ECDSA | 323,983,718 | 12,541,922 / 3,802,871 | **25.83× / 85.19×** | 23,927,448 / 32 / 32 |
+| Secp256k1 ECDSA | 137,009,273 | 2,454,026 / 2,202,476 | **55.83× / 62.21×** | 10,903,256 / 32 / 32 |
+| P256 ECDSA | 323,983,718 | 11,961,908 / 3,223,424 | **27.08× / 100.51×** | 23,927,448 / 32 / 32 |
 
-The prepared ratios exclude preparation. Library controls include byte parsing and validation, with reusable curve construction outside timing. P256's library normalizes the high-S fixture internally; these valid-input comparisons do not establish identical error semantics.
+Prepared ratios exclude setup. Library controls include byte parsing and validation, with reusable curve construction outside timing; P256 normalizes its high-S input internally. These valid-input comparisons do not establish identical error semantics. Allocation includes returned values and temporary garbage; payload excludes headers, and heap snapshots are not peaks or exact live-memory measurements. Ed25519 direct signing returns a Result while prepared signing returns a Blob. Digest rows exclude message hashing; schemes and security profiles differ.
 
-Allocation includes temporary garbage and returned values; payload excludes object headers. Ed25519's direct signer returns a Result while its prepared signer returns a Blob. Heap snapshots are not peaks or exact live-memory measurements; separate pressure/drop experiments and their limitations are documented. Algorithms and security profiles differ; ECDSA/RSA digest rows exclude message hashing.
-
-All **199 final cases × 3 trials** passed independent output checks. Six independent crypto audits and integrated package, composition, rejection, GC and 20 codec/SHA regression checks pass.
-[Full prepared-key measurements, memory evidence and limits](benchmarks/crypto/prepared/RESULTS.md) · [Reproduction](benchmarks/crypto/prepared/README.md).
+All **111 matched workloads / 666 fresh-canister observations** passed exact-output checks. All 23 plugin builds, packaging, combined composition, rejection and GC checks pass, alongside six independent internal scheme audits. Audits and regression tests are correctness evidence, not security guarantees.
+[Full round-four results and evidence](benchmarks/crypto/round4/RESULTS.md) · [Reproduction](benchmarks/crypto/round4/README.md).
 
 <details>
 <summary>Earlier signature benchmark results</summary>
 
-The previous compiler/plugin measurements remain archived in [round three](benchmarks/crypto/round3/RESULTS.md) and the [crypto API benchmark history](benchmark_crypto.md). They are historical controls, not current prepared-SDK costs.
+The [prepared-key measurements](benchmarks/crypto/prepared/RESULTS.md), [round three](benchmarks/crypto/round3/RESULTS.md), and [crypto API benchmark history](benchmark_crypto.md) remain archived. Their plugin costs are historical; the two explicitly identified pure Motoko controls above are reused because the compiler and inputs match.
 
 </details>
 

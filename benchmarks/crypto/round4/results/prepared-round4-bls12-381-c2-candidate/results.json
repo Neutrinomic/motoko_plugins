@@ -1,0 +1,1127 @@
+{
+  "protocol": "crypto-prepared-v1",
+  "stage": "prepared-round4-bls12-381-c2-candidate",
+  "expected_case_count": 9,
+  "complete": true,
+  "recorded_utc": "2026-10-13T06:15:39.988Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "runner_dependencies": {
+    "package_lock_sha256": "7aa2b27b47c3a1687b90f58d24c3019850abfb1c8c9a263448dffa1a9724d996",
+    "modules_sha256": {
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-core.js": "8afeff8f66ff4b17cde52404afde64dfa2b58081948b36624ab15bf2e1a9758e",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-ui.js": "deed5c788fec30dfe9a27275faa374ea3bc0882490efab56028c82293d2631f6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/idl.js": "24a5f38a5abce8ae51e5cf8fe9c14911d68308a000f23ea338e62d7cec76e7da",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/index.js": "2f06723a6cbdbb8d3d09f01ae471c1cd0170d35ca57d14e512d137d2716fdb27",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/types.js": "98fdc337ae0e090594e9f79d5654ec9b42aefe1f7397ed6f2706cda39fa860a0",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/bigint-math.js": "bff79122d3ad07d91342ab23539699f94cdf7b320079e92f33c3e1ed27515a62",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/buffer.js": "1daa2af18f451a226cdf420899e05c081bdaad76aa93e9160167eaad098fb434",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/hash.js": "c9ea528e50690f4cd231de88708071917ffb80f76c86b9ecdd39b7addbb5b6b6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/leb128.js": "35dc93a2549521ead1e111be4d0b1eacbed7f30bb37d7793fd65ac84afd91887",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/index.js": "96637e1ec315d5ff4288ebef2bbc606bb35b26e358824065f7a8488ef4fdf5e7",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/principal.js": "3360b13ec66c7692884a7805c9d3390861424d66d2dee1e2442554bded9c9d72",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/base32.js": "56c38f84c788a38b46e8302e22563c950c51d86fc69d90f2aed7f9164bdf25ac",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/getCrc.js": "8d5546512a158f0f02805b637694b467232118e908e784cb6f643e8d1004d904",
+      "node_modules/@noble/hashes/sha2.js": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b",
+      "node_modules/@noble/hashes/utils.js": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c"
+    }
+  },
+  "runner_dependencies_sha256": "1515439779b1f9ac3432fe294bdd14d116631277acf771d387b5afbc454a685e",
+  "build_sha256": "a8e7b4f05928013bba5267aafa3975cd89a2d303076dd0e16cd4fb3eef74c07d",
+  "runner_sha256": "aaa373e29976b89eee12e7d178f9358ec3bbdecf0b1b91ff78064c058b763f31",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes. memory_metrics fixtures additionally query occupied heap, Wasm capacity and cumulative RTS counters after setup GC, after the run message, and after four further forced GC increments. These snapshots are outside measurement; after_run includes any message-end GC. Four increments are not guaranteed to complete collection. Snapshots are neither true peaks nor a measurement of retained live data; the result remains reachable until the oracle query.",
+  "cases": [
+    {
+      "name": "bls12-381-verify-ic-certificate-direct",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ic-certificate-direct/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "IC",
+        "operation": "verifyIC",
+        "fixture": "verify-ic-certificate",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ic-certificate",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "prepared_key_count": 0,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "dfd67ab7ac289f81dd02994a372b6c89e2a82e3a97487336aa1cac9ce8500a32",
+      "wasm": "bls12-381-verify-ic-certificate-direct/native/main.wasm",
+      "wasm_sha256": "1fca8834c79abcecca044a54e8aacb772962de89d4a8b32d25e4d68781752bee",
+      "wasm_bytes": 889003,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 210694553,
+          "allocated_bytes": 19672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411024,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 210694553,
+          "allocated_bytes": 19672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411024,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 210694553,
+          "allocated_bytes": 19672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411024,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-verify-ic-certificate-prepare",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ic-certificate-prepare/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "IC",
+        "operation": "verifyIC",
+        "fixture": "verify-ic-certificate",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ic-certificate",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 19680,
+        "prepared_key_count": 1,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "4a5f9a021b9f39ab3c61ced052e485b4aaf1e0f7c368cb9ccfaa976bed54a2f5",
+      "wasm": "bls12-381-verify-ic-certificate-prepare/native/main.wasm",
+      "wasm_sha256": "d00452660b9f8d505e5a21719ad9dbbd363a2584614ee00e9079efd4fee28401",
+      "wasm_bytes": 891126,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 43312942,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321128,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341096,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411112,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 43312942,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321128,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341096,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411112,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 43312942,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321128,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341096,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411112,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-verify-ic-certificate-prepared",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ic-certificate-prepared/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "IC",
+        "operation": "verifyIC",
+        "fixture": "verify-ic-certificate",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ic-certificate",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 19680,
+        "prepared_key_count": 1,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "9e9d599d1dbcda4bb3020ade316f22455c6b1fef7f6212968a35bc35f170ab18",
+      "wasm": "bls12-381-verify-ic-certificate-prepared/native/main.wasm",
+      "wasm_sha256": "4fd65253484a86c47653978f122c4ee7087e91e448bfc2ce9f0c061900f2cda7",
+      "wasm_bytes": 891497,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 167423232,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5340976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5340976,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341272,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341272,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411288,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 167423232,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5340976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5340976,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341272,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341272,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411288,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 167423232,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5340976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5340976,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341272,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341272,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411288,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-verify-ethereum-official-direct",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ethereum-official-direct/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum",
+        "operation": "verifyEthereum",
+        "fixture": "verify-ethereum-official",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ethereum-official",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "prepared_key_count": 0,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "0c354c61390b90367d3c4f3ad010fd523e49dc8628ce3a651dd3a52197f57c14",
+      "wasm": "bls12-381-verify-ethereum-official-direct/native/main.wasm",
+      "wasm_sha256": "a58422ba13a15eea3f3ce4ed4f906895ff5ffdc4e49d35e68b0037434ed50283",
+      "wasm_bytes": 888989,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 275027762,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321088,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321088,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360600,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430616,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430616,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 275027762,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321088,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321088,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360600,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430616,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430616,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 275027762,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321088,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321088,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360600,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430616,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430616,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-verify-ethereum-official-prepare",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ethereum-official-prepare/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum",
+        "operation": "verifyEthereum",
+        "fixture": "verify-ethereum-official",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ethereum-official",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 144,
+        "prepared_key_count": 1,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "f1036142eaa294e22c12c1348ac6a72ebde29332e9169f5a5a1e33fdb9a1f246",
+      "wasm": "bls12-381-verify-ethereum-official-prepare/native/main.wasm",
+      "wasm_sha256": "938135d79dc28f70099236900ca3721c050362b05e16d3950a1805fe135b963c",
+      "wasm_bytes": 891111,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 11144375,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321112,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321544,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391560,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391560,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 11144375,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321112,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321544,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391560,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391560,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 11144375,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321112,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321112,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321544,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391560,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391560,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-verify-ethereum-official-prepared",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-verify-ethereum-official-prepared/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum",
+        "operation": "verifyEthereum",
+        "fixture": "verify-ethereum-official",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-verify-ethereum-official",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 144,
+        "prepared_key_count": 1,
+        "key_references": 1,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "7b3e4709eecebb8d3fdd0049ac8fd0c89a9ba2f8c43f6c92a2230fa4661befbc",
+      "wasm": "bls12-381-verify-ethereum-official-prepared/native/main.wasm",
+      "wasm_sha256": "a06673ea1e8ef65a3f5fc587be8fc1bfea8d363a748cf2b7df9d44b60b06e51d",
+      "wasm_bytes": 891482,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 263884549,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321424,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360936,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360936,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430952,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430952,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 263884549,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321424,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360936,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360936,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430952,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430952,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 263884549,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321424,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360936,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360936,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430952,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430952,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-aggregate-ethereum-distinct-n8-direct",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-aggregate-ethereum-distinct-n8-direct/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum-PoP",
+        "operation": "aggregateVerifyEthereum",
+        "fixture": "aggregate-ethereum-distinct-n8",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-aggregate-ethereum-distinct-n8",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "prepared_key_count": 0,
+        "key_references": 8,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "c558b7986e4a1ca7e9cbae2f181c61a03d5eff48a7f68b234c15a72cce096d84",
+      "wasm": "bls12-381-aggregate-ethereum-distinct-n8-direct/native/main.wasm",
+      "wasm_sha256": "5531e2aa9b40093b5d6deb73a2cf69992e573aaf203ddb49e415ca80ddcab92e",
+      "wasm_bytes": 895107,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3176407705,
+          "allocated_bytes": 494840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323408,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323408,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5818480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5818480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5888496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5888496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 3176407705,
+          "allocated_bytes": 494840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323408,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323408,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5818480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5818480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5888496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5888496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 3176407705,
+          "allocated_bytes": 494840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323408,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323408,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5818480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5818480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5888496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5888496,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-aggregate-ethereum-distinct-n8-prepare",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-aggregate-ethereum-distinct-n8-prepare/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum-PoP",
+        "operation": "aggregateVerifyEthereum",
+        "fixture": "aggregate-ethereum-distinct-n8",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-aggregate-ethereum-distinct-n8",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 1152,
+        "prepared_key_count": 8,
+        "key_references": 8,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "984e18b3e9292b20354c47e9dc0f425118da85cfba1174d75044b18a50ddc92a",
+      "wasm": "bls12-381-aggregate-ethereum-distinct-n8-prepare/native/main.wasm",
+      "wasm_sha256": "7c66fd3ddd4c30a2e3e189786dbb161269c62eca6ba698dd1159dc7f39121c22",
+      "wasm_bytes": 912361,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2200221822,
+          "allocated_bytes": 315416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323416,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5639064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5639064,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5709080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5709080,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 2200221822,
+          "allocated_bytes": 315416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323416,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5639064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5639064,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5709080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5709080,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 2200221822,
+          "allocated_bytes": 315416,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323416,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5639064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5639064,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5709080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5709080,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12-381-aggregate-ethereum-distinct-n8-prepared",
+      "implementation": "native",
+      "family": "bls12-381",
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "prepared/bls12-381/cases/bls12-381-aggregate-ethereum-distinct-n8-prepared/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "operations_per_sample": 1,
+      "prepared": {
+        "scheme": "bls12-381",
+        "profile": "Ethereum-PoP",
+        "operation": "aggregateVerifyEthereum",
+        "fixture": "aggregate-ethereum-distinct-n8",
+        "fixture_source": "prepared/bls12-381/fixtures.json",
+        "comparison_group": "bls12-381-aggregate-ethereum-distinct-n8",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 1152,
+        "prepared_key_count": 8,
+        "key_references": 8,
+        "shared_repeated_key": false,
+        "fixture_sha256": "f29709c3b474a8d53e41ab90fb0c8339a66721bfcc0c8357049a4fb8ad2b55b5"
+      },
+      "returncode": 0,
+      "source_sha256": "9ae9b8914723ce60e250b1f30c3209a9fdd3bf1c7025f37c59cb7beb6b05cffd",
+      "wasm": "bls12-381-aggregate-ethereum-distinct-n8-prepared/native/main.wasm",
+      "wasm_sha256": "8aa9dac1308dd76758fe59de474dcc657740a11af0eaa285aab7a644e2341462",
+      "wasm_bytes": 912673,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 976190426,
+          "allocated_bytes": 181552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5638944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5638944,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5820728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5820728,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5890744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5890744,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 976190426,
+          "allocated_bytes": 181552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5638944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5638944,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5820728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5820728,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5890744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5890744,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 976190426,
+          "allocated_bytes": 181552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5638944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5638944,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5820728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5820728,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5890744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5890744,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}
