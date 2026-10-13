@@ -8,19 +8,27 @@ the archive records upstream commit `5ac8f5d77f11399ff48d87b0554935f6eddda342`.
 `upstream-source.json` records every original file's hash, changed files'
 before/after hashes, and the hash of `exact.patch`.
 
-Eight upstream files differ, and three focused arithmetic files are added:
+Nine upstream files differ, and three focused arithmetic files are added:
 
 - `Cargo.toml` adds an empty workspace to keep upstream development targets
   outside the enclosing plugin workspace. Dependencies, features and package
   identity retain the published values.
 - `src/schnorr/signing.rs` reuses the affine point already computed by
   `SigningKey::from(NonZeroScalar)` and adds one constructor regression test.
-  Direct and prepared Schnorr signing share the original nonce/sign equation
+  Direct and prepared Schnorr signing share the nonce/sign equation
   through `sign_raw_prepared`, which accepts the normalized secret and matching
   public X created by a validated factory. Secret temporary buffers are zeroized.
   Previously, the constructor calculated `dG` to obtain parity, normalized the
   scalar, and calculated the normalized scalar's public point a second time.
   It now conditionally negates the existing point using the same parity bit.
+
+- `src/schnorr.rs` permits zero signature scalars, as BIP340 requires, while
+  rejecting noncanonical field/scalar values and incorrect lengths. The shared
+  signer reduces the nonce hash modulo the group order before rejecting zero,
+  and permits a computed zero S. These correct rare inherited upstream boundary
+  errors; independently forced hash-output regressions exercise the actual signer
+  and direct/prepared verification in debug and release. They are synthetic
+  internal-branch tests, not naturally occurring SHA256 vectors.
 
 - `src/arithmetic/field.rs` and `src/arithmetic/field/field_impl.rs` select
   upstream's unchanged 10x26 coordinate field backend on Wasm64 in release
@@ -60,8 +68,9 @@ operations or tweaks. The ECDSA wrapper preserves the upstream verification
 formula, full scalar/point validation, and acceptance of both low and high S.
 BIP340 input-range, identity, parity and X-coordinate checks are unchanged.
 
-The scalar conditional assignment, nonce/signing
-equation, hashing, and `SigningKey` zeroization remain unchanged. Point
+The scalar conditional assignment, hash inputs, and `SigningKey` zeroization
+remain unchanged. The round-five BIP340 corrections reduce the nonce digest
+modulo n and allow a zero signature scalar; nonce zero still returns an error. Point
 negation and selection use existing upstream `AffinePoint` implementations.
 Both scalar and point normalization use `ConditionallySelectable`; no branch
 depends on the parity bit. `PublicKey::from_affine` checks nonidentity. Its

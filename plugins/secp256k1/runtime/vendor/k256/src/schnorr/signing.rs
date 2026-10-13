@@ -127,9 +127,11 @@ impl SigningKey {
             .chain_update(msg)
             .finalize());
 
-        let k = NonZeroScalar::try_from(rand.as_slice())
+        // BIP340 reduces the nonce hash modulo n before rejecting zero.
+        let nonce = Zeroizing::new(<Scalar as Reduce<U256>>::reduce_bytes(&rand));
+        let k = Option::<NonZeroScalar>::from(NonZeroScalar::new(*nonce))
             .map(Self::from)
-            .map_err(|_| Error::new())?;
+            .ok_or_else(Error::new)?;
 
         let verifying_point = AffinePoint::from(k.verifying_key);
         let r = verifying_point.x.normalize();
@@ -143,7 +145,6 @@ impl SigningKey {
         );
 
         let s = *k.secret_key + e * **normalized_secret;
-        let s = Option::from(NonZeroScalar::new(s)).ok_or_else(Error::new)?;
         let sig = Signature { r, s };
 
         #[cfg(debug_assertions)]

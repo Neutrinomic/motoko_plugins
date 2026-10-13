@@ -68,9 +68,9 @@ mod verifying;
 pub use self::{signing::SigningKey, verifying::VerifyingKey};
 pub use signature::{self, rand_core::CryptoRngCore, Error};
 
-use crate::{arithmetic::FieldElement, NonZeroScalar};
+use crate::{arithmetic::FieldElement, Scalar};
 use core::fmt;
-use elliptic_curve::subtle::ConstantTimeEq;
+use elliptic_curve::{subtle::ConstantTimeEq, PrimeField};
 use sha2::{Digest, Sha256};
 use signature::Result;
 
@@ -87,7 +87,7 @@ pub type SignatureBytes = [u8; Signature::BYTE_SIZE];
 #[derive(Copy, Clone)]
 pub struct Signature {
     r: FieldElement,
-    s: NonZeroScalar,
+    s: Scalar,
 }
 
 impl Signature {
@@ -109,12 +109,12 @@ impl Signature {
     }
 
     /// Get the `s` component of this signature.
-    fn s(&self) -> &NonZeroScalar {
+    fn s(&self) -> &Scalar {
         &self.s
     }
 
     /// Split this signature into its `r` and `s` components.
-    fn split(&self) -> (&FieldElement, &NonZeroScalar) {
+    fn split(&self) -> (&FieldElement, &Scalar) {
         (self.r(), self.s())
     }
 }
@@ -143,17 +143,16 @@ impl TryFrom<&[u8]> for Signature {
     type Error = Error;
 
     fn try_from(bytes: &[u8]) -> Result<Signature> {
+        let bytes: &[u8; Self::BYTE_SIZE] = bytes.try_into().map_err(|_| Error::new())?;
         let (r_bytes, s_bytes) = bytes.split_at(Self::BYTE_SIZE / 2);
 
         let r: FieldElement =
             Option::from(FieldElement::from_bytes(r_bytes.into())).ok_or_else(Error::new)?;
 
-        // one of the rules for valid signatures: !is_infinite(R);
-        if r.is_zero().into() {
-            return Err(Error::new());
-        }
-
-        let s = NonZeroScalar::try_from(s_bytes).map_err(|_| Error::new())?;
+        // BIP340 permits zero r and s; the verifier checks the curve equation.
+        let s = Option::<Scalar>::from(Scalar::from_repr(
+            <[u8; 32]>::try_from(s_bytes).map_err(|_| Error::new())?.into(),
+        )).ok_or_else(Error::new)?;
 
         Ok(Self { r, s })
     }

@@ -1,0 +1,190 @@
+{
+  "baseline_commit": "cf55e909fdb03f863f8e5fd67f9ef6fb15e891c4",
+  "normal_native": [
+    {
+      "mode": "debug",
+      "command": "cargo test --offline --locked --jobs 2 --manifest-path tests/crypto-audit/round5/secp256k1/native/Cargo.toml -- --test-threads=2",
+      "passed": 22,
+      "log_sha256": "d3ca89168f6fa1b08682ed67fd7e44e516303d78a05a2a8e1f71fcd27bc241b5"
+    },
+    {
+      "mode": "release",
+      "command": "cargo test --offline --locked --jobs 2 --manifest-path tests/crypto-audit/round5/secp256k1/native/Cargo.toml --release -- --test-threads=2",
+      "passed": 22,
+      "log_sha256": "5ea3b50ed6c8c21b3141219b29dca285125a3886080fbf89bc8cdc5b4687af9b"
+    }
+  ],
+  "injected_runs": [
+    {
+      "stage": "before",
+      "evidence": {
+        "method": "Run rare BIP340 branches by replacing only tagged hash outputs in a disposable copy.\n\nNo injected code is added to shipped source. The signer, parsers, curve operations,\nFFI and debug self-check remain the selected production source. This is a forced\ninternal-branch regression, not a natural SHA256 vector or end-to-end hash test.\n",
+        "reference_sha256": "4b1d4ad9e60820df4a6d239733d52b014bc03e4c47afd757a2fe4d3b586d892c",
+        "source_sha256": {
+          "plugins/secp256k1/runtime/src/lib.rs": "fa9a25230097ca9743fbd4e1d10fbb9c1ef1d5edd491e0f0dd94c6d735a9ebf5",
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr.rs": "374bef2468f10a592077c206fb9107ce0723e9f03adcaf9946a9fd97e5ebf4fe",
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr/signing.rs": "246662b4d96748d9bc596d9529fa7da9275551239eb0db8839b4c230f8a34a63"
+        },
+        "injected_source_sha256": {
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr.rs": "f07ae206a808b2c93a91f8d59f7f426c6e4c227114efc18749d3e3cbf6cb7d63",
+          "plugins/secp256k1/runtime/src/lib.rs": "d9099edfbc4abfd5bc1ee530b93f4d38a0a20acf81441a7cead5f7764aa23589"
+        },
+        "forced_vectors_sha256": "57cf9234e733e6e7884bf1f18adcafbfdf4f8e358393d233201f9eeaa3435280",
+        "runs": [
+          {
+            "mode": "debug",
+            "command": [
+              "cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "--jobs",
+              "2",
+              "--manifest-path",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/rare-before-2/source/tests/crypto-audit/round5/secp256k1/native/Cargo.toml",
+              "--target-dir",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/rare-before-2/target",
+              "--features",
+              "injected-hashes",
+              "audit5_rare_",
+              "--",
+              "--test-threads=1",
+              "--nocapture"
+            ],
+            "exit": 101,
+            "passed": true,
+            "log_sha256": "91df58cee768f66923661061a96620c16a835b30e5909a19f904c7c9600f4a2e"
+          },
+          {
+            "mode": "release",
+            "command": [
+              "cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "--jobs",
+              "2",
+              "--manifest-path",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/rare-before-2/source/tests/crypto-audit/round5/secp256k1/native/Cargo.toml",
+              "--target-dir",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/rare-before-2/target",
+              "--features",
+              "injected-hashes",
+              "--release",
+              "audit5_rare_",
+              "--",
+              "--test-threads=1",
+              "--nocapture"
+            ],
+            "exit": 101,
+            "passed": true,
+            "log_sha256": "d72ea9d7f8aaf2abdf0e90b6ec585b0ff403f1ef5f45b2435668029e077d07ce"
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "stage": "after",
+      "evidence": {
+        "method": "Run rare BIP340 branches by replacing only tagged hash outputs in a disposable copy.\n\nNo injected code is added to shipped source. The signer, parsers, curve operations,\nFFI and debug self-check remain the selected production source. This is a forced\ninternal-branch regression, not a natural SHA256 vector or end-to-end hash test.\n",
+        "reference_sha256": "4b1d4ad9e60820df4a6d239733d52b014bc03e4c47afd757a2fe4d3b586d892c",
+        "source_sha256": {
+          "plugins/secp256k1/runtime/src/lib.rs": "e032ba31855f748be8063f631d64f90f54364807f128fd1fcfe14e3a2940a901",
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr.rs": "d9ef527fbfea2d8024fa337c677accaf244b3fc11d10f6fda95700d46cd6a0f0",
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr/signing.rs": "157668c561c68d8fd89aca1903046291887a897f9598270a5f2a974fab6a3e2f"
+        },
+        "injected_source_sha256": {
+          "plugins/secp256k1/runtime/vendor/k256/src/schnorr.rs": "89a5775c1c9f196121f4bbd17ad629ebb7321e85d65c16a6164da4acdf136541",
+          "plugins/secp256k1/runtime/src/lib.rs": "5e33aa86fe97ed1108ee551bcf01230b67b763c8d2761b23502e7bbb944f1374"
+        },
+        "forced_vectors_sha256": "57cf9234e733e6e7884bf1f18adcafbfdf4f8e358393d233201f9eeaa3435280",
+        "runs": [
+          {
+            "mode": "debug",
+            "command": [
+              "cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "--jobs",
+              "2",
+              "--manifest-path",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/fixed-native/injected/source/tests/crypto-audit/round5/secp256k1/native/Cargo.toml",
+              "--target-dir",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/fixed-native/injected/target",
+              "--features",
+              "injected-hashes",
+              "audit5_rare_",
+              "--",
+              "--test-threads=1",
+              "--nocapture"
+            ],
+            "exit": 0,
+            "passed": true,
+            "log_sha256": "63ebfc3fc985c71d742053dedc754f65045c5bfe6c4d2778b2b90e6878676375"
+          },
+          {
+            "mode": "release",
+            "command": [
+              "cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "--jobs",
+              "2",
+              "--manifest-path",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/fixed-native/injected/source/tests/crypto-audit/round5/secp256k1/native/Cargo.toml",
+              "--target-dir",
+              "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/secp256k1/_build/fixed-native/injected/target",
+              "--features",
+              "injected-hashes",
+              "--release",
+              "audit5_rare_",
+              "--",
+              "--test-threads=1",
+              "--nocapture"
+            ],
+            "exit": 0,
+            "passed": true,
+            "log_sha256": "da4898ba4e17ac8d4c4ba305b0ddf346a953e70e1ee03b67ee4db8815d7ade10"
+          }
+        ],
+        "passed": true
+      }
+    }
+  ],
+  "vendor_reconstruction": {
+    "passed": true,
+    "archive_sha256": "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b",
+    "ledger_sha256": "1a9acf9e67def47cd9dc5a849078f8ff146a98b1090192cf04c76a4afbd0beb7",
+    "exact_patch_sha256": "f7a7d254a0315cb8c27bbc2c959d5b179433efd35b5cc0f81072d40c0ced3625",
+    "original_files": 34,
+    "changed_original_files": 9,
+    "added_source_files": 3,
+    "patch_stdout": "patching file Cargo.toml\npatching file src/arithmetic.rs\npatching file src/arithmetic/field.rs\npatching file src/arithmetic/field/field_impl.rs\npatching file src/arithmetic/mul.rs\npatching file src/arithmetic/projective.rs\npatching file src/arithmetic/scalar.rs\npatching file src/schnorr.rs\npatching file src/schnorr/signing.rs\npatching file src/arithmetic/prepared.rs\npatching file src/arithmetic/fixed_base.rs\npatching file src/arithmetic/fixed_base_table.rs\n",
+    "script_sha256": "c988d1dbc8f05df994d42462a95940e4766d459c0f0d14b59b6427336f048cb4",
+    "method": "Compared every archive file with the pinned ledger and unchanged/changed vendor source; applied exact.patch without fuzz, then compared every patched or added source byte."
+  },
+  "shared_registry_dependencies_match_production_lock": true,
+  "test_only_std_registry_dependencies": [
+    "base64ct 1.8.3",
+    "getrandom 0.2.17",
+    "once_cell 1.21.4",
+    "pkcs8 0.10.2",
+    "spki 0.7.3",
+    "wasi 0.11.1+wasi-snapshot-preview1"
+  ],
+  "audit_sources_sha256": {
+    "generate.py": "a3fbe60f2a7dd4216bb9419ac78d469c1196cc1ae60d9716449c83952cf8db17",
+    "native/Cargo.lock": "47ec9eced79b704ee9a7da6f32d9588032bcd2052606ec6f832111dbf1db8b45",
+    "native/Cargo.toml": "31f0390402742b189bf7efa306aa913b54df9aaad45bdc6a663ba386672b3630",
+    "native/src/audit.rs": "de9fc24f8fb715af476f131cd0e59feb89c9ed010ca35c9f1fa860299b17fb68",
+    "native/src/lib.rs": "ebf77e8cc4debfa5f7b90db581f4633c2171686ae1c5b560fb6ecd4cd89e7597",
+    "native/src/rare.rs": "fda8def0ccf48fcf2b42f7fabf0ff6984fdbf68297549a2f6202ea3973224e0c",
+    "oracle/reference.py": "4b1d4ad9e60820df4a6d239733d52b014bc03e4c47afd757a2fe4d3b586d892c",
+    "run-native.sh": "2b5f039ed7223accf38fe7b13337654142fc2f972d3861719dc0431d052c94a8",
+    "run_injected.py": "6b43937a042733418988c6fe76ab7444da569ec085453cb585633fcc2b24d00d",
+    "schnorr-boundaries.tsv": "d2b9e70b0e7fe6d5405124452af61c0aa51958f82bce12bca4df6fb077c783a2"
+  }
+}

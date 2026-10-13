@@ -140,9 +140,8 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
                 None
             };
             let public_x = &a[..32];
-            // BIP340 permits zero r/s in the input range checks. k256 0.13's
-            // Signature type excludes those values; use its audited point and
-            // scalar operations directly for the specified verification equation.
+            // BIP340 permits zero r/s in the input range checks. Use the same
+            // point/scalar equation for direct and prepared verification.
             if c.len() != 64 { return Err(SIGNATURE); }
             const FIELD: [u8; 32] = [
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,

@@ -122,6 +122,36 @@
 +        // Existing constant-time wide square avoids duplicate cross products;
 +        // reduction is the same as ordinary scalar multiplication.
 +        WideScalar(self.0.square()).reduce()
+--- a/src/schnorr.rs
++++ b/src/schnorr.rs
+@@ -71 +71 @@
+-use crate::{arithmetic::FieldElement, NonZeroScalar};
++use crate::{arithmetic::FieldElement, Scalar};
+@@ -73 +73 @@
+-use elliptic_curve::subtle::ConstantTimeEq;
++use elliptic_curve::{subtle::ConstantTimeEq, PrimeField};
+@@ -90 +90 @@
+-    s: NonZeroScalar,
++    s: Scalar,
+@@ -112 +112 @@
+-    fn s(&self) -> &NonZeroScalar {
++    fn s(&self) -> &Scalar {
+@@ -117 +117 @@
+-    fn split(&self) -> (&FieldElement, &NonZeroScalar) {
++    fn split(&self) -> (&FieldElement, &Scalar) {
+@@ -145,0 +146 @@
++        let bytes: &[u8; Self::BYTE_SIZE] = bytes.try_into().map_err(|_| Error::new())?;
+@@ -151,6 +152,4 @@
+-        // one of the rules for valid signatures: !is_infinite(R);
+-        if r.is_zero().into() {
+-            return Err(Error::new());
+-        }
+-
+-        let s = NonZeroScalar::try_from(s_bytes).map_err(|_| Error::new())?;
++        // BIP340 permits zero r and s; the verifier checks the curve equation.
++        let s = Option::<Scalar>::from(Scalar::from_repr(
++            <[u8; 32]>::try_from(s_bytes).map_err(|_| Error::new())?.into(),
++        )).ok_or_else(Error::new)?;
 --- a/src/schnorr/signing.rs
 +++ b/src/schnorr/signing.rs
 @@ -9 +9 @@
@@ -130,10 +160,8 @@
 @@ -12 +12 @@
 -    zeroize::{Zeroize, ZeroizeOnDrop},
 +    zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing},
-@@ -98,3 +98,23 @@
+@@ -98 +98,21 @@
 -        let mut t = tagged_hash(AUX_TAG).chain_update(aux_rand).finalize();
--
--        for (a, b) in t.iter_mut().zip(self.secret_key.to_bytes().iter()) {
 +        Self::sign_raw_prepared(&self.secret_key, &self.verifying_key.to_bytes(), msg, aux_rand)
 +    }
 +
@@ -155,7 +183,8 @@
 +    ) -> Result<Signature> {
 +        let mut t = Zeroizing::new(tagged_hash(AUX_TAG).chain_update(aux_rand).finalize());
 +        let secret_bytes = Zeroizing::new(normalized_secret.to_bytes());
-+
+@@ -100 +120 @@
+-        for (a, b) in t.iter_mut().zip(self.secret_key.to_bytes().iter()) {
 +        for (a, b) in t.iter_mut().zip(secret_bytes.iter()) {
 @@ -104,3 +124,3 @@
 -        let rand = tagged_hash(NONCE_TAG)
@@ -164,25 +193,30 @@
 +        let rand = Zeroizing::new(tagged_hash(NONCE_TAG)
 +            .chain_update(&*t)
 +            .chain_update(public_x)
-@@ -108,3 +128,3 @@
+@@ -108 +128 @@
 -            .finalize();
--
--        let k = NonZeroScalar::try_from(&*rand)
 +            .finalize());
-+
-+        let k = NonZeroScalar::try_from(rand.as_slice())
-@@ -114 +133,0 @@
+@@ -110 +130,3 @@
+-        let k = NonZeroScalar::try_from(&*rand)
++        // BIP340 reduces the nonce hash modulo n before rejecting zero.
++        let nonce = Zeroizing::new(<Scalar as Reduce<U256>>::reduce_bytes(&rand));
++        let k = Option::<NonZeroScalar>::from(NonZeroScalar::new(*nonce))
+@@ -112 +134 @@
+-            .map_err(|_| Error::new())?;
++            .ok_or_else(Error::new)?;
+@@ -114 +135,0 @@
 -        let secret_key = k.secret_key;
-@@ -121 +140 @@
+@@ -121 +142 @@
 -                .chain_update(self.verifying_key.to_bytes())
 +                .chain_update(public_x)
-@@ -126 +145 @@
+@@ -126,2 +147 @@
 -        let s = *secret_key + e * *self.secret_key;
+-        let s = Option::from(NonZeroScalar::new(s)).ok_or_else(Error::new)?;
 +        let s = *k.secret_key + e * **normalized_secret;
-@@ -131 +150 @@
+@@ -131 +151 @@
 -        self.verifying_key.verify_prehash(msg, &sig)?;
 +        VerifyingKey::from_bytes(public_x)?.verify_prehash(msg, &sig)?;
-@@ -140,5 +159,2 @@
+@@ -140,5 +160,2 @@
 -        let odd = (ProjectivePoint::GENERATOR * *secret_key)
 -            .to_affine()
 -            .y
@@ -190,15 +224,16 @@
 -            .is_odd();
 +        let mut public_point = ProjectivePoint::mul_by_generator(&secret_key).to_affine();
 +        let odd = public_point.y.normalize().is_odd();
-@@ -146,0 +163 @@
+@@ -146,0 +164 @@
 +        public_point.conditional_assign(&-public_point, odd);
-@@ -149 +166,4 @@
+@@ -149 +167,4 @@
 -            inner: PublicKey::from_secret_scalar(&secret_key),
 +            // A nonzero scalar times the prime-order generator is nonidentity.
 +            // Negating both the scalar and point preserves their correspondence.
 +            inner: PublicKey::from_affine(public_point)
 +                .expect("nonzero secret scalar produces a nonidentity point"),
-@@ -252,0 +273,41 @@
+@@ -251,0 +273,41 @@
++
 +#[cfg(test)]
 +mod constructor_tests {
 +    use super::*;
@@ -239,7 +274,6 @@
 +        assert_eq!(odd_points, 32);
 +    }
 +}
-+
 --- /dev/null
 +++ b/src/arithmetic/prepared.rs
 @@ -0,0 +1,146 @@

@@ -43,9 +43,10 @@ the upstream scalar signer, avoiding an unused cached public-key derivation.
 Copied secret scalars are zeroized after signing; Taproot secret-tweak scratch
 is zeroized after copying the result to its caller-owned Blob.
 
-The runtime uses k256's point/scalar operations directly for BIP340 verification
-because its version 0.13 Schnorr signature parser excludes zero components that
-BIP340 permits in input range checks. Signing remains k256's `sign_raw`.
+Direct and prepared BIP340 verification share k256's point/scalar equation.
+The patched signer reduces its nonce hash modulo n before rejecting zero and
+permits a computed zero S, matching BIP340. Its signature parser accepts zero
+components while rejecting noncanonical values and incorrect lengths.
 
 ## Validation
 
