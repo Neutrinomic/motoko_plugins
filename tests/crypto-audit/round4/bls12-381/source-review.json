@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "baseline": "0e1e96a",
+  "selected_source_at_review": "5e72dabe5edbc53e1efcde9ca1f1635a258ed232",
+  "source_sha256": {
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/fp.rs": "7bde5d87d37a205a352397c93e4320c327e5116e744cff2446b78eba23c08ecb",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/fp2.rs": "3bd62534d3c0d54d8efd2417e69c40fb155998a8ce696b71c4198fe51924628a",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/chain.rs": "9d0358c16c2c4197a31c961a9254dba809529fb02376865cbc21f5e6f32c3f59",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/pairings.rs": "f3b402e436a163ce8deb86284a163d2230a03cb71d518613f6968b89f6c10846",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/plugin_prepared.rs": "88b37f97a8201f1335a4568c2677885aa78f9285bb8c14b2067c3fb4a5d75e21",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/plugin_prepared_tests.rs": "6efd6b0d4608e1d5bd974cbb380526d375211e2298ed3ddac01c96f1a40bfbba",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/plugin_round4_tests.rs": "e8d57632bcc8fbaf4f9e6a6efd1051070ded43adc36a14d28d529f317b061592",
+    "plugins/bls12-381/runtime/src/lib.rs": "2124671701bc28f479d5d0a1ea2508ffa6667bfc273227dc4f8f3def9aeed0a9"
+  },
+  "checks": {
+    "fixed_chain": "Independent symbolic schedule equals e=(p-3)/4 exactly, with positive derived exponents; zero predicates and exact-root branches unchanged. Generic reference MulAssign compile issue was resolved with Copy values.",
+    "original_oracles": "Original Fp2 sqrt and complete final-exponentiation test bodies match baseline byte-for-byte after only comments, whitespace and self/value argument normalization.",
+    "conjugation": "Fp12/Fp6 quadratic p^6 automorphism fixes c0 and negates c1 for all field elements; no unitary/inverse assumption. Test includes zero, basis terms, general deterministic values and complete final exponentiation on nonzero values.",
+    "streaming": "Only pair_equal changes. Two fixed curve states reproduce original G2Prepared identity substitution and per-term masking; same loop orders doubling/addition, coefficient indexing, final doubling, squaring and negative-x conjugation. No arithmetic formula copy.",
+    "protocol": "Canonical decode, subgroup, identity, PoP, distinct-message, limit and error precedence paths unchanged. Existing prepared IC and general aggregate pairing drivers unchanged.",
+    "lifecycle": "No payload or ABI change; no new managed allocation, retained pointer or mutable cache. References are borrowed synchronously; fixed generator table immutable. Driver size bound does not establish total Wasm stack or peak memory.",
+    "tests": "Owner tests compare raw Miller field values before final exponentiation for all16 identity masks, generator/dynamic placements, cancellation, subgroup and hash-derived inputs. Independent final artifact tests still required."
+  },
+  "findings_remaining": [],
+  "executed_validation": "evidence/final/report.json"
+}

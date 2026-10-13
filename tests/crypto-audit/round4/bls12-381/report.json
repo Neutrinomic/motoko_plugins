@@ -1,0 +1,57 @@
+{
+  "status": "correctness-pass-performance-pending",
+  "baseline_commit": "0e1e96a",
+  "production_commit": "5e72dabe5edbc53e1efcde9ca1f1635a258ed232",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "artifacts_sha256": {
+    "build.json": "1fe017b2393effac37f45b8bd6a7ffd244a075fce3062e5f8ad72b130e79ef99",
+    "plugin.cmxs": "5c0940966ab3701d934181dec92d9f35eccfde7dc15a4d498d2d61d291e3dc3f",
+    "runtime.wasm": "ebc5fa2fd9fc6ed3698bd523f5101d4883ef51c0e7bf4783f4b2da64d691972c"
+  },
+  "runtime_wasm_bytes": 655629,
+  "executed_validation": {
+    "report": "evidence/final/report.json",
+    "sha256": "04755112fa61288f3bdb6034e84db4e3411613071f04cb9ca9546b067af21328",
+    "successful_commands": 18,
+    "native_tests": 5,
+    "factory_cases": 128,
+    "single_cases": 32,
+    "prepared_aggregate_cases": 68,
+    "direct_public_cases": 270,
+    "public_backends": [
+      "Motoko interpreter",
+      "validated memory64 Wasm"
+    ],
+    "other_public_coverage": [
+      "prepared boundaries and exactly-once argument evaluation",
+      "aggregate bounds and combined errors",
+      "ordinary typed aggregate callbacks"
+    ]
+  },
+  "source_review": {
+    "report": "source-review.json",
+    "sha256": "48b78ceb3bb87cd9c4db4fb6d514b202cda465e3e0c23f16fc269a5d7276d90d"
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "issue": "Generic addition chain retained MulAssign<&F> calls without that generic bound.",
+      "resolution": "Owner switched to Copy value arguments before compilation; no runtime behavior change."
+    }
+  ],
+  "reused_evidence": {
+    "report": "tests/crypto-audit/prepared/bls12-381/report.json",
+    "sha256": "30782f375801515df6cd6b730f194c2f42cd4d72042fdef2c769b097dfe3501e",
+    "scope": [
+      "nine nominal/Candid rejection cases",
+      "actual managed collection: nine prepared keys retained across arrays/closure and suspension, over 4 MiB reclaimed"
+    ],
+    "reason": "SDK, public nominal types, compiler generator, prepared payload layout/encoding and ownership contract are unchanged. Round4 modifies private synchronous field/pairing arithmetic and removes temporary tables. These GC/type tests were not rerun; current artifact correctness is independently executed above."
+  },
+  "limitations": [
+    "Functional/source review, not formal verification or empirical side-channel certification.",
+    "The owner tests bound StreamingPair driver state to 1,024 B; this is not measured total Wasm stack or peak memory.",
+    "Payload/ABI unchanged; performance and allocation conclusions await independent paired evidence review."
+  ],
+  "approval": "Frozen source and exact-artifact correctness approved; final performance approval pending."
+}
