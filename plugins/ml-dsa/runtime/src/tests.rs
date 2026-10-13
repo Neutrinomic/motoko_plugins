@@ -374,3 +374,260 @@ fn prepared_abi_bounds_unaligned_payloads_and_error_initialization() {
         }
     });
 }
+
+// Round-five tests reuse official answers; malformed encodings preserve the
+// mathematical hint set, so challenge mismatch cannot hide a lax decoder.
+#[test]
+fn canonical_hint_malleability_for_each_polynomial() {
+    stack(|| {
+        let data = corpus();
+        for id in [4, 373] {
+            let row = data["sigGen"].as_array().unwrap().iter()
+                .find(|row| row["tcId"] == id).unwrap();
+            let public = bytes(row, "pk");
+            let message = bytes(row, "message");
+            let ctx = bytes(row, "context");
+            let signature = bytes(row, "signature");
+            let mut prepared_public = [0; PUBLIC_LEN];
+            prepare_public_key(&public, &mut prepared_public).unwrap();
+            let check = |sig: &[u8], expected| {
+                assert_eq!(verify(&public, &message, sig, &ctx), Ok(expected));
+                assert_eq!(verify_prepared(&prepared_public, &message, sig, &ctx), Ok(expected));
+            };
+            check(&signature, true);
+            let used = usize::from(signature[2419]);
+            assert!(used < 79);
+            let mut start = 0;
+            for row in 0..4 {
+                let end = usize::from(signature[2416 + row]);
+                assert!(end >= start + 2);
+                // Unsorting leaves precisely the same set of hint positions.
+                let mut bad = signature.clone();
+                bad.swap(2336 + start, 2336 + start + 1);
+                check(&bad, false);
+                // Inserting a duplicate also leaves the decoded bitset intact.
+                // Shift later positions and every affected row endpoint.
+                let mut bad = signature.clone();
+                bad.copy_within(2336 + start..2336 + used, 2336 + start + 1);
+                for count in &mut bad[2416 + row..2420] { *count += 1; }
+                check(&bad, false);
+                start = end;
+            }
+            // Ignoring either end of the unused padding must not be accepted.
+            for position in [2336 + used, 2415] {
+                let mut bad = signature.clone();
+                assert_eq!(bad[position], 0);
+                bad[position] = 1;
+                check(&bad, false);
+            }
+            check(&signature, true);
+        }
+    });
+}
+
+// Every guard has a nonempty prefix/suffix, and allocations can be deliberately
+// unaligned. Inputs are snapshotted in full, including their surrounding bytes.
+struct AbiGuard {
+    bytes: Vec<u8>,
+    offset: usize,
+    length: usize,
+}
+impl AbiGuard {
+    fn new(value: &[u8], offset: usize) -> Self {
+        let mut bytes = vec![0xa5; offset + value.len() + 9];
+        bytes[offset..offset + value.len()].copy_from_slice(value);
+        Self { bytes, offset, length: value.len() }
+    }
+    fn ptr(&self) -> *const u8 { self.bytes[self.offset..].as_ptr() }
+    fn mut_ptr(&mut self) -> *mut u8 { self.bytes[self.offset..].as_mut_ptr() }
+    fn payload(&self) -> &[u8] { &self.bytes[self.offset..self.offset + self.length] }
+    fn assert_output(&self, value: &[u8]) {
+        assert_eq!(self.payload(), value);
+        assert!(self.bytes[..self.offset].iter().all(|&b| b == 0xa5));
+        assert!(self.bytes[self.offset + self.length..].iter().all(|&b| b == 0xa5));
+    }
+    fn poison(&mut self) { self.bytes.fill(0xa5); }
+}
+
+#[test]
+fn abi_all_byte_alignments_match_official_answers() {
+    stack(|| {
+        let data = corpus();
+        for id in [4, 373] {
+            let row = data["sigGen"].as_array().unwrap().iter()
+                .find(|row| row["tcId"] == id).unwrap();
+            for offset in 1..=8 {
+                let secret = AbiGuard::new(&bytes(row, "seed"), offset);
+                let message = AbiGuard::new(&bytes(row, "message"), 9 - offset);
+                let ctx = AbiGuard::new(&bytes(row, "context"), offset);
+                let rnd = AbiGuard::new(&bytes(row, "rnd"), 9 - offset);
+                let inputs = [&secret, &message, &ctx, &rnd].map(|g| g.bytes.clone());
+                let mut public = AbiGuard::new(&[0xa5; PK_LEN], 9 - offset);
+                let mut signature = AbiGuard::new(&[0xa5; SIG_LEN], offset);
+                let mut pk = AbiGuard::new(&[0xa5; PUBLIC_LEN], offset);
+                let mut sk = AbiGuard::new(&[0xa5; SECRET_LEN], 9 - offset);
+                unsafe {
+                    assert_eq!(mldsa_public_key(secret.ptr(), 32, public.mut_ptr()), PK_LEN as i64);
+                    public.assert_output(&bytes(row, "pk"));
+                    assert_eq!(mldsa_prepare_public_key(public.ptr(), PK_LEN, pk.mut_ptr()), PUBLIC_LEN as i64);
+                    assert_eq!(mldsa_prepare_secret_key(secret.ptr(), 32, sk.mut_ptr()), SECRET_LEN as i64);
+                    let saved_pk = pk.bytes.clone();
+                    let saved_sk = sk.bytes.clone();
+                    assert_eq!(mldsa_sign_randomized(secret.ptr(), 32, message.ptr(), message.length,
+                        ctx.ptr(), ctx.length, rnd.ptr(), 32, signature.mut_ptr()), SIG_LEN as i64);
+                    signature.assert_output(&bytes(row, "signature"));
+                    assert_eq!(mldsa_verify(public.ptr(), PK_LEN, message.ptr(), message.length,
+                        signature.ptr(), SIG_LEN, ctx.ptr(), ctx.length), 1);
+                    signature.poison();
+                    assert_eq!(mldsa_sign_randomized_prepared(sk.ptr(), message.ptr(), message.length,
+                        ctx.ptr(), ctx.length, rnd.ptr(), 32, signature.mut_ptr()), SIG_LEN as i64);
+                    signature.assert_output(&bytes(row, "signature"));
+                    assert_eq!(mldsa_verify_prepared(pk.ptr(), message.ptr(), message.length,
+                        signature.ptr(), SIG_LEN, ctx.ptr(), ctx.length), 1);
+                    if row["deterministic"].as_bool().unwrap() {
+                        signature.poison();
+                        assert_eq!(mldsa_sign(secret.ptr(), 32, message.ptr(), message.length,
+                            ctx.ptr(), ctx.length, signature.mut_ptr()), SIG_LEN as i64);
+                        signature.assert_output(&bytes(row, "signature"));
+                        signature.poison();
+                        assert_eq!(mldsa_sign_prepared(sk.ptr(), message.ptr(), message.length,
+                            ctx.ptr(), ctx.length, signature.mut_ptr()), SIG_LEN as i64);
+                        signature.assert_output(&bytes(row, "signature"));
+                    }
+                    pk.assert_output(&saved_pk[pk.offset..pk.offset + PUBLIC_LEN]);
+                    sk.assert_output(&saved_sk[sk.offset..sk.offset + SECRET_LEN]);
+                    assert_eq!(pk.bytes, saved_pk);
+                    assert_eq!(sk.bytes, saved_sk);
+                }
+                public.assert_output(&bytes(row, "pk"));
+                for (input, before) in [&secret, &message, &ctx, &rnd].into_iter().zip(inputs) {
+                    assert_eq!(input.bytes, before);
+                }
+            }
+        }
+    });
+}
+
+#[test]
+fn abi_failures_zero_exact_outputs_and_leave_live_handles_usable() {
+    stack(|| {
+        let seed = [7; 33];
+        let mut public = [0; PK_LEN];
+        public_key(&seed[..32], &mut public).unwrap();
+        let mut pk = [0; PUBLIC_LEN];
+        let mut sk = [0; SECRET_LEN];
+        prepare_public_key(&public, &mut pk).unwrap();
+        prepare_secret_key(&seed[..32], &mut sk).unwrap();
+        let saved_pk = pk;
+        let saved_sk = sk;
+        let ctx = [0; 256];
+        let rnd = [0; 33];
+        for offset in 1..=8 {
+            let mut output = AbiGuard::new(&[0xa5; PK_LEN], offset);
+            unsafe { assert_eq!(mldsa_public_key(seed.as_ptr(), 31, output.mut_ptr()), INVALID_SECRET_KEY); }
+            output.assert_output(&[0; PK_LEN]);
+            let mut output = AbiGuard::new(&[0xa5; PUBLIC_LEN], offset);
+            unsafe { assert_eq!(mldsa_prepare_public_key(public.as_ptr(), PK_LEN - 1, output.mut_ptr()), INVALID_PUBLIC_KEY); }
+            output.assert_output(&[0; PUBLIC_LEN]);
+            let mut output = AbiGuard::new(&[0xa5; SECRET_LEN], offset);
+            unsafe { assert_eq!(mldsa_prepare_secret_key(seed.as_ptr(), 33, output.mut_ptr()), INVALID_SECRET_KEY); }
+            output.assert_output(&[0; SECRET_LEN]);
+            let mut output = AbiGuard::new(&[0xa5; SIG_LEN], offset);
+            // All combinations exercise status priority and initialization through
+            // the exported ABI, including simultaneous context/randomness errors.
+            for (secret_len, context_len, rnd_len, expected) in [
+                (31, 256, 31, INVALID_SECRET_KEY), (32, 256, 31, INVALID_CONTEXT),
+                (32, 0, 0, INVALID_RANDOMNESS), (32, 0, 31, INVALID_RANDOMNESS),
+                (32, 0, 33, INVALID_RANDOMNESS),
+            ] {
+                output.poison();
+                unsafe { assert_eq!(mldsa_sign_randomized(seed.as_ptr(), secret_len, core::ptr::null(), 0,
+                    ctx.as_ptr(), context_len, rnd.as_ptr(), rnd_len, output.mut_ptr()), expected); }
+                output.assert_output(&[0; SIG_LEN]);
+                if secret_len == 32 {
+                    output.poison();
+                    unsafe { assert_eq!(mldsa_sign_randomized_prepared(sk.as_ptr(), core::ptr::null(), 0,
+                        ctx.as_ptr(), context_len, rnd.as_ptr(), rnd_len, output.mut_ptr()), expected); }
+                    output.assert_output(&[0; SIG_LEN]);
+                }
+            }
+            output.poison();
+            unsafe { assert_eq!(mldsa_sign(seed.as_ptr(), 32, core::ptr::null(), 0,
+                ctx.as_ptr(), 256, output.mut_ptr()), INVALID_CONTEXT); }
+            output.assert_output(&[0; SIG_LEN]);
+            output.poison();
+            unsafe { assert_eq!(mldsa_sign_prepared(sk.as_ptr(), core::ptr::null(), 0,
+                ctx.as_ptr(), 256, output.mut_ptr()), INVALID_CONTEXT); }
+            output.assert_output(&[0; SIG_LEN]);
+        }
+        assert_eq!(pk, saved_pk);
+        assert_eq!(sk, saved_sk);
+        let mut signature = [0; SIG_LEN];
+        sign_prepared(&sk, b"still usable", &[], &[0; 32], &mut signature).unwrap();
+        assert_eq!(verify_prepared(&pk, b"still usable", &signature, &[]), Ok(true));
+    });
+}
+
+#[test]
+fn binary_context_framing_and_shared_readonly_inputs() {
+    stack(|| {
+        let seed = [0x80; 32];
+        let mut public = [0; PK_LEN];
+        public_key(&seed, &mut public).unwrap();
+        let mut pk = [0; PUBLIC_LEN];
+        let mut sk = [0; SECRET_LEN];
+        prepare_public_key(&public, &mut pk).unwrap();
+        prepare_secret_key(&seed, &mut sk).unwrap();
+        for (message, ctx, other_message, other_ctx) in [
+            (&b"b\0c"[..], &b"a"[..], &b"\0c"[..], &b"ab"[..]),
+            (&b"\0\xffa"[..], &b""[..], &b"a"[..], &b"\0\xff"[..]),
+        ] {
+            assert_eq!([ctx, message].concat(), [other_ctx, other_message].concat());
+            let mut signature = [0; SIG_LEN];
+            sign(&seed, message, ctx, &[0; 32], &mut signature).unwrap();
+            let mut repeated = [0; SIG_LEN];
+            sign_prepared(&sk, message, ctx, &[0; 32], &mut repeated).unwrap();
+            assert_eq!(signature, repeated);
+            assert_eq!(verify(&public, message, &signature, ctx), Ok(true));
+            assert_eq!(verify_prepared(&pk, other_message, &signature, other_ctx), Ok(false));
+            assert_eq!(verify(&public, other_message, &signature, other_ctx), Ok(false));
+        }
+        // The ABI permits overlapping immutable inputs. Here all four inputs
+        // alias, whereas the output remains disjoint as the contract requires.
+        let mut expected = [0; SIG_LEN];
+        sign(&seed, &seed, &seed, &seed, &mut expected).unwrap();
+        let mut output = [0; SIG_LEN];
+        unsafe {
+            assert_eq!(mldsa_sign_randomized(seed.as_ptr(), 32, seed.as_ptr(), 32,
+                seed.as_ptr(), 32, seed.as_ptr(), 32, output.as_mut_ptr()), SIG_LEN as i64);
+            assert_eq!(output, expected);
+            assert_eq!(mldsa_sign_randomized_prepared(sk.as_ptr(), seed.as_ptr(), 32,
+                seed.as_ptr(), 32, seed.as_ptr(), 32, output.as_mut_ptr()), SIG_LEN as i64);
+        }
+        assert_eq!(output, expected);
+        assert_eq!(seed, [0x80; 32]);
+        assert_eq!(verify(&public, &seed, &output, &seed), Ok(true));
+    });
+}
+
+#[test]
+fn public_key_coefficient_extremes_are_canonical_encodings() {
+    stack(|| {
+        let data = corpus();
+        let row = &data["sigGen"][3];
+        for byte in [0, 255] {
+            // t1 uses the full ten-bit range. In particular, all-one packed t1
+            // scales to q-1, not an out-of-range or noncanonical coefficient.
+            let public = [byte; PK_LEN];
+            let decoded = PublicKey::try_from_bytes(public).unwrap();
+            assert_eq!(decoded.into_bytes(), public);
+            let mut prepared = [0; PUBLIC_LEN];
+            assert_eq!(prepare_public_key(&public, &mut prepared), Ok(PUBLIC_LEN));
+            let message = bytes(row, "message");
+            let signature = bytes(row, "signature");
+            let context = bytes(row, "context");
+            assert_eq!(verify(&public, &message, &signature, &context), Ok(false));
+            assert_eq!(verify_prepared(&prepared, &message, &signature, &context), Ok(false));
+        }
+    });
+}
