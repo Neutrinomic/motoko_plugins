@@ -119,3 +119,10 @@ checks every existing official signing/verification vector through the prepared
 path, including deterministic/randomized exact signature parity and cache
 immutability. Public interpreter/Wasm and Ash tests also cover typed errors,
 key interleaving and retained handles across collection.
+
+The [round-four optimization report](../../benchmarks/crypto/round4/ml-dsa/)
+measures a further 5.17–6.94% reduction in prepared verification instructions
+and 0.85–4.01% in prepared signing across the same four official fixtures.
+Buffered matrix sampling also reduces direct and preparation costs. Allocation
+and prepared payloads are unchanged; redundant decode copies and conservative
+Wasm shadow-stack bounds are reduced.
