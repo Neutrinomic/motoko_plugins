@@ -272,3 +272,105 @@ fn abi_outputs_are_bounded_initialized_and_independent() {
         );
     });
 }
+
+
+#[test]
+fn prepared_official_vectors_and_immutable_reuse() {
+    stack(|| {
+        for row in corpus()["sigGen"].as_array().unwrap() {
+            let secret = bytes(row, "seed");
+            let public = bytes(row, "pk");
+            let message = bytes(row, "message");
+            let context = bytes(row, "context");
+            let randomness = bytes(row, "rnd");
+            let mut prepared_secret = [0; SECRET_LEN];
+            let mut prepared_public = [0; PUBLIC_LEN];
+            assert_eq!(prepare_secret_key(&secret, &mut prepared_secret), Ok(SECRET_LEN));
+            assert_eq!(prepare_public_key(&public, &mut prepared_public), Ok(PUBLIC_LEN));
+            let secret_before = prepared_secret;
+            let public_before = prepared_public;
+            let mut output = [0; SIG_LEN];
+            for _ in 0..2 {
+                assert_eq!(sign_prepared(&prepared_secret, &message, &context, &randomness, &mut output), Ok(SIG_LEN));
+                assert_eq!(output.as_slice(), bytes(row, "signature"), "prepared sigGen {}", row["tcId"]);
+                assert_eq!(verify_prepared(&prepared_public, &message, &output, &context), Ok(true));
+            }
+            assert_eq!(prepared_secret, secret_before);
+            assert_eq!(prepared_public, public_before);
+        }
+        for row in corpus()["sigVer"].as_array().unwrap() {
+            let mut public = [0; PUBLIC_LEN];
+            prepare_public_key(&bytes(row, "pk"), &mut public).unwrap();
+            assert_eq!(verify_prepared(&public, &bytes(row, "message"), &bytes(row, "signature"), &bytes(row, "context")),
+                Ok(row["testPassed"].as_bool().unwrap()));
+        }
+    });
+}
+
+#[test]
+fn prepared_factory_boundaries_and_error_precedence() {
+    stack(|| {
+        let mut secret = [0; SECRET_LEN];
+        let mut public = [0; PUBLIC_LEN];
+        for length in [0, 1, 31, 33, 2560, SECRET_LEN] {
+            assert_eq!(prepare_secret_key(&vec![0; length], &mut secret), Err(INVALID_SECRET_KEY));
+        }
+        for length in [0, 1, PK_LEN-1, PK_LEN+1, PUBLIC_LEN] {
+            assert_eq!(prepare_public_key(&vec![0; length], &mut public), Err(INVALID_PUBLIC_KEY));
+        }
+        for seed in [[0; 32], [255; 32]] {
+            let mut raw_public = [0; PK_LEN];
+            public_key(&seed, &mut raw_public).unwrap();
+            prepare_secret_key(&seed, &mut secret).unwrap();
+            prepare_public_key(&raw_public, &mut public).unwrap();
+            let mut signature = [0; SIG_LEN];
+            for context in [vec![], vec![1; 255]] {
+                sign_prepared(&secret, &[], &context, &[0; 32], &mut signature).unwrap();
+                assert_eq!(verify_prepared(&public, &[], &signature, &context), Ok(true));
+            }
+            assert_eq!(sign_prepared(&secret, &[], &[0; 256], &[], &mut signature), Err(INVALID_CONTEXT));
+            assert_eq!(sign_prepared(&secret, &[], &[], &[], &mut signature), Err(INVALID_RANDOMNESS));
+            assert_eq!(verify_prepared(&public, &[], &[], &[0; 256]), Err(INVALID_SIGNATURE));
+            assert_eq!(verify_prepared(&public, &[], &signature, &[0; 256]), Err(INVALID_CONTEXT));
+        }
+    });
+}
+
+#[test]
+fn prepared_abi_bounds_unaligned_payloads_and_error_initialization() {
+    stack(|| {
+        let seed = [7; 32];
+        let mut public = [0; PK_LEN];
+        public_key(&seed, &mut public).unwrap();
+        let mut public_guard = vec![0xa5; PUBLIC_LEN + 2];
+        let mut secret_guard = vec![0xa5; SECRET_LEN + 2];
+        let mut signature_guard = [0xa5; SIG_LEN + 2];
+        unsafe {
+            assert_eq!(mldsa_prepare_public_key(public.as_ptr(), PK_LEN, public_guard[1..].as_mut_ptr()), PUBLIC_LEN as i64);
+            assert_eq!(mldsa_prepare_secret_key(seed.as_ptr(), 32, secret_guard[1..].as_mut_ptr()), SECRET_LEN as i64);
+        }
+        let public_before = public_guard.clone();
+        let secret_before = secret_guard.clone();
+        unsafe {
+            assert_eq!(mldsa_sign_prepared(secret_guard[1..].as_ptr(), core::ptr::null(), 0,
+                core::ptr::null(), 0, signature_guard[1..].as_mut_ptr()), SIG_LEN as i64);
+            assert_eq!(mldsa_verify_prepared(public_guard[1..].as_ptr(), core::ptr::null(), 0,
+                signature_guard[1..].as_ptr(), SIG_LEN, core::ptr::null(), 0), 1);
+            assert_eq!(mldsa_sign_randomized_prepared(secret_guard[1..].as_ptr(), core::ptr::null(), 0,
+                core::ptr::null(), 0, seed.as_ptr(), 32, signature_guard[1..].as_mut_ptr()), SIG_LEN as i64);
+            assert_eq!(mldsa_verify_prepared(public_guard[1..].as_ptr(), core::ptr::null(), 0,
+                signature_guard[1..].as_ptr(), SIG_LEN, core::ptr::null(), 0), 1);
+        }
+        assert_eq!(public_guard, public_before);
+        assert_eq!(secret_guard, secret_before);
+        assert_eq!((signature_guard[0], signature_guard[SIG_LEN + 1]), (0xa5, 0xa5));
+        unsafe {
+            assert_eq!(mldsa_prepare_public_key(core::ptr::null(), 0, public_guard[1..].as_mut_ptr()), INVALID_PUBLIC_KEY);
+            assert_eq!(mldsa_prepare_secret_key(core::ptr::null(), 0, secret_guard[1..].as_mut_ptr()), INVALID_SECRET_KEY);
+        }
+        for (guard, length) in [(&public_guard, PUBLIC_LEN), (&secret_guard, SECRET_LEN)] {
+            assert_eq!((guard[0], guard[length + 1]), (0xa5, 0xa5));
+            assert!(guard[1..=length].iter().all(|&byte| byte == 0));
+        }
+    });
+}

@@ -6,6 +6,7 @@
 
 use fips204::ml_dsa_44::{KG, PK_LEN, SIG_LEN, PublicKey};
 use fips204::traits::{KeyGen, SerDes, Signer, Verifier};
+use fips204::motoko_prepared::{self as prepared, PUBLIC_LEN, SECRET_LEN};
 
 const INVALID_SECRET_KEY: i64 = -1;
 const INVALID_PUBLIC_KEY: i64 = -2;
@@ -47,6 +48,31 @@ fn verify(public: &[u8], message: &[u8], signature: &[u8], ctx: &[u8]) -> Result
     // Every length-correct public key is a canonical rho || packed-t1 value.
     let public = PublicKey::try_from_bytes(*public).map_err(|_| INVALID_PUBLIC_KEY)?;
     Ok(public.verify(message, signature, ctx))
+}
+
+fn prepare_public_key(public: &[u8], output: &mut [u8]) -> Result<usize, i64> {
+    let public = public.try_into().map_err(|_| INVALID_PUBLIC_KEY)?;
+    prepared::prepare_public(public, output.try_into().expect("fixed prepared public output"))
+        .map_err(|_| INVALID_PUBLIC_KEY)?;
+    Ok(PUBLIC_LEN)
+}
+
+fn prepare_secret_key(secret: &[u8], output: &mut [u8]) -> Result<usize, i64> {
+    prepared::prepare_secret(seed(secret)?, output.try_into().expect("fixed prepared secret output"));
+    Ok(SECRET_LEN)
+}
+
+fn sign_prepared(secret: &[u8; SECRET_LEN], message: &[u8], ctx: &[u8], randomness: &[u8], output: &mut [u8]) -> Result<usize, i64> {
+    context(ctx)?;
+    let randomness = randomness.try_into().map_err(|_| INVALID_RANDOMNESS)?;
+    output[..SIG_LEN].copy_from_slice(&prepared::sign(secret, message, ctx, randomness));
+    Ok(SIG_LEN)
+}
+
+fn verify_prepared(public: &[u8; PUBLIC_LEN], message: &[u8], signature: &[u8], ctx: &[u8]) -> Result<bool, i64> {
+    let signature = signature.try_into().map_err(|_| INVALID_SIGNATURE)?;
+    context(ctx)?;
+    Ok(prepared::verify(public, message, signature, ctx))
 }
 
 unsafe fn input<'a>(ptr: *const u8, len: usize) -> &'a [u8] {
@@ -108,6 +134,66 @@ pub unsafe extern "C" fn mldsa_verify(
     ctx: *const u8, ctx_len: usize,
 ) -> i64 {
     match verify(unsafe { input(public, public_len) }, unsafe { input(message, message_len) },
+        unsafe { input(signature, signature_len) }, unsafe { input(ctx, ctx_len) }) {
+        Ok(value) => i64::from(value), Err(error) => error,
+    }
+}
+
+/// # Safety
+/// Input is readable; out is a disjoint writable PUBLIC_LEN-byte Blob payload.
+/// The compiler publishes it as a protected public handle only on success.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mldsa_prepare_public_key(public: *const u8, public_len: usize, out: *mut u8) -> i64 {
+    status(prepare_public_key(unsafe { input(public, public_len) }, unsafe { output(out, PUBLIC_LEN) }))
+}
+
+/// # Safety
+/// Input is readable; out is a disjoint writable SECRET_LEN-byte Blob payload.
+/// The compiler publishes it as a protected secret handle only on success.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mldsa_prepare_secret_key(secret: *const u8, secret_len: usize, out: *mut u8) -> i64 {
+    status(prepare_secret_key(unsafe { input(secret, secret_len) }, unsafe { output(out, SECRET_LEN) }))
+}
+
+/// # Safety
+/// secret is the immutable SECRET_LEN-byte payload of this plugin's protected
+/// secret handle; other inputs are readable and out is disjoint writable SIG_LEN
+/// bytes. No GC or callback occurs while any pointer is borrowed.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mldsa_sign_prepared(
+    secret: *const u8, message: *const u8, message_len: usize,
+    ctx: *const u8, ctx_len: usize, out: *mut u8,
+) -> i64 {
+    let secret = unsafe { &*secret.cast::<[u8; SECRET_LEN]>() };
+    status(sign_prepared(secret, unsafe { input(message, message_len) },
+        unsafe { input(ctx, ctx_len) }, &[0; 32], unsafe { output(out, SIG_LEN) }))
+}
+
+/// # Safety
+/// Same protected secret and disjoint output requirements as mldsa_sign_prepared;
+/// randomness is readable for its stated length. No GC safepoint occurs.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mldsa_sign_randomized_prepared(
+    secret: *const u8, message: *const u8, message_len: usize,
+    ctx: *const u8, ctx_len: usize,
+    randomness: *const u8, randomness_len: usize, out: *mut u8,
+) -> i64 {
+    let secret = unsafe { &*secret.cast::<[u8; SECRET_LEN]>() };
+    status(sign_prepared(secret, unsafe { input(message, message_len) },
+        unsafe { input(ctx, ctx_len) }, unsafe { input(randomness, randomness_len) },
+        unsafe { output(out, SIG_LEN) }))
+}
+
+/// # Safety
+/// public is the immutable PUBLIC_LEN-byte payload of this plugin's protected
+/// public handle. All other inputs are readable; no GC safepoint occurs.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mldsa_verify_prepared(
+    public: *const u8, message: *const u8, message_len: usize,
+    signature: *const u8, signature_len: usize, ctx: *const u8, ctx_len: usize,
+) -> i64 {
+    let public = unsafe { &*public.cast::<[u8; PUBLIC_LEN]>() };
+    match verify_prepared(public, unsafe { input(message, message_len) },
         unsafe { input(signature, signature_len) }, unsafe { input(ctx, ctx_len) }) {
         Ok(value) => i64::from(value), Err(error) => error,
     }
