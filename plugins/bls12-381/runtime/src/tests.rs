@@ -639,3 +639,6 @@ fn empty_public_batches_preserve_errors_and_canonical_identity() {
         assert_eq!(call(msm,&[],&[0;32*129+1],&[]),Err(INVALID_LENGTH));
     }
 }
+
+#[path = "aggregate_tests.rs"]
+mod aggregate;

@@ -17,4 +17,13 @@ let operations = List.map (fun (opcode,name,arity,output_size,boolean) ->
   14,"verify_ic",3,1,true; 15,"verify_ethereum",3,1,true;
   16,"verify_ethereum_pop",2,1,true;
   17,"g1_aggregate",1,48,false; 18,"g2_aggregate",1,96,false;
+  19,"aggregate_verify_ic",3,1,true;
+  20,"aggregate_verify_ethereum",4,1,true;
+  21,"fast_aggregate_verify_ethereum",4,1,true;
 ]
+
+let arguments operation = match operation.opcode with
+  | 19 -> [T.Array T.blob; T.Array T.blob; T.blob]
+  | 20 -> [T.Array T.blob; T.Array T.blob; T.Array T.blob; T.blob]
+  | 21 -> [T.Array T.blob; T.Array T.blob; T.blob; T.blob]
+  | _ -> List.init operation.arity (fun _ -> T.blob)

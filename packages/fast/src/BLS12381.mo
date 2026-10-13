@@ -54,171 +54,17 @@ module {
   public let g1Aggregate = Prim.bls12_381_g1_aggregate;
   public let g2Aggregate = Prim.bls12_381_g2_aggregate;
 
-  let icDST : Blob = "BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_";
-  let ethDST : Blob = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
-
-  func pack(parts : [Blob]) : Blob {
-    var size = 0;
-    for (part in parts.values()) { size += part.size() };
-    let output = Prim.Array_init<Nat8>(size, 0);
-    var at = 0;
-    for (part in parts.values()) {
-      for (byte in part.values()) { output[at] := byte; at += 1 };
-    };
-    Prim.arrayMutToBlob(output)
-  };
-  // Called only after canonical validation and rejection of infinity.
-  func negateG1(point : Blob) : Blob {
-    let bytes = Prim.blobToArrayMut(point);
-    bytes[0] := bytes[0] ^ 0x20;
-    Prim.arrayMutToBlob(bytes)
-  };
-  func validG1(point : Blob) : Result<Blob> {
-    switch (validateG1(point)) {
-      case (#err(e)) #err(e);
-      case (#ok(p)) { if (p == g1Identity) #err(#identity) else #ok(p) };
-    }
-  };
-  func validG2(point : Blob) : Result<Blob> {
-    switch (validateG2(point)) {
-      case (#err(e)) #err(e);
-      case (#ok(p)) { if (p == g2Identity) #err(#identity) else #ok(p) };
-    }
-  };
-
-  // Keep tiny batches and early duplicate rejection allocation-free. Larger
-  // batches use a bounded merge sort; equality still compares exact bytes.
-  func differentMessages(messages : [Blob]) : Bool {
-    let n = messages.size();
-    let prefix = if (n < 16) n else 8;
-    var i = 0;
-    while (i < prefix) {
-      var j = 0;
-      while (j < i) {
-        if (messages[i] == messages[j]) return false;
-        j += 1;
-      };
-      i += 1;
-    };
-    if (n < 16) return true;
-    var source = Prim.Array_tabulateVar<Blob>(n, func(i) { messages[i] });
-    var target = Prim.Array_init<Blob>(n, "");
-    var width = 1;
-    while (width < n) {
-      var start = 0;
-      while (start < n) {
-        let middle = if (start + width < n) start + width else n;
-        let end = if (middle + width < n) middle + width else n;
-        var left = start;
-        var right = middle;
-        var out = start;
-        while (left < middle and right < end) {
-          let a = source[left]; let b = source[right];
-          let comparison : Int8 = if (a.size() < b.size()) -1 else if (a.size() > b.size()) 1 else Prim.blobCompare(a, b);
-          if (comparison == 0) return false;
-          if (comparison < 0) { target[out] := a; left += 1 }
-          else { target[out] := b; right += 1 };
-          out += 1;
-        };
-        while (left < middle) { target[out] := source[left]; left += 1; out += 1 };
-        while (right < end) { target[out] := source[right]; right += 1; out += 1 };
-        start := end;
-      };
-      let old = source; source := target; target := old;
-      width *= 2;
-    };
-    true
-  };
-
   /// Aggregate IC/basic signatures only over pairwise-distinct messages.
   /// Requires 1..127 entries and rejects duplicates before doing cryptography.
-  public func aggregateVerifyIC(keys : [Blob], messages : [Blob], signature : Blob) : Result<Bool> {
-    let n = keys.size();
-    if (n != messages.size()) return #err(#invalidLength);
-    if (n == 0) return #err(#emptyBatch);
-    if (n > maxAggregateSize) return #err(#tooManyItems);
-    if (not differentMessages(messages)) return #err(#duplicateMessage);
-    var i = 0;
-    let sig = switch (validG1(signature)) { case (#ok(p)) p; case (#err(e)) return #err(e) };
-    let terms = Prim.Array_init<Blob>(n * 2 + 2, "");
-    terms[0] := negateG1(sig); terms[1] := g2Generator;
-    i := 0;
-    while (i < n) {
-      let key = switch (validG2(keys[i])) { case (#ok(p)) p; case (#err(e)) return #err(e) };
-      let hashed = switch (hashToG1(messages[i], icDST)) { case (#ok(p)) p; case (#err(e)) return #err(e) };
-      terms[i * 2 + 2] := hashed; terms[i * 2 + 3] := key;
-      i += 1;
-    };
-    pairingCheck(pack(Prim.Array_tabulate<Blob>(terms.size(), func(i) { terms[i] })))
-  };
+  public let aggregateVerifyIC = Prim.bls12_381_aggregate_verify_ic;
 
-  /// Verify every distinct key/proof byte pair within each call before aggregate use.
-  /// Byte-identical pairs reuse only a successful check from this same call.
-  /// Well-formed proofs that fail verification return #invalidProof. Malformed
-  /// keys/proofs preserve decoding errors; no unchecked assertion flag exists.
-  func checkProofs(keys : [Blob], proofs : [Blob]) : Result<()> {
-    if (keys.size() != proofs.size()) return #err(#invalidLength);
-    var i = 0;
-    while (i < keys.size()) {
-      // Reuse only a byte-identical pair already checked successfully in this
-      // call. A new proof for a repeated key is always verified independently.
-      var duplicate = false;
-      var j = 0;
-      while (j < i and not duplicate) {
-        duplicate := keys[j] == keys[i] and proofs[j] == proofs[i];
-        j += 1;
-      };
-      if (not duplicate) {
-        switch (verifyEthereumProof(keys[i], proofs[i])) {
-          case (#err(e)) return #err(e);
-          case (#ok(false)) return #err(#invalidProof);
-          case (#ok(true)) {};
-        };
-      };
-      i += 1;
-    };
-    #ok(())
-  };
   /// Ethereum aggregate verification with PoP verification for every key.
-  /// Repeated messages up to 1024 bytes reuse their hash after possession is checked.
-  /// Longer messages are hashed directly to bound byte-comparison work. 1..127 entries.
-  public func aggregateVerifyEthereum(keys : [Blob], proofs : [Blob], messages : [Blob], signature : Blob) : Result<Bool> {
-    let n = keys.size();
-    if (n != messages.size() or n != proofs.size()) return #err(#invalidLength);
-    if (n == 0) return #err(#emptyBatch);
-    if (n > maxAggregateSize) return #err(#tooManyItems);
-    let sig = switch (validG2(signature)) { case (#ok(p)) p; case (#err(e)) return #err(e) };
-    switch (checkProofs(keys, proofs)) { case (#err(e)) return #err(e); case (#ok(())) {} };
-    let terms = Prim.Array_init<Blob>(n * 2 + 2, "");
-    terms[0] := negateG1(g1Generator); terms[1] := sig;
-    var i = 0;
-    while (i < n) {
-      var representative = i;
-      var j = 0;
-      // Keep pairwise byte comparisons bounded independently of message length.
-      // Ethereum signing roots are 32 bytes; longer raw messages remain supported.
-      let reusable = messages[i].size() <= 1024;
-      while (reusable and j < i and representative == i) {
-        if (messages[j] == messages[i]) representative := j;
-        j += 1;
-      };
-      let hashed = if (representative < i) terms[representative * 2 + 3] else {
-        switch (hashToG2(messages[i], ethDST)) { case (#ok(p)) p; case (#err(e)) return #err(e) }
-      };
-      terms[i * 2 + 2] := keys[i]; terms[i * 2 + 3] := hashed;
-      i += 1;
-    };
-    pairingCheck(pack(Prim.Array_tabulate<Blob>(terms.size(), func(i) { terms[i] })))
-  };
+  /// Only exact key/proof pairs checked successfully within this call are reused.
+  /// Malformed keys/proofs preserve decoding errors; false proofs return #invalidProof.
+  /// Repeated messages up to 1024 bytes reuse their hash. Requires 1..127 entries.
+  public let aggregateVerifyEthereum = Prim.bls12_381_aggregate_verify_ethereum;
 
   /// Same-message Ethereum aggregate verification. Every key requires its PoP;
   /// the aggregate key is then verified in one two-term pairing. 1..128 entries.
-  public func fastAggregateVerifyEthereum(keys : [Blob], proofs : [Blob], message : Blob, signature : Blob) : Result<Bool> {
-    if (keys.size() != proofs.size()) return #err(#invalidLength);
-    if (keys.size() == 0) return #err(#emptyBatch);
-    if (keys.size() > maxBatchSize) return #err(#tooManyItems);
-    switch (checkProofs(keys, proofs)) { case (#err(e)) return #err(e); case (#ok(())) {} };
-    let key = switch (g1Aggregate(pack(keys))) { case (#ok(p)) p; case (#err(e)) return #err(e) };
-    verifyEthereum(key, message, signature)
-  };
+  public let fastAggregateVerifyEthereum = Prim.bls12_381_fast_aggregate_verify_ethereum;
 }

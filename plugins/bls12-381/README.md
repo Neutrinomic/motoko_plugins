@@ -14,7 +14,7 @@ Group operations permit infinity. Signature keys and signatures must be nonident
 `BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_`. It verifies raw signed bytes; the
 caller constructs protocol framing such as `ic-state-root` and verifies certificate
 structure/delegations separately. `aggregateVerifyIC` enforces distinct messages
-with exact byte comparisons and a bounded merge sort for larger batches.
+with exact byte comparisons and a bounded index sort for larger batches.
 
 `verifyEthereum` uses G2 signatures/G1 keys and
 `BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_`. Proofs use
@@ -23,7 +23,12 @@ every distinct byte-identical key/proof pair in each call before using its key.
 A previously verified pair may be reused within that call; a different proof is
 always checked. No result or native state is retained between calls. Repeated
 messages up to 1024 bytes reuse their hash within the call. Longer messages
-are hashed directly, bounding comparison work independently of message length. There is no unchecked assertion flag.
+are hashed directly, bounding comparison work independently of message length. Aggregate
+profiles execute in one native call: a bounded descriptor table borrows the original
+Blobs, and validated keys and hash-to-curve points stay decoded until pairing. This
+avoids packing and re-decoding intermediate points between group operations. All
+external points still receive canonical, curve, subgroup and identity checks. There is
+no unchecked assertion flag.
 Callers construct Ethereum signing roots themselves. Raw group aggregation does
 not prove key possession and should not be substituted for signature verification.
 
@@ -53,7 +58,9 @@ state. Pairing precomputation uses bounded managed scratch via SDK host allocati
 MSM uses 33 stack bucket slots (at most 32 active magnitude buckets) plus
 bounded managed decoded-input scratch. Two/three-term Straus uses at most
 12 projective table entries and 768 signed digits on the stack.
-Other kernels use bounded stack storage. All compiler values and outputs use SDK
+Aggregate profiles use at most 6 KiB of stack for borrowed input descriptors, a
+bounded vector of validated keys for Ethereum proofs, and the same bounded pairing
+scratch. Other kernels use bounded stack storage. All compiler values and outputs use SDK
 managed constructors. Interpreter semantics are independent portable OCaml using
 the compiler's Num arithmetic, including full hashes and pairings.
 

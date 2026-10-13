@@ -64,7 +64,10 @@ const INVALID_POINT: u32 = 2;
 const INVALID_SCALAR: u32 = 3;
 const INVALID_FIELD: u32 = 4;
 const TOO_MANY_ITEMS: u32 = 5;
+const EMPTY_BATCH: u32 = 6;
 const IDENTITY: u32 = 7;
+const INVALID_PROOF: u32 = 8;
+const DUPLICATE_MESSAGE: u32 = 9;
 const INVALID_ARGUMENT: u32 = 10;
 
 const IC_DST: &[u8] = b"BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_";
@@ -234,6 +237,12 @@ fn pairing_check(bytes: &[u8]) -> Result<bool, u32> {
             points.push((p, q));
         }
     }
+    Ok(pairing_product(points))
+}
+
+// All operands passed here have already been decoded and subgroup-checked,
+// or were produced by hash-to-curve. No unchecked external points enter here.
+fn pairing_product(mut points: Vec<(G1Affine, G2Affine)>) -> bool {
     // Pairing is bilinear: terms sharing Q can add their P operands before
     // Miller preparation. All original encodings were checked above, even
     // terms that cancel. Keep unique P affine to avoid unnecessary inversions.
@@ -256,7 +265,7 @@ fn pairing_check(bytes: &[u8]) -> Result<bool, u32> {
     }
     points.retain(|(p, _)| !bool::from(p.is_identity()));
     if points.is_empty() {
-        return Ok(true);
+        return true;
     }
     let prepared: Vec<_> = points.iter().map(|(_, q)| G2Prepared::from(*q)).collect();
     let terms: Vec<_> = points
@@ -264,7 +273,7 @@ fn pairing_check(bytes: &[u8]) -> Result<bool, u32> {
         .zip(&prepared)
         .map(|((p, _), q)| (p, q))
         .collect();
-    Ok(multi_miller_loop(&terms).final_exponentiation() == Gt::identity())
+    multi_miller_loop(&terms).final_exponentiation() == Gt::identity()
 }
 
 // Width-four non-adjacent form for a canonical public scalar. A carry may
@@ -502,6 +511,173 @@ pub unsafe extern "C" fn bls_call(
         Err(code) => return code,
     }
     0
+}
+
+// The generated bridge passes only borrowed Blob payloads. Each row is six
+// native-width words: key pointer/length, proof pointer/length, message
+// pointer/length. It checks array shape and batch bounds before allocating
+// this bounded descriptor buffer. Payloads are never copied or retained.
+#[derive(Clone, Copy, Default)]
+struct AggregateInput<'a> {
+    key: &'a [u8],
+    proof: &'a [u8],
+    message: &'a [u8],
+}
+
+fn distinct_messages(inputs: &[AggregateInput<'_>]) -> bool {
+    let prefix = if inputs.len() < 16 { inputs.len() } else { 8 };
+    for i in 0..prefix {
+        if inputs[..i].iter().any(|previous| previous.message == inputs[i].message) {
+            return false;
+        }
+    }
+    if inputs.len() < 16 {
+        return true;
+    }
+    // Sorting bounded indices avoids copying payloads and keeps large common
+    // prefixes from turning a distinct-message check into quadratic work.
+    let mut order = [0usize; MAX_BATCH];
+    for (index, slot) in order[..inputs.len()].iter_mut().enumerate() {
+        *slot = index;
+    }
+    let order = &mut order[..inputs.len()];
+    order.sort_unstable_by(|a, b| {
+        let a = inputs[*a].message;
+        let b = inputs[*b].message;
+        a.len().cmp(&b.len()).then_with(|| a.cmp(b))
+    });
+    !order.windows(2).any(|pair| inputs[pair[0]].message == inputs[pair[1]].message)
+}
+
+fn aggregate_ic(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    if !distinct_messages(inputs) {
+        return Err(DUPLICATE_MESSAGE);
+    }
+    let signature = g1(signature)?;
+    if bool::from(signature.is_identity()) {
+        return Err(IDENTITY);
+    }
+    let mut terms = Vec::with_capacity(inputs.len() + 1);
+    terms.push((-signature, G2Affine::generator()));
+    for input in inputs {
+        let key = g2(input.key)?;
+        if bool::from(key.is_identity()) {
+            return Err(IDENTITY);
+        }
+        terms.push((G1Affine::from(hash_g1(input.message, IC_DST)), key));
+    }
+    Ok(pairing_product(terms))
+}
+
+fn proof_checked_keys(inputs: &[AggregateInput<'_>]) -> Result<Vec<G1Affine>, u32> {
+    let mut keys = Vec::with_capacity(inputs.len());
+    for (i, input) in inputs.iter().enumerate() {
+        if let Some(previous) = inputs[..i].iter().position(|previous| {
+            previous.key == input.key && previous.proof == input.proof
+        }) {
+            // Reuse only an exactly equal pair whose proof already passed in
+            // this call. A different proof for a repeated key is still checked.
+            keys.push(keys[previous]);
+            continue;
+        }
+        let key = g1(input.key)?;
+        let proof = g2(input.proof)?;
+        if bool::from(key.is_identity()) || bool::from(proof.is_identity()) {
+            return Err(IDENTITY);
+        }
+        if !pair_equal(key, G2Affine::from(hash_g2(input.key, ETH_POP_DST)),
+            G1Affine::generator(), proof) {
+            return Err(INVALID_PROOF);
+        }
+        keys.push(key);
+    }
+    Ok(keys)
+}
+
+fn aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    // Preserve the public error order: signature first, then all proofs, then
+    // message hashing. This prevents any unproved key from reaching the sum.
+    let signature = g2(signature)?;
+    if bool::from(signature.is_identity()) {
+        return Err(IDENTITY);
+    }
+    let keys = proof_checked_keys(inputs)?;
+    let mut terms = Vec::with_capacity(inputs.len() + 1);
+    terms.push((-G1Affine::generator(), signature));
+    for (i, input) in inputs.iter().enumerate() {
+        let previous = if input.message.len() <= 1024 {
+            inputs[..i].iter().position(|previous| previous.message == input.message)
+        } else { None };
+        let hash = match previous {
+            Some(previous) => terms[previous + 1].1,
+            None => G2Affine::from(hash_g2(input.message, ETH_DST)),
+        };
+        terms.push((keys[i], hash));
+    }
+    Ok(pairing_product(terms))
+}
+
+fn fast_aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    let keys = proof_checked_keys(inputs)?;
+    let mut key = G1Projective::identity();
+    for part in keys {
+        key += part;
+    }
+    let key = G1Affine::from(key);
+    // Decode both operands before identity rejection, matching verifyEthereum.
+    let signature = g2(signature)?;
+    if bool::from(key.is_identity()) || bool::from(signature.is_identity()) {
+        return Err(IDENTITY);
+    }
+    Ok(pair_equal(key, G2Affine::from(hash_g2(inputs[0].message, ETH_DST)),
+        G1Affine::generator(), signature))
+}
+
+/// Fused profile verification. The public compiler bridge enforces matching
+/// array lengths and populates every descriptor. No payload pointer survives
+/// the synchronous call and no GC safepoint occurs while descriptors are live.
+///
+/// # Safety
+/// `rows` denotes `count * 6` readable native-width words, each pointer/length
+/// pair describing readable bytes (null is allowed only for empty payloads).
+/// `signature` denotes `signature_len` readable bytes; `out` is one writable
+/// byte disjoint from the descriptors and all payloads. Fast aggregate rows
+/// must all describe the same message. Invalid statuses leave `out` unchanged.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn bls_aggregate(
+    op: u32, rows: *const usize, count: usize,
+    signature: *const u8, signature_len: usize, out: *mut u8,
+) -> u32 {
+    let maximum = match op {
+        19 | 20 => MAX_BATCH - 1,
+        21 => MAX_BATCH,
+        _ => return INVALID_ARGUMENT,
+    };
+    if count == 0 { return EMPTY_BATCH; }
+    if count > maximum { return TOO_MANY_ITEMS; }
+    unsafe fn bytes<'a>(pointer: *const u8, length: usize) -> &'a [u8] {
+        if length == 0 { &[] } else { unsafe { core::slice::from_raw_parts(pointer, length) } }
+    }
+    let mut inputs = [AggregateInput::default(); MAX_BATCH];
+    for (index, input) in inputs[..count].iter_mut().enumerate() {
+        let row = unsafe { rows.add(index * 6).cast::<[usize; 6]>().read_unaligned() };
+        *input = AggregateInput {
+            key: unsafe { bytes(row[0] as *const u8, row[1]) },
+            proof: unsafe { bytes(row[2] as *const u8, row[3]) },
+            message: unsafe { bytes(row[4] as *const u8, row[5]) },
+        };
+    }
+    let signature = unsafe { bytes(signature, signature_len) };
+    let result = match op {
+        19 => aggregate_ic(&inputs[..count], signature),
+        20 => aggregate_eth(&inputs[..count], signature),
+        21 => fast_aggregate_eth(&inputs[..count], signature),
+        _ => unreachable!(),
+    };
+    match result {
+        Ok(value) => { unsafe { out.write(u8::from(value)) }; 0 }
+        Err(error) => error,
+    }
 }
 
 #[cfg(test)]
