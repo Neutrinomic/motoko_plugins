@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-13T05:26:38.777321+00:00",
+  "verdict": "Separate post-hoc paired occupied-heap reporting is supported for this fixed workload. The original absolute quiet-window qualification remains failed.",
+  "rawReport": {
+    "path": "benchmarks/crypto/results/prepared-mldsa-memory/memory.json",
+    "sha256": "94c0c591bf5ba3842c354091805566eac96753a9a7b67d63a3a7497e76ed4cc3",
+    "originalComplete": false,
+    "originalStatus": "incomplete-needs-investigation",
+    "executionComplete": true,
+    "sourceArchiveSha256": "c71a2cc49f1e7305ac7e7fc8583c6242c46ebec67eec2c4489eab7d7fe70a135",
+    "wasmSha256": "d92a1af1a564eee9666920af2955c6d92e7d1c08cb9cdae9d7172f84eb46b2dc",
+    "pluginRuntimeSha256": "07ae75432d55ddcbb4741f0d0aa40bb0d086f365d1c68c0648bde3dd20850c3f"
+  },
+  "pairedMethod": {
+    "trials": 3,
+    "trialModeOrder": "Rotated baseline/public/secret over fresh canisters, one identical Wasm.",
+    "keysPerCanister": 32,
+    "matching": "Exact trial, retained/dropped stage and GC snapshot label. All 24 GC indices checked, not only the tail.",
+    "queries": "Snapshot and verification use read/query; their transient allocations do not commit.",
+    "controls": "Both root arrays, canonical inputs, fixture, pressure messages and 24 GC trigger calls are shared across modes; dropping preserves array capacities."
+  },
+  "observedPairedOccupiedBytes": {
+    "public": {
+      "totalRetainedMin": 659200,
+      "totalRetainedMax": 659200,
+      "perKey": 20600,
+      "maximumAbsoluteDropResidual": 0
+    },
+    "secret": {
+      "totalRetainedMin": 922368,
+      "totalRetainedMax": 922368,
+      "perKey": 28824,
+      "maximumAbsoluteDropResidual": 0
+    }
+  },
+  "counterReconciliation": {
+    "publicExtraAllocated": 660224,
+    "secretExtraAllocated": 923392,
+    "extraConstructorGarbageReclaimedBeforeRetainedWindow": 1024,
+    "afterDrop": "Each mode reclaims its entire extra allocation relative to baseline; additional occupied heap is zero at every matched GC index."
+  },
+  "absoluteProtocolFailure": {
+    "all18WindowsFailedOnlyHeapSpread": true,
+    "tailSpreadBytes": 122528,
+    "requiredMaximumSpreadBytes": 4096,
+    "meaningfulReclamationAndZeroCopyResidualPassed": true
+  },
+  "commonDrift": {
+    "observedBytesPerTrigger": 17504,
+    "normalMarkTableBytes": 8208,
+    "weakRegistryMarkTableBytes": 8208,
+    "weakRegistryHolderBytes": 40,
+    "partitionRankingArrayBytes": 1048,
+    "sum": 17504,
+    "sourceReason": "Each mark stack table requests size 8184 plus 24-byte Blob header. The weak registry additionally uses a 16-byte MarkStack holder plus 24-byte header, initialized by complete_marking even without user Weak. Ranking 128 partitions uses 1024-byte payload plus 24-byte header. Forced GC replies without Candid allocation, and the current allocation partition is excluded from evacuation, allowing collector garbage to accumulate.",
+    "cacheHeaderMatch": "Each observed per-key increment equals its fixed 20576/28800-byte payload plus 24-byte Blob header."
+  },
+  "sdkPins": {
+    "revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+    "mocSha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+    "rts": {
+      "mo-rts.wasm": {
+        "sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+        "bytes": 203637
+      },
+      "mo-rts-debug.wasm": {
+        "sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+        "bytes": 7636686
+      }
+    },
+    "reviewedSourcesSha256": {
+      "src/codegen/compile.ml": "bcc433801a346e283900e241de781660620cff7b2d2554641891cf4f0a5f51f6",
+      "rts/motoko-rts/src/types.rs": "3175db649bebacd15e438cb1383b0e87a26058684d3d299b19e8ce45b5bcd0be",
+      "rts/motoko-rts/src/memory.rs": "1fb55e4b36389dbf1af84ca5f01d7b01b55399b3fc724e88b44edb6c3a350e75",
+      "rts/motoko-rts/src/persistence.rs": "4615fc648e56d9c0e55ce4c60d14831e6e50b12effaba3ac1a53b424a9373eb0",
+      "rts/motoko-rts/src/gc/incremental.rs": "55a1eac265786b6ae2b0c907c1bedfaf8597ac105cfe882ccfa087b906ecd61d",
+      "rts/motoko-rts/src/gc/incremental/mark_stack.rs": "a89b513c86b0900dc8db86ca9f5edb5ff49475f516115d3ef0e9cbb288e9aea3",
+      "rts/motoko-rts/src/gc/incremental/phases/mark_increment.rs": "55e0d5a31deeaa384c2c05fe26f08cce4127dfbe833181118463dfe8f181ffe6",
+      "rts/motoko-rts/src/gc/incremental/partitioned_heap.rs": "4166cf48f196c461fd01c18d4232a8c6d9da531f8930c18a2dc946ce52ae602c"
+    }
+  },
+  "limitations": [
+    "Post-hoc analysis of the unchanged frozen run, not a rerun or a pass of the original protocol.",
+    "Observed paired occupied heap and recovery in this workload, not universal exact live-memory sizes.",
+    "No authoritative GC-phase/completion claim and no secure secret-erasure claim.",
+    "Identical paired drift is measured and accounted for here; unrelated workloads need their own matched controls."
+  ],
+  "changes": "No actor, runtime, SDK, runner, thresholds or original raw evidence were changed; no measurement was rerun."
+}

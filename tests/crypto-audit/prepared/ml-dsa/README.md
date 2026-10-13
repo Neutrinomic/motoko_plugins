@@ -42,6 +42,24 @@ and actual-GC tests below were not repeated for this narrow change: the SDK,
 compiler plugin, RTS, public module, cache format and managed pointer/allocation
 boundaries are unchanged. Their original runtime pins and logs remain intact.
 
+## Paired memory evidence
+
+The original absolute quiet-window gate **failed** and remains failed: occupied
+heap grows by 17,504 B per forced GC trigger. The pinned RTS accounts for that
+common drift through mark-stack, weak-registry and partition-ranking storage.
+A [separate post-hoc review](paired-memory-review.json) checks every matching GC
+index across all three rotated trials using the unchanged raw report.
+
+| Observed additional occupied heap | Per prepared key | Maximum residual after dropping |
+|---|---:|---:|
+| Public cache | 20,600 B | 0 B |
+| Secret cache | 28,824 B | 0 B |
+
+Every one of the 24 aligned GC indices gives the same paired difference;
+allocation/reclamation counters independently reconcile it. These are observed
+paired overhead and recovery for this workload. They do not establish an
+absolute live-heap plateau, authoritative GC completion or secure erasure.
+
 ## Initial prepared checkpoint
 
 **Approved for the frozen implementation after one performance regression was
