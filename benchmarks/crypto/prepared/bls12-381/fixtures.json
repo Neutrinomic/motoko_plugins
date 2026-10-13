@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "description": "Exact public-key/message/signature/PoP input subset from published IC/Ethereum and independent py_ecc benchmark fixtures. No plugin output is an oracle. All return #ok(true); this cohort encodes that as 01.",
+  "fixtures": [
+    {
+      "id": "verify-ic-certificate",
+      "profile": "IC",
+      "operation": "verifyIC",
+      "argument_order": [
+        "publicKey",
+        "message",
+        "signature"
+      ],
+      "inputs": {
+        "publicKey": "814c0e6ec71fab583b08bd81373c255c3c371b2e84863c98a4f1e08b74235d14fb5d9c0cd546d9685f913a0c0b2cc5341583bf4b4392e467db96d65b9bb4cb717112f8472e0d5a4d14505ffd7484b01291091c5f87b98883463f98091a0baaae",
+        "message": "0d69632d73746174652d726f6f74e6c01e909b4923345ce5970962bcfe3004bfd8474a21dae28f50692502f46d90",
+        "signature": "ace9fcdd9bc977e05d6328f889dc4e7c99114c737a494653cb27a1f55c06f4555e0f160980af5ead098acc195010b2f7"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "provenance": {
+        "path": "benchmarks/crypto/generate-curves.py",
+        "sha256": "0c482636d28ce22a8ecb70c1a0fe6dd34cc289a1efa6c8ebd013d0d41ed29ea4"
+      }
+    },
+    {
+      "id": "verify-ethereum-official",
+      "profile": "Ethereum",
+      "operation": "verifyEthereum",
+      "argument_order": [
+        "publicKey",
+        "message",
+        "signature"
+      ],
+      "inputs": {
+        "publicKey": "b53d21a4cfd562c469cc81514d4ce5a6b577d8403d32a394dc265dd190b47fa9f829fdd7963afdf972e5e77854051f6f",
+        "message": "abababababababababababababababababababababababababababababababab",
+        "signature": "ae82747ddeefe4fd64cf9cedb9b04ae3e8a43420cd255e3c7cd06a8d88b7c7f8638543719981c5d16fa3527c468c25f0026704a6951bde891360c7e8d12ddee0559004ccdbe6046b55bae1b257ee97f7cdb955773d7cf29adf3ccbb9975e4eb9"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "provenance": {
+        "path": "benchmarks/crypto/generate-curves.py",
+        "sha256": "0c482636d28ce22a8ecb70c1a0fe6dd34cc289a1efa6c8ebd013d0d41ed29ea4"
+      }
+    },
+    {
+      "id": "aggregate-ic-distinct-n2",
+      "profile": "IC",
+      "operation": "aggregateVerifyIC",
+      "argument_order": [
+        "keys",
+        "messages",
+        "signature"
+      ],
+      "inputs": {
+        "keys": [
+          "89c24b4b5362b4462afb4968b799df200e305ca2d78b9bb9dab238322396b9d699f8daac58afb200d809e62e67d0bda500cab71ec22e441ba86f22a82d9bad9ecffd268a364c18645cd2094058326adb86a790253fef9ad285843fb7fc570c93",
+          "9725f51211655be1b734cbb86c7c1906f96302f6e906fd2d87b3734e2d0b4b72aae900e6c16deb143f15a8a1479f3ae60c18ab9aedff04e7f6387e81efde32f6f26004010aeb9eaa70b03b99ea43e482836c633ec0fa32bbe2f9c5877fba9c7a"
+        ],
+        "messages": [
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8869283ebea738fdc5a1e24c0d3986c2c8cf6d1eef1a97a982ee639513b601d5"
+        ],
+        "signature": "b0a4cb3277c63b5c0b227526cd84d647f25340a491d7dcf8199262544226d49fc4730d5278f14796bbba6a6e7af7e7e2"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "py_ecc 8.0.0 hash_to_G1 with IC NUL DST; scalar-derived G2 keys and aggregated G1 signatures; independent pairing-product identity verified.",
+      "original_name": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "original_expected_hex": "0001",
+      "share_repeated_key": false,
+      "provenance": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/fixtures.json",
+        "sha256": "c3a41c100f831560b7d7f0f8f635eb27028c8306826096b270bd58c542c5776d"
+      },
+      "oracle_generator": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/generate.py",
+        "sha256": "3891c725948dfd2e1190679954fdcb56cc2b2a7b43d00ac38bcece28218474e0"
+      }
+    },
+    {
+      "id": "aggregate-ethereum-distinct-n2",
+      "profile": "Ethereum-PoP",
+      "operation": "aggregateVerifyEthereum",
+      "argument_order": [
+        "keys",
+        "proofs",
+        "messages",
+        "signature"
+      ],
+      "inputs": {
+        "keys": [
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a4c854b27d6b3ce64615725e5d023c8ef56987cff12cfefcbc01ef61e19d7d569900963e59cc82ff9a9dc5e32a8ae5fd"
+        ],
+        "messages": [
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8869283ebea738fdc5a1e24c0d3986c2c8cf6d1eef1a97a982ee639513b601d5"
+        ],
+        "proofs": [
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "8c2c9fd3c8e9c28baf52624f072591dcc8198540650e070ab5f737f8922b7ac43dfd1dd4393537d713966c1e5c57a5cc0725153ce446f15654eb1bde46e9a0d448c87ab5bcb6fe351064504fc47ed456687d00da4843d3a819d4eb8bc7719fe7"
+        ],
+        "signature": "a8c6c1671b1def9d2416c5185498ad38d3fcc8a941002ce30681330ebd1f743fbb926553b8afb6f490bb04feb0435205121f65a85a656155be738437ddac8b5779967ae66a285bb21a77edf32241ade5ac8e6f0fc6f90bb3e46fb8bc39bb8708"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified.",
+      "original_name": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "original_expected_hex": "0001",
+      "share_repeated_key": false,
+      "provenance": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/fixtures.json",
+        "sha256": "c3a41c100f831560b7d7f0f8f635eb27028c8306826096b270bd58c542c5776d"
+      },
+      "oracle_generator": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/generate.py",
+        "sha256": "3891c725948dfd2e1190679954fdcb56cc2b2a7b43d00ac38bcece28218474e0"
+      }
+    },
+    {
+      "id": "aggregate-ethereum-repeated-n8",
+      "profile": "Ethereum-PoP",
+      "operation": "aggregateVerifyEthereum",
+      "argument_order": [
+        "keys",
+        "proofs",
+        "messages",
+        "signature"
+      ],
+      "inputs": {
+        "keys": [
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64"
+        ],
+        "messages": [
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932"
+        ],
+        "proofs": [
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4"
+        ],
+        "signature": "9656174bd2e39798437f2c0d7929296e384ba487761ff932b36d6dc1377ba3adadcb6ab2c20c0bc14f628f91f73c566c0ed98fa22c12370e7a3dc4ce43f8f306e345583104e50fb60767837a7e170f8c6dc50dd7436ea48c33dfbcf109e4af98"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified.",
+      "original_name": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n8",
+      "original_expected_hex": "0001",
+      "share_repeated_key": true,
+      "provenance": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/fixtures.json",
+        "sha256": "c3a41c100f831560b7d7f0f8f635eb27028c8306826096b270bd58c542c5776d"
+      },
+      "oracle_generator": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/generate.py",
+        "sha256": "3891c725948dfd2e1190679954fdcb56cc2b2a7b43d00ac38bcece28218474e0"
+      }
+    },
+    {
+      "id": "aggregate-ethereum-distinct-n8",
+      "profile": "Ethereum-PoP",
+      "operation": "aggregateVerifyEthereum",
+      "argument_order": [
+        "keys",
+        "proofs",
+        "messages",
+        "signature"
+      ],
+      "inputs": {
+        "keys": [
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a4c854b27d6b3ce64615725e5d023c8ef56987cff12cfefcbc01ef61e19d7d569900963e59cc82ff9a9dc5e32a8ae5fd",
+          "8289570a921456708d5cbfc1c5f389dcb3951cbdb9869be57bce905ea9c3224ba35bc39e5076efbae43d9066a5d95453",
+          "8e5ea3c6a3c423a1ed04992fad24b86da4fbb11b5b74cad126145fd4e5a619e85b4299c453ff623c72f538e916b8414b",
+          "8f1c3291b21fd0522126eb05b608a99ce831ed76e87467f3e7639dc16789ed4462867abb328aec95a3556c05b4507b7c",
+          "ab476513ff74b2176d4de95fb412931c1f1d963a249b86dc186a581037db906df961d88b967d1397e3b2631960e53656",
+          "82ba1531ab2bdb0b319f9716a3372b496088e91efd60be7dcfec1aa2e3035558c4babfcd719b58a6ec511edc7862a2c4",
+          "8258ce687b13b7f4e2838df810e2d544de677e27ef4a6ad92f62f0ea2acf5077a222a7f568caa79d5a6292a2f5f2d0ef"
+        ],
+        "messages": [
+          "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+          "8869283ebea738fdc5a1e24c0d3986c2c8cf6d1eef1a97a982ee639513b601d5",
+          "d6e1c6265270d50f97250cbccef7cb59d12486f564ebe11637cd8bfe489728dd",
+          "a0a39aaf6282a0407d4fc47d548d85f7dd5e3f04dcfed238f19afc4aa2778840",
+          "42becd711793d1f749d81104c9e35f0f501e796ea64c6ff856992a2136d8f015",
+          "bca79071dc8dc4ba93c2e69b1ad77e6b87c860a0ca8615dcc0d892e87b1c8dec",
+          "9055663bdade719c749b5d9c0b14f1e617c30ef4da70ff6a8f7cddb136dc1db6",
+          "7e3747ed51485cf908ea440df0d2c41b94b50997aec627dd1a9f9ced3ee624c7"
+        ],
+        "proofs": [
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "8c2c9fd3c8e9c28baf52624f072591dcc8198540650e070ab5f737f8922b7ac43dfd1dd4393537d713966c1e5c57a5cc0725153ce446f15654eb1bde46e9a0d448c87ab5bcb6fe351064504fc47ed456687d00da4843d3a819d4eb8bc7719fe7",
+          "85a423e8adc728f4a6be451e9ecdaadf99dc8e626264496063e6897a3d5f5010df68d3de7ea2074594411fe9890d89c8031a57dd49e4e253761162f514125b4d4586362d72b549021db878903d4bfa68c06645ccdd1e7f2dbc9a82e2484160bd",
+          "95995de0ad4694fc40de16ffd619df4e3c68f381c923e8df396e71ed43fff61e098c735a1decd7b8d1b1810a8096210401bf89a4aa4b8ccab9d5b27b045eccd1261d50382147f3d7e763a9409c62b1e9ea97f9ff36d42c5875c96f8b46fdbd2f",
+          "86d7aaef05e59aabe1870b3aa7ef9749feed6f2fcc6ff5b307d69bbb6d621633ecae9937522da2ef7225add796e80e8112d632b65afe78f73b181421d19501f433ce48e32313d4179428e6a3c85bab7b9024899081d7cfa58bfecec3902ef4e6",
+          "8026ff37aa842457b8f1e7887fab264adf769cc512539d55985bcfae8a5f96208a5ce5b8ae64762afb71c5363227cb150e450ab3c66a637170b63779625b70e6e74119f4b6f67fd28c7a3f8c9e8dd27db90604717636b397bf250a38c4a043a0",
+          "a4df5c43b862b8ea072bede6eb6cf998020906bf1d872915ca5db070d70b128c110ffa8f97f8ba9ee7be7152f83d005f191c1d3f22175ad1b0aa42eca4f42d356face6cc48d2e232435bc70002cc26c257b2a0b53b418d249e5efd85f8fded90",
+          "81bab9b26ce2af02ed4d6d28263d71de07e636994cd21bb128e337a1b0e86357ee2bb62cc8afd34a3c66a3ad55283a0307258e67c9bad9fd7f203790aeebabc5879907dfff719e645636e51927cf23b54c6d6f94939859278ae62f902e121aca"
+        ],
+        "signature": "928ccccc3f10ddf24e83e2f0ed6456a6364c9d086b15dd90b83092dc0c55d82b3caf9344142aec435a66ac9e0624e08e0431cf676fd4e37625d755b6c1a9bbb9751611a71c64695db0054c13eac0687ae3b59f53d1d0cda50ee8e27dece7636c"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified.",
+      "original_name": "round2_bls12_381_aggregate_ethereum_distinct_n8",
+      "original_expected_hex": "0001",
+      "share_repeated_key": false,
+      "provenance": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/fixtures.json",
+        "sha256": "c3a41c100f831560b7d7f0f8f635eb27028c8306826096b270bd58c542c5776d"
+      },
+      "oracle_generator": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/generate.py",
+        "sha256": "3891c725948dfd2e1190679954fdcb56cc2b2a7b43d00ac38bcece28218474e0"
+      }
+    },
+    {
+      "id": "fast-aggregate-ethereum-distinct-n2",
+      "profile": "Ethereum-PoP",
+      "operation": "fastAggregateVerifyEthereum",
+      "argument_order": [
+        "keys",
+        "proofs",
+        "message",
+        "signature"
+      ],
+      "inputs": {
+        "keys": [
+          "a85a2312ba5be2746f4f0e2c03b0fc8a5c60a52c971a80a19a1d027dadab1c61c28927c693364b1b5cb17b96c2b40c64",
+          "a4c854b27d6b3ce64615725e5d023c8ef56987cff12cfefcbc01ef61e19d7d569900963e59cc82ff9a9dc5e32a8ae5fd"
+        ],
+        "message": "8864054e169a5c79e4213b2c06de4aeca0558e0fb2c09e8290b51f60fd6da932",
+        "proofs": [
+          "a2eb488a75d110a59baf7df60029eb6f5181e17b0d3261dcb4ec59a4e5992079f6521b355e245952dda05761b1ca4dad03a1aedba60911cc8a8f9f76a4606a5176c8647a09062753c896373c379a858969101f95e4002abfbcf5a6ed5fc0a0c4",
+          "8c2c9fd3c8e9c28baf52624f072591dcc8198540650e070ab5f737f8922b7ac43dfd1dd4393537d713966c1e5c57a5cc0725153ce446f15654eb1bde46e9a0d448c87ab5bcb6fe351064504fc47ed456687d00da4843d3a819d4eb8bc7719fe7"
+        ],
+        "signature": "816f80c4e202e21dce5d5f722375c16f0c9b7583b7b927af04a2f039c3638b787ebf5bbc0ba21e67e2e3ed654dce1ed605d01d522196daace23c40d0ec9a5ec956bdde558d8c4b3d689ca2f3c2a41b9f932f530e5e49fdaef5c1239797ea3891"
+      },
+      "expected": {
+        "ok_bool": true
+      },
+      "oracle": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified.",
+      "original_name": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "original_expected_hex": "0001",
+      "share_repeated_key": false,
+      "provenance": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/fixtures.json",
+        "sha256": "c3a41c100f831560b7d7f0f8f635eb27028c8306826096b270bd58c542c5776d"
+      },
+      "oracle_generator": {
+        "path": "benchmarks/crypto/round2/curve-hotspots/bls/generate.py",
+        "sha256": "3891c725948dfd2e1190679954fdcb56cc2b2a7b43d00ac38bcece28218474e0"
+      }
+    }
+  ]
+}
