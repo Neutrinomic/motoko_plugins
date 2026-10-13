@@ -14,6 +14,38 @@ module {
   };
   public type Result<T> = { #ok : T; #err : Error };
 
+  /// Immutable validated public key with reusable verification preparation.
+  /// Opaque, local and nonstable: retain it in transient state and prepare it
+  /// again from the public-key Blob after an upgrade.
+  public type PreparedPublicKey = Prim.MLDSAPreparedPublicKey;
+
+  /// Immutable expanded secret key with reusable signing preparation.
+  /// This holds secret material. It is opaque, local and nonstable; retain it
+  /// in transient state and prepare it again from the secret seed after upgrade.
+  public type PreparedSecretKey = Prim.MLDSAPreparedSecretKey;
+
+  /// Prepare a 1312-byte public key once for repeated verification.
+  /// Invalid public-key lengths return #err(#invalidPublicKey).
+  public let preparePublicKey = Prim.mldsa_prepare_public_key;
+
+  /// Expand a 32-byte secret seed once for repeated signing.
+  /// Invalid seed lengths return #err(#invalidSecretKey).
+  public let prepareSecretKey = Prim.mldsa_prepare_secret_key;
+
+  /// Verify with a previously prepared public key. Argument order is prepared
+  /// key, message, signature, context. Invalid signature length is checked
+  /// before context length. Length-correct invalid signatures return #ok(false).
+  public let verifyPrepared = Prim.mldsa_verify_prepared;
+
+  /// Deterministic signing with a prepared secret key and rnd = 32 zero bytes.
+  /// Context is at most 255 bytes. Preparation does not change signature bytes.
+  public let signPrepared = Prim.mldsa_sign_prepared;
+
+  /// Hedged signing with a prepared secret key and explicit 32-byte randomness.
+  /// Argument order is prepared key, message, context, randomness. Context length
+  /// is checked before randomness length; supply fresh secure randomness.
+  public let signRandomizedPrepared = Prim.mldsa_sign_randomized_prepared;
+
   /// Deterministically generate the public key corresponding to a secret seed.
   /// This performs FIPS 204 key generation; no expanded secret key is retained.
   public let publicKey = Prim.mldsa_public_key;
