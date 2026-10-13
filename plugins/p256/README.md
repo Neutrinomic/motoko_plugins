@@ -144,6 +144,18 @@ and trait-implementation attribute warnings when built as path dependencies;
 the archived build logs preserve them. The selected width-eight format uses 16,320 payload bytes per key; it is not
 a portable prepared-key encoding.
 
+## Fourth-pass performance
+
+The matched PocketIC comparison reduces RFC6979 sample signing from 7,252,878
+to 4,791,659 instructions (33.93%), key derivation from 4,996,581 to 3,297,998
+(33.99%), and prepared verification from 3,802,871 to 3,223,424 (15.24%).
+Direct verification costs 11,961,908 instructions; preparation costs 19,688,627.
+All 168 observations across 28 workloads passed. Allocation and the prepared
+payload are unchanged; runtime Wasm grows by 14,570 bytes. The
+[fourth-pass report](../../benchmarks/crypto/round4/p256/README.md) includes
+measured setup/reuse costs, every candidate's incremental result, code sizes
+and exact independent fixtures.
+
 ## Prepared verification performance before the fourth pass
 
 The prepared-key pass selected a width-eight table, reducing repeated RFC6979

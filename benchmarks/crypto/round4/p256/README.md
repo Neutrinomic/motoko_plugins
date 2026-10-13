@@ -4,8 +4,9 @@ The selected implementation reduces RFC6979 sample signing from 7,252,878 to
 4,791,659 IC instructions (33.93%) and public-key derivation from 4,996,581 to
 3,297,998 (33.99%). Direct verification falls from 12,541,922 to 11,961,908
 (4.62%); prepared verification falls from 3,802,871 to 3,223,424 (15.24%).
-These are matched six-case screening results; final workload acceptance and
-the independent audit are recorded separately when complete.
+The final matched 28-case cohort confirms these results: all 168 observations
+passed, with no final instruction regressions or allocation changes. See the
+[full comparison](comparison-final.md) and its [machine-readable evidence](comparison-final.json).
 
 All comparisons use compiler `9f6ebeedc547e389a0529b4c91442e46b88fcbe0`, actual
 `moc` SHA-256 `24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2`,
@@ -13,6 +14,25 @@ the original RTS, identical Motoko actors and independent expected outputs.
 Baseline source is `0e1e96a4c325bdfebc627f0c16d546cb39c16a70`. Every measured
 case has three fresh canisters and all three instruction counts agree.
 The runner measures deterministic IC counters, not host wall-clock speed.
+
+| RFC sample workload | Baseline instructions | Selected instructions | Selected allocated bytes |
+|---|---:|---:|---:|
+| One preparation | 19,688,675 | 19,688,627 | 16,376 |
+| One direct verification | 12,541,922 | 11,961,908 | 32 |
+| One prepared verification | 3,802,871 | 3,223,424 | 32 |
+| Preparation + one verification | 23,491,346 | 22,911,851 | 16,408 |
+| Preparation + 10 verifications | 57,714,287 | 51,919,769 | 16,696 |
+| Preparation + 100 verifications | 399,943,697 | 341,998,949 | 19,576 |
+| 100 direct verifications | 1,254,167,648 | 1,196,166,248 | 3,200 |
+| 100 prepared verifications | 380,255,222 | 322,310,522 | 3,200 |
+
+Every row is the measured complete interval, not a per-call extrapolation.
+Preparing a key still costs more than one direct check; repeated use amortizes
+that setup. The modeled break-even remains three verifications for this
+fixture (`ceil(prepare / (direct - prepared))`); measured cold workloads are
+shown separately. The rare valid `x=n+3` prepared check improves from 1,754,864
+to 1,179,938 instructions (32.76%), and the deliberately false field-wrap
+signature stays rejected. Final linked actor size increases by 14,425 bytes.
 
 ## Bounded candidate sequence
 
@@ -80,6 +100,20 @@ derivation retain their affine normalization and fixed operation paths.
   preserve upstream path-dependency warnings instead of claiming warning-free
   builds. The final native suite passed all 14 tests, including all 484 pinned
   Wycheproof cases through direct and prepared verification.
+- The [independent audit](../../../../tests/crypto-audit/round4/p256/README.md)
+  passed 18 tests in both native debug and release, including 1,085 exact
+  Python square/inverse values, 512 key derivations, 43 independent RFC6979
+  signatures and 184 direct/prepared equations. Its own Motoko fixture and
+  both public fixtures passed source, IR, lowered and Wasm execution; Ash
+  passed all 19 tests. Source and emitted-Wasm review checked the fixed table
+  scans, scalar exponent schedule and inversionless predicate. A reserved
+  identifier in the new Motoko fixture was corrected before its successful
+  rerun; the failed log is preserved and no production change was needed.
+  Final approval also independently rechecked all 168 benchmark outputs,
+  frozen input hashes, metric ranges and deltas. Allocation and sampled memory
+  are unchanged. Audited native scratch-stack bounds are 8,736 bytes for
+  signing, 7,296 for derivation, 88,000 for preparation and 1,360 for hot
+  verification; these are separate from Motoko heap allocation.
 
 Frozen stages are under `../results/prepared-round4-p256-*` in the integration
 evidence tree. Each stage has its original portable source archive, exact
