@@ -77,6 +77,15 @@ signing, and 46.78% fewer for prepared Schnorr signing. ECDSA verification impro
 instructions. Managed allocation is unchanged; runtime Wasm grows by 26,034 bytes.
 These are fixture-specific instruction counts, not host-throughput estimates.
 
+The [additional numeric review](extra-numeric-review.json) verifies all **36**
+paired ten-call observations, bringing the reviewed total to **168**. All three
+README reuse rows match the raw counters. With preparation inside the measured
+interval, ten ECDSA verifications cost 22,508,855 instructions versus 24,539,878
+directly (8.28% saving); Schnorr verification costs 22,101,917 versus 24,135,788
+(8.43%); Schnorr signing costs 15,060,120 versus 26,812,948 (43.83%). The additional
+allocation is exactly one preparation: 568 bytes for either public key or 120
+bytes for the secret key. No additional runtime changes or tests were needed.
+
 ## Reproduction
 
 Use the matching SDK Nix shell and a coordinator execution slot:

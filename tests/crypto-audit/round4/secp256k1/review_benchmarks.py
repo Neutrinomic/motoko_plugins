@@ -10,6 +10,7 @@ def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--results-root',type=Path,required=True)
 parser.add_argument('--out',type=Path,required=True)
+parser.add_argument('--extra',action='store_true',help='Review the final paired direct/cold ten-call cohort')
 args=parser.parse_args()
 summaries=ROOT/'benchmarks/crypto/round4/secp256k1'
 stages={}
@@ -42,10 +43,12 @@ def stage(meta):
         cases[c['name']]={k:c['measurements'][0][k] for k in ['instructions','allocated_bytes','reclaimed_bytes']}
         cases[c['name']].update({k:c[k] for k in ['wasm_bytes','source_sha256','expected_hex']})
         count+=len(c['measurements'])
-    assert count==meta['observations']==33 and len(cases)==11
+    assert count==meta['observations']==(18 if args.extra else 33)
+    assert len(cases)==(6 if args.extra else 11)
     stages[name]={**meta,'oracle_correct':True,'triples_identical':True}
     return cases
-for name in ['c1-fixed-generator','c2-inversionless-verify','c3-specialized-square','final-comparison']:
+names=['extra-comparison'] if args.extra else ['c1-fixed-generator','c2-inversionless-verify','c3-specialized-square','final-comparison']
+for name in names:
     path=summaries/(name+'.json')
     report=json.loads(path.read_text())
     left,right=stage(report['baseline']),stage(report['candidate'])
@@ -59,11 +62,33 @@ for name in ['c1-fixed-generator','c2-inversionless-verify','c3-specialized-squa
         assert saved==case['instructions_saved']
         assert abs(case['reduction_percent']-saved/before['instructions']*100)<1e-10
     pins[name+'.json']=sha(path)
-selected=stages['prepared-round4-secp256k1-c3-candidate']
+selected=stages['prepared-round4-secp256k1-extra-final' if args.extra else 'prepared-round4-secp256k1-c3-candidate']
 assert selected['runtime_sha256']==sha(ROOT/'dist/secp256k1/runtime.wasm')
-assert len(stages)==4 and sum(s['observations'] for s in stages.values())==132
-report={'passed':True,'distinct_observations':132,'stages':stages,'summary_sha256':pins,
-        'method':'Recomputed every comparison from all four raw 11-case/three-trial stages; checked oracle flags, identical counters/allocations, artifact and compiled-Wasm/source hashes, compiler identity, every summary field and percentage. No host timing, isolated live-heap or new collection inference.',
+total=36 if args.extra else 132
+assert len(stages)==(2 if args.extra else 4) and sum(s['observations'] for s in stages.values())==total
+report={'passed':True,'distinct_observations':total,'stages':stages,'summary_sha256':pins,
+        'method':'Recomputed every comparison from raw three-trial stages; checked oracle flags, identical counters/allocations, artifact and compiled-Wasm/source hashes, compiler identity, every summary field and percentage. No host timing, isolated live-heap or new collection inference.',
         'script_sha256':sha(Path(__file__))}
+if args.extra:
+    prior=json.loads((HERE/'numeric-review.json').read_text())
+    assert prior['passed'] and prior['distinct_observations']==132
+    assert set(prior['stages']).isdisjoint(stages)
+    report['prior_numeric_review_sha256']=sha(HERE/'numeric-review.json')
+    report['total_distinct_observations_with_prior_review']=132+total
+    report['benchmark_readme_sha256']=sha(summaries/'README.md')
+    readme=(summaries/'README.md').read_text()
+    assert '168 PocketIC observations' in readme
+    report['actual_ten_call_comparisons']={}
+    for label,family in [('ECDSA verify','ecdsa-verify'),('Schnorr verify','schnorr-verify'),('Schnorr sign','schnorr-sign')]:
+        direct=right[f'secp256k1-{family}-direct-n10']
+        cold=right[f'secp256k1-{family}-cold-n10']
+        saving=(direct['instructions']-cold['instructions'])/direct['instructions']*100
+        expected=f"| {label} | {direct['instructions']:,} | {cold['instructions']:,} | {saving:.2f}% | {direct['allocated_bytes']:,} / {cold['allocated_bytes']:,} B |"
+        assert expected in readme,expected
+        assert cold['allocated_bytes']-direct['allocated_bytes']==(120 if family=='schnorr-sign' else 568)
+        source=args.results_root/selected['stage']/f'inputs/benchmarks/crypto/round4/secp256k1/cases/secp256k1-{family}-cold-n10/main.mo'
+        measured=source.read_text().split('let start = Prim.performanceCounter(0);',1)[1].split('let stop = Prim.performanceCounter(0);',1)[0]
+        assert measured.index('key := ?unwrap(Curve.prepare')<measured.index('var remaining = 10;')<measured.index('while (remaining > 0)')
+        report['actual_ten_call_comparisons'][family]={'direct':direct,'preparation_plus_ten':cold,'saving_percent':saving,'preparation_inside_interval_source_sha256':sha(source)}
 args.out.write_text(json.dumps(report,indent=2)+'\n')
-print('132 observations and all four comparison summaries independently verified')
+print(f'{total} observations and all {len(names)} comparison summaries independently verified')
