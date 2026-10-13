@@ -5,6 +5,11 @@ The Wasm runtime uses pinned `ed25519-dalek` 2.2.0 and `curve25519-dalek` 4.1.3.
 The compiler component supplies independent portable OCaml interpreter semantics
 and ABI 1 code generation. No other plugin is required.
 
+The build manifest selects Dalek's documented `serial` backend with 32-bit
+field/scalar limbs. Its widening products fit native Wasm `i64` operations;
+Wasm64 pointers and the plugin ABI remain unchanged. The backend selection is
+pinned in the manifest and recorded in `dist/ed25519/build.json`.
+
 ```motoko
 import Ed25519 "mo:fast/Ed25519";
 
