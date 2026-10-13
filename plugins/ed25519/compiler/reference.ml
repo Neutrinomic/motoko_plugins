@@ -233,17 +233,34 @@ let public_key seed =
   let scalar, _ = expand seed in
   encode (multiply scalar base)
 
-let sign seed message =
-  let scalar, prefix = expand seed in
-  let public_key = encode (multiply scalar base) in
+let sign_expanded scalar prefix public_key message =
   let nonce = hash_scalar [prefix; message] in
   let r = encode (multiply nonce base) in
   let challenge = hash_scalar [r; public_key; message] in
   r ^ to_le 32 (Z.rem (Z.add nonce (Z.mul challenge scalar)) order)
 
+let sign seed message =
+  let scalar, prefix = expand seed in
+  let public_key = encode (multiply scalar base) in
+  sign_expanded scalar prefix public_key message
+
 module V = Mo_values.Value
+module Prepared = Mo_values.Compute_plugin.Prepared
 let err label = Ok (V.Variant ("err", V.Variant (label, V.Tup [])))
 let ok value = Ok (V.Variant ("ok", value))
+
+let verify_with_public key public_key message signature =
+  if String.length signature <> 64 then err "invalidSignature"
+  else
+    let r_bytes = String.sub signature 0 32 in
+    let scalar = from_le (String.sub signature 32 32) in
+    if Z.compare scalar order >= 0 then err "invalidSignature"
+    else match decode r_bytes with
+    | None -> err "invalidSignature"
+    | Some r ->
+        let challenge = hash_scalar [r_bytes; key; message] in
+        ok (V.Bool (point_equal (multiply scalar base)
+          (point_add r (multiply challenge public_key))))
 
 let evaluate name _type_arguments _types arguments =
   match name, arguments with
@@ -261,15 +278,39 @@ let evaluate name _type_arguments _types arguments =
       (match decode key with
       | None -> err "invalidPublicKey"
       | Some public_key ->
-          if String.length signature <> 64 then err "invalidSignature"
-          else
-            let r_bytes = String.sub signature 0 32 in
-            let scalar = from_le (String.sub signature 32 32) in
-            if Z.compare scalar order >= 0 then err "invalidSignature"
-            else match decode r_bytes with
-            | None -> err "invalidSignature"
-            | Some r ->
-                let challenge = hash_scalar [r_bytes; key; message] in
-                ok (V.Bool (point_equal (multiply scalar base)
-                  (point_add r (multiply challenge public_key)))))
+          verify_with_public key public_key message signature)
+  | _ -> Error ("ed25519_" ^ name ^ " received invalid interpreter arguments")
+
+(* Prepared reference payloads are private to the interpreters. The public-key
+   payload retains its validated canonical encoding rather than duplicating
+   Dalek's private Niels table. The SDK permits private byte formats to differ
+   when typed behavior agrees; no Motoko operation can inspect these bytes.
+
+   The secret payload has the same explicit 96-byte format as the Wasm runtime:
+   reduced scalar || nonce prefix || bound compressed public key. It is created
+   only from a seed; re-clamping the saved scalar would change its value. *)
+let evaluate_prepared ~public_key ~secret_key name _type_arguments _types arguments =
+  match name, arguments with
+  | "prepare_public_key", [V.Blob key] ->
+      (match decode key with
+      | None -> err "invalidPublicKey"
+      | Some _ -> ok (Prepared.wrap public_key key))
+  | "prepare_secret_key", [V.Blob seed] ->
+      if String.length seed <> 32 then err "invalidSecretKey"
+      else
+        let scalar, prefix = expand seed in
+        let scalar = Z.rem scalar order in
+        let key = encode (multiply scalar base) in
+        ok (Prepared.wrap secret_key (to_le 32 scalar ^ prefix ^ key))
+  | "verify_prepared", [prepared; V.Blob message; V.Blob signature] ->
+      let key = Prepared.unwrap public_key prepared in
+      (match decode key with
+      | None -> Error "ed25519_verify_prepared received an invalid interpreter payload"
+      | Some point -> verify_with_public key point message signature)
+  | "sign_prepared", [prepared; V.Blob message] ->
+      let payload = Prepared.unwrap secret_key prepared in
+      let scalar = from_le (String.sub payload 0 32) in
+      let prefix = String.sub payload 32 32 in
+      let key = String.sub payload 64 32 in
+      Ok (V.Blob (sign_expanded scalar prefix key message))
   | _ -> Error ("ed25519_" ^ name ^ " received invalid interpreter arguments")

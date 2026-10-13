@@ -3,8 +3,15 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(not(test), feature(simd_wasm64))]
 
-use curve25519_dalek::{edwards::CompressedEdwardsY, scalar::Scalar};
-use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use curve25519_dalek::{
+    edwards::{CompressedEdwardsY, PreparedVartimeEdwardsTable},
+    scalar::Scalar,
+};
+use ed25519_dalek::{
+    Signature, Signer, SigningKey, Verifier, VerifyingKey, hazmat::ExpandedSecretKey,
+};
+use sha2::{Digest, Sha512};
+use zeroize::Zeroizing;
 
 const INVALID_SECRET_KEY: i64 = -1;
 const INVALID_PUBLIC_KEY: i64 = -2;
@@ -84,6 +91,65 @@ fn verify(key: &[u8], message: &[u8], sig: &[u8]) -> Result<bool, i64> {
     Ok(key.verify(message, &sig).is_ok())
 }
 
+// Prepared payloads are immutable SDK-protected managed Blobs. Their explicit
+// encodings contain no pointers, padding, or platform-dependent Rust layouts.
+const PREPARED_PUBLIC_BYTES: usize = 1056;
+const PREPARED_SECRET_BYTES: usize = 96;
+
+fn prepare_public_key(key: &[u8], output: &mut [u8; PREPARED_PUBLIC_BYTES]) -> Result<(), i64> {
+    let key = public(key)?;
+    let table = PreparedVartimeEdwardsTable::from_point(&(-key.to_edwards()));
+    output[..32].copy_from_slice(key.as_bytes());
+    output[32..].copy_from_slice(&table.to_bytes());
+    Ok(())
+}
+
+fn prepare_secret_key(seed: &[u8], output: &mut [u8; PREPARED_SECRET_BYTES]) -> Result<(), i64> {
+    let seed: &[u8; 32] = seed.try_into().map_err(|_| INVALID_SECRET_KEY)?;
+    let digest = Zeroizing::new(<[u8; 64]>::from(Sha512::digest(seed)));
+    let expanded = ExpandedSecretKey::from_bytes(&digest);
+    let key = VerifyingKey::from(&expanded);
+    output[..32].copy_from_slice(expanded.scalar.as_bytes());
+    output[32..64].copy_from_slice(&expanded.hash_prefix);
+    output[64..].copy_from_slice(key.as_bytes());
+    Ok(())
+}
+
+fn sign_prepared(key: &[u8; PREPARED_SECRET_BYTES], message: &[u8], output: &mut [u8; 64]) {
+    // The nominal type proves factory origin, immutable bytes, and exact size.
+    // Stored scalar bytes are already reduced; never clamp them again.
+    let mut scalar = Zeroizing::new([0; 32]);
+    scalar.copy_from_slice(&key[..32]);
+    let mut expanded = ExpandedSecretKey {
+        scalar: Scalar::from_bytes_mod_order(*scalar),
+        hash_prefix: [0; 32],
+    };
+    expanded.hash_prefix.copy_from_slice(&key[32..64]);
+    let public_bytes: &[u8; 32] = key[64..].try_into().unwrap();
+    *output = expanded
+        .sign_prepared::<Sha512>(message, public_bytes)
+        .to_bytes();
+}
+
+fn verify_prepared(
+    key: &[u8; PREPARED_PUBLIC_BYTES],
+    message: &[u8],
+    sig: &[u8],
+) -> Result<bool, i64> {
+    let sig = signature(sig)?;
+    let r = sig.r_bytes();
+    let s = Scalar::from_bytes_mod_order(*sig.s_bytes());
+    let mut challenge = Sha512::new();
+    challenge.update(r);
+    challenge.update(&key[..32]);
+    challenge.update(message);
+    let k = Scalar::from_bytes_mod_order_wide(&challenge.finalize().into());
+    let table = PreparedVartimeEdwardsTable::from_trusted_bytes(key[32..].try_into().unwrap());
+    // Cache -A, not a negated scalar modulo L: those differ for mixed-order A.
+    let expected_r = table.vartime_double_scalar_mul_basepoint(&k, &s).compress();
+    Ok(expected_r.as_bytes() == r)
+}
+
 unsafe fn input<'a>(ptr: *const u8, len: usize) -> &'a [u8] {
     if len == 0 {
         &[]
@@ -147,6 +213,76 @@ pub unsafe extern "C" fn ed25519_verify(
 ) -> i64 {
     match verify(
         unsafe { input(key, key_len) },
+        unsafe { input(message, message_len) },
+        unsafe { input(sig, sig_len) },
+    ) {
+        Ok(valid) => i64::from(valid),
+        Err(error) => error,
+    }
+}
+
+/// # Safety
+/// Input is readable for len bytes; out is disjoint and writable for 1056 bytes.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ed25519_prepare_public_key(
+    ptr: *const u8,
+    len: usize,
+    out: *mut u8,
+) -> i64 {
+    match prepare_public_key(unsafe { input(ptr, len) }, unsafe {
+        &mut *out.cast::<[u8; PREPARED_PUBLIC_BYTES]>()
+    }) {
+        Ok(()) => 0,
+        Err(error) => error,
+    }
+}
+
+/// # Safety
+/// Input is readable for len bytes; out is disjoint and writable for 96 bytes.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ed25519_prepare_secret_key(
+    ptr: *const u8,
+    len: usize,
+    out: *mut u8,
+) -> i64 {
+    match prepare_secret_key(unsafe { input(ptr, len) }, unsafe {
+        &mut *out.cast::<[u8; PREPARED_SECRET_BYTES]>()
+    }) {
+        Ok(()) => 0,
+        Err(error) => error,
+    }
+}
+
+/// # Safety
+/// key points to an intact 96-byte result of ed25519_prepare_secret_key.
+/// Message is readable for message_len bytes; out is a disjoint 64-byte buffer.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ed25519_sign_prepared(
+    key: *const u8,
+    message: *const u8,
+    message_len: usize,
+    out: *mut u8,
+) {
+    sign_prepared(
+        unsafe { &*key.cast::<[u8; PREPARED_SECRET_BYTES]>() },
+        unsafe { input(message, message_len) },
+        unsafe { &mut *out.cast::<[u8; 64]>() },
+    )
+}
+
+/// # Safety
+/// key points to an intact 1056-byte result of ed25519_prepare_public_key.
+/// Other inputs are readable for their lengths and remain live for this call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ed25519_verify_prepared(
+    key: *const u8,
+    message: *const u8,
+    message_len: usize,
+    sig: *const u8,
+    sig_len: usize,
+) -> i64 {
+    match verify_prepared(
+        unsafe { &*key.cast::<[u8; PREPARED_PUBLIC_BYTES]>() },
         unsafe { input(message, message_len) },
         unsafe { input(sig, sig_len) },
     ) {

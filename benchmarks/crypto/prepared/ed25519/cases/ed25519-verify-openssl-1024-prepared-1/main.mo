@@ -1,0 +1,40 @@
+import Prim "mo:⛔";
+import Ed "mo:fast/Ed25519";
+persistent actor {
+  type Measurement = {instructions : Nat64; allocated : Nat; reclaimed : Nat; outputSize : Nat};
+  transient var result : Ed.Result<Bool> = #err(#invalidSignature);
+
+  transient var seed : Blob = "";
+  transient var key : Blob = "";
+  transient var message : Blob = "";
+  transient var signature : Blob = "";
+  func must<T>(value : Ed.Result<T>) : T {
+    switch value { case (#ok result) result; case (#err _) Prim.trap("unexpected fixture error") }
+  };
+  transient var prepared : ?Ed.PreparedPublicKey = null;
+  public func configure() : async () { seed := "\f8\09\1a\2b\3c\4d\5e\6f\80\91\a2\b3\c4\d5\e6\f7\08\19\2a\3b\4c\5d\6e\7f\90\a1\b2\c3\d4\e5\f6\07";
+    key := "\1a\54\c3\ef\cb\49\d1\e2\73\8b\da\10\e5\0c\1e\33\8b\f9\b4\6d\c1\3d\37\c2\8b\35\0a\b4\f1\7a\ae\e9";
+    message := "\08\25\42\5f\7c\99\b6\d3\f0\0d\2a\47\64\81\9e\bb\d8\f5\12\2f\4c\69\86\a3\c0\dd\fa\17\34\51\6e\8b\a8\c5\e2\ff\1c\39\56\73\90\ad\ca\e7\04\21\3e\5b\78\95\b2\cf\ec\09\26\43\60\7d\9a\b7\d4\f1\0e\2b\48\65\82\9f\bc\d9\f6\13\30\4d\6a\87\a4\c1\de\fb\18\35\52\6f\8c\a9\c6\e3\00\1d\3a\57\74\91\ae\cb\e8\05\22\3f\5c\79\96\b3\d0\ed\0a\27\44\61\7e\9b\b8\d5\f2\0f\2c\49\66\83\a0\bd\da\f7\14\31\4e\6b\88\a5\c2\df\fc\19\36\53\70\8d\aa\c7\e4\01\1e\3b\58\75\92\af\cc\e9\06\23\40\5d\7a\97\b4\d1\ee\0b\28\45\62\7f\9c\b9\d6\f3\10\2d\4a\67\84\a1\be\db\f8\15\32\4f\6c\89\a6\c3\e0\fd\1a\37\54\71\8e\ab\c8\e5\02\1f\3c\59\76\93\b0\cd\ea\07\24\41\5e\7b\98\b5\d2\ef\0c\29\46\63\80\9d\ba\d7\f4\11\2e\4b\68\85\a2\bf\dc\f9\16\33\50\6d\8a\a7\c4\e1\fe\1b\38\55\72\8f\ac\c9\e6\03\20\3d\5a\77\94\b1\ce\eb\08\25\42\5f\7c\99\b6\d3\f0\0d\2a\47\64\81\9e\bb\d8\f5\12\2f\4c\69\86\a3\c0\dd\fa\17\34\51\6e\8b\a8\c5\e2\ff\1c\39\56\73\90\ad\ca\e7\04\21\3e\5b\78\95\b2\cf\ec\09\26\43\60\7d\9a\b7\d4\f1\0e\2b\48\65\82\9f\bc\d9\f6\13\30\4d\6a\87\a4\c1\de\fb\18\35\52\6f\8c\a9\c6\e3\00\1d\3a\57\74\91\ae\cb\e8\05\22\3f\5c\79\96\b3\d0\ed\0a\27\44\61\7e\9b\b8\d5\f2\0f\2c\49\66\83\a0\bd\da\f7\14\31\4e\6b\88\a5\c2\df\fc\19\36\53\70\8d\aa\c7\e4\01\1e\3b\58\75\92\af\cc\e9\06\23\40\5d\7a\97\b4\d1\ee\0b\28\45\62\7f\9c\b9\d6\f3\10\2d\4a\67\84\a1\be\db\f8\15\32\4f\6c\89\a6\c3\e0\fd\1a\37\54\71\8e\ab\c8\e5\02\1f\3c\59\76\93\b0\cd\ea\07\24\41\5e\7b\98\b5\d2\ef\0c\29\46\63\80\9d\ba\d7\f4\11\2e\4b\68\85\a2\bf\dc\f9\16\33\50\6d\8a\a7\c4\e1\fe\1b\38\55\72\8f\ac\c9\e6\03\20\3d\5a\77\94\b1\ce\eb\08\25\42\5f\7c\99\b6\d3\f0\0d\2a\47\64\81\9e\bb\d8\f5\12\2f\4c\69\86\a3\c0\dd\fa\17\34\51\6e\8b\a8\c5\e2\ff\1c\39\56\73\90\ad\ca\e7\04\21\3e\5b\78\95\b2\cf\ec\09\26\43\60\7d\9a\b7\d4\f1\0e\2b\48\65\82\9f\bc\d9\f6\13\30\4d\6a\87\a4\c1\de\fb\18\35\52\6f\8c\a9\c6\e3\00\1d\3a\57\74\91\ae\cb\e8\05\22\3f\5c\79\96\b3\d0\ed\0a\27\44\61\7e\9b\b8\d5\f2\0f\2c\49\66\83\a0\bd\da\f7\14\31\4e\6b\88\a5\c2\df\fc\19\36\53\70\8d\aa\c7\e4\01\1e\3b\58\75\92\af\cc\e9\06\23\40\5d\7a\97\b4\d1\ee\0b\28\45\62\7f\9c\b9\d6\f3\10\2d\4a\67\84\a1\be\db\f8\15\32\4f\6c\89\a6\c3\e0\fd\1a\37\54\71\8e\ab\c8\e5\02\1f\3c\59\76\93\b0\cd\ea\07\24\41\5e\7b\98\b5\d2\ef\0c\29\46\63\80\9d\ba\d7\f4\11\2e\4b\68\85\a2\bf\dc\f9\16\33\50\6d\8a\a7\c4\e1\fe\1b\38\55\72\8f\ac\c9\e6\03\20\3d\5a\77\94\b1\ce\eb\08\25\42\5f\7c\99\b6\d3\f0\0d\2a\47\64\81\9e\bb\d8\f5\12\2f\4c\69\86\a3\c0\dd\fa\17\34\51\6e\8b\a8\c5\e2\ff\1c\39\56\73\90\ad\ca\e7\04\21\3e\5b\78\95\b2\cf\ec\09\26\43\60\7d\9a\b7\d4\f1\0e\2b\48\65\82\9f\bc\d9\f6\13\30\4d\6a\87\a4\c1\de\fb\18\35\52\6f\8c\a9\c6\e3\00\1d\3a\57\74\91\ae\cb\e8\05\22\3f\5c\79\96\b3\d0\ed\0a\27\44\61\7e\9b\b8\d5\f2\0f\2c\49\66\83\a0\bd\da\f7\14\31\4e\6b\88\a5\c2\df\fc\19\36\53\70\8d\aa\c7\e4\01\1e\3b\58\75\92\af\cc\e9\06\23\40\5d\7a\97\b4\d1\ee\0b\28\45\62\7f\9c\b9\d6\f3\10\2d\4a\67\84\a1\be\db\f8\15\32\4f\6c\89\a6\c3\e0\fd\1a\37\54\71\8e\ab\c8\e5\02\1f\3c\59\76\93\b0\cd\ea\07\24\41\5e\7b\98\b5\d2\ef\0c\29\46\63\80\9d\ba\d7\f4\11\2e\4b\68\85\a2\bf\dc\f9\16\33\50\6d\8a\a7\c4\e1\fe\1b\38\55\72\8f\ac\c9\e6\03\20\3d\5a\77\94\b1\ce\eb";
+    signature := "\02\a0\5d\5b\5b\08\b0\15\96\f3\62\34\90\4a\5c\36\93\5b\a1\7e\b7\35\8b\e5\93\ba\ca\57\7c\7d\e2\45\8e\89\9d\2a\b8\46\c0\ae\73\b7\a4\8d\d1\62\a0\67\ae\0f\02\bd\42\04\ac\04\67\08\dc\01\3f\d8\f6\0f";
+    prepared := ?must(Ed.preparePublicKey(key)); };
+  public func run() : async Measurement {
+    let allocatedBefore = Prim.rts_total_allocation();
+    let reclaimedBefore = Prim.rts_reclaimed();
+    let start = Prim.performanceCounter(0);
+    let handle = switch prepared { case (?value) value; case null Prim.trap("configure first") };
+    result := Ed.verifyPrepared(handle, message, signature);
+    let stop = Prim.performanceCounter(0);
+    let allocatedAfter = Prim.rts_total_allocation();
+    let reclaimedAfter = Prim.rts_reclaimed();
+    {instructions = stop - start; allocated = allocatedAfter - allocatedBefore;
+      reclaimed = reclaimedAfter - reclaimedBefore; outputSize = 0}
+  };
+
+  public query func memory() : async {
+    heapSize : Nat; memorySize : Nat; totalAllocation : Nat; reclaimed : Nat
+  } {
+    {heapSize = Prim.rts_heap_size(); memorySize = Prim.rts_memory_size();
+      totalAllocation = Prim.rts_total_allocation(); reclaimed = Prim.rts_reclaimed()}
+  };
+  public query func bytesResult() : async Blob { if (must(result)) "\01" else "\00" };
+}

@@ -26,12 +26,52 @@ let valid = Ed25519.verify(publicKey, message, signatureBytes);
 | `validatePublicKey(key)` | 32-byte compressed key | `true` |
 | `sign(seed, message)` | Seed and original message bytes | 64-byte signature |
 | `verify(key, message, signature)` | Public key, original message, signature | `Bool` |
+| `preparePublicKey(key)` | Canonical public key | `PreparedPublicKey` |
+| `prepareSecretKey(seed)` | 32-byte secret seed | `PreparedSecretKey` |
+| `verifyPrepared(key, message, signature)` | Prepared public key, original message, signature | `Bool` |
+| `signPrepared(key, message)` | Prepared secret key and original message | 64-byte signature, returned directly |
 
-All return `#ok` or `#err` with `#invalidSecretKey`, `#invalidPublicKey`, or
+Except for infallible `signPrepared`, all return `#ok` or `#err` with `#invalidSecretKey`, `#invalidPublicKey`, or
 `#invalidSignature`. Every 32-byte seed is accepted, including all-zero bytes;
 acceptance does not imply adequate entropy. `keyPairFromSeed` returns the caller's
 seed as its secret key without introducing another secret format or copying it.
 The plugin never generates randomness and never retains a key.
+
+## Reusing prepared keys
+
+```motoko
+switch (Ed25519.prepareSecretKey(seed)) {
+  case (#err error) { /* handle an invalid seed length */ };
+  case (#ok key) {
+    let first = Ed25519.signPrepared(key, firstMessage);
+    let second = Ed25519.signPrepared(key, secondMessage);
+  };
+};
+```
+
+Prepared handles are immutable nominal types backed by ordinary GC-managed
+storage. They can live in transient records and maps and survive collection;
+they cannot be forged from a Blob, extracted as bytes, stored in stable fields,
+or sent through shared calls. The caller chooses their lifetime. There is no
+hidden key cache or retained native pointer.
+
+The public-key payload is 1,056 bytes: compressed A followed by eight odd
+multiples of **-A** in portable projective Niels coordinates. Each of the four
+fields in each entry occupies 32 canonical little-endian bytes. Preparation
+validates the public key once; verification still validates every signature and
+checks the same strict equation, including mixed-order behavior.
+
+The secret payload is 96 bytes: reduced scalar, nonce prefix and bound compressed
+public key, each 32 bytes. Only a seed can construct it; callers cannot select an
+independent public key or prefix. This removes repeated expansion and public-key
+derivation. All valid prepared secrets can sign every Blob message, so
+`signPrepared` returns a Blob directly. It produces exactly the bytes from `sign`.
+Treat this handle as a secret: its immutable managed storage is **not zeroized
+when collected**. Temporary expanded state uses upstream zeroization on drop.
+
+Narrow patches to pinned Dalek sources expose an explicit table codec and reuse
+the existing multiplication/signing loops. They introduce no new curve formulas.
+The vendor directories retain upstream licenses, exact patches and provenance.
 
 ## Exact verification policy
 
@@ -64,7 +104,8 @@ The runtime uses fixed-size stack scratch and streams hashes over borrowed
 message bytes. There is no message-sized copy, heap allocator, RNG, mutable
 persistent state, retained pointer or GC call. Motoko owns all result blobs.
 Derived keys and signatures allocate 32 and 64 payload bytes respectively;
-verification allocates only the Motoko result wrapper.
+verification allocates only the Motoko result wrapper. Prepared factories also
+allocate their fixed payloads; prepared signing allocates its signature Blob.
 
 Dalek's established signing implementation uses constant-time secret arithmetic.
 Its `zeroize` features erase owned signing keys and expanded secret state on
@@ -87,4 +128,7 @@ professional cryptographic audit.
 
 Fixtures and their generation are in
 [`benchmarks/crypto/round3/ed25519`](../../benchmarks/crypto/round3/ed25519/).
-Public test inventory: [Ed25519 coverage](../../packages/fast/tests/ash/coverage/Ed25519.md).
+Public test inventory: [Ed25519 coverage](../../packages/fast/tests/ash/coverage/Ed25519.md)
+and [prepared coverage](../../packages/fast/tests/ash/coverage/Ed25519Prepared.md).
+Prepared validation and measurements live separately under
+[`benchmarks/crypto/prepared/ed25519`](../../benchmarks/crypto/prepared/ed25519/).

@@ -20,9 +20,21 @@ fn fixtures(json: &str) {
         assert_eq!(sign(&seed, &message, &mut output_sig), Ok(()));
         assert_eq!(output_sig.as_slice(), sig, "{}", vector["name"]);
         assert_eq!(verify(&key, &message, &sig), Ok(true));
+        let mut prepared_secret = [0; PREPARED_SECRET_BYTES];
+        let mut prepared_public = [0; PREPARED_PUBLIC_BYTES];
+        prepare_secret_key(&seed, &mut prepared_secret).unwrap();
+        prepare_public_key(&key, &mut prepared_public).unwrap();
+        sign_prepared(&prepared_secret, &message, &mut output_sig);
+        assert_eq!(output_sig.as_slice(), sig, "prepared {}", vector["name"]);
+        assert_eq!(verify_prepared(&prepared_public, &message, &sig), Ok(true));
+        assert_eq!(
+            verify_prepared(&prepared_public, &message, b""),
+            Err(INVALID_SIGNATURE)
+        );
         let mut wrong = message.clone();
         wrong.push(0);
         assert_eq!(verify(&key, &wrong, &sig), Ok(false));
+        assert_eq!(verify_prepared(&prepared_public, &wrong, &sig), Ok(false));
         assert!(
             public(&key)
                 .unwrap()
@@ -118,5 +130,38 @@ fn strict_upstream_parity_and_input_immutability() {
         assert_eq!(message, saved_message);
         assert_eq!(key, saved_key);
         assert_eq!(sig, saved_sig);
+    }
+}
+
+#[test]
+fn prepared_initialized_payloads_and_no_input_mutation() {
+    for case in [0, 1, 31, 127, 255] {
+        let seed = [case; 32];
+        let mut a = [0xaa; PREPARED_SECRET_BYTES];
+        let mut b = [0x55; PREPARED_SECRET_BYTES];
+        prepare_secret_key(&seed, &mut a).unwrap();
+        prepare_secret_key(&seed, &mut b).unwrap();
+        assert_eq!(a, b);
+        let mut p = [0xaa; PREPARED_PUBLIC_BYTES];
+        let mut q = [0x55; PREPARED_PUBLIC_BYTES];
+        prepare_public_key(&a[64..], &mut p).unwrap();
+        prepare_public_key(&a[64..], &mut q).unwrap();
+        assert_eq!(p, q);
+        let mut sig = [0; 64];
+        sign_prepared(&a, &seed, &mut sig);
+        assert_eq!(verify_prepared(&p, &seed, &sig), Ok(true));
+        assert_eq!(seed, [case; 32]);
+        assert_eq!(a, b);
+        assert_eq!(p, q);
+    }
+    for length in [0, 1, 31, 33, 64, 96, 1056] {
+        assert_eq!(
+            prepare_secret_key(&vec![0; length], &mut [0; PREPARED_SECRET_BYTES]),
+            Err(INVALID_SECRET_KEY)
+        );
+        assert_eq!(
+            prepare_public_key(&vec![0; length], &mut [0; PREPARED_PUBLIC_BYTES]),
+            Err(INVALID_PUBLIC_KEY)
+        );
     }
 }

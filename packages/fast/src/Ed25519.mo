@@ -8,6 +8,15 @@ module {
   public type Result<T> = { #ok : T; #err : Error };
   public type KeyPair = { secretKey : Blob; publicKey : Blob };
 
+  /// Immutable, process-local validated public key and multiplication table.
+  /// Handles may be retained in transient records/maps; they are not stable
+  /// values and cannot be sent in shared calls or converted to Blob.
+  public type PreparedPublicKey = Prim.Ed25519PreparedPublicKey;
+
+  /// Immutable, process-local expanded secret key. Treat this handle as secret.
+  /// Its managed payload persists until collected and is not erased on drop.
+  public type PreparedSecretKey = Prim.Ed25519PreparedSecretKey;
+
   /// Derive the public key from an exactly 32-byte secret seed. Every 32-byte
   /// seed is accepted. Use cryptographically random bytes for real keys.
   public let derivePublicKey = Prim.ed25519_public_key;
@@ -36,4 +45,21 @@ module {
   /// The uncofactored equation is checked. Invalid encodings return #err;
   /// a well-formed signature that does not verify returns #ok(false).
   public let verify = Prim.ed25519_verify;
+
+  /// Validate a public key once and prepare its multiplication table. Uses the
+  /// same canonical and non-small-order rules as validatePublicKey.
+  public let preparePublicKey = Prim.ed25519_prepare_public_key;
+
+  /// Expand an exactly 32-byte seed once and bind its derived public key.
+  /// The caller owns the resulting handle; there is no hidden key cache.
+  public let prepareSecretKey = Prim.ed25519_prepare_secret_key;
+
+  /// Sign exact message bytes using a validated prepared secret key. Returns
+  /// the same deterministic signature as sign; no recoverable input can fail.
+  public let signPrepared = Prim.ed25519_sign_prepared;
+
+  /// Verify with a prepared public key. Signature validation and the strict
+  /// uncofactored equation are identical to verify; malformed signatures return
+  /// #err(#invalidSignature), and well-formed mismatches return #ok(false).
+  public let verifyPrepared = Prim.ed25519_verify_prepared;
 }
