@@ -43,7 +43,20 @@ impl Reader<'_> {
         value
     }
     fn vector(&mut self) -> [T; 4] {
-        core::array::from_fn(|_| T(core::array::from_fn(|_| i32::from_le_bytes(self.bytes()))))
+        const VECTOR_BYTES: usize = 4 * 256 * 4;
+        let encoded = &self.bytes[self.offset..self.offset + VECTOR_BYTES];
+        self.offset += VECTOR_BYTES;
+        let mut value = [crate::types::T0; 4];
+        for (coefficient, bytes) in value
+            .iter_mut()
+            .flat_map(|polynomial| polynomial.0.iter_mut())
+            .zip(encoded.chunks_exact(4))
+        {
+            *coefficient = i32::from_le_bytes(
+                bytes.try_into().expect("fixed coefficient size"),
+            );
+        }
+        value
     }
     fn matrix(&mut self) -> Matrix { core::array::from_fn(|_| self.vector()) }
 }
