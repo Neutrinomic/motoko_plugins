@@ -136,7 +136,11 @@ costs 19,688,675 instructions and allocates 16,376 bytes, including the 16,320-b
 key payload. Its modeled total cost becomes cheaper than direct calls from
 three verifications. Use direct verification for one-off keys.
 
-The bounded width-four/six/eight comparison passed all 81 PocketIC trials;
+The final build passed all 111 PocketIC trials across seven independent
+fixtures. Including preparation, ten RFC sample verifications cost 57,714,287
+instructions versus 125,416,988 for direct calls (53.98% fewer); 100 cost
+399,943,697 versus 1,254,167,648 (68.11% fewer). The bounded
+width-four/six/eight comparison also passed all 81 trials;
 width eight is 20.95% cheaper per repeated call than width six, using about four times
 the payload. The public API has one chosen format. See the
 [prepared-key report](../../benchmarks/crypto/prepared/p256/README.md) for

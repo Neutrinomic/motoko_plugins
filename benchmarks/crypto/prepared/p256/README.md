@@ -1,11 +1,31 @@
 # Prepared P256 verification
 
 The selected representation is a width-eight affine public-key comb. It makes
-repeated verification 69.68% cheaper in the RFC6979 sample screen: 12,541,922 →
+repeated verification 69.68% cheaper in the RFC6979 sample: 12,541,922 →
 3,802,871 IC instructions. Both calls allocate 32 bytes for their typed result.
 The same prepared-capable plugin, compiler and RTS supply each direct control.
 Direct verification also uses fixed odd multiples of G, so rebuilding the
 shared generator table is not credited as a prepared-key benefit.
+
+The final selected build passed all 111 trials: seven independent fixtures,
+37 cases, each measured in three fresh PocketIC canisters. Every instruction
+count was identical across its three trials. These are actual RFC sample batch
+measurements; cold batches include one preparation followed by all checks.
+
+| Checks with one key | Direct instructions | Prepared instructions, key already prepared | Cold instructions, including preparation | Cold allocated bytes |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 12,541,922 | 3,802,871 | 23,491,346 | 16,408 |
+| 2 | 25,083,596 | 7,605,420 | 27,293,895 | 16,440 |
+| 10 | 125,416,988 | 38,025,812 | 57,714,287 | 16,696 |
+| 100 | 1,254,167,648 | 380,255,222 | 399,943,697 | 19,576 |
+
+Including preparation, ten checks save 53.98% and 100 checks save 68.11%.
+Direct and already-prepared batches both allocate 32 bytes per check.
+The three-call break-even below is modeled from the separately measured
+single-operation counters, not an additional measured batch. All seven final
+fixtures have that same modeled break-even. See the
+[final counters and memory samples](final-comparison.md) and
+[strict final source/artifact comparison](final-comparison.json).
 
 | Internal candidate | Preparation instructions | Verification instructions | Preparation allocation | Public-key payload |
 | --- | ---: | ---: | ---: | ---: |
@@ -50,5 +70,13 @@ check; runtime output is never used as an expected answer.
 The shared [prepared benchmark protocol](../README.md) freezes all sources,
 plugin binaries, compiler/RTS and runner dependencies. Screen stages are
 `prepared-p256-width4-screen`, `prepared-p256-width6-screen`, and
-`prepared-p256-width8-screen`. They measure deterministic IC counters; no host
-wall-time or host-isolation performance claim is made.
+`prepared-p256-width8-screen`; the final stage is
+`prepared-p256-width8-final-fixed`. They measure deterministic IC counters;
+no host wall-time or host-isolation performance claim is made.
+
+The earlier `prepared-p256-width8-final` actor build found a duplicate local
+binding in the generated cold fixtures. Scoping the factory statement fixed
+those ten fixtures; no plugin or SDK source changed. The original failed build
+is preserved, and no counters were collected from it. The corrected stage
+compiled all 37 actors before running the 111 successful trials. Compressed
+actor-build and counter logs accompany this report.

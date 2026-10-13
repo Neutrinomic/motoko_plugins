@@ -80,7 +80,7 @@ def main():
             prepare='let #ok(key) = P256.preparePublicKey(publicKey) else Prim.trap("prepare error"); prepared := ?key;'
             configure=prepare if mode=='prepared' else ''
             verify='P256.verifyPrehashPrepared(key, digest, signature)' if mode in ('prepared','cold') else 'P256.verifyPrehash(publicKey, digest, signature)'
-            operation=prepare if mode=='prepare' else (((prepare if mode=='cold' else '')+(key if mode in ('prepared','cold') else ''))+f' var i = 0; while (i < {reuse}) {{ result := {verify}; i += 1 }};')
+            operation=prepare if mode=='prepare' else ((('do { '+prepare+' }; ' if mode=='cold' else '')+(key if mode in ('prepared','cold') else ''))+f' var i = 0; while (i < {reuse}) {{ result := {verify}; i += 1 }};')
             output=(key+' let answer = P256.verifyPrehashPrepared(key, digest, signature);') if mode=='prepare' else 'let answer = result;'
             source=f'''import Prim "mo:⛔";
 import P256 "mo:fast/P256";

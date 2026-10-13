@@ -11,7 +11,7 @@ persistent actor {
     let allocatedBefore = Prim.rts_total_allocation();
     let reclaimedBefore = Prim.rts_reclaimed();
     let start = Prim.performanceCounter(0);
-    let #ok(key) = P256.preparePublicKey(publicKey) else Prim.trap("prepare error"); prepared := ?key;let ?key = prepared else Prim.trap("missing prepared key"); var i = 0; while (i < 10) { result := P256.verifyPrehashPrepared(key, digest, signature); i += 1 };
+    do { let #ok(key) = P256.preparePublicKey(publicKey) else Prim.trap("prepare error"); prepared := ?key; }; let ?key = prepared else Prim.trap("missing prepared key"); var i = 0; while (i < 10) { result := P256.verifyPrehashPrepared(key, digest, signature); i += 1 };
     let stop = Prim.performanceCounter(0);
     let allocatedAfter = Prim.rts_total_allocation();
     let reclaimedAfter = Prim.rts_reclaimed();
