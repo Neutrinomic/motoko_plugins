@@ -1,0 +1,366 @@
+   Compiling bls12_381 v0.8.0 (/srv/shared/code/motoko_experiments/plugins/_build/signature-round4/bls12-381/plugins/bls12-381/runtime/vendor/bls12_381)
+warning: unexpected `cfg` condition value: `std`
+   --> src/scalar.rs:833:7
+    |
+833 | #[cfg(feature = "std")]
+    |       ^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `alloc`, `bits`, `default`, `digest`, `experimental`, `group`, `groups`, `nightly`, `pairing`, `pairings`, `plugin-prepared`, and `zeroize`
+    = help: consider adding `std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+    = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: use of deprecated crate `digest::generic_array`: please upgrade to generic-array 1.x
+  --> src/lib.rs:93:24
+   |
+93 | pub(crate) use digest::generic_array;
+   |                        ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/mod.rs:19:47
+   |
+19 | use crate::generic_array::{typenum::Unsigned, ArrayLength, GenericArray};
+   |                                               ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/mod.rs:19:60
+   |
+19 | use crate::generic_array::{typenum::Unsigned, ArrayLength, GenericArray};
+   |                                                            ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/mod.rs:32:23
+   |
+32 |     type InputLength: ArrayLength<u8>;
+   |                       ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/mod.rs:36:23
+   |
+36 |     fn from_okm(okm: &GenericArray<u8, Self::InputLength>) -> Self;
+   |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/mod.rs:49:23
+   |
+49 |         let mut buf = GenericArray::<u8, Self::InputLength>::default();
+   |                       ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:13:5
+   |
+13 |     ArrayLength, GenericArray,
+   |     ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:13:18
+   |
+13 |     ArrayLength, GenericArray,
+   |                  ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:27:26
+   |
+27 | enum ExpandMsgDst<'x, L: ArrayLength<u8>> {
+   |                          ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:29:12
+   |
+29 |     Hashed(GenericArray<u8, L>),
+   |            ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:34:13
+   |
+34 | impl<'x, L: ArrayLength<u8>> ExpandMsgDst<'x, L> {
+   |             ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/expand_msg.rs:195:10
+    |
+195 |     b_0: GenericArray<u8, H::OutputSize>,
+    |          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/expand_msg.rs:196:10
+    |
+196 |     b_i: GenericArray<u8, H::OutputSize>,
+    |          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/expand_msg.rs:41:28
+   |
+41 |             let mut data = GenericArray::<u8, L>::default();
+   |                            ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/expand_msg.rs:224:20
+    |
+224 |             .chain(GenericArray::<u8, <H as BlockInput>::BlockSize>::default())
+    |                    ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> src/hash_to_curve/map_g1.rs:9:42
+  |
+9 | use crate::generic_array::{typenum::U64, GenericArray};
+  |                                          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g1.rs:507:23
+    |
+507 |     fn from_okm(okm: &GenericArray<u8, U64>) -> Fp {
+    |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> src/hash_to_curve/map_g2.rs:9:5
+  |
+9 |     GenericArray,
+  |     ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g2.rs:371:23
+    |
+371 |     fn from_okm(okm: &GenericArray<u8, U128>) -> Fp2 {
+    |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g2.rs:372:48
+    |
+372 |         let c0 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[..64]));
+    |                                                ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g2.rs:373:48
+    |
+373 |         let c1 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[64..]));
+    |                                                ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> src/hash_to_curve/map_scalar.rs:4:42
+  |
+4 | use crate::generic_array::{typenum::U48, GenericArray};
+  |                                          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/map_scalar.rs:11:23
+   |
+11 |     fn from_okm(okm: &GenericArray<u8, U48>) -> Scalar {
+   |                       ^^^^^^^^^^^^
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> src/scalar.rs:652:5
+    |
+652 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, functions, unions, required trait methods, provided trait methods, inherent methods, foreign functions, and traits
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> src/scalar.rs:657:5
+    |
+657 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, functions, unions, required trait methods, provided trait methods, inherent methods, foreign functions, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> src/g1.rs:982:5
+    |
+982 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, functions, unions, required trait methods, provided trait methods, inherent methods, foreign functions, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+    --> src/g2.rs:1127:5
+     |
+1127 |     #[must_use]
+     |     ^^^^^^^^^^^
+     |
+     = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+     = help: `#[must_use]` can be applied to data types, functions, unions, required trait methods, provided trait methods, inherent methods, foreign functions, and traits
+
+warning: `#[must_use]` attribute cannot be used on trait methods in impl blocks
+   --> src/pairings.rs:477:5
+    |
+477 |     #[must_use]
+    |     ^^^^^^^^^^^
+    |
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = help: `#[must_use]` can be applied to data types, functions, unions, required trait methods, provided trait methods, inherent methods, foreign functions, and traits
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/map_scalar.rs:36:55
+   |
+36 |         let output = format!("{:?}", Scalar::from_okm(GenericArray::from_slice(input)));
+   |                                                       ^^^^^^^^^^^^
+
+warning: use of deprecated associated function `digest::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g2.rs:372:73
+    |
+372 |         let c0 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[..64]));
+    |                                                                         ^^^^^^^^^^
+
+warning: use of deprecated associated function `digest::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+   --> src/hash_to_curve/map_g2.rs:373:73
+    |
+373 |         let c1 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[64..]));
+    |                                                                         ^^^^^^^^^^
+
+warning: use of deprecated associated function `digest::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+  --> src/hash_to_curve/map_scalar.rs:36:69
+   |
+36 |         let output = format!("{:?}", Scalar::from_okm(GenericArray::from_slice(input)));
+   |                                                                     ^^^^^^^^^^
+
+warning: `bls12_381` (lib) generated 31 warnings (run `cargo fix --lib -p bls12_381` to apply 5 suggestions)
+warning: `bls12_381` (lib test) generated 33 warnings (31 duplicates)
+    Finished `release` profile [optimized] target(s) in 7.01s
+     Running unittests src/lib.rs (_build/vendor-target/release/deps/bls12_381-b502f6d8f4ef7dea)
+
+running 129 tests
+test fp2::test_addition ... ok
+test fp2::test_conditional_selection ... ok
+test fp2::test_equality ... ok
+test fp12::test_arithmetic ... ok
+test fp2::test_lexicographic_largest ... ok
+test fp2::test_inversion ... ok
+test fp2::test_multiplication ... ok
+test fp2::test_negation ... ok
+test fp2::test_squaring ... ok
+test fp2::test_subtraction ... ok
+test fp6::test_arithmetic ... ok
+test fp::test_addition ... ok
+test fp2::test_sqrt ... ok
+test fp::test_conditional_selection ... ok
+test fp::test_debug ... ok
+test fp::test_equality ... ok
+test fp::test_from_bytes ... ok
+test fp::test_inversion ... ok
+test fp::test_lexicographic_largest ... ok
+test fp::test_multiplication ... ok
+test fp::test_negation ... ok
+test fp::test_sqrt ... ok
+test fp::test_squaring ... ok
+test fp::test_subtraction ... ok
+test fp_chain::tests::test_fp_chain ... ok
+test g1::test_affine_negation_and_subtraction ... ok
+test g1::test_affine_point_equality ... ok
+test g1::test_affine_scalar_multiplication ... ok
+test g1::test_affine_to_projective ... ok
+test g1::test_batch_normalize ... ok
+test g1::test_beta ... ok
+test g1::test_clear_cofactor ... ok
+test fp_chain::tests::test_fp2_chain ... ok
+test g1::test_conditionally_select_affine ... ok
+test g1::test_conditionally_select_projective ... ok
+test g1::test_doubling ... ok
+test g1::test_is_on_curve ... ok
+test g1::test_is_torsion_free ... ok
+test g1::test_mixed_addition ... ok
+test g1::test_mul_by_x ... ok
+test g1::test_commutative_scalar_subgroup_multiplication ... ok
+test g1::test_projective_addition ... ok
+test g1::test_projective_negation_and_subtraction ... ok
+test g1::test_projective_point_equality ... ok
+test g1::test_projective_to_affine ... ok
+test g2::test_affine_negation_and_subtraction ... ok
+test g2::test_affine_point_equality ... ok
+test g1::test_projective_scalar_multiplication ... ok
+test g2::test_affine_to_projective ... ok
+test g2::test_batch_normalize ... ok
+test g2::test_affine_scalar_multiplication ... ok
+test g2::test_clear_cofactor ... ok
+test g2::test_conditionally_select_affine ... ok
+test g2::test_conditionally_select_projective ... ok
+test g2::test_doubling ... ok
+test g2::test_is_on_curve ... ok
+test g2::test_is_torsion_free ... ok
+test g2::test_mixed_addition ... ok
+test g2::test_mul_by_x ... ok
+test g2::test_projective_addition ... ok
+test g2::test_projective_negation_and_subtraction ... ok
+test g2::test_projective_point_equality ... ok
+test g2::test_projective_scalar_multiplication ... ok
+test g2::test_projective_to_affine ... ok
+test g2::test_psi ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xmd_works_for_draft12_testvectors_sha256 ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xmd_works_for_draft12_testvectors_sha256_long_dst ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xmd_works_for_draft12_testvectors_sha512 ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xof_works_for_draft12_testvectors_shake128 ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xof_works_for_draft12_testvectors_shake128_long_dst ... ok
+test hash_to_curve::expand_msg::tests::expand_message_xof_works_for_draft12_testvectors_shake256 ... ok
+test hash_to_curve::map_g1::test_encode_to_curve_10 ... ok
+test hash_to_curve::map_g1::test_hash_to_curve_10 ... ok
+test hash_to_curve::map_g1::test_osswu_semirandom ... ok
+test hash_to_curve::map_g1::test_sgn0 ... ok
+test hash_to_curve::map_g1::test_simple_swu_expected ... ok
+test hash_to_curve::map_g2::test_encode_to_curve_10 ... ok
+test g2::test_commutative_scalar_subgroup_multiplication ... ok
+test hash_to_curve::map_g2::test_hash_to_curve_10 ... ok
+test hash_to_curve::map_g2::test_sgn0 ... ok
+test hash_to_curve::map_scalar::test_hash_to_scalar ... ok
+test hash_to_curve::map_g2::test_osswu_semirandom ... ok
+test pairings::plugin_prepared::tests::all_coefficients_match_upstream_preparation ... ok
+test pairings::plugin_prepared::tests::g1_coordinates_match_validated_wire_points ... ok
+test pairings::plugin_prepared::tests::identity_rejection_leaves_output_untouched ... ok
+test pairings::plugin_prepared::tests::neutral_and_cancelling_terms_preserve_pairing_semantics ... ok
+test pairings::plugin_prepared::tests::streaming_driver_state_is_bounded_to_two_terms ... ok
+test pairings::plugin_prepared::tests::streaming_generators_and_cancellation_match_prepared_loops ... ok
+test pairings::plugin_prepared::tests::streaming_hash_derived_points_match_prepared_loops ... ok
+test pairings::plugin_prepared::tests::borrowed_and_mixed_loops_match_upstream_across_batch_sizes ... ok
+test pairings::plugin_prepared::tests::streaming_seeded_subgroup_points_match_prepared_loops ... ok
+test pairings::plugin_prepared::tests::writers_and_readers_accept_every_alignment_without_overrun ... ok
+test pairings::test_bilinearity ... ok
+test pairings::test_gt_generator ... ok
+test pairings::test_miller_loop_result_default ... ok
+test pairings::plugin_prepared::tests::streaming_identity_in_every_operand_matches_prepared_loops ... ok
+test pairings::test_unitary ... ok
+test pairings::tricking_miller_loop_result ... ok
+test pairings::test_multi_miller_loop ... ok
+test plugin_round4_tests::final_exponentiation::conjugation_matches_six_frobenius_on_general_fields ... ok
+test scalar::test_addition ... ok
+test scalar::test_constants ... ok
+test scalar::test_double ... ok
+test scalar::test_equality ... ok
+test scalar::test_from_bytes ... ok
+test scalar::test_from_bytes_wide_maximum ... ok
+test scalar::test_from_bytes_wide_negative_one ... ok
+test scalar::test_from_bytes_wide_r2 ... ok
+test scalar::test_from_raw ... ok
+test scalar::test_from_u512_max ... ok
+test scalar::test_from_u512_r ... ok
+test scalar::test_from_u512_r2 ... ok
+test scalar::test_from_u512_zero ... ok
+test scalar::test_inv ... ok
+test scalar::test_inversion ... ok
+test scalar::test_invert_is_pow ... ok
+test scalar::test_multiplication ... ok
+test scalar::test_negation ... ok
+test scalar::test_sqrt ... ok
+test scalar::test_squaring ... ok
+test scalar::test_subtraction ... ok
+test scalar::test_to_bytes ... ok
+test scalar::test_zero ... ok
+test plugin_round4_tests::fixed_chain_matches_binary_for_edge_cases_and_random_fields ... ok
+test tests::g1_compressed_valid_test_vectors ... ok
+test tests::g1_uncompressed_valid_test_vectors ... ok
+test tests::g2_uncompressed_valid_test_vectors ... ok
+test tests::test_pairing_result_against_relic ... ok
+test tests::g2_compressed_valid_test_vectors ... ok
+
+test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+   Doc-tests bls12_381
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,67 @@
+{
+  "candidate": "c3-two-term-streaming-on-c2",
+  "production_commit": "5e72dabe5edbc53e1efcde9ca1f1635a258ed232",
+  "compiler_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "host_tests": {
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+    "vendor_groups": 111,
+    "vendor_experimental": 129,
+    "runtime": 28,
+    "log_prefix": "c3-"
+  },
+  "frozen_nix_tests": {
+    "rustc": "rustc 1.99.0-nightly (da86f4d07 2026-07-24)",
+    "vendor_groups": 111,
+    "vendor_experimental": 129,
+    "runtime": 28,
+    "log_prefix": "c3-nightly-"
+  },
+  "test_commands_in_each_environment": [
+    "CARGO_BUILD_JOBS=2 RUST_TEST_THREADS=2 cargo test --locked --offline --manifest-path plugins/bls12-381/runtime/vendor/bls12_381/Cargo.toml --no-default-features --features plugin-prepared --release --target-dir _build/vendor-target",
+    "CARGO_BUILD_JOBS=2 RUST_TEST_THREADS=2 cargo test --locked --offline --manifest-path plugins/bls12-381/runtime/vendor/bls12_381/Cargo.toml --no-default-features --features plugin-prepared,experimental --release --target-dir _build/vendor-target",
+    "CARGO_BUILD_JOBS=2 RUST_TEST_THREADS=2 cargo test --locked --offline --release -p motoko-compute-bls12-381 --target-dir _build/native"
+  ],
+  "nix_environment": "nix develop --command bash -c from /srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+  "plugin_build_command": "CARGO_BUILD_JOBS=2 RUST_TEST_THREADS=2 python3 scripts/build.py --motoko /srv/shared/code/motoko_experiments/prepared-crypto/sdk --skip-motoko-build bls12-381",
+  "runtime_wasm": {
+    "sha256": "ebc5fa2fd9fc6ed3698bd523f5101d4883ef51c0e7bf4783f4b2da64d691972c",
+    "bytes": 655629
+  },
+  "c2_runtime_wasm": {
+    "sha256": "61b6b3c1ad9e1dedcaf4692e201f8255af2315192124af6d986b39c6e593259e",
+    "bytes": 650746
+  },
+  "runtime_rustflags": [
+    "--remap-path-prefix=/srv/shared/code/motoko_experiments/plugins/_build/signature-round4/bls12-381=.",
+    "-C",
+    "link-arg=--import-memory"
+  ],
+  "artifact_build_sha256": "1fe017b2393effac37f45b8bd6a7ffd244a075fce3062e5f8ad72b130e79ef99",
+  "changed_source_sha256": {
+    "plugins/bls12-381/runtime/src/lib.rs": "2124671701bc28f479d5d0a1ea2508ffa6667bfc273227dc4f8f3def9aeed0a9",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/plugin_prepared.rs": "88b37f97a8201f1335a4568c2677885aa78f9285bb8c14b2067c3fb4a5d75e21",
+    "plugins/bls12-381/runtime/vendor/bls12_381/src/plugin_prepared_tests.rs": "6efd6b0d4608e1d5bd974cbb380526d375211e2298ed3ddac01c96f1a40bfbba",
+    "plugins/bls12-381/runtime/vendor/bls12_381/MOTOKO-PREPARED.md": "fbec5e44c71f828b885b6fa59c6b5aa74b01024571fabb70d007dc0fda6b286d"
+  },
+  "evidence_sha256": {
+    "c3-build.log": "6741afac49cf4972b72c557daf624891a13a3adc0864bfc42012bf5d4127602d",
+    "c3-nightly-runtime.log": "288917a9b8d831edf3db352fddd8c695db85204b9ac4a8f9c02ff7b7b560b21a",
+    "c3-nightly-vendor-experimental.log": "1cec0b6b08f9aa473b4372fa3427e6641cb597d7d4eeb62c0562982d01d23579",
+    "c3-nightly-vendor-groups.log": "13c8721c1977d8a64bf354511c7a7b4d8df11e579cd339ee84756529f4f99727",
+    "c3-runtime.log": "4ff5493b03707404fc12a568e65ffb184497b767e43a0657e66fe1538c6dd5bc",
+    "c3-vendor-experimental.log": "4a25469cc67f4219691f8a39fd92a52f507c13013c08caa561fce11984919c4d",
+    "c3-vendor-groups.log": "e76c7b4c6984fd7f5d1e4c2df88ec52adb07186031f45238ce3ea2efcb6f215a",
+    "vendor-Cargo.lock": "008450875e9ba9f6c3b4c5c83738c4ae5aab3e414832a2df9453c141ee4ee607"
+  },
+  "actor_capture": {
+    "stage": "prepared-round4-bls12-381-c3-candidate",
+    "complete": true,
+    "compiled_cases": 9,
+    "build_sha256": "4714566ad26e9987983173543d08e0be0616b5f0d40cac6c5b81075cdaa09631",
+    "log": "_build/c3-actor-candidate.log",
+    "log_sha256": "18ad80eb09e387fe810fd962efb1619dbe2567595b5617b1d86fb97f4bb00333"
+  },
+  "driver_state_bound_bytes": 1024,
+  "notes": "All gates passed in both environments. Driver-state bound is not total Wasm stack frame or peak stack use. Generated vendor-local lock removed before plugin build. Production commit contains only the four scoped files. General pairing_product and prepared IC path unchanged. No PocketIC runner invoked by this task."
+}
