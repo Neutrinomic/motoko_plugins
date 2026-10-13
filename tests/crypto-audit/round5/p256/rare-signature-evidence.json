@@ -1,0 +1,100 @@
+{
+  "kind": "synthetic forced-nonce zero-s signing policy regression",
+  "scope": "Actual production arithmetic and wrappers with only nonce selection injected",
+  "limitation": "Does not exhibit a real RFC6979 preimage or force a zero-r point",
+  "harness_sha256": "cb024b601ffeeaec43d8fe663917779cfeb76778f1b629fc204b43b6bb849783",
+  "before": {
+    "source_sha256": {
+      "plugins/secp256k1/compiler/secp256k1_reference.ml": "533787b4b2d8fd2f3e7014313aac7eaf45d3b00845192fd9171a80efa7188941",
+      "plugins/p256/compiler/reference.ml": "5c1ea75adfb8bbc850dc5591b5f28d8e9d96cd60405093e03a979830e725cb14",
+      "plugins/p256/runtime/src/lib.rs": "14c73f32a6142e4cf23ccaacd3a83104183ddb5b8c071c1b62c0c4e83e2b2b4a",
+      "plugins/p256/runtime/src/secret_table.rs": "760aa780b33e62d79cfc7ba5715bc0d8c137a92a06cb06c892663f9ae4de2c68",
+      "plugins/p256/runtime/src/prepared_table.rs": "1b5aac2f6e9a28476b78675dea09e5b81650869d47356a6c9ed546a9941daffa",
+      "plugins/p256/runtime/Cargo.toml": "92d9b0943f55c42dc223fdf9830778e4711d1f182034dd2fb850fe2a5ade3204",
+      "Cargo.lock": "8086c567e1d2fac55416ba2a935a50e00b3094a94beea7f1d7121dd5fd6607d1"
+    },
+    "reference": {
+      "compile": {
+        "command": [
+          "ocamlfind",
+          "ocamlopt",
+          "-package",
+          "num",
+          "-linkpkg",
+          "-w",
+          "+a-4-23-27-30-32-42-44-45-58-60-69-70",
+          "-warn-error",
+          "+a",
+          "mo_values.ml",
+          "key_type.ml",
+          "p256_curve.ml",
+          "p256_reference.ml",
+          "rare_signature.ml",
+          "-o",
+          "rare_signature"
+        ],
+        "returncode": 0,
+        "output": ""
+      },
+      "injected_source_sha256": "ea3baadc6973708f891910b7c7160ffda185bdd3cc959bbef1d326c6cc5c1265",
+      "test": {
+        "command": [
+          "/tmp/nix-shell.IXRNpK/p256-rare-signature-_28m8e6x/reference/rare_signature"
+        ],
+        "returncode": 1,
+        "output": "OBSERVED\tp256\tzero_s_result=Some\tnonce_calls=2\nCHECK\tp256/zero-s-rejected\tFAIL\nCHECK\tp256/exactly-one-nonce\tFAIL\nCHECK\tp256/nonzero-control\tPASS\nCHECK\tp256/nonzero-one-nonce\tPASS\nCHECK\tp256/invalid-secret-before-nonce\tPASS\nCHECK\tp256/invalid-digest-before-nonce\tPASS\nOBSERVED\tsecp256k1\tzero_s_result=Some\tnonce_calls=2\nCHECK\tsecp256k1/zero-s-rejected\tFAIL\nCHECK\tsecp256k1/exactly-one-nonce\tFAIL\nCHECK\tsecp256k1/nonzero-control\tPASS\nCHECK\tsecp256k1/nonzero-one-nonce\tPASS\nCHECK\tsecp256k1/invalid-secret-before-nonce\tPASS\nCHECK\tsecp256k1/invalid-digest-before-nonce\tPASS\nCHECK\tp256/real-wrapper-invalid-signature\tFAIL\nCHECK\tsecp256k1/real-wrapper-invalid-signature\tFAIL\nCHECK\tp256/real-wrapper-secret-precedence\tPASS\nCHECK\tsecp256k1/real-wrapper-secret-precedence\tPASS\nCHECK\tp256/real-wrapper-invalid-digest\tPASS\nCHECK\tsecp256k1/real-wrapper-invalid-digest\tPASS\n"
+      },
+      "passed": false
+    },
+    "native": {
+      "passed": true,
+      "injected_source_sha256": "cdb5b7098dfd3fc5e75177c3d634b6cf844c9276d08d66c6d95ad9e482fc1aea",
+      "returncode": 0,
+      "summary": "test rare_signature_tests::forced_zero_s_uses_real_signer_and_error_wrapper ... ok\ntest rare_signature_tests::nonzero_control_and_real_validation_remain_intact ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    }
+  },
+  "after": {
+    "source_sha256": {
+      "plugins/secp256k1/compiler/secp256k1_reference.ml": "e4e89863b6f58e1637b0ab024c4310203ec663771e7cd79efd22e7e196b75c36",
+      "plugins/p256/compiler/reference.ml": "5c1ea75adfb8bbc850dc5591b5f28d8e9d96cd60405093e03a979830e725cb14",
+      "plugins/p256/runtime/src/lib.rs": "14c73f32a6142e4cf23ccaacd3a83104183ddb5b8c071c1b62c0c4e83e2b2b4a",
+      "plugins/p256/runtime/src/secret_table.rs": "760aa780b33e62d79cfc7ba5715bc0d8c137a92a06cb06c892663f9ae4de2c68",
+      "plugins/p256/runtime/src/prepared_table.rs": "1b5aac2f6e9a28476b78675dea09e5b81650869d47356a6c9ed546a9941daffa",
+      "plugins/p256/runtime/Cargo.toml": "92d9b0943f55c42dc223fdf9830778e4711d1f182034dd2fb850fe2a5ade3204",
+      "Cargo.lock": "8086c567e1d2fac55416ba2a935a50e00b3094a94beea7f1d7121dd5fd6607d1"
+    },
+    "reference": {
+      "compile": {
+        "command": [
+          "ocamlfind",
+          "ocamlopt",
+          "-package",
+          "num",
+          "-linkpkg",
+          "-w",
+          "+a-4-23-27-30-32-42-44-45-58-60-69-70",
+          "-warn-error",
+          "+a",
+          "mo_values.ml",
+          "key_type.ml",
+          "p256_curve.ml",
+          "p256_reference.ml",
+          "rare_signature.ml",
+          "-o",
+          "rare_signature"
+        ],
+        "returncode": 0,
+        "output": ""
+      },
+      "injected_source_sha256": "bbf930da6768e8c5bf4d610e7354cd7d9000c7b61c9e9b4cf2fd5a2266bc2403",
+      "test": {
+        "command": [
+          "/tmp/nix-shell.DXdIhv/p256-rare-signature-ua97if3t/reference/rare_signature"
+        ],
+        "returncode": 0,
+        "output": "OBSERVED\tp256\tzero_s_result=None\tnonce_calls=1\nCHECK\tp256/zero-s-rejected\tPASS\nCHECK\tp256/exactly-one-nonce\tPASS\nCHECK\tp256/nonzero-control\tPASS\nCHECK\tp256/nonzero-one-nonce\tPASS\nCHECK\tp256/invalid-secret-before-nonce\tPASS\nCHECK\tp256/invalid-digest-before-nonce\tPASS\nOBSERVED\tsecp256k1\tzero_s_result=None\tnonce_calls=1\nCHECK\tsecp256k1/zero-s-rejected\tPASS\nCHECK\tsecp256k1/exactly-one-nonce\tPASS\nCHECK\tsecp256k1/nonzero-control\tPASS\nCHECK\tsecp256k1/nonzero-one-nonce\tPASS\nCHECK\tsecp256k1/invalid-secret-before-nonce\tPASS\nCHECK\tsecp256k1/invalid-digest-before-nonce\tPASS\nCHECK\tp256/real-wrapper-invalid-signature\tPASS\nCHECK\tsecp256k1/real-wrapper-invalid-signature\tPASS\nCHECK\tp256/real-wrapper-secret-precedence\tPASS\nCHECK\tsecp256k1/real-wrapper-secret-precedence\tPASS\nCHECK\tp256/real-wrapper-invalid-digest\tPASS\nCHECK\tsecp256k1/real-wrapper-invalid-digest\tPASS\n"
+      },
+      "passed": true
+    }
+  }
+}

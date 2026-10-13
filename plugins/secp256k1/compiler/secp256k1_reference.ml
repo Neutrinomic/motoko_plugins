@@ -252,14 +252,15 @@ let ec_ecdsa_sign ?(low_s=true) curve secret message =
     if not (valid_scalar curve d) then None
     else
       let next_nonce = nonce_generator curve secret message in
-      let rec sign () =
+      let sign () =
         let k = next_nonce () in
         match multiply curve k (generator curve) with
-        | Infinity -> sign ()
+        | Infinity -> None
         | Point (x, _) ->
           let r = modulo x curve.n in
           let s = modulo (Z.mul (Z.invert k curve.n) (Z.add (of_bytes message) (Z.mul r d))) curve.n in
-          if Z.equal r Z.zero || Z.equal s Z.zero then sign ()
+          (* Match the native runtimes' failure for this valid nonce. *)
+          if Z.equal r Z.zero || Z.equal s Z.zero then None
           else
             let s = if low_s && Z.compare s (Z.shift_right curve.n 1) > 0 then Z.sub curve.n s else s in
             Some (to_bytes 32 r ^ to_bytes 32 s)

@@ -25,6 +25,12 @@ mod secret_table;
 #[cfg(test)]
 mod projective_tests;
 
+#[cfg(test)]
+mod ffi_tests;
+
+#[cfg(test)]
+mod encoding_tests;
+
 const INVALID_SECRET_KEY: i64 = -1;
 const INVALID_PUBLIC_KEY: i64 = -2;
 const INVALID_DIGEST: i64 = -3;

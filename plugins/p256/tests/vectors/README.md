@@ -1,5 +1,24 @@
 # P256 independent vectors
 
+`encoding.json` contains focused OpenSSL encoding answers from
+`generate-encoding.py`. Its 133 scalar pairs cover every DER output length from
+8 through 72 bytes, the positive INTEGER sign-octet transition at every scalar
+byte width, and normalization immediately below and above half the order.
+OpenSSL's ASN.1 generator supplies the exact DER bytes. Its EC decoder supplies
+28 compressed SEC1 membership/coordinate answers around zero, the scalar order
+and the field prime, including both roots where a point exists. Regenerate with
+`python3 generate-encoding.py --openssl /path/to/openssl`; `--check` checks both
+the JSON and generated public Motoko fixture without writing them. The recorded
+OpenSSL version is part of the fixture provenance.
+
+Native tests check strict decoder errors independently of verification and
+mutate sequence/integer lengths, required/redundant sign padding, truncations
+and trailing bytes. The shared public `P256EncodingTests.mo` runs through both
+the ordinary Motoko suite and Ash, including all SEC1 tags and truncations.
+FFI tests separately cover byte offsets 1 through 8, exact output capacities,
+zero initialization on errors, DER scratch tails, immutable input buffers and
+permitted overlap between read-only verification inputs.
+
 `wycheproof-ecdsa-secp256r1-sha256.json` is an unmodified copy of C2SP Wycheproof's
 `testvectors_v1/ecdsa_secp256r1_sha256_test.json` at commit
 `878e5366008753df2064d40c49f8e2f50f9c6af7` (484 test cases).

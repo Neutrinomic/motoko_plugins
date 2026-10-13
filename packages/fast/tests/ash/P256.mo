@@ -3,10 +3,23 @@ import P256 "mo:fast/P256";
 import Array "mo:core/Array";
 import Blob "mo:core/Blob";
 import Prim "mo:⛔";
+import EncodingTests "../lib/P256EncodingTests";
 
 // RFC 6979 A.2.5 and pinned C2SP Wycheproof vectors; see coverage/P256.md.
 // SHA-256 digests are fixed independent answers, so this suite loads only P256.
 persistent actor {
+  public func test_der_all_lengths_and_padding_boundaries() : async Test.Metrics {
+    Test.test(EncodingTests.derLengthsAndPadding)
+  };
+
+  public func test_sec1_canonical_coordinate_boundaries() : async Test.Metrics {
+    Test.test(EncodingTests.sec1CanonicalCoordinates)
+  };
+
+  public func test_sec1_all_tags_and_truncations() : async Test.Metrics {
+    Test.test(EncodingTests.sec1TagsAndLengths)
+  };
+
   func concat(a : Blob, b : Blob) : Blob { Blob.fromArray(a.toArray().concat(b.toArray())) };
   type RetainedPrepared = { key : P256.PreparedPublicKey; aliases : [P256.PreparedPublicKey] };
   transient var retainedPrepared : ?RetainedPrepared = null;
