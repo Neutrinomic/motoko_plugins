@@ -1638,6 +1638,75 @@ fn test_mul_by_x() {
 }
 
 #[test]
+fn test_fixed_x_on_full_curve_and_rescaled_representatives() {
+    use rand_core::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    // Integer multiplication is deliberate. Reducing -x modulo the subgroup
+    // order would give a different result on the full curve's torsion points.
+    fn signed_integer_reference(point: &G1Projective) -> G1Projective {
+        let mut result = G1Projective::identity();
+        let mut power = *point;
+        let mut magnitude = 0xd201_0000_0001_0000u64;
+        while magnitude != 0 {
+            if magnitude & 1 != 0 {
+                result += power;
+            }
+            power = power.double();
+            magnitude >>= 1;
+        }
+        -result
+    }
+
+    fn check(point: G1Projective) {
+        assert!(bool::from(point.is_on_curve()));
+        assert_eq!(point.mul_by_x(), signed_integer_reference(&point));
+        assert_eq!((-point).mul_by_x(), signed_integer_reference(&(-point)));
+        assert!(bool::from(point.mul_by_x().is_on_curve()));
+    }
+
+    assert_eq!(crate::BLS_X, 0xd201_0000_0001_0000);
+    assert!(crate::BLS_X_IS_NEGATIVE);
+    check(G1Projective::identity());
+    check(G1Projective::generator());
+    let mut rng = XorShiftRng::from_seed(*b"bls7-g1-fullcrv!");
+    let mut generated = 0;
+    let mut nonsubgroup = 0;
+    while generated < 32 {
+        let x = Fp::random(&mut rng);
+        let y = (x.square() * x + B).sqrt();
+        if !bool::from(y.is_some()) {
+            continue;
+        }
+        let affine = G1Affine {
+            x,
+            y: y.unwrap(),
+            infinity: Choice::from(0),
+        };
+        if !bool::from(affine.is_torsion_free()) {
+            nonsubgroup += 1;
+        }
+        let point = G1Projective::from(affine);
+        check(point);
+        let scale = Fp::random(&mut rng);
+        assert!(!bool::from(scale.is_zero()));
+        // These are homogeneous coordinates (x/z, y/z), not Jacobian.
+        let rescaled = G1Projective {
+            x: point.x * scale,
+            y: point.y * scale,
+            z: point.z * scale,
+        };
+        assert_eq!(rescaled, point);
+        check(rescaled);
+        let cleared = point.clear_cofactor();
+        check(cleared);
+        assert!(bool::from(G1Affine::from(cleared).is_torsion_free()));
+        generated += 1;
+    }
+    assert!(nonsubgroup > 0);
+}
+
+#[test]
 fn test_clear_cofactor() {
     // the generator (and the identity) are always on the curve,
     // even after clearing the cofactor
