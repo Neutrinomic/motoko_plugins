@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-13",
+  "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+  "moc_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "phases": [
+    {
+      "phase": "smoke",
+      "passed": 2,
+      "failed": 0,
+      "log": "_build/prepared-validation/logs/smoke-20261013T052058.log",
+      "log_sha256": "f944bc6b87d8acfdd5e2c4b0b7c41b1de6de293f54db3bf0f1718ebd2bba2a1e",
+      "provenance": "_build/prepared-validation/logs/smoke-20261013T052058.log.provenance.json",
+      "provenance_sha256": "b69e1d7d7808f832cdd58f7f3d86527b86e908d6fdd51c476ff74a6ffb4aa249",
+      "artifacts": {
+        "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e",
+        "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba"
+      }
+    },
+    {
+      "phase": "negative_accept",
+      "passed": 6,
+      "failed": 0,
+      "log": "_build/prepared-validation/logs/accept-fail-20261013T052158.log",
+      "log_sha256": "26b2e1542aaad4750961df103e23469006128c456b1fdb03a6bd619bb6c8b74e",
+      "provenance": "_build/prepared-validation/logs/accept-fail-20261013T052158.log.provenance.json",
+      "provenance_sha256": "ae679bfb8ce5fd295d16b16d4758b44fdd5344c08d253ce4e251c091ce9c2568",
+      "artifacts": {
+        "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e",
+        "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba"
+      }
+    },
+    {
+      "phase": "negative_verify",
+      "passed": 6,
+      "failed": 0,
+      "log": "_build/prepared-validation/logs/verify-fail-20261013T052213.log",
+      "log_sha256": "879a5a6d887d6e1ad971502d4d83483bc9acd188d5686ebdd0556f2482266c98",
+      "provenance": "_build/prepared-validation/logs/verify-fail-20261013T052213.log.provenance.json",
+      "provenance_sha256": "ae679bfb8ce5fd295d16b16d4758b44fdd5344c08d253ce4e251c091ce9c2568",
+      "artifacts": {
+        "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e",
+        "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba"
+      }
+    },
+    {
+      "phase": "ash_prepared",
+      "passed": 8,
+      "failed": 0,
+      "log": "_build/prepared-validation/logs/ash-prepared-20261013T052229.log",
+      "log_sha256": "b0879a2cff36f138bf821360fded815244591e388a7270a908631cbc9d2cfbd3",
+      "provenance": "_build/prepared-validation/logs/ash-prepared-20261013T052229.log.provenance.json",
+      "provenance_sha256": "ae679bfb8ce5fd295d16b16d4758b44fdd5344c08d253ce4e251c091ce9c2568",
+      "artifacts": {
+        "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e",
+        "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba"
+      }
+    },
+    {
+      "phase": "ash_direct",
+      "passed": 9,
+      "failed": 0,
+      "log": "_build/prepared-validation/logs/ash-direct-20261013T052244.log",
+      "log_sha256": "6c8c49e8a7149698b604893c06d9236093b7055aa870bb50486c26235400cd0b",
+      "provenance": "_build/prepared-validation/logs/ash-direct-20261013T052244.log.provenance.json",
+      "provenance_sha256": "ae679bfb8ce5fd295d16b16d4758b44fdd5344c08d253ce4e251c091ce9c2568",
+      "artifacts": {
+        "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e",
+        "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba"
+      }
+    }
+  ],
+  "negative_review": {
+    "candid": "M0173 non-shared Candid argument",
+    "expose": "M0096 prepared public key cannot become Blob",
+    "forge": "M0096 explicitly typed Blob cannot become prepared public key",
+    "kind": "M0096 prepared secret cannot become prepared public key",
+    "shared": "M0031 non-shared actor argument",
+    "stable": "M0131 non-stable actor variable"
+  },
+  "test_only_fixes": [
+    "Forge source explicitly typed as Blob instead of an untyped Text literal.",
+    "Removed redundant persistent keyword from stable rejection case."
+  ],
+  "frozen_production_sources_changed": false,
+  "notes": [
+    "Both positive package tests passed interpreter and generated-Wasm runner paths.",
+    "All 17 Ash methods passed; prepared retention/drop and direct retention assertions confirmed GC activity.",
+    "Negative acceptance is not an additional set of unique tests; six reviewed cases passed a subsequent run without acceptance.",
+    "GC activity does not prove erasure or collection of particular context bytes."
+  ]
+}

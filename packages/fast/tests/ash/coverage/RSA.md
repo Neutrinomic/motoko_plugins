@@ -58,3 +58,9 @@ configuration, including the observed-GC assertion. The targeted package
 `crypto-rsa.mo` test also passed through `test-runner` against the matching
 plugin-enabled compiler. Independent crypto audit evidence is retained in
 [`tests/crypto-audit/round3/rsa`](../../../../../tests/crypto-audit/round3/rsa/README.md).
+
+The prepared-key candidate was independently retested on 2026-10-13: all nine
+direct Ash methods and the ordinary package test passed with its selected
+window-five runtime. [Prepared coverage](RSAPrepared.md) records the exact
+SDK and artifact hashes, alongside the eight prepared methods and six
+nominal-type rejection cases.

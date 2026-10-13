@@ -49,5 +49,21 @@ Run after building the matching prepared-type SDK and plugin:
 scripts/test-ash.sh --ash-source /srv/shared/code/ash RSAPrepared
 ```
 
-Validation results will be recorded after execution; the source addition alone
-does not establish a passing suite.
+Validated on 2026-10-13: all eight prepared Ash methods passed, with zero
+failures or skips. Both lifecycle methods satisfied their observed-GC
+assertions. The direct RSA suite also passed all nine methods. The two package
+smoke tests passed through `test-runner`; all six negative diagnostics were
+reviewed, then passed again without accepting expectations.
+
+The selected SDK was `9f6ebeedc547e389a0529b4c91442e46b88fcbe0`, compiler
+SHA-256 `24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2`.
+The tested artifacts were:
+
+- `plugin.cmxs`: `9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e`
+- `runtime.wasm`: `6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba`
+
+Local execution logs and per-run compiler/tool/test-source hashes are under
+`_build/prepared-validation/logs/`; the exact phase inventory is in
+`_build/prepared-validation/validation-summary.json`. The isolated Ash source
+copy changed only compiler resolution to the selected SDK; global binaries
+were unchanged.

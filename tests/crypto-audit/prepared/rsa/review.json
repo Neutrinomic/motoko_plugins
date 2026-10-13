@@ -1,0 +1,125 @@
+{
+  "status": "approved",
+  "profile": "RSA3072/e65537/PSS-SHA256/MGF1-SHA256/salt32",
+  "production_commit": "6c40297",
+  "independent_evidence": "final/report.json",
+  "prior_window2_evidence": "window2/report.json",
+  "prepared_payload_bytes": {
+    "public": 824,
+    "secret": 1840
+  },
+  "window_bits": 5,
+  "workspace": {
+    "direct_factor_slots": 37,
+    "prepared_exponentiation_words": 1716,
+    "word_bytes": 4
+  },
+  "native_stack_chain_upper_bound_bytes": {
+    "direct_sign": 11664,
+    "prepared_sign": 9568,
+    "compiler_reserved": 4194304
+  },
+  "stack_scope": "Bound from actual runtime Wasm fixed frames/direct acyclic calls; excludes Motoko caller and engine value stack.",
+  "verified_source_files": 62,
+  "plugin_artifacts": {
+    "runtime.wasm": "6d1ccca08f869a499c27e9dc9bb3103f3d4377cd580db0b19d90f7d301b5ebba",
+    "plugin.cmxs": "9576e6c81e74a4e80537f4fe29ca26db643bf0e1dff26115b96e5ec9bb21228e"
+  },
+  "independent_gates": {
+    "native_asan_ubsan": "pass",
+    "portable_ocaml": "pass",
+    "compiled_wasm_sanity": "pass",
+    "semantic_cases": 272,
+    "wycheproof_cases": 108,
+    "public_math_cases": 1223,
+    "private_math_cases": 68,
+    "native_shaped_crt_faults": 20,
+    "motoko_interleaved_key_rounds": 12,
+    "ordinary_import_formats": 7,
+    "restricted_import_rejections": 16,
+    "full_context_layout_oracle": "pass",
+    "guards_and_input_context_immutability": "pass"
+  },
+  "external_gates": {
+    "package_smoke": {
+      "status": "pass",
+      "log": "final/external/smoke-20261013T052058.log",
+      "provenance": "final/external/smoke-20261013T052058.log.provenance.json",
+      "log_sha256": "f944bc6b87d8acfdd5e2c4b0b7c41b1de6de293f54db3bf0f1718ebd2bba2a1e"
+    },
+    "negative_type_verification": {
+      "status": "pass",
+      "log": "final/external/verify-fail-20261013T052213.log",
+      "provenance": "final/external/verify-fail-20261013T052213.log.provenance.json",
+      "log_sha256": "879a5a6d887d6e1ad971502d4d83483bc9acd188d5686ebdd0556f2482266c98"
+    },
+    "prepared_ash": {
+      "status": "pass",
+      "log": "final/external/ash-prepared-20261013T052229.log",
+      "provenance": "final/external/ash-prepared-20261013T052229.log.provenance.json",
+      "log_sha256": "b0879a2cff36f138bf821360fded815244591e388a7270a908631cbc9d2cfbd3"
+    },
+    "direct_ash": {
+      "status": "pass",
+      "log": "final/external/ash-direct-20261013T052244.log",
+      "provenance": "final/external/ash-direct-20261013T052244.log.provenance.json",
+      "log_sha256": "6c8c49e8a7149698b604893c06d9236093b7055aa870bb50486c26235400cd0b"
+    }
+  },
+  "resolved_findings": [
+    {
+      "issue": "Prepared verification hashed the message after an already-known out-of-range signature.",
+      "resolution": "Return invalidSignature immediately after the public operation range failure, before hashing."
+    },
+    {
+      "issue": "The inherited direct modpow window lookup reads unused padding words that could be uninitialized.",
+      "resolution": "Initialize the entire direct private workspace; retain volatile clearing. Arithmetic primitives unchanged."
+    },
+    {
+      "issue": "Factory GC tests initially prepared only from static fixture key inputs.",
+      "resolution": "Owner added dynamic raw key clones retained and checked across observed collection; prepared Ash gate passed8/8."
+    },
+    {
+      "issue": "README still described CRT checks on every private operation after adding preparation.",
+      "resolution": "Clarify direct validation per call and prepared validation once; every signature still performs the public fault check."
+    }
+  ],
+  "reviewed_invariants": [
+    "Factories fully initialize inline pointer-free payloads and validate ranges, CRT inverses and modulus width once.",
+    "Montgomery R squared, qInvMont and inverse words match independent Python integers, including qInv with191 leading zero bytes.",
+    "Fixed1536-bit factors and192-byte exponents select the unchanged constant-time five-bit i31 primitive on both direct and prepared paths.",
+    "Temporary secret scratch is initialized and explicitly cleared; mandatory public signature self-check and output clearing remain.",
+    "Typed immutable nominal handles justify omitting redundant per-call context metadata checks.",
+    "The restricted RSA-PSS import rejection remains intact."
+  ],
+  "scope_limits": [
+    "Runtime private-key validation checks consistency, not primality; the OpenSSL import tool performs key checking.",
+    "Native corrupted-context injections preserve valid shape and test fault defense; Motoko cannot forge raw handles through this API.",
+    "Managed secret payloads and earlier GC copies are not promised to be erased when references are dropped.",
+    "Portable interpreter arithmetic is a correctness reference with variable timing.",
+    "Differential tests and sanitizers are not a formal constant-time proof or comprehensive cryptanalysis."
+  ],
+  "approval_time_utc": "2026-10-13T05:25:30.709462+00:00",
+  "negative_type_diagnostics": {
+    "candid": "M0173 non-shared type",
+    "expose": "M0096 nominal type is not Blob",
+    "forge": "M0096 Blob is not prepared nominal type",
+    "kind": "M0096 secret/public nominal types differ",
+    "shared": "M0031 non-shared parameter",
+    "stable": "M0131 non-stable type"
+  },
+  "test_only_fixes_reviewed": [
+    "Blob-forgery case now explicitly annotates the source as Blob.",
+    "Stable-state rejection case now reaches the intended M0131 diagnostic without an unrelated modifier diagnostic.",
+    "Retained-context GC method prepares from dynamic raw-key clones and verifies their immutability across actual collection."
+  ],
+  "final_recheck": "All62 implementation files, both plugin artifacts and both independent audit sources matched executed evidence after external gates completed.",
+  "unresolved_findings": [],
+  "external_evidence_manifest": {
+    "validation_summary": "final/external/validation-summary.json",
+    "owned_files": "final/external/final-owned-files.json",
+    "verified_owned_file_hashes": 38,
+    "negative_expectation_acceptance": "final/external/accept-fail-20261013T052158.log",
+    "negative_expectation_acceptance_provenance": "final/external/accept-fail-20261013T052158.log.provenance.json"
+  }
+}
