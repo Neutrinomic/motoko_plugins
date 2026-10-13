@@ -1,0 +1,53 @@
+{
+  "production_source_commit": "8b9ed75",
+  "runtime_sha256": "b80144750378751937e2e88a476358dd452cb9bfb71fbcc8e633985f2f8f0dfa",
+  "scope": "Candidate 1 rate-block sampling native gates; paired PocketIC measurements and final audit are separate.",
+  "environment": "nix develop in fixed SDK checkout 9f6ebeedc, CARGO_BUILD_JOBS=2",
+  "commands": [
+    "cargo test --offline --manifest-path plugins/ml-dsa/runtime/vendor/fips204/Cargo.toml --lib --no-default-features --features ml-dsa-44,default-rng motoko_rate_block_tests",
+    "cargo test --offline --release -p motoko-compute-ml-dsa",
+    "cargo test --offline -p motoko-compute-ml-dsa",
+    "scripts/build.sh --motoko /srv/shared/code/motoko_experiments/prepared-crypto/sdk --skip-motoko-build ml-dsa"
+  ],
+  "results": {
+    "vendor_differential": {
+      "passed": 2,
+      "failed": 0,
+      "seed_nonce_ctest_comparisons": 1024,
+      "boundary_seed_values": [
+        714,
+        841,
+        3
+      ],
+      "rejected_candidate_indices": [
+        55,
+        56,
+        242
+      ]
+    },
+    "native_release": {
+      "passed": 10,
+      "failed": 0
+    },
+    "native_debug": {
+      "passed": 10,
+      "failed": 0
+    },
+    "plugin_build": {
+      "exit_code": 0
+    }
+  },
+  "test_configuration": "Only the standalone upstream unit-test build enables default-rng because existing upstream test functions reference try_keygen. The filtered differential tests use fixed SHAKE seeds. Production plugin dependency disables default features and never enables default-rng. The standalone lock is retained here; future runs should use an external CARGO_TARGET_DIR so generated files never enter runtime source pins.",
+  "initial_failures": [
+    "Offline standalone unit-test build lacked cached clap test dependency; fetched only isolated test dependencies.",
+    "Standalone upstream tests need default-rng, and an existing debug assertion required an explicit i32 conversion due to serde_json PartialEq inference. Test command fixed and debug-only conversion made explicit; no functional algorithm change."
+  ],
+  "logs": {
+    "candidate1-vendor-debug.log": "ef297491bdffd4544c4ea71ce979c391c0de12d50d3d6831bb1457ab22a8e381",
+    "candidate1-native-release.log": "66f709bc2a5964438d72b6433a227f680158b1016727ad328eb5c6f9f2499547",
+    "candidate1-native-debug.log": "bcf0abc16bcd157de88ef320e5dca6e7ee353705b2d949d25a5bdfb3106fa9e3",
+    "candidate1-build.log": "40212d0c230d0dbf1396a6dd121c7286d4683cf9ba5fedd3c4ee2c0cb94d43cf",
+    "candidate1-vendor-debug-initial-offline.log": "a0d3d4dd11fab14b1835f4c061a8f1bd98e77e5b94394e98e17f43918af19660",
+    "candidate1-vendor-debug-initial-test-config.log": "647c447735726df9d85107337200fbcdeedf90ba07336e51b42c79e0cb524c88"
+  }
+}

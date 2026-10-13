@@ -1,0 +1,109 @@
+ Downloading crates ...
+  Downloaded textwrap v0.16.4
+  Downloaded clap_lex v0.2.4
+  Downloaded os_str_bytes v6.6.1
+  Downloaded criterion v0.4.0
+  Downloaded clap v3.2.25
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling autocfg v1.5.1
+   Compiling zerocopy v0.8.62
+   Compiling syn v2.0.119
+   Compiling cfg-if v1.0.5
+   Compiling version_check v0.9.5
+   Compiling libc v0.2.190
+   Compiling generic-array v0.14.7
+   Compiling crossbeam-utils v0.8.23
+   Compiling serde_core v1.0.229
+   Compiling crossbeam-epoch v0.9.21
+   Compiling memchr v2.8.3
+   Compiling zerocopy-derive v0.8.62
+   Compiling typenum v1.20.1
+   Compiling syn v3.0.9
+   Compiling crossbeam-deque v0.8.8
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_derive v1.0.229
+   Compiling indexmap v1.9.3
+   Compiling num-traits v0.2.19
+   Compiling serde_json v1.0.154
+   Compiling rayon-core v1.13.0
+   Compiling either v1.19.0
+   Compiling half v2.7.1
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling aho-corasick v1.1.5
+   Compiling getrandom v0.2.17
+   Compiling plotters-backend v0.3.7
+   Compiling hashbrown v0.12.3
+   Compiling regex-syntax v0.8.11
+   Compiling itoa v1.0.18
+   Compiling ciborium-io v0.2.2
+   Compiling os_str_bytes v6.6.1
+   Compiling clap_lex v0.2.4
+   Compiling ciborium-ll v0.2.2
+   Compiling regex-automata v0.4.18
+   Compiling plotters-svg v0.3.7
+   Compiling rand_core v0.6.4
+   Compiling digest v0.10.7
+   Compiling itertools v0.10.5
+   Compiling ppv-lite86 v0.2.21
+   Compiling same-file v1.0.6
+   Compiling textwrap v0.16.4
+   Compiling cast v0.3.0
+   Compiling bitflags v1.3.2
+   Compiling clap v3.2.25
+   Compiling criterion-plot v0.5.0
+   Compiling walkdir v2.5.0
+   Compiling rand_chacha v0.3.1
+   Compiling plotters v0.3.7
+   Compiling rayon v1.12.0
+   Compiling regex v1.13.1
+   Compiling tinytemplate v1.2.1
+   Compiling ciborium v0.2.2
+   Compiling zeroize_derive v1.5.0
+   Compiling atty v0.2.14
+   Compiling keccak v0.1.6
+   Compiling anes v0.1.6
+   Compiling oorandom v11.1.5
+   Compiling cpufeatures v0.2.17
+   Compiling lazy_static v1.5.1
+   Compiling sha2 v0.10.9
+   Compiling criterion v0.4.0
+   Compiling sha3 v0.10.9
+   Compiling zeroize v1.9.1
+   Compiling rand v0.8.8
+   Compiling hex v0.4.3
+   Compiling fips204 v0.4.6 (/srv/shared/code/motoko_experiments/plugins/_build/signature-round4/ml-dsa/plugins/ml-dsa/runtime/vendor/fips204)
+error[E0283]: type annotations needed
+  --> src/hashing.rs:94:56
+   |
+94 |         c.0.iter().map(|&e| e & 1).sum::<i32>() == tau.try_into().expect("cannot fail"),
+   |                                                 --     ^^^^^^^^
+   |                                                 |
+   |                                                 type must be known at this point
+   |
+   = note: multiple `impl`s satisfying `i32: PartialEq<_>` found in the following crates: `core`, `serde_json`:
+           - impl PartialEq for i32;
+           - impl PartialEq<serde_json::Value> for i32;
+help: try using a fully qualified path to specify the expected types
+   |
+94 -         c.0.iter().map(|&e| e & 1).sum::<i32>() == tau.try_into().expect("cannot fail"),
+94 +         c.0.iter().map(|&e| e & 1).sum::<i32>() == <usize as TryInto<T>>::try_into(tau).expect("cannot fail"),
+   |
+
+error[E0425]: cannot find function `try_keygen` in this scope
+   --> src/lib.rs:526:32
+    |
+526 |                 let (pk, sk) = try_keygen().unwrap();
+    |                                ^^^^^^^^^^ not found in this scope
+...
+659 |     functionality!();
+    |     ---------------- in this macro invocation
+    |
+    = note: this error originates in the macro `functionality` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+Some errors have detailed explanations: E0283, E0425.
+For more information about an error, try `rustc --explain E0283`.
+error: could not compile `fips204` (lib test) due to 2 previous errors
