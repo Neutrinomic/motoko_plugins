@@ -1,0 +1,105 @@
+{
+  "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+  "scope": "Read-only source evidence; benchmark has not yet been executed. Verify exact benchmark RTS source hashes before applying these identities.",
+  "files": {
+    "src/prelude/prim.mo": {
+      "sha256": "81665633934e5c3691fa3caf238c39fe50d5bcc5ca9cbf869cca1ffadc84dde7",
+      "line_anchors": {
+        "func rts_heap_size()": [
+          69
+        ],
+        "func rts_reclaimed()": [
+          73
+        ],
+        "func rts_max_live_size()": [
+          74
+        ],
+        "func rts_collector_instructions()": [
+          85
+        ]
+      }
+    },
+    "src/codegen/compile.ml": {
+      "sha256": "bcc433801a346e283900e241de781660620cff7b2d2554641891cf4f0a5f51f6",
+      "line_anchors": {
+        "let collect_garbage env force =": [
+          767
+        ],
+        "let export_gc_trigger_method env =": [
+          10485
+        ]
+      }
+    },
+    "rts/motoko-rts/src/memory/ic/partitioned_memory.rs": {
+      "sha256": "37b9eafda772123f273ad336eea3c667c2b4f3ad1b453b0c097ae06f149c3982",
+      "line_anchors": {
+        "unsafe extern \"C\" fn get_reclaimed()": [
+          5
+        ],
+        "pub unsafe extern \"C\" fn get_total_allocations()": [
+          10
+        ],
+        "pub unsafe extern \"C\" fn get_heap_size()": [
+          20
+        ]
+      }
+    },
+    "rts/motoko-rts/src/gc/incremental.rs": {
+      "sha256": "55a1eac265786b6ae2b0c907c1bedfaf8597ac105cfe882ccfa087b906ecd61d",
+      "line_anchors": {
+        "unsafe fn incremental_gc<M: Memory>": [
+          69
+        ],
+        "unsafe fn record_gc_stop<M: Memory>": [
+          91
+        ],
+        "const INCREMENT_BASE_LIMIT:": [
+          129
+        ]
+      }
+    },
+    "rts/motoko-rts/src/gc/incremental/partitioned_heap.rs": {
+      "sha256": "4166cf48f196c461fd01c18d4232a8c6d9da531f8930c18a2dc946ce52ae602c",
+      "line_anchors": {
+        "pub const PARTITION_SIZE:": [
+          78
+        ],
+        "pub unsafe fn complete_collection": [
+          776
+        ],
+        "pub fn occupied_size": [
+          859
+        ],
+        "pub fn total_allocated_size": [
+          871
+        ]
+      }
+    },
+    "rts/motoko-rts/src/types.rs": {
+      "sha256": "3175db649bebacd15e438cb1383b0e87a26058684d3d299b19e8ce45b5bcd0be",
+      "line_anchors": {
+        "pub struct Obj": [
+          549,
+          679
+        ],
+        "pub struct Blob": [
+          725
+        ],
+        "pub struct Array": [
+          587
+        ]
+      }
+    }
+  },
+  "semantics": {
+    "heapOccupiedBytes": "PartitionedHeap.occupied_size; includes allocated garbage and active evacuation copies.",
+    "totalAllocationBytes": "occupied_size - evacuated_size + reclaimed_size; counts allocation, not current live retention.",
+    "reclaimedBytes": "Cumulative reclaim accounting, including all workload and GC garbage, not only prepared keys.",
+    "derivedEvacuationCopyBytes": "heapOccupiedBytes - (totalAllocationBytes - reclaimedBytes); zero alone does not prove Phase::Pause.",
+    "maxObservedPostGcHeapBytes": "Historical maximum occupied dynamic heap at recorded GC stops; not current live bytes and not necessarily an exact live maximum.",
+    "gcTrigger": "One forced bounded incremental_gc call after replying without Candid allocation; may start, advance or finish a cycle.",
+    "gcPhaseCounter": "No public Prim exposes authoritative current incremental phase or completed collection count.",
+    "wasmMemoryBytes": "Allocated Wasm linear-memory capacity, a high-water allocation, not reclaimable live heap.",
+    "partitionBytes": 67108864
+  }
+}
