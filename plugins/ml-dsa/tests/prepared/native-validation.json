@@ -1,0 +1,35 @@
+{
+  "source_commit": "4657a21",
+  "scope": "Native debug/release validation; public interpreter/Wasm/Ash and PocketIC measurement are separate gates.",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "runtime_sha256": "104aedb9853a4f039c825e14136db44af879d17edb692812751ab75393f44696",
+  "native_plugin_sha256": "213365588b45552c5330cd6e30586f348a9eb75780a27836b30e66ae81dd06bb",
+  "native_commands": [
+    "cargo test --offline --release -p motoko-compute-ml-dsa",
+    "cargo test --offline -p motoko-compute-ml-dsa"
+  ],
+  "environment": "nix develop in the prepared SDK checkout",
+  "results": {
+    "release": {
+      "groups": 10,
+      "passed": 10,
+      "exit_code": 0
+    },
+    "debug": {
+      "groups": 10,
+      "passed": 10,
+      "exit_code": 0
+    }
+  },
+  "coverage": [
+    "Existing25officialkeygen,30officialsigning,15officialverificationvectors",
+    "Prepared30officialsigningvectors twice each with exact bytes and immutable cache checks",
+    "Prepared15officialverificationanswers",
+    "Seed/context/randomness/signature boundaries and validation precedence",
+    "Guarded and intentionally unaligned byte-array FFI cache inputs; output initialization on factory errors"
+  ],
+  "logs": {
+    "native-debug.log": "e3968c6adb85e5d372416f8cc866de174ec4c6078450fb482a8e6568a084255d",
+    "native-release.log": "80700516157cb61000220e92be0ebc920089257d75eb84542aff0976607a0228"
+  }
+}
