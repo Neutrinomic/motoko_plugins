@@ -37,7 +37,7 @@ persistent actor {
     switch result { case (#ok value) value; case (#err _) Prim.trap("unexpected composition error") }
   };
   func copy(bytes : Blob) : Blob {
-    let data = bytes.toArray();
+    let data = Prim.blobToArray(bytes);
     Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(data.size(), func(i) { data[i] }))
   };
   func hmacKey() : Blob {
