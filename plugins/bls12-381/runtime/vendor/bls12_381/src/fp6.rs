@@ -196,6 +196,8 @@ impl Fp6 {
     ///
     /// Implements the full-tower interleaving strategy from
     /// [ePrint 2022-376](https://eprint.iacr.org/2022/367).
+    /// Retained as the pre-optimization differential-test oracle.
+    #[cfg(test)]
     #[inline]
     fn mul_interleaved(&self, b: &Self) -> Self {
         // The intuition for this algorithm is that we can look at F_p^6 as a direct
@@ -317,7 +319,19 @@ impl<'a, 'b> Mul<&'b Fp6> for &'a Fp6 {
 
     #[inline]
     fn mul(self, other: &'b Fp6) -> Self::Output {
-        self.mul_interleaved(other)
+        // Six-product Karatsuba in Fp2[v]/(v^3 - (u + 1)).
+        // Expanding each cross product cancels the two diagonal products;
+        // v^3 = u + 1 then reduces degrees three and four.
+        let a = self.c0 * other.c0;
+        let b = self.c1 * other.c1;
+        let c = self.c2 * other.c2;
+        Fp6 {
+            c0: a + ((self.c1 + self.c2) * (other.c1 + other.c2) - b - c)
+                .mul_by_nonresidue(),
+            c1: (self.c0 + self.c1) * (other.c0 + other.c1) - a - b
+                + c.mul_by_nonresidue(),
+            c2: (self.c0 + self.c2) * (other.c0 + other.c2) - a + b - c,
+        }
     }
 }
 
@@ -371,6 +385,43 @@ impl<'a, 'b> Sub<&'b Fp6> for &'a Fp6 {
 
 impl_binops_additive!(Fp6, Fp6);
 impl_binops_multiplicative!(Fp6, Fp6);
+
+#[test]
+fn test_karatsuba_matches_interleaved() {
+    use rand_core::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    let mut rng = XorShiftRng::from_seed([0x67; 16]);
+    let edges = [Fp::zero(), Fp::one(), -Fp::one()];
+    // All basis vectors, each with zero, one or minus-one coefficient,
+    // check reductions across both extension boundaries.
+    let mut basis = [Fp6::zero(); 18];
+    for (i, value) in edges.iter().enumerate() {
+        for j in 0..6 {
+            let coefficients = [
+                &mut basis[i * 6 + j].c0.c0,
+                &mut basis[i * 6 + j].c0.c1,
+                &mut basis[i * 6 + j].c1.c0,
+                &mut basis[i * 6 + j].c1.c1,
+                &mut basis[i * 6 + j].c2.c0,
+                &mut basis[i * 6 + j].c2.c1,
+            ];
+            *coefficients[j] = *value;
+        }
+    }
+    for a in basis {
+        for b in basis {
+            assert_eq!(a * b, a.mul_interleaved(&b));
+        }
+    }
+    for _ in 0..1024 {
+        let a = Fp6::random(&mut rng);
+        let b = Fp6::random(&mut rng);
+        assert_eq!(a * b, a.mul_interleaved(&b));
+        assert_eq!(a * a, a.square());
+        assert_eq!(a * -a, a.mul_interleaved(&-a));
+    }
+}
 
 #[test]
 fn test_arithmetic() {
