@@ -6,7 +6,7 @@ use crate::{
 };
 use elliptic_curve::{
     bigint::U256,
-    ops::Reduce,
+    ops::{Reduce, MulByGenerator},
     rand_core::CryptoRngCore,
     subtle::ConditionallySelectable,
     zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing},
@@ -156,7 +156,7 @@ impl SigningKey {
 impl From<NonZeroScalar> for SigningKey {
     #[inline]
     fn from(mut secret_key: NonZeroScalar) -> SigningKey {
-        let mut public_point = (ProjectivePoint::GENERATOR * *secret_key).to_affine();
+        let mut public_point = ProjectivePoint::mul_by_generator(&secret_key).to_affine();
         let odd = public_point.y.normalize().is_odd();
 
         secret_key.conditional_assign(&-secret_key, odd);

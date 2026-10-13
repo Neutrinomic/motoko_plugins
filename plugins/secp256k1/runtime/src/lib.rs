@@ -9,7 +9,7 @@ const PUBLIC_CACHE_SIZE: usize = 512;
 
 use k256::{ProjectivePoint, PublicKey, Scalar, SecretKey};
 use k256::ecdsa::{Signature, hazmat::SignPrimitive};
-use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, Invert}};
+use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, Invert, MulByGenerator}};
 use k256::sha2::{Digest, Sha256};
 use k256::elliptic_curve::zeroize::Zeroize;
 use k256::elliptic_curve::{point::AffineCoordinates, subtle::ConditionallySelectable};
@@ -55,7 +55,10 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
             let key = SecretKey::from_slice(a).map_err(|_| SECRET)?;
             // SecretKey::from_slice accepts short inputs. Public API requires 32 bytes.
             if a.len() != 32 { return Err(SECRET); }
-            Ok(write(key.public_key().to_encoded_point(true).as_bytes(), out))
+            let mut secret = key.to_nonzero_scalar();
+            let point = ProjectivePoint::mul_by_generator(&secret);
+            secret.zeroize();
+            Ok(write(point.to_affine().to_encoded_point(true).as_bytes(), out))
         }
         1 | 2 => {
             let key = public(a)?;
@@ -68,8 +71,8 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
         },
         3 => encoded(public(a)?.to_projective() + public(b)?.to_projective(), true, out),
         4 => encoded(public(a)?.to_projective() * scalar(b)?, true, out),
-        5 => encoded(ProjectivePoint::GENERATOR * scalar(a)?, true, out),
-        6 => encoded(public(a)?.to_projective() + ProjectivePoint::GENERATOR * scalar(b)?, true, out),
+        5 => encoded(ProjectivePoint::mul_by_generator(&scalar(a)?), true, out),
+        6 => encoded(public(a)?.to_projective() + ProjectivePoint::mul_by_generator(&scalar(b)?), true, out),
         7 => {
             if a.len() != 32 { return Err(SECRET); }
             let key = SecretKey::from_slice(a).map_err(|_| SECRET)?;
@@ -106,7 +109,7 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
                 None => ProjectivePoint::lincomb_generator_prepared_vartime(
                     &(z * inverse), a, &(*r * inverse)),
             };
-            Ok(i64::from(*r == <Scalar as Reduce<U256>>::reduce_bytes(&point.to_affine().x())))
+            Ok(i64::from(point.x_matches_scalar_vartime(&r)))
         }
         9 => Ok(write(signature(a)?.to_der().as_bytes(), out)),
         10 => Ok(write(&Signature::from_der(a).map_err(|_| SIGNATURE)?.to_bytes(), out)),
@@ -167,7 +170,7 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
         15 => {
             if a.len() != 32 { return Err(PUBLIC); }
             let key = k256::schnorr::VerifyingKey::from_bytes(a).map_err(|_| PUBLIC)?;
-            encoded(ProjectivePoint::from(*key.as_affine()) + ProjectivePoint::GENERATOR * scalar(b)?, true, out)
+            encoded(ProjectivePoint::from(*key.as_affine()) + ProjectivePoint::mul_by_generator(&scalar(b)?), true, out)
         }
         16 => {
             if a.len() != 32 { return Err(SECRET); }
@@ -176,7 +179,7 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<
             let key = SecretKey::from_slice(a).map_err(|_| SECRET)?;
             let tweak = scalar(b)?;
             let mut secret = key.to_nonzero_scalar();
-            let odd = PublicKey::from_secret_scalar(&secret).as_affine().y_is_odd();
+            let odd = ProjectivePoint::mul_by_generator(&secret).to_affine().y_is_odd();
             let mut negated = -secret;
             secret.conditional_assign(&negated, odd);
             negated.zeroize();
@@ -391,6 +394,85 @@ mod tests {
             let mut table = [0; 512];
             ProjectivePoint::prepare_verification_key(&y.to_affine(), &mut table);
             assert_eq!(ProjectivePoint::lincomb_generator_prepared_vartime(k, &table, l), expected, "table pair {i}");
+        }
+    }
+
+    #[test]
+    fn immutable_fixed_generator_matches_generic_at_scalar_boundaries() {
+        let mut scalars = vec![Scalar::ZERO, Scalar::ONE, -Scalar::ONE];
+        for bit in 0..256 {
+            let mut bytes = [0u8; 32];
+            bytes[31 - bit / 8] = 1 << (bit % 8);
+            let value = <Scalar as Reduce<U256>>::reduce_bytes(&bytes.into());
+            scalars.extend([value - Scalar::ONE, value, value + Scalar::ONE]);
+        }
+        for i in 0u64..512 {
+            let hash = Sha256::new().chain_update(b"immutable-fixed-generator-differential")
+                .chain_update(i.to_be_bytes()).finalize();
+            scalars.push(<Scalar as Reduce<U256>>::reduce_bytes(&hash));
+        }
+        for (i, scalar) in scalars.iter().enumerate() {
+            assert_eq!(ProjectivePoint::mul_by_generator(scalar),
+                ProjectivePoint::GENERATOR * scalar, "fixed generator scalar {i}");
+        }
+    }
+
+    #[test]
+    fn inversionless_ecdsa_coordinate_checks_reduction_and_field_wrap() {
+        use k256::elliptic_curve::bigint::Encoding;
+        let order = U256::from_be_hex("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+        let difference = U256::from_be_hex("000000000000000000000000000000014551231950b75fc4402da1722fc9baee");
+        assert!(!ProjectivePoint::IDENTITY.x_matches_scalar_vartime(&Scalar::ZERO));
+        assert!(!ProjectivePoint::IDENTITY.x_matches_scalar_vartime(&Scalar::ONE));
+        for i in 1u64..128 {
+            let point = ProjectivePoint::GENERATOR * Scalar::from(i);
+            let r = <Scalar as Reduce<U256>>::reduce_bytes(&point.to_affine().x());
+            assert!(point.x_matches_scalar_vartime(&r));
+            assert!(!point.x_matches_scalar_vartime(&(r + Scalar::ONE)));
+        }
+        // Construct a real curve point with x >= n; random tests cannot reach
+        // this branch with useful probability because p-n is only 129 bits.
+        let mut found = false;
+        for i in 1u64..64 {
+            let x = order.wrapping_add(&U256::from(i));
+            let mut bytes = [0u8; 33]; bytes[0] = 2;
+            bytes[1..].copy_from_slice(&x.to_be_bytes());
+            if let Ok(key) = public(&bytes) {
+                let r = Scalar::from(i);
+                assert!(key.to_projective().x_matches_scalar_vartime(&r));
+                let q = key.to_projective() * r.invert().unwrap();
+                let mut sig = [0u8; 64]; sig[..32].copy_from_slice(&r.to_bytes()); sig[63] = 1;
+                assert_eq!(operation(8, q.to_affine().to_encoded_point(true).as_bytes(), &[0;32], &sig, &mut []), Ok(1));
+                found = true; break;
+            }
+        }
+        assert!(found);
+        // Without the r < p-n guard, field reduction of r+n would make this
+        // wrong scalar compare equal to G.x and admit a forged equation.
+        let x = U256::from_be_slice(&ProjectivePoint::GENERATOR.to_affine().x());
+        let wrong = scalar(&x.wrapping_add(&difference).to_be_bytes()).unwrap();
+        assert!(!ProjectivePoint::GENERATOR.x_matches_scalar_vartime(&wrong));
+        let q = ProjectivePoint::GENERATOR * wrong.invert().unwrap();
+        let mut sig = [0u8;64]; sig[..32].copy_from_slice(&wrong.to_bytes()); sig[63] = 1;
+        assert_eq!(operation(8, q.to_affine().to_encoded_point(true).as_bytes(), &[0;32], &sig, &mut []), Ok(0));
+    }
+
+    #[test]
+    fn wide_scalar_square_matches_general_multiplication() {
+        let mut scalars = vec![Scalar::ZERO, Scalar::ONE, -Scalar::ONE];
+        for bit in 0..256 {
+            let mut bytes = [0u8; 32];
+            bytes[31 - bit / 8] = 1 << (bit % 8);
+            let value = <Scalar as Reduce<U256>>::reduce_bytes(&bytes.into());
+            scalars.extend([value - Scalar::ONE, value, value + Scalar::ONE]);
+        }
+        for i in 0u64..512 {
+            let hash = Sha256::new().chain_update(b"wide-scalar-square-differential")
+                .chain_update(i.to_be_bytes()).finalize();
+            scalars.push(<Scalar as Reduce<U256>>::reduce_bytes(&hash));
+        }
+        for (i, scalar) in scalars.iter().enumerate() {
+            assert_eq!(scalar.square(), scalar * scalar, "wide square scalar {i}");
         }
     }
 

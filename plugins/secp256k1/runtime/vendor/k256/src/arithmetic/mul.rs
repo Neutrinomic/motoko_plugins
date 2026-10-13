@@ -241,14 +241,14 @@ pub(super) fn decompose_scalar(k: &Scalar) -> (Scalar, Scalar) {
 // (required because it's used in static_map later)
 // Otherwise we could just have a function returning an array.
 #[derive(Copy, Clone)]
-struct Radix16Decomposition<const D: usize>([i8; D]);
+pub(super) struct Radix16Decomposition<const D: usize>(pub(super) [i8; D]);
 
 impl<const D: usize> Radix16Decomposition<D> {
     /// Returns an object containing a decomposition
     /// `[a_0, ..., a_D]` such that `sum(a_j * 2^(j * 4)) == x`,
     /// and `-8 <= a_j <= 7`.
     /// Assumes `x < 2^(4*(D-1))`.
-    fn new(x: &Scalar) -> Self {
+    pub(super) fn new(x: &Scalar) -> Self {
         debug_assert!((x >> (4 * (D - 1))).is_zero().unwrap_u8() == 1);
 
         // The resulting decomposition can be negative, so, despite the limit on `x`,
@@ -412,7 +412,7 @@ impl MulByGenerator for ProjectivePoint {
     /// Calculates `k * G`, where `G` is the generator.
     #[cfg(not(feature = "precomputed-tables"))]
     fn mul_by_generator(k: &Scalar) -> ProjectivePoint {
-        ProjectivePoint::GENERATOR * k
+        super::fixed_base::mul_by_generator(k)
     }
 
     /// Calculates `k * G`, where `G` is the generator.

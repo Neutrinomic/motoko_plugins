@@ -77,6 +77,37 @@ impl ProjectivePoint {
             .unwrap_or_else(|| AffinePoint::IDENTITY)
     }
 
+    /// Test the ECDSA public-coordinate equation without a field inversion.
+    ///
+    /// These homogeneous coordinates represent affine x = X/Z. Since p < 2n,
+    /// x mod n = r exactly when x = r or x = r+n with r+n < p. All inputs are
+    /// public verification data; the early exits must not be used with secrets.
+    pub fn x_matches_scalar_vartime(&self, r: &Scalar) -> bool {
+        if bool::from(self.z.normalizes_to_zero()) { return false; }
+        const P_MINUS_N: [u8; 32] = [
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,
+            0x45,0x51,0x23,0x19,0x50,0xb7,0x5f,0xc4,
+            0x40,0x2d,0xa1,0x72,0x2f,0xc9,0xba,0xee,
+        ];
+        const ORDER: FieldElement = FieldElement::from_bytes_unchecked(&[
+            0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+            0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,
+            0xba,0xae,0xdc,0xe6,0xaf,0x48,0xa0,0x3b,
+            0xbf,0xd2,0x5e,0x8c,0xd0,0x36,0x41,0x41,
+        ]);
+        let bytes: [u8; 32] = r.to_bytes().into();
+        // Every canonical scalar is a valid coordinate-field element: n < p.
+        let candidate = FieldElement::from_bytes_unchecked(&bytes);
+        if bool::from((candidate * self.z).negate(1).add(&self.x).normalizes_to_zero()) {
+            return true;
+        }
+        // Strictly exclude p and field wrapping. Scalar addition cannot be
+        // used here because it would reduce r+n back to r modulo n.
+        if bytes >= P_MINUS_N { return false; }
+        bool::from(((candidate + ORDER) * self.z).negate(1).add(&self.x).normalizes_to_zero())
+    }
+
     pub(super) fn to_affine_internal(self, zinv: FieldElement) -> AffinePoint {
         let x = self.x * &zinv;
         let y = self.y * &zinv;

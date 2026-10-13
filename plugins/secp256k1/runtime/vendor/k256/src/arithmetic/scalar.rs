@@ -114,7 +114,9 @@ impl Scalar {
 
     /// Modulo squares the scalar.
     pub fn square(&self) -> Self {
-        self.mul(self)
+        // Existing constant-time wide square avoids duplicate cross products;
+        // reduction is the same as ordinary scalar multiplication.
+        WideScalar(self.0.square()).reduce()
     }
 
     /// Right shifts the scalar.

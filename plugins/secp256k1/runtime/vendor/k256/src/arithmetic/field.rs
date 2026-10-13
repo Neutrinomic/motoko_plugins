@@ -6,7 +6,7 @@ use cfg_if::cfg_if;
 
 // Wasm64 has native 64-bit multiplication but no 128-bit multiplication.
 // Reuse the upstream 10x26 backend whose products fit in u64.
-// Scalar arithmetic and the constant-time curve formulas are unchanged.
+// Scalar backend selection and the constant-time curve formulas are unchanged.
 
 cfg_if! {
     if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {

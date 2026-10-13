@@ -8,7 +8,7 @@ the archive records upstream commit `5ac8f5d77f11399ff48d87b0554935f6eddda342`.
 `upstream-source.json` records every original file's hash, changed files'
 before/after hashes, and the hash of `exact.patch`.
 
-Seven upstream files differ, and one focused arithmetic module is added:
+Eight upstream files differ, and three focused arithmetic files are added:
 
 - `Cargo.toml` adds an empty workspace to keep upstream development targets
   outside the enclosing plugin workspace. Dependencies, features and package
@@ -31,10 +31,18 @@ Seven upstream files differ, and one focused arithmetic module is added:
 - `src/arithmetic/mul.rs` exposes its existing GLV scalar decomposition to
   the prepared module and retains the width-five non-adjacent recoder for
   **public verification inputs only**. Fixed-size arrays bound scratch space. The existing
-  `LinearCombination`, `Mul` and `MulByGenerator` implementations are untouched.
+  `LinearCombination` and `Mul` implementations are untouched.
+  `MulByGenerator` uses the immutable affine fixed-generator table described below.
+
+- `src/arithmetic/scalar.rs` selects pinned crypto-bigint's existing
+  constant-time wide square instead of general multiplication for squaring.
+  The existing k256 modular reduction and inversion addition chain are retained.
 
 - `src/arithmetic/projective.rs` exposes its existing beta constant to the
   sibling prepared module; the endomorphism operation itself is unchanged.
+  Its public ECDSA coordinate comparison skips inversion using homogeneous
+  `X = r*Z` or `X = (r+n)*Z`, with explicit identity and strict `r < p-n`
+  checks. Existing modular-difference normalization handles weak field values.
 
 - `src/arithmetic.rs` registers the added `src/arithmetic/prepared.rs`. That
   module reuses the same GLV split and width-five recoder, with immutable affine
@@ -52,7 +60,7 @@ operations or tweaks. The ECDSA wrapper preserves the upstream verification
 formula, full scalar/point validation, and acceptance of both low and high S.
 BIP340 input-range, identity, parity and X-coordinate checks are unchanged.
 
-The original secret multiplication, scalar conditional assignment, nonce/signing
+The scalar conditional assignment, nonce/signing
 equation, hashing, and `SigningKey` zeroization remain unchanged. Point
 negation and selection use existing upstream `AffinePoint` implementations.
 Both scalar and point normalization use `ConditionallySelectable`; no branch
@@ -132,10 +140,33 @@ The prepared Schnorr secret is normalized scalar32 || public-X32. Its factory
 uses the existing constant-time key constructor, and signing reuses the shared
 nonce/sign implementation without repeating long-term public-key derivation.
 It accepts explicit caller auxiliary randomness exactly as the direct API does.
-No public-data table or variable-time verification helper is used by signing.
+No variable-time table or verification helper is used by signing.
 The factory clears its temporary stack output; managed secret values and their
 copies can persist until collection and do not provide guaranteed erasure.
 
 Prepared performance, format selection and independent executable audit are
 recorded separately by the enclosing prepared-key workflow. These changes have
 not received an external cryptographic audit.
+
+## Round-four fixed-generator candidate
+
+`fixed_base.rs` and the generated `fixed_base_table.rs` adapt the upstream
+`precomputed-tables` radix-16 schedule to immutable affine constants. There is
+no lazy initializer, runtime table setup or mutable cache. The existing signed
+radix-16 recoder and complete mixed-add formulas are reused. Every scalar uses
+65 full eight-entry scans, 65 additions and four doublings. Selection uses
+`subtle` conditional assignment; scalar digits never index the table.
+
+`plugins/secp256k1/tests/generate_fixed_base.py --check` reproduces all 264
+points with independent Python integer affine arithmetic. Each row contains
+`[1..8] * 2^(8*i) * G`, encoded canonically in source. The table contains
+16,896 bytes of canonical coordinate data; Wasm size is measured separately.
+
+Schnorr key construction, nonce derivation, and plugin known-generator
+operations explicitly call `MulByGenerator`. Arbitrary-point multiplication
+retains the upstream generic constant-time GLV implementation and serves as
+an independent differential reference. Secret normalization, RFC6979,
+BIP340 auxiliary randomness, hash inputs and signature equations are unchanged.
+
+Round-four evidence is maintained under `benchmarks/crypto/round4/secp256k1`.
+This implementation has not received an external cryptographic audit.
