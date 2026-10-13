@@ -24,10 +24,11 @@
 
 #include "inner.h"
 
-/* see inner.h */
-void
-br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i)
+/* The arithmetic body is unchanged; an explicit public length lets the
+ * compiler specialize the two fixed RSA profile sizes. */
+static inline __attribute__((always_inline)) void
+montymul_len(uint32_t *restrict d, const uint32_t *x, const uint32_t *y,
+	const uint32_t *m, uint32_t m0i, size_t len)
 {
 	/*
 	 * Each outer loop iteration computes:
@@ -40,10 +41,9 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 	 * We represent d over 31-bit words, with an extra word 'dh'
 	 * which can thus be only 0 or 1.
 	 */
-	size_t len, len4, u, v;
+	size_t len4, u, v;
 	uint32_t dh;
 
-	len = (m[0] + 31) >> 5;
 	len4 = len & ~(size_t)3;
 	br_i31_zero(d, m[0]);
 	dh = 0;
@@ -124,4 +124,22 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 	 * 'dh' word may be non-zero.
 	 */
 	br_i31_sub(d, m, NEQ(dh, 0) | NOT(br_i31_sub(d, m, 0)));
+}
+
+/* See inner.h: d is disjoint from all inputs, but x and y may alias.
+ * Dispatch depends only on the announced modulus length, which is fixed by
+ * RSA key validation (50 factor limbs or 100 public-modulus limbs). Keep the
+ * upstream generic contract for other lengths as well. */
+void
+br_i31_montymul(uint32_t *restrict d, const uint32_t *x, const uint32_t *y,
+	const uint32_t *m, uint32_t m0i)
+{
+	size_t len = (m[0] + 31) >> 5;
+	if (len == 50) {
+		montymul_len(d, x, y, m, m0i, 50);
+	} else if (len == 100) {
+		montymul_len(d, x, y, m, m0i, 100);
+	} else {
+		montymul_len(d, x, y, m, m0i, len);
+	}
 }

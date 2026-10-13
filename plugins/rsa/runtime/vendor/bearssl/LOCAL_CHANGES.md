@@ -1,6 +1,12 @@
 Pinned source revision and original file digests are recorded in `UPSTREAM.json`.
 All files are unchanged except:
 
+- `src/int/i31_montmul.c`: declare only the output pointer `restrict`, matching
+  the upstream API requirement that it be disjoint from every input. The two
+  input operands may still alias for squaring. The unchanged arithmetic body
+  also receives an explicit public limb count through an inline helper: the
+  wrapper specializes the fixed 50/100-limb sizes and retains a generic fallback.
+
 - `src/hash/sha2small.c`: `br_sha256_init` assigns a null context vtable. This
   plugin uses only the direct `br_sha256_*` functions. Removing this unused
   function-pointer table reference avoids dynamic Wasm data relocation/startup.
