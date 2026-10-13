@@ -1,0 +1,146 @@
+{
+  "status": "approved for current audited implementation",
+  "scope": "Fixed RSA3072/e65537/PSSSHA256/MGF1SHA256/salt32; native runtime, compiler adapter, portable reference, public module and OpenSSL importer",
+  "public_cases": 270,
+  "public_paths": [
+    "native ASan+UBSan",
+    "portable OCaml interpreter",
+    "compiled Motoko Wasm with sanity checks"
+  ],
+  "raw_public_exponentiation": {
+    "cases": 1223,
+    "accepted": 918,
+    "rejected": 305,
+    "moduli": 102,
+    "result": "pass"
+  },
+  "key_import": {
+    "ordinary_formats_pass": 7,
+    "restricted_pss_profiles_rejected": 16,
+    "original_importer_accepted_and_lost_restrictions": 16
+  },
+  "findings": [
+    {
+      "id": "RSA-1",
+      "severity": "hardening",
+      "finding": "Upstream modulus derivation left decoded private p/q in its stack workspace.",
+      "resolution": "Minimal documented volatile workspace wipe added; fixed-profile earlier error exits are unreachable after geometry validation.",
+      "status": "resolved"
+    },
+    {
+      "id": "RSA-2",
+      "severity": "medium",
+      "finding": "OpenSSL conversion silently removed RSA-PSS source-key restrictions, allowing SHA384/MGF1SHA512/minimum-salt policies to be lost.",
+      "evidence": "baseline/restricted-import.json",
+      "resolution": "Importer now requires rsaEncryption AlgorithmIdentifier before exporting components; all 16 restricted PEM/DER fixtures reject without output files.",
+      "regression": "final/restricted-import.json",
+      "status": "resolved"
+    }
+  ],
+  "reviewed_invariants": [
+    "3072-bit odd public modulus, exact 384 bytes and fixed public exponent 65537",
+    "Distinct 1536-bit odd CRT factors, product 3072 bits, canonical 192-byte components, dp/dq/qInv ranges and modular inverse relationships",
+    "Private validation is consistency only; OpenSSL import checks primes; deliberately composite consistent key exercises sign fault check",
+    "Final public-operation selfcheck before releasing a signature; failure output is zeroed",
+    "RFC8017 emBits 3071, exact SHA256/MGF1SHA256/salt32, topbit/PS/delimiter/hash/trailer checking",
+    "Static public exponentiation uses distinct Montgomery buffers, sixteen squares and one multiplication, then conversion out; unchanged upstream i31 arithmetic",
+    "No allocator, retained pointers or global mutable runtime state; input immutability and bounded output writes tested",
+    "Wasm64 size_t/Rust usize/compiler I64 boundary matches; managed inputs are rooted before result allocation; runtime cannot allocate/yield",
+    "Secret exponentiation retains fixed public geometry and unchanged upstream i31 constant-time structure; review is not a timing proof",
+    "Vendored provenance pins 43 files; exactly 3 documented minimal patches and no missing pinned files"
+  ],
+  "unresolved_findings": [],
+  "owner_gate": {
+    "status": "pass",
+    "ash_tests": 9,
+    "failed": 0,
+    "skipped": 0,
+    "flags": [
+      "--force-gc",
+      "--sanity-checks"
+    ],
+    "gc": "Dynamic secret/digest/salt and managed signature/public key retained across13awaits; actual reclaimed bytes increase by >4MiB; exact signing repeated after collection.",
+    "review": "Independently inspected test sources and owner run log; implementation and artifacts remain identical to independent audit.",
+    "source_hashes": {
+      "packages/fast/tests/ash/RSA.mo": "16945ba02d67ee0318d33c0b8d86642fa22708f77f03578001df8c788ae8530a",
+      "packages/fast/tests/ash/RSA.ash.json": "5928495cd033f00711ee0c28f019910b21dd8c4cafd85c08eeede45e8cc45ff1",
+      "packages/fast/tests/fixtures/RSA.mo": "a28ba2cc4d325204154a1b29b171fa5fa3c9fb14729024c2945e3f8748aabb1a"
+    },
+    "log": "final/ash.log"
+  },
+  "implementation_source_hashes": {
+    "packages/fast/src/RSA.mo": "c37d6a093525a2b293e2bdcc22ca8a8190c898f13854ad3ab005b77c0c838cf3",
+    "plugins/rsa/compiler/reference.ml": "81c4a7b7bdefd241d19d811f22800df72c7804812d4daa4aed242914ad7dcc6e",
+    "plugins/rsa/compiler/register.ml": "f66c1eb3540072e3d740c432fa509de8178a1bad5b52cab77ff01e77825bbf66",
+    "plugins/rsa/compiler/rsa_sha256.ml": "9655b79b69e32d24790b8c0bd736dc09ce409a44278c9dff3a47ab349fbfba36",
+    "plugins/rsa/compiler/rsa_sha256.mli": "e157067646e5c2d49c8b150787bbe6d2d9e7cca7f6b67a45cc6134f1ee52b9f5",
+    "plugins/rsa/plugin.json": "5030f5f7eceb0a5da12baba1f125da12535d70947222afff5fb4f47e755deddd",
+    "plugins/rsa/runtime/Cargo.toml": "41602833d2552f7f4a238c12156dbfc21918cb5110bf286afda630ffed6dd27f",
+    "plugins/rsa/runtime/build.rs": "d76d6dec6e9e78fbd65d26f7f5b31dbd2042c8397da3723150753589e539710e",
+    "plugins/rsa/runtime/shim/string.h": "1cf184fb36d705632c73c94897acf9ff22362a4624825205f24728ad5d435463",
+    "plugins/rsa/runtime/src/lib.rs": "969c81c5289d82f2663145adc2f02e8179e6f01c0ef13b0f77ae0e66dbae4271",
+    "plugins/rsa/runtime/src/rsa.c": "30603b193be2bfb2974ddfd5145edd20bd419788e1b879419398fd3e2da5e12d",
+    "plugins/rsa/runtime/src/tests.rs": "23baab835d06854221317490dca2a3138222a720759ab1f949b1ceaef9f4e938",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl.h": "8543ceb43850a5121782ebb0cff767a610ea7d215b1ad57ff9866deca214e92f",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_aead.h": "9d90afbc65535335517c028817ac0704af6b58971f2c262a65eb26e0b4099201",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_block.h": "a00b4a48c42c824f2ec4ee775672df9cec86ad455b08cb8ae7eb8c89e63d082a",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_ec.h": "6e9eb7490b5b256f9a98bea86906e008bd0d5f2bf1423c9c2eeb7af29ad1e9df",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_hash.h": "d31186fcdfe224965d1028592d1df78e1a10cb61fb8830fdafac847921e26572",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_hmac.h": "a40c14a7a71d5b4fa21f8485d7ad3975d3a37b9cd8b9f72cd0fa032af8105614",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_kdf.h": "e4cf36cab1c4692e4bba034c9e257c630e8e370c8e40d38b8fa106c7b4dbf8d5",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_pem.h": "ef36260e8568e5927178e92c2aab849be71bc07414c01baeb1d12a3a51a82c3e",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_prf.h": "0162e674d6c49425bfa0e8e9c79b3d850530e7928288930284fb7ac940a12b17",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_rand.h": "968335e8a2957e5bf64cb0b6b1f916e53bc330e8c66d5f2d2f658f415a56dd44",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_rsa.h": "2d4ee476ce67c6361c0e3792e192a12297dd29c039272c03dd0ab4225ed534c1",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_ssl.h": "1d11c6ca7563f974d6f6d847ed435900c66e4e9d7b8b88ce88be402db5727414",
+    "plugins/rsa/runtime/vendor/bearssl/inc/bearssl_x509.h": "a0680ddf9d1ba6d3bbf3e9436ed295c208d022a1a2d73cd51c520a4f93c11699",
+    "plugins/rsa/runtime/vendor/bearssl/src/codec/ccopy.c": "5163871149faa35a4ba026a915743065238fc94cc4312f02867a4f50ff2631f8",
+    "plugins/rsa/runtime/vendor/bearssl/src/codec/dec32be.c": "ebd7bf469655a9e4de4b3d1d01d4c54f19117def3e3b918242629c150979bd9c",
+    "plugins/rsa/runtime/vendor/bearssl/src/codec/enc32be.c": "8090b5bd6959586e769814e9d3698ac1c454e31ee4dfd5a2b2eb95a805063ae4",
+    "plugins/rsa/runtime/vendor/bearssl/src/config.h": "7fcf78414405f4f747758dd9c4aaa2c4993dfd123bb2e5240e943b3b9e1eae56",
+    "plugins/rsa/runtime/vendor/bearssl/src/hash/sha2small.c": "dacd7298562d38410687fd1ce9ef59acfccb78dbc15d3aa5b24a36ab52a4bf32",
+    "plugins/rsa/runtime/vendor/bearssl/src/inner.h": "b63fec8b61524fb595675d31f1cd2657eb7ef37c13aad5e89670f4feb7bca697",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_add.c": "d8b364d686757e2ea87e900930f84cc1ed6991e67ee454c3c4edbede745762dc",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_bitlen.c": "c0bb679941783edf36ef941e11258ffa9261255ec1095e916f3b43c87b28a044",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_decmod.c": "654e982c3fefbd874effb816646159f08340291c4805df9a28aba29f1c8eb12c",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_decode.c": "93690aeb61b5986c2bed451e6fb9dadd893b7caf132d21dd10d980ae6c47eb92",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_decred.c": "99ccf4b5c0d7c88ae4f233801ba6e4ce7363bf58d8d3eed0f4693f0a70dacb4a",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_encode.c": "4235d5bb38695e8296603682c84a1b1959fd3e6a44fe9d26f6c1e320c110f923",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_fmont.c": "2d327ab832882c41ebd7be305883e48d7b7c1ddc25a84ae1894914ec7429201d",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_iszero.c": "a479041e88dfc813e1560442b31c4e6a4b1f40ce1c0c50335a52dfd5205c47f2",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_moddiv.c": "e930db501f7c400ed036e2e9054216afc8c4d4bb0701563e97520f96dea3131b",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_modpow.c": "484c22d19397cda93be1b349683a3128e5f51fb8fb408ddc6a7bbdf96ee53993",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_modpow2.c": "9f1996dc8e0fbeee66d9535a44d4f89836848206cac44cee01db52191e79c008",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_montmul.c": "c29597ec2e1d3c06ddcae2e32ed7e6219137444ad749b03843deb23eadda1e83",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_mulacc.c": "9313190bd761299ffce0ecc4d1c4f32543ccd672ed7bf1e0b54615d0ef459b4a",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_muladd.c": "243f4587f7eb443e2844d7e3ccd7b5177187a7c4d1707344d085599ba28fe192",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_ninv31.c": "6e8cb090af5052252253597338b7b1c3b5f1c34a31b7b9668cfb512b9c5854eb",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_reduce.c": "7dab79ac842ef8fbf45441a1453e2661049b2166dd76e220dffade5621cdea27",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_rshift.c": "0e9b7fbbd45c6ed7d4647cbd84afa9a8ff51d3c3b7033e8c103de630c17b1ef0",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_sub.c": "08e82e7fbb042081b6b37e882f05e4611e8c9502f0acb19234520a6f8b8e22c8",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_tmont.c": "a16cd1f0b8a1658b6db2b4ea3d6423dab0da9294ce2a146fa7bc46de5dd84798",
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i32_div32.c": "f0ade1999953e879c5cdb2ae66fd00438d09cab3099ed1143288cbeaaad40295",
+    "plugins/rsa/runtime/vendor/bearssl/src/rsa/rsa_i31_modulus.c": "17eef3f3b51dc7f2e2e11309f6f3515cb36933a19982f3c51a672b892661182d",
+    "plugins/rsa/runtime/vendor/bearssl/src/rsa/rsa_i31_priv.c": "96c13e87558cfd1da35ab992bfce587292f6645eb8608630da1a830ab75f96b8",
+    "plugins/rsa/runtime/vendor/bearssl/src/rsa/rsa_i31_pub.c": "e6514c5c4eba7068a7e6655717d18a20ac8f19524501120ac117d8a859542631",
+    "plugins/rsa/tools/import_key.py": "f324ab9fee47021e55e4c2857cb7e889a8850eb0468d92f531de79f8d91276dc",
+    "tests/crypto-audit/round3/rsa/audit.py": "0df6a4392bf85b11e41d8857f9ec4ab40d6b800d66ce51cb7e552d3967a4ed47"
+  },
+  "plugin_artifacts": {
+    "runtime.wasm": "00a9b94f4c39ce467b06bef2cbc72f3ebaf2bd765e58864f8f3680d915b88f99",
+    "plugin.cmxs": "cbfd1ccd18189249c1df0a0eae61edb5500682be7ec885c1f5065311c3ab4c67"
+  },
+  "compiler_version": "Motoko compiler (source 2.0.0-14-g92b1bdecb)",
+  "retained_evidence": {
+    "final/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final/interpreter.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final/native-build.log": "eecf4e6f8f5e6571b8ead1479b962ec929f472a4edc9cce5da756f2fa819f747",
+    "final/native.log": "87f99971b05c275920bfbb6ef108ad39f914eec127b47545b06d6c5b9ca8759d",
+    "final/public-differential.json": "969e96f4a83f98cdc51d9959a2b092846801784c3c11c31ad1f3f98e5832b365",
+    "final/public-differential.log": "752a4154fb68caa1ee068d762e01ee96a4d0c4df6ac2404608ed1065ae45fd12",
+    "final/report.json": "488a05f04b0a5a3d67024a4bcfcfe3385ac694a163a614349dbdba6ada1f9c8e",
+    "final/restricted-import.json": "5e344469cf50780931daecccb60d5ab82ee5a6f8b00a530125f219e9d7ce1d87",
+    "final/wasm.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final/ash.log": "d9afdde653b0334092df1767036bf26f60aa3161963ea5482e644bf5b9726bf9"
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "stage": "r3-rsa-generic-baseline",
+  "expected_case_count": 7,
+  "complete": true,
+  "recorded_utc": "2026-10-13T04:06:45.925Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "5277c0cb064ed47037e12dc63b12f246c441a8d66c547ad9fa39906442a64fe1",
+  "runner_sha256": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes.",
+  "cases": [
+    {
+      "name": "r3-rsa3072-derive-public-key",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-derive-public-key/main.mo",
+      "expected_hex": "a3ba3d904c9f30fb1edb8f0cf325347fc75a447dee14514fb767595efe814935566869656acb71485046009bb4dbf6b41ba714e8bcc0cea5110904206b86c77afe8c34607de6043f4a936094ac377e563baa375ad62fd802cb38d1c175ad4472dacf134a184856ef0822deca007b389a9d48b76dc7f1cf2033ed67c82ca02e340aea10457dc0c3205d78f51a81f944e1c63278995ae12dbd707b5ae6c890de20fc1c7e579ec0f7727a7f7572f3960c3e37ef35f35608a3860e1fbb7bfd9cdfb94435e02d12c2ac2aca704ca87239156e38ad6b2527c9d5f5cb35b13dadd926e1506e97045f8f9c0f3a91f5066b7b54e26c96db4648c5838bf509e8e996765fb08ca726820d2b3b93a65db50241f2c866277e8e4197d67ec95559f99b36b0c26e3501846a16cd85e8a23db102c22e5f334ebba026e302db7da5093c4caea6edcb31edf1ada73de2adede5ec8cb77604fc63d554414990daf062f43259f6add84bbe2fd27c5ae0f68d7e1f1107f5866dd4765a5e89819d2ff7d263b25c845c2b67",
+      "returncode": 0,
+      "source_sha256": "a8fae1f3acd0832f15403708298983ad1b20ba9b81d21cbd40656867ae7fb179",
+      "wasm": "r3-rsa3072-derive-public-key/native/main.wasm",
+      "wasm_sha256": "0591492c772c6b077a9074873185248dfe98fae81c56d98d26a6a2950ee1467f",
+      "wasm_bytes": 271050,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1946943,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "9c56ea05e52e8488e7c030f25ed007cb6879fd1d70822b3af274c1bf1504228c",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1946943,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "9c56ea05e52e8488e7c030f25ed007cb6879fd1d70822b3af274c1bf1504228c",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1946943,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "9c56ea05e52e8488e7c030f25ed007cb6879fd1d70822b3af274c1bf1504228c",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-validate-private-key",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-validate-private-key/main.mo",
+      "expected_hex": "01",
+      "returncode": 0,
+      "source_sha256": "b9b4ef2c8d7dcd11a221b1d89029631361a3d16fc282cd1c5e3549ff46618f0b",
+      "wasm": "r3-rsa3072-validate-private-key/native/main.wasm",
+      "wasm_sha256": "afc4c3de838edb4b4c30ee556e1c6b8d5aef2b9e170cb5c2f2c6dd7c498715ea",
+      "wasm_bytes": 270747,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1946784,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1946784,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1946784,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-validate-public-key",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-validate-public-key/main.mo",
+      "expected_hex": "01",
+      "returncode": 0,
+      "source_sha256": "046999fac23085609b9cebb86375680eb589efd9276d52b155c4c9409da99ef4",
+      "wasm": "r3-rsa3072-validate-public-key/native/main.wasm",
+      "wasm_sha256": "c36f95e4f8d7a67746e0b41f3270a75b644d942d44a976246338ae8f62aa97d9",
+      "wasm_bytes": 270171,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 475,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 475,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 475,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-sign-prehash",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-sign-prehash/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "returncode": 0,
+      "source_sha256": "ea5f7029e2d95bf82fd718051370ac86a31cfabe5d97376089ee234714dc834e",
+      "wasm": "r3-rsa3072-sign-prehash/native/main.wasm",
+      "wasm_sha256": "3c8bd7fe84addb06695af37f6bee81b32aa358d8a498239a2762c5e930081e2a",
+      "wasm_bytes": 271404,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 564659446,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 564659446,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 564659446,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-verify-prehash",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-verify-prehash/main.mo",
+      "expected_hex": "01",
+      "returncode": 0,
+      "source_sha256": "bae8c9f6d39f959eeea7caf57d453f75d6f4e7b889614429e52a597f778be229",
+      "wasm": "r3-rsa3072-verify-prehash/native/main.wasm",
+      "wasm_sha256": "d414634e2dd7e4129c206689d225c89de36f4275a2bd6680525833e47bd5726e",
+      "wasm_bytes": 270882,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 23623625,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 23623625,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 23623625,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-sign-message",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-sign-message/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "returncode": 0,
+      "source_sha256": "15dfd77bdfe664c12be4518948dc3c9080e790decd61c612dcda845bb26ac5d0",
+      "wasm": "r3-rsa3072-sign-message/native/main.wasm",
+      "wasm_sha256": "44fc900ffc4b7ff373730c4d14d5542e0cae9454d9881388aa4ecff87f97a3ba",
+      "wasm_bytes": 271419,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 564668863,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 564668863,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 564668863,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "name": "r3-rsa3072-verify-message",
+      "implementation": "native",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "round3/rsa/cases/r3-rsa3072-verify-message/main.mo",
+      "expected_hex": "01",
+      "returncode": 0,
+      "source_sha256": "1b0f6445413b47789327f4515d4d3933db310c3d3177c38e1e591572ce8e04b6",
+      "wasm": "r3-rsa3072-verify-message/native/main.wasm",
+      "wasm_sha256": "2c15f3cf939715da3713e9d50615c66dca611c5e958cf4198520610777d8f09f",
+      "wasm_bytes": 270897,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 23633043,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 23633043,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 23633043,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}
