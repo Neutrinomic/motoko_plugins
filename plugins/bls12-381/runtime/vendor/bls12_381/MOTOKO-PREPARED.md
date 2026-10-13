@@ -22,6 +22,22 @@ in `src/pairings.rs`, and a feature-gated crate-private finite G1 constructor in
 `src/plugin_prepared_tests.rs` contains their unit tests. The hooks reuse
 existing field, curve, Miller-loop and final-exponentiation formulas.
 
+## Limb and extension arithmetic
+
+Widening multiply-add uses four fixed 32-bit partial products rather than a
+generic 128-bit multiplication helper. Limb subtraction uses two unsigned
+overflow predicates and returns their combined borrow as a full-width mask.
+Both helpers preserve their contracts for all 64-bit inputs; differential tests
+cover boundary values and seeded random inputs. Neither introduces a branch on
+field data, changes the Montgomery representation, or requires reduced operands.
+
+Fp2 multiplication uses three base-field products, and Fp6 multiplication uses
+six Fp2 products, through the usual quadratic and cubic Karatsuba identities.
+These are general-field identities, with no subgroup assumptions. The original
+interleaved formulas and their sum-of-products helper remain only as test
+oracles, checked against basis vectors, edge values and seeded random fields.
+Prepared payloads and all point-validation rules are unchanged.
+
 ## Fixed field exponentiation
 
 The existing upstream `chain_pm3div4` addition chain is also used by Fp square
