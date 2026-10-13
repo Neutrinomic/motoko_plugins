@@ -37,15 +37,33 @@ compare exact roots and inverses on edge cases and seeded random fields,
 including pure-real/imaginary Fp2 values and both valid and invalid roots.
 No prepared payload, external point format or group-validation rule changes.
 
-## Final exponentiation entry
+## Final exponentiation
 
 The six initial Frobenius maps are replaced by one conjugation. Since Fp12 is
 a quadratic extension over Fp6, the p^6 Frobenius fixes the base coefficient
 and negates the extension coefficient for every field value. Tests compare
 both transforms on zero, basis values and general random fields, then compare
 the complete result with the original final-exponentiation formula for
-nonzero values. The remaining formula and nonzero Miller-result invariant
-are unchanged.
+nonzero values. The nonzero Miller-result invariant is unchanged.
+
+The hard part follows the equivalent, shorter schedule in
+[ePrint 2020/875](https://eprint.iacr.org/2020/875), as implemented by
+[arkworks at `4a19a1c`](https://github.com/arkworks-rs/algebra/blob/4a19a1c50606ae4a0e96ccce107f6281aa0be38e/ec/src/models/bls12/mod.rs).
+With signed parameter `x`, both the original and replacement schedules have
+the exact exponent `3 + (x - 1)^2 * (p + x) * (p^2 + x^2 - 1)`.
+This preserves exact pairing outputs, not just equality-to-one checks.
+Exponentiation by the fixed BLS parameter starts at the top set bit and follows
+its five remaining set-bit gaps, removing the identity multiplication.
+
+The two required p-squared Frobenius maps scale each Fp2 coefficient directly
+by an Fp constant, instead of applying the general p-map twice. In basis
+`1, v, v^2, w, vw, v^2w`, where `w^2 = v` and `v^3 = u + 1`, the factors
+are `(u + 1)^(j * (p^2 - 1) / 6)` for `j = 0, 2, 4, 1, 3, 5`.
+The `j = 0` and `j = 3` cases are identity and negation. The other four
+constants use the existing reduced Montgomery representation.
+Tests compare the direct map with two original p-maps on each real and
+imaginary basis coefficient, their negatives, zero and seeded random inputs;
+the full final exponent is compared with the isolated original schedule.
 
 ## Two-term streaming pairing
 

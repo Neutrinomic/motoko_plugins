@@ -170,6 +170,51 @@ impl Fp12 {
         Fp12 { c0, c1 }
     }
 
+    /// Raises this element to p^2 without applying the p-map twice.
+    /// Since Fp2 is fixed by p^2, each coefficient is scaled in Fp.
+    #[inline]
+    pub fn frobenius_map_square(&self) -> Self {
+        // In the basis 1, v, v^2, w, vw, v^2w with w^2=v and
+        // v^3=u+1, coefficient j is scaled by (u+1)^(j*(p^2-1)/6).
+        // The five nontrivial powers use j=2,4,1,3,5 respectively;
+        // j=3 is -1. All constants below are reduced Montgomery values.
+        const C1: Fp = Fp::from_raw_unchecked([
+            0xecfb_361b_798d_ba3a, 0xc100_ddb8_9186_5a2c,
+            0x0ec0_8ff1_232b_da8e, 0xd5c1_3cc6_f1ca_4721,
+            0x4722_2a47_bf7b_5c04, 0x0110_f184_e51c_5f59,
+        ]);
+        const C2: Fp = Fp::from_raw_unchecked([
+            0x30f1_361b_798a_64e8, 0xf3b8_ddab_7ece_5a2a,
+            0x16a8_ca3a_c615_77f7, 0xc26a_2ff8_74fd_029b,
+            0x3636_b766_6070_1c6e, 0x051b_a4ab_241b_6160,
+        ]);
+        const C4: Fp = Fp::from_raw_unchecked([
+            0xcd03_c9e4_8671_f071, 0x5dab_2246_1fcd_a5d2,
+            0x5870_42af_d385_1b95, 0x8eb6_0ebe_01ba_cb9e,
+            0x03f9_7d6e_83d0_50d2, 0x18f0_2065_5463_8741,
+        ]);
+        const C5: Fp = Fp::from_raw_unchecked([
+            0x890d_c9e4_8675_45c3, 0x2af3_2253_3285_a5d5,
+            0x5088_0866_309b_7e2c, 0xa20d_1b8c_7e88_1024,
+            0x14e4_f04f_e2db_9068, 0x14e5_6d3f_1564_853a,
+        ]);
+        fn scale(value: Fp2, coefficient: Fp) -> Fp2 {
+            Fp2 { c0: value.c0 * coefficient, c1: value.c1 * coefficient }
+        }
+        Fp12 {
+            c0: Fp6 {
+                c0: self.c0.c0,
+                c1: scale(self.c0.c1, C2),
+                c2: scale(self.c0.c2, C4),
+            },
+            c1: Fp6 {
+                c0: scale(self.c1.c0, C1),
+                c1: -self.c1.c1,
+                c2: scale(self.c1.c2, C5),
+            },
+        }
+    }
+
     #[inline]
     pub fn square(&self) -> Self {
         let ab = self.c0 * self.c1;

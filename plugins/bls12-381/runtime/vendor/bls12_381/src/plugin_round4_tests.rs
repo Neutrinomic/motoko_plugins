@@ -120,6 +120,7 @@ mod final_exponentiation {
     use crate::{fp12::Fp12, fp6::Fp6, Gt, MillerLoopResult, BLS_X};
 
     fn check(value: Fp12) {
+        assert_eq!(value.frobenius_map_square(), value.frobenius_map().frobenius_map());
         let mut sixth = value;
         for _ in 0..6 { sixth = sixth.frobenius_map(); }
         assert_eq!(sixth, value.conjugate());
@@ -127,6 +128,43 @@ mod final_exponentiation {
             let input = MillerLoopResult(value);
             assert_eq!(input.final_exponentiation(), original_final_exponentiation(&input));
         }
+    }
+
+    #[test]
+    fn direct_square_frobenius_matches_repeated_map_on_basis_and_random_fields() {
+        // Exercise every coefficient independently, including imaginary
+        // Fp2 coefficients, so swapped constants cannot cancel each other.
+        for index in 0..12 {
+            let mut value = Fp12::zero();
+            let coefficients = [
+                &mut value.c0.c0.c0, &mut value.c0.c0.c1,
+                &mut value.c0.c1.c0, &mut value.c0.c1.c1,
+                &mut value.c0.c2.c0, &mut value.c0.c2.c1,
+                &mut value.c1.c0.c0, &mut value.c1.c0.c1,
+                &mut value.c1.c1.c0, &mut value.c1.c1.c1,
+                &mut value.c1.c2.c0, &mut value.c1.c2.c1,
+            ];
+            *coefficients[index] = Fp::one();
+            for value in [value, -value] {
+                assert_eq!(value.frobenius_map_square(), value.frobenius_map().frobenius_map());
+            }
+        }
+        let mut rng = rand_xorshift::XorShiftRng::from_seed(*b"bls-round6-proof");
+        for _ in 0..128 {
+            let value = Fp12::random(&mut rng);
+            assert_eq!(value.frobenius_map_square(), value.frobenius_map().frobenius_map());
+        }
+    }
+
+    #[test]
+    fn fixed_cyclotomic_schedule_matches_bls_parameter() {
+        let mut exponent = 1u64;
+        for squares in [1, 2, 3, 9, 32] {
+            exponent = (exponent << squares) + 1;
+        }
+        exponent <<= 16;
+        assert_eq!(exponent, BLS_X);
+        assert!(crate::BLS_X_IS_NEGATIVE);
     }
 
     #[test]

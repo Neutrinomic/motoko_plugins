@@ -112,58 +112,49 @@ impl MillerLoopResult {
             }
         }
         #[must_use]
-        fn cycolotomic_exp(f: Fp12) -> Fp12 {
-            let x = BLS_X;
-            let mut tmp = Fp12::one();
-            let mut found_one = false;
-            for i in (0..64).rev().map(|b| ((x >> b) & 1) == 1) {
-                if found_one {
-                    tmp = cyclotomic_square(tmp)
-                } else {
-                    found_one = i;
+        fn cyclotomic_exp(f: Fp12) -> Fp12 {
+            // BLS_X = 0xd201000000010000 has set bits 63, 62, 60,
+            // 57, 48, 16. Start at the top bit to avoid multiplying
+            // the identity, then follow the five fixed gaps.
+            let mut tmp = f;
+            for squares in [1, 2, 3, 9, 32] {
+                for _ in 0..squares {
+                    tmp = cyclotomic_square(tmp);
                 }
-
-                if i {
-                    tmp *= f;
-                }
+                tmp *= f;
+            }
+            for _ in 0..16 {
+                tmp = cyclotomic_square(tmp);
             }
 
             tmp.conjugate()
         }
 
-        let mut f = self.0;
+        let f = self.0;
         // Fp12 is quadratic over Fp6: the p^6 Frobenius fixes the
         // base field and negates the extension coefficient, for all f.
-        let mut t0 = f.conjugate();
+        let t0 = f.conjugate();
         Gt(f.invert()
-            .map(|mut t1| {
-                let mut t2 = t0 * t1;
-                t1 = t2;
-                t2 = t2.frobenius_map().frobenius_map();
-                t2 *= t1;
-                t1 = cyclotomic_square(t2).conjugate();
-                let mut t3 = cycolotomic_exp(t2);
-                let mut t4 = cyclotomic_square(t3);
-                let mut t5 = t1 * t3;
-                t1 = cycolotomic_exp(t5);
-                t0 = cycolotomic_exp(t1);
-                let mut t6 = cycolotomic_exp(t0);
-                t6 *= t4;
-                t4 = cycolotomic_exp(t6);
-                t5 = t5.conjugate();
-                t4 *= t5 * t2;
-                t5 = t2.conjugate();
-                t1 *= t2;
-                t1 = t1.frobenius_map().frobenius_map().frobenius_map();
-                t6 *= t5;
-                t6 = t6.frobenius_map();
-                t3 *= t0;
-                t3 = t3.frobenius_map().frobenius_map();
-                t3 *= t1;
-                t3 *= t6;
-                f = t3 * t4;
+            .map(|inverse| {
+                let mut r = t0 * inverse;
+                r *= r.frobenius_map_square();
 
-                f
+                // Equivalent hard-part chain from ePrint 2020/875, as used
+                // by arkworks' BLS12 implementation. For signed x=-BLS_X,
+                // this and the original chain both have the exact exponent
+                // 3 + (x-1)^2 * (p+x) * (p^2+x^2-1).
+                let mut y0 = cyclotomic_square(r);
+                let mut y1 = cyclotomic_exp(r) * r.conjugate();
+                let mut y2 = cyclotomic_exp(y1);
+                y1 = y1.conjugate() * y2;
+                y2 = cyclotomic_exp(y1);
+                y1 = y1.frobenius_map() * y2;
+                r *= y0;
+                y0 = cyclotomic_exp(y1);
+                y2 = cyclotomic_exp(y0);
+                y0 = y1.frobenius_map_square();
+                y1 = y1.conjugate() * y2 * y0;
+                r * y1
             })
             // We unwrap() because `MillerLoopResult` can only be constructed
             // by a function within this crate, and we uphold the invariant
