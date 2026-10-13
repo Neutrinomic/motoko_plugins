@@ -56,15 +56,21 @@ module {
 
   /// Aggregate IC/basic signatures only over pairwise-distinct messages.
   /// Requires 1..127 entries and rejects duplicates before doing cryptography.
-  public let aggregateVerifyIC = Prim.bls12_381_aggregate_verify_ic;
+  public func aggregateVerifyIC(keys : [Blob], messages : [Blob], signature : Blob) : Result<Bool> {
+    Prim.bls12_381_aggregate_verify_ic(keys, messages, signature)
+  };
 
   /// Ethereum aggregate verification with PoP verification for every key.
   /// Only exact key/proof pairs checked successfully within this call are reused.
   /// Malformed keys/proofs preserve decoding errors; false proofs return #invalidProof.
   /// Repeated messages up to 1024 bytes reuse their hash. Requires 1..127 entries.
-  public let aggregateVerifyEthereum = Prim.bls12_381_aggregate_verify_ethereum;
+  public func aggregateVerifyEthereum(keys : [Blob], proofs : [Blob], messages : [Blob], signature : Blob) : Result<Bool> {
+    Prim.bls12_381_aggregate_verify_ethereum(keys, proofs, messages, signature)
+  };
 
   /// Same-message Ethereum aggregate verification. Every key requires its PoP;
   /// the aggregate key is then verified in one two-term pairing. 1..128 entries.
-  public let fastAggregateVerifyEthereum = Prim.bls12_381_fast_aggregate_verify_ethereum;
+  public func fastAggregateVerifyEthereum(keys : [Blob], proofs : [Blob], message : Blob, signature : Blob) : Result<Bool> {
+    Prim.bls12_381_fast_aggregate_verify_ethereum(keys, proofs, message, signature)
+  };
 }
