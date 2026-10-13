@@ -42,8 +42,9 @@ Signing validates the secret before the digest. No message hashing or domain
 separation is implicit in the prehash API.
 
 The native kernel borrows input Blobs synchronously and has no allocator,
-retained pointers, or mutable state between calls. Secret signing scalars are
-explicitly zeroized after the upstream signing primitive returns. Generated code allocates
+retained pointers, or mutable state between calls. Secret signing scalar copies, serialized secret and nonce bytes, nonce and
+inverse scalars, and intermediate secret products use zeroizing wrappers.
+This does not claim complete erasure of upstream arithmetic or HMAC stack copies. Generated code allocates
 managed output Blobs and constructs typed result variants through the SDK.
 Fixed-size operations write directly to their result payload. DER encoding
 uses a zero-initialized 72-byte scratch Blob. A 72-byte encoding returns that
@@ -57,14 +58,19 @@ loading P256 does not require the secp256k1 plugin. The reference uses
 variable-time arbitrary-precision arithmetic for interpreter correctness; the
 canister runtime uses the separate RustCrypto implementation.
 
-Public-key derivation uses a fixed-base comb with 64 iterations and a full,
-constant-time scan of all 15 table entries on each iteration. Its public table
+Public-key derivation and signing nonce multiplication share a fixed-base comb
+with 64 iterations and a full, constant-time scan of all 15 table entries on
+each iteration. The table uses affine points with upstream complete mixed
+addition, including its constant-time identity handling for zero digits. Its public table
 is independently checked against Python arithmetic and exact OpenSSL scalar
 multiplication. Secret bytes and the copied scalar are explicitly zeroized.
 Verification combines the two public scalar multiplications with width-5
 nonadjacent forms and performs one affine normalization. Its variable-time
 branches depend only on the supplied public key, digest and signature. Signing
-retains the upstream constant-time nonce multiplication. Targeted source and
+keeps upstream RFC6979 nonce generation and constant-time scalar inversion,
+with the same ECDSA equation and nonzero signature validation. As before, the
+vanishingly rare zero-r or zero-s result returns `#invalidSignature`; it does
+not silently change deterministic signing by retrying with another nonce. Targeted source and
 emitted-Wasm inspection found no secret-dependent branch or address in the
 added comb loop; this review is not a formal constant-time proof.
 
@@ -77,7 +83,9 @@ semantics; the Ash suite exercises public aliases, validation precedence,
 retained values, representative Wycheproof flags, and a 72-byte DER output
 retained across asynchronous continuations and observed garbage collection.
 Native differential tests additionally compare 1,284 comb inputs and 147
-verification linear combinations with upstream arithmetic. See
+verification linear combinations with upstream arithmetic. Another 530
+exact-byte signing comparisons cover boundary secrets and digests, all
+256 single-bit secrets, and deterministic SHA-256-derived inputs. See
 [vector provenance](tests/vectors/README.md) and
 [public API coverage](../../packages/fast/tests/ash/coverage/P256.md).
 
@@ -88,12 +96,31 @@ and [Wycheproof](https://github.com/C2SP/wycheproof).
 
 ## Performance
 
+The third pass reuses the fixed-base comb for signing and switches its table to
+complete affine mixed addition. All 30 workloads passed exact-output checks in
+three fresh PocketIC canisters for each version.
+
+| Operation | Previous instructions | Current instructions | Reduction | Allocation change |
+| --- | ---: | ---: | ---: | ---: |
+| RFC6979 signing | 13,458,880 | 7,225,034 | 46.32% | None |
+| Compressed public key | 5,207,139 | 4,968,732 | 4.58% | None |
+| Compressed-key verification | 12,873,756 | 12,873,756 | 0% | None |
+
+All verification, key-conversion, DER and normalization cases have exactly
+unchanged instruction counts. Allocation and sampled memory are unchanged for
+all cases. Whole-canister Wasm grows by 8,416 bytes and the runtime by 8,535 bytes.
+See the [round-three report](../../benchmarks/crypto/round3/p256/README.md) for
+all results, frozen toolchain/artifact hashes, memory definitions and the
+independent source, emitted-Wasm and functional audit.
+
+### Earlier passes
+
 The second performance pass compares the delivered implementation with the
 combined comb, verification and DER allocation changes. All 25 cases passed
 exact-output checks in three fresh PocketIC canisters per case with the same
 fixtures and toolchain; setup and output validation are outside measurement.
 
-| Operation | Delivered instructions | Current instructions | Reduction | Allocation change |
+| Operation | Delivered instructions | Round-two instructions | Reduction | Allocation change |
 | --- | ---: | ---: | ---: | ---: |
 | Compressed public key | 11,201,615 | 5,207,139 | 53.51% | None |
 | Compressed-key verification | 22,609,363 | 12,873,756 | 43.06% | None |
@@ -111,9 +138,9 @@ not every key or digest. See the [strict comparison](../../benchmarks/crypto/rou
 and [current results](../../benchmarks/crypto/results/round2-p256-combined/results.json)
 for exact source, artifact and toolchain provenance.
 
-The earlier signing improvement remains in place: signing skips `SigningKey`'s
-eager computation of an unused cached verifying key and calls the same upstream
-RFC6979 primitive directly on the secret scalar. Against the corrected baseline
+The earlier signing improvement also remains in place: signing skips
+`SigningKey`'s eager computation of an unused cached verifying key. The first
+pass called the upstream RFC6979 primitive directly on the secret scalar. Against the corrected baseline
 with matching dependency versions, this reduced signing from 24,655,157 to
 13,457,023 instructions (45.4%) with unchanged allocation. See the
 [corrected signing baseline](../../benchmarks/crypto/results/curves-p256-fixed-baseline/results.json)

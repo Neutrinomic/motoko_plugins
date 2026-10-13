@@ -694,7 +694,7 @@ mod tests {
                     .0;
                 let mut output = [0u8; 64];
                 assert_eq!(sign_prehash(&scalar.to_bytes(), hash, &mut output), Ok(64));
-                assert_eq!(output.as_slice(), expected.to_bytes().as_slice());
+                assert_eq!(output.as_slice(), &expected.to_bytes()[..]);
                 let key = (ProjectivePoint::GENERATOR * scalar)
                     .to_affine()
                     .to_encoded_point(true);
