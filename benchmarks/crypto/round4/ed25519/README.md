@@ -35,6 +35,26 @@ and [selected build measurements](../results/prepared-round4-ed25519-c1-candidat
 record the six matched cases and all 36 observations. Inputs, expected outputs,
 compiler, plugin artifacts and workload metadata are checked before comparison.
 
+The final cohort adds 36 observations for other message sizes and actual reuse:
+
+| Verification workload | Baseline instructions | Selected instructions | Saving |
+|---|---:|---:|---:|
+| Direct, empty message | 2,318,893 | 2,179,487 | 6.01% |
+| Prepared, empty message | 2,081,792 | 1,944,012 | 6.62% |
+| Direct, 1 KiB | 2,379,349 | 2,239,939 | 5.86% |
+| Prepared, 1 KiB | 2,142,252 | 2,004,464 | 6.43% |
+| Direct, ten calls on 32 B | 23,085,048 | 21,691,008 | 6.04% |
+| Prepared, ten calls on 32 B | 20,712,785 | 19,334,975 | 6.65% |
+
+Ten-call rows measure the whole batch and exclude preparation. Allocation stays
+at 32 B per single call and 320 B per ten-call batch. All 72 observations across
+the two paired cohorts passed; each selected runtime is byte-identical.
+[Final paired comparison](final/comparison.md),
+[final comparison JSON](final/comparison.json),
+[raw baseline](../results/prepared-round4-ed25519-final-baseline/results.json),
+and [raw selected measurements](../results/prepared-round4-ed25519-final-candidate/results.json)
+retain the complete three-trial evidence.
+
 ## Rejected backend experiment
 
 The configuration-only Fiat32 screen used upstream `fiat-crypto` 0.2.9 already
