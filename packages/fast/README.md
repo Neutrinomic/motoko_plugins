@@ -5,7 +5,7 @@ its calls specialize directly to the plugin implementation.
 
 | Import | API | Required compiler plugin |
 |---|---|---|
-| `mo:fast/CandidX` | `encode(...)` → `#ok Blob` / `#err Text` | `candidx` |
+| `mo:fast/CandidX` | `encode(...)` → `#ok Blob` / `#err Text`; `estimateSize(...)` → conservative `Nat` | `candidx` |
 | `mo:fast/JSON` | `encode(value)`, `decode<T>(text)` | `json` |
 | `mo:fast/CBOR` | `encode(value)`, `decode<T>(bytes)` | `cbor` |
 | `mo:fast/SHA256` | `digest(bytes)` → 32-byte Blob | `sha256` |
@@ -23,6 +23,9 @@ its calls specialize directly to the plugin implementation.
 | `mo:fast/pure/Map` | Persistent ordered map | `pure-map` |
 | `mo:fast/Set` | Core-compatible mutable ordered set | `mutable-set` |
 | `mo:fast/pure/Set` | Persistent ordered set with rank/select and split/join | `pure-set` |
+| `mo:fast/Queue` | Core-compatible mutable double-ended queue | `queue` |
+| `mo:fast/HistoryRing` | Bounded history indexed by absolute sequence | `history-ring` |
+| `mo:fast/IndexedPriorityQueue` | Mutable priority queue with cancellation and rescheduling handles | `indexed-priority-queue` |
 
 The cryptographic APIs use `Blob` for bytes. Each primitive module loads only
 its own plugin; HMAC and curve signing include their internal hash operations.
@@ -55,8 +58,9 @@ primitive costs from full address, key-derivation and transaction workflows.
 `Map` and `Set` expose every function from their `mo:core` counterparts,
 including implicit comparator and formatter arguments. Their `toPure` and
 `fromPure` conversions use Core’s pure Map/Set types, matching Core’s interface.
-These two modules use the declared `core` dependency for conversions.
-Conversions rebuild the container while sharing keys, values, and elements.
+These two modules and `Queue` use the declared `core` dependency for their
+conversions. Conversions rebuild the container while sharing keys, values, and
+elements.
 
 Both pure modules also provide Core’s function interfaces, with additional
 operations. The plugin containers have different storage representations from
@@ -168,6 +172,76 @@ exposes every Core mutable Set function, plus `find` and direct scalar helpers.
 The [pure Set](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/pure-set)
 shares unchanged branches when updated. Both store elements directly without
 dummy map values. Elements remain shared Motoko references.
+
+## Queues and retained history
+
+[`Queue`](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/queue)
+provides Core's mutable Queue interface, including both ends and conversions to
+Core's pure Queue. Its lazy chunks share the original payloads. Removing an
+element clears its slot. It retains at most one empty chunk for reuse;
+`clear` releases all its storage. `toArray` and `toVarArray` copy directly into
+one result array while sharing payloads. As with the maps and sets, Core and
+Fast Queue values have different representations.
+
+The current Queue packs chunk position and count into one field, replacing the
+earlier experimental `start`/`count` fields. This changes its stable storage
+shape: queues stored in that earlier format need explicit migration or
+recreation. There is no legacy-format adapter; upgrade tests cover queues
+created in the current format.
+
+[`HistoryRing`](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/history-ring)
+retains the latest entries up to a fixed capacity. `append` returns an absolute
+`Nat` sequence, and `get` and `page` address entries by that sequence without
+scanning an older prefix. Storage grows lazily, so a large configured capacity
+does not allocate all its element slots at construction.
+
+```motoko
+import HistoryRing "mo:fast/HistoryRing";
+
+let history = HistoryRing.empty<Text>(2);
+let first = HistoryRing.append(history, "started");
+ignore HistoryRing.append(history, "waiting");
+ignore HistoryRing.append(history, "completed");
+assert HistoryRing.get(history, first) == null;
+assert HistoryRing.page(history, first, 10) == ["waiting", "completed"];
+```
+
+Sequences start at zero and are arbitrary-precision `Nat` values. Removing
+entries or clearing the ring preserves the next sequence. Capacity zero retains
+no entries but still advances it. `page` includes its starting sequence and
+clamps evicted starts to the oldest retained entry. Use
+`emptyAt(capacity, nextSequence)` to start an empty history at an existing
+sequence when copying retained data. Partial drops release empty chunks but
+retain the directory's high-water length until the ring becomes empty or is
+cleared.
+
+Both containers remain stable when their elements are stable. Their public
+representation fields are private by contract. Mutation invalidates iterators;
+traversal callbacks must not structurally mutate the container being traversed.
+
+## Cancellable priorities
+
+[`IndexedPriorityQueue`](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/indexed-priority-queue)
+is a mutable min-heap with generic priorities and values. `push` returns a
+handle for `get`, `remove`, `reschedule`, or `replace`, without a second key
+lookup. `peek` and `pop` return the minimum `(priority, value)` pair;
+`peekPriority` reads only the priority without constructing that pair.
+`entries` traverses heap order, not sorted order. Equal priorities have no FIFO
+guarantee: include an explicit tie-breaker in the priority when order matters.
+
+Handles belong to the queue that created them. Removal, popping, and clearing
+invalidate them; stale operations return `null` or `false`. A live handle
+retains its queue, while an invalidated handle releases that reference and
+retains no payload. `clear` visits the entries to invalidate their handles.
+The queue and its handles can be stable when their priority and value types
+are stable.
+
+Use the same comparator for every operation on a queue. As with Map and Set,
+proven scalar comparators select native comparisons, and custom comparators
+use normal Motoko callbacks. A callback must not structurally mutate the queue
+being compared. It may read the evolving queue, but must not assume an
+in-progress heap operation is atomic. Do not mutate a stored priority in a way
+that changes its ordering. Mutation invalidates iterators.
 
 ## Aliases and callbacks
 

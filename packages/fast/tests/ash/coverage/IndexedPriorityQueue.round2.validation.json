@@ -1,0 +1,102 @@
+{
+  "round": 2,
+  "validated_at_utc": "2026-10-12T00:50:19.740517+00:00",
+  "compiler_revision": "92b1bdecbc7bc67fd51ad226f8d147d15494fc09",
+  "compiler_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+  "artifacts_sha256": {
+    "dist/indexed-priority-queue/plugin.cmxs": "87627cd033f978563ad17d991376427de4118343f5fc6b697306c500e0e6364e",
+    "plugins/indexed-priority-queue/compiler/generator.ml": "9c6a60f8f201bbd3d761d4b1da3044713b121cd1d62343d65452de01925883d5",
+    "packages/fast/src/IndexedPriorityQueue.mo": "644a461af0cfea3291baedbc735c844f43421cb06ec6e3c6273dc92f248d6ccd"
+  },
+  "tests_sha256": {
+    "packages/fast/tests/lib/IndexedPriorityQueueCases.mo": "11f6498473b133cf5ce0a3559138af69f5daa78af62f245dfb6c038747ab4972",
+    "packages/fast/tests/run/indexed-priority-queue-model.mo": "f393509174592257934644a1664c5b14cf1d2728d41f371026e3185275a785eb",
+    "packages/fast/tests/run/indexed-priority-queue-generics.mo": "7d55679cf035ddc5fbf88de5886f141385ccf90330527473bb945ea8e41124af",
+    "packages/fast/tests/run-drun/indexed-priority-queue-upgrade.mo": "d0e3c57056a468e9ef435449843ca7787aaad54b516944e2bcf5118a3db78cd6",
+    "packages/fast/tests/ash/IndexedPriorityQueue.mo": "5e8ae0a6549baf1ae1882bb048229f9264130ff71bd9904293b81baa7d6d6cc9",
+    "packages/fast/tests/ash/IndexedPriorityQueueGC.mo": "9c469ab06e7561765707f821a3b360825bcdb2db0563c2863a9d0a857b3fb345",
+    "packages/fast/tests/ash/IndexedPriorityQueue.ash.json": "813bd04083c8daa6e120519f3e40673f445bf4b85cdfd1c2cb39beabcec5d1ff",
+    "packages/fast/tests/ash/IndexedPriorityQueueGC.ash.json": "8e19f714fe8a361b16801125f63a533162cbce329aee22257ab03802c669d806"
+  },
+  "native": {
+    "fixtures": [
+      {
+        "fixture": "packages/fast/tests/run/indexed-priority-queue-model.mo",
+        "status": "passed",
+        "clean_outputs": [
+          "tc",
+          "comp",
+          "run",
+          "run-ir",
+          "run-low",
+          "wasm-run"
+        ],
+        "failure_return_files": []
+      },
+      {
+        "fixture": "packages/fast/tests/run/indexed-priority-queue-generics.mo",
+        "status": "passed",
+        "clean_outputs": [
+          "tc",
+          "comp",
+          "run",
+          "run-ir",
+          "run-low",
+          "wasm-run"
+        ],
+        "failure_return_files": []
+      },
+      {
+        "fixture": "packages/fast/tests/run-drun/indexed-priority-queue-upgrade.mo",
+        "status": "passed",
+        "clean_outputs": [
+          "tc",
+          "comp"
+        ],
+        "failure_return_files": []
+      }
+    ],
+    "elapsed_seconds": 68.902195149,
+    "accept_mode": false,
+    "upgrade_verification_messages": 2,
+    "upgrade_transcript_sha256": "199638f65665d0901ad6760bdeab1b91716837c7b383097c0f71dc0363fc0b96"
+  },
+  "ash": {
+    "IndexedPriorityQueue": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    "IndexedPriorityQueueGC": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "new_coverage": [
+    "Mixed built-in/opaque-equivalent Nat64 comparisons over 16 size/pattern combinations, including all-equal and duplicate priorities; exact traversal/popped IDs/handle state and callback traces.",
+    "Proven scalar pop/refill of managed nullable payloads during the existing pending-GC cycle, verifying minimum and retained handles after each step.",
+    "Scalar minimum pop before and after two upgrades."
+  ],
+  "scalar_path_evidence": {
+    "core_comparator": "Core 2.5.0 Nat64.compare uses the ordinary x<y/#less, x==y/#equal, otherwise #greater expression recognized by compiler scalar_compare.ml as descriptor 6.",
+    "generator_selection": "Compare.dispatch selects Scalar Nat64; Pop passes pop=true to remove_at, selecting sift_pop_bottom. Opaque callbacks remain on the callback repair path.",
+    "generated_fixture": "packages/fast/tests/run/_out/indexed-priority-queue-generics.wasm",
+    "generated_fixture_sha256": "a4b53b66c88b8f8d03d02ea16ad576976483f1c7242793604077e7cfda1ea689",
+    "emitted_helpers": [
+      "ipq_sift_pop_bottom_scalar_Nat64",
+      "ipq_pop_at_scalar_Nat64",
+      "ipq_sift_down_callback"
+    ],
+    "runtime_instrumentation": false
+  },
+  "logs": [
+    "tmp/collections-optimization-round-2/ipq/independent-validation/published-native.log",
+    "tmp/collections-optimization-round-2/ipq/independent-validation/published-ash.log"
+  ],
+  "notes": [
+    "Prior first-round validation and negative-control evidence remain in IndexedPriorityQueue.md.",
+    "Native and Ash checks used the published plugin artifact; interrupted private runs are not counted.",
+    "Ash GC metrics cover final verification only, not whole-test instruction/allocation benchmarks."
+  ]
+}

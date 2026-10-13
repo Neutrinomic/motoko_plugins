@@ -1,0 +1,33 @@
+//MOC-FLAG --package fast ../../../../packages/fast/src --plugin ../../../../dist/history-ring --sanity-checks
+import Ring "mo:fast/HistoryRing";
+let ring = Ring.empty<Nat>(130);
+var i = 0;
+while (i < 1000) { assert Ring.append(ring, i) == i; i += 1 };
+assert Ring.size(ring) == 130;
+assert Ring.firstSequence(ring) == 870;
+assert Ring.get(ring, 869) == null;
+assert Ring.get(ring, 870) == ?870;
+assert Ring.get(ring, 999) == ?999;
+assert Ring.get(ring, 1000) == null;
+let page = Ring.page(ring, 900, 3);
+assert page == [900, 901, 902];
+assert Ring.drop(ring, 100) == 100;
+assert Ring.popFront(ring) == ?970;
+Ring.clear(ring);
+assert Ring.nextSequence(ring) == 1000;
+assert Ring.append(ring, 42) == 1000;
+assert Ring.toArray(ring) == [42];
+let zero = Ring.empty<Null>(0);
+assert Ring.append(zero, null) == 0;
+assert Ring.isEmpty(zero);
+let one = Ring.empty<?Null>(1);
+assert Ring.append(one, ?null) == 0;
+assert Ring.get(one, 0) == ??null;
+assert Ring.popFront(one) == ??null;
+
+let wrapped = Ring.empty<Nat>(5);
+i := 0;
+while (i < 6) { ignore Ring.append(wrapped, i); i += 1 };
+i := 1;
+while (i < 5) { assert Ring.popFront(wrapped) == ?i; i += 1 };
+assert Ring.toArray(wrapped) == [5];

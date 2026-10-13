@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-10-12T00:10:46.165509+00:00",
+  "plugin_sha256": "57e9a26e9f560f2486aedc158ea143d25bd7023b0cc5085f2990c95dc5578242",
+  "compiler_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+  "compiler_version": "Motoko compiler (source 2.0.0-14-g92b1bdecb)",
+  "module_sha256": "8f188edc4a2b2991fee1aabaaef8f798842c3bf667d1503914373c96b5b4ef11",
+  "native": {
+    "fixtures": [
+      {
+        "fixture": "queue-basic",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "ae2c525b4b07a0b9835fe28977c7b2d93afb833e0e0f0439920c11ba61b5709b"
+      },
+      {
+        "fixture": "queue-model",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "7ebae9dde9677be24a03c275704aab25e6565353cc1469267b2ee1692bbc88e8"
+      },
+      {
+        "fixture": "queue-generics",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "cacc77c6fc16cbcab527cf8c03d15746497ab179222df07b3031bd9d44153133"
+      },
+      {
+        "fixture": "queue-collection-upgrade",
+        "upgrades": 2,
+        "post_upgrade_checks": 2,
+        "drun_log_sha256": "764dbd5029eb4e031611795bc9a87175247f411f8ab82971c2f5ea5cc613866a",
+        "wasm_sha256": "0f4d8145860a78ce6a95b50fe056f2e36d9784020bfc0aebb2d3d57073dd25fe"
+      }
+    ],
+    "final_command_accept_mode": false,
+    "passed": 4
+  },
+  "ash": {
+    "runner": "scripts/test-ash.sh --ash-source /srv/shared/code/ash QueueCollection QueueCollectionGC",
+    "core_version": "2.5.0",
+    "suites": [
+      {
+        "name": "QueueCollection",
+        "passed": 5,
+        "failed": 0,
+        "wasm_sha256": "74467b9226c3ab092d90c1c91d903dda7d0b9b29667e93546ab61a510dd667ba"
+      },
+      {
+        "name": "QueueCollectionGC",
+        "passed": 3,
+        "failed": 0,
+        "wasm_sha256": "c25b001b5a21b6ef0b06971cbfb61822251879cb4986e102b081dc74186f088c"
+      }
+    ]
+  },
+  "mutation_control": {
+    "change": "replace public popBack intrinsic with popFront",
+    "exit_code": 1,
+    "assertion_failed": true
+  },
+  "source_sha256": {
+    "packages/fast/src/Queue.mo": "8f188edc4a2b2991fee1aabaaef8f798842c3bf667d1503914373c96b5b4ef11",
+    "packages/fast/tests/queue/Checks.mo": "1e3aa8ef45d6c110118c48246c983eebd4a775026aae0d5ea9c057f722a10855",
+    "packages/fast/tests/run/queue-basic.mo": "c2af56c1b1757f966899caae89570d5aeea41aaccef684ee26eb0c2f0909d5a3",
+    "packages/fast/tests/run/queue-model.mo": "5c9ec4a2475e47e0ad9e6eb6ac5018c9ddd34c77d9efd0bba60334c864746dee",
+    "packages/fast/tests/run/queue-generics.mo": "479cddf7c6c586b2e2704b6cdf6e41b4af8b0d109b95696f7458bb4d834cabb9",
+    "packages/fast/tests/run-drun/queue-collection-upgrade.mo": "5994240a8f1064279cf01abe32590825c36247829f2bbe7f2111173df53f4ad9",
+    "packages/fast/tests/ash/QueueCollection.mo": "08d537fa438fd3c63f565a111dec46a9a6ca6b6870b4c37461f3eb07f89c4593",
+    "packages/fast/tests/ash/QueueCollection.ash.json": "39c0abb4941f8ccad9d227907366a1fb6c5f865e996f31473c04fa8577e5b020",
+    "packages/fast/tests/ash/QueueCollectionGC.mo": "226eb0c3ce1eebf389e685ccc30483205624f634a18a8a6f74d152d818c2382d",
+    "packages/fast/tests/ash/QueueCollectionGC.ash.json": "c7cfc57ce8f5a96dfa6fc22db4cae54e3f72c0ddb213e514a780c4a5ab2c8a83"
+  },
+  "limits": [
+    "Correctness tests, not performance benchmarks",
+    "Reference release checked structurally; exact retained heap reduction is not inferred from GC counters",
+    "Incremental GC test observes a pending/completed collection and at least32MiB total reclamation; it does not attribute reclaimed bytes solely to Queue"
+  ],
+  "documentation_correction": {
+    "completed_utc": "2026-10-12T00:20:49.069973+00:00",
+    "change": "Scope the no-whole-queue-copy promise to endpoint operations; two header comment lines only.",
+    "before_module_sha256": "8f188edc4a2b2991fee1aabaaef8f798842c3bf667d1503914373c96b5b4ef11",
+    "after_module_sha256": "921db27b88350ca8bcc472278494fdc4b0505bf94279e811d6120511533ddc4d",
+    "implementation_bytes_unchanged": true,
+    "line_count_unchanged": true,
+    "plugin_sha256": "57e9a26e9f560f2486aedc158ea143d25bd7023b0cc5085f2990c95dc5578242",
+    "verification": {
+      "command": "test-runner -b /srv/shared/code/motoko_experiments/plugins/tests/integration/run/collections.mo",
+      "before": "passed source, IR, lowered IR, and compiled Wasm",
+      "after": "passed source, IR, lowered IR, and compiled Wasm",
+      "wasm_byte_identical": true,
+      "wasm_sha256": "0353f83a2d74b6bdbbd1010bb68a441c409aa79d82a3f3275619bf64a9e6b13b"
+    },
+    "prior_validation_scope": "The main module_sha256 and prior Ash/native/upgrade results above refer to the pre-comment module. Those suites and benchmarks were not rerun for this documentation-only correction. Frozen benchmark and installation snapshots retain that historical hash."
+  }
+}

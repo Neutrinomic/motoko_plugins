@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "round": 2,
+  "completed_utc": "2026-10-12T00:44:08.218688+00:00",
+  "previous_validation": "QueueCollection.validation.json",
+  "plugin_sha256": "c6e8927021cbf3d5206c2c5d09378feb3f9d769a8913538610a3bc819cbb2ae7",
+  "compiler_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+  "compiler_version": "Motoko compiler (source 2.0.0-14-g92b1bdecb)",
+  "module_sha256": "558f7ddcb66cd9b636b9449fc4d5dc180639baa69edaf37e90f3e43d74ba3ca8",
+  "representation": {
+    "chunk_geometry": "Nat32 meta: low 5 bits start, high bits count",
+    "spare": "fully cleared meta = 0, null payload slots, no neighbor links",
+    "empty_endpoint": "count = 0; start bits may remain nonzero",
+    "stable_layout_changed": true,
+    "upgrade_test_scope": "Two upgrades with the new packed stable layout. No migration or upgrade from the old unpacked layout was attempted or claimed."
+  },
+  "expanded_coverage": [
+    "192 Core-oracle geometry scenarios: all32 start offsets at31/32/33 elements in both directions, peeks after every pop and drained endpoint reuse",
+    "Heterogeneous Any payloads and native array exports retained through actual incremental GC messages",
+    "Detached spare retained over both upgrades and reused at both endpoints afterward",
+    "Existing native array, generic, nullable, closure, mutable alias, model, spare cleanup and cursor coverage retained"
+  ],
+  "native": {
+    "fixtures": [
+      {
+        "fixture": "queue-basic",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "6d1818d978cc63407f2d997d52123d575db877c324e3552571acf9ffec7653c3"
+      },
+      {
+        "fixture": "queue-model",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "025eecb48c5deab342607cb036a3716aaabd44f07861a078624e4f2f56f28b6b"
+      },
+      {
+        "fixture": "queue-generics",
+        "modes": [
+          "typecheck",
+          "compile",
+          "source interpreter",
+          "IR interpreter",
+          "lowered IR interpreter",
+          "Wasm",
+          "Wasm validation"
+        ],
+        "all_positive_outputs_empty": true,
+        "wasm_sha256": "5d096c926eabd45295f4bedc400df4f7da63e8541d41021f2fb814a5af36ad81"
+      },
+      {
+        "fixture": "queue-collection-upgrade",
+        "upgrades": 2,
+        "post_upgrade_checks": 2,
+        "retained_spare_reused_after_upgrade": true,
+        "drun_log_sha256": "764dbd5029eb4e031611795bc9a87175247f411f8ab82971c2f5ea5cc613866a",
+        "wasm_sha256": "8c9fc2294719c95b791667ab8ab4554aeab6c5a86bfa28bdaf2415565ff30fed"
+      }
+    ],
+    "command_accept_mode": false,
+    "passed": 4
+  },
+  "ash": {
+    "runner": "scripts/test-ash.sh --ash-source /srv/shared/code/ash QueueCollection QueueCollectionGC",
+    "core_version": "2.5.0",
+    "suites": [
+      {
+        "name": "QueueCollection",
+        "passed": 5,
+        "failed": 0,
+        "wasm_sha256": "5f9b1eec2a77f1d5020b9381c7045136ea4da630293ee8f68105009670823030"
+      },
+      {
+        "name": "QueueCollectionGC",
+        "passed": 3,
+        "failed": 0,
+        "wasm_sha256": "70b13ee5c9e9afbd2e19ec314c7a47427e10632203df3e9791bc825c100c688b"
+      }
+    ]
+  },
+  "mutation_controls": [
+    {
+      "mutation": "wrong_end",
+      "exit_code": 1,
+      "test_rejected_wrong_behavior": true,
+      "diagnostic": "/srv/shared/code/motoko_experiments/plugins/packages/fast/tests/queue/Checks.mo:46.18-46.63: execution error, assertion failure"
+    },
+    {
+      "mutation": "empty_retained_back",
+      "exit_code": 1,
+      "test_rejected_wrong_behavior": true,
+      "diagnostic": "prim:63.31-63.42: execution error, explicit trap: mutation: empty retained endpoint"
+    }
+  ],
+  "retention_probe": {
+    "owner": "perf_queue/queue_memory_probe",
+    "report": "benchmarks/queue/results/round2-memory-final/report.json",
+    "sha256": "2ac550a2fff51c4aaee4c2e4255f6de0c2881c25d9b68b360a0feaf18c2ca5bd",
+    "settings": {
+      "count": 4096,
+      "bytes": 4096,
+      "batch": 128,
+      "cycles": 3,
+      "trials": 1
+    },
+    "summaries": {
+      "fast": {
+        "full_heap_minus_initial": 17091584,
+        "one_heap_minus_initial": 4976,
+        "drained_heap_minus_initial": 408,
+        "final_heap_minus_initial": 0,
+        "total_allocated": 2086963128,
+        "total_reclaimed": 2086963128,
+        "linear_memory_high_water": 402653184,
+        "max_live_high_water": 65603728
+      },
+      "core": {
+        "full_heap_minus_initial": 17432576,
+        "one_heap_minus_initial": 4256,
+        "drained_heap_minus_initial": 0,
+        "final_heap_minus_initial": 0,
+        "total_allocated": 2089509096,
+        "total_reclaimed": 2089509096,
+        "linear_memory_high_water": 402653184,
+        "max_live_high_water": 65968664
+      }
+    },
+    "scope": "Separate controlled-pressure probe closes the allocation partition before GC, uses matched baseline heap differences and direct reachable node/slot/payload counts. Its gross allocation includes disposable collection pressure and is not a Queue operation-allocation measurement."
+  },
+  "source_sha256": {
+    "packages/fast/src/Queue.mo": "558f7ddcb66cd9b636b9449fc4d5dc180639baa69edaf37e90f3e43d74ba3ca8",
+    "packages/fast/tests/queue/Checks.mo": "2834665b97cae9955c38285a9986ce970b60513d1d6b8df6da62f72a8e142a53",
+    "packages/fast/tests/run/queue-basic.mo": "c2af56c1b1757f966899caae89570d5aeea41aaccef684ee26eb0c2f0909d5a3",
+    "packages/fast/tests/run/queue-model.mo": "5c9ec4a2475e47e0ad9e6eb6ac5018c9ddd34c77d9efd0bba60334c864746dee",
+    "packages/fast/tests/run/queue-generics.mo": "479cddf7c6c586b2e2704b6cdf6e41b4af8b0d109b95696f7458bb4d834cabb9",
+    "packages/fast/tests/run-drun/queue-collection-upgrade.mo": "9a8504795d6303b2254beda58416b4ae8db3fbbf921c6a069ecc5b1044cf0213",
+    "packages/fast/tests/ash/QueueCollection.mo": "08d537fa438fd3c63f565a111dec46a9a6ca6b6870b4c37461f3eb07f89c4593",
+    "packages/fast/tests/ash/QueueCollection.ash.json": "39c0abb4941f8ccad9d227907366a1fb6c5f865e996f31473c04fa8577e5b020",
+    "packages/fast/tests/ash/QueueCollectionGC.mo": "76e2586120b149b06a15f24991cbe0652771c73486c65c0c3a13c8b56d7f3f5b",
+    "packages/fast/tests/ash/QueueCollectionGC.ash.json": "c7cfc57ce8f5a96dfa6fc22db4cae54e3f72c0ddb213e514a780c4a5ab2c8a83"
+  },
+  "limits": [
+    "Functional/Ash instruction figures are correctness-test costs, not operation benchmark results",
+    "White-box cleanup checks verify released slot and neighbor references; exact heap reclamation comes only from the separate controlled-pressure retention probe",
+    "Upgrade tests cover only the new packed layout; the old stable shape changed"
+  ]
+}

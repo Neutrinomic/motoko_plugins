@@ -1,0 +1,124 @@
+{
+  "result": "pass",
+  "scope": "Independent Python model; not native code verification or GC proof",
+  "source_sha256": "daf1b7824ed0a7765344c27dccd284525e9c68b1c68b376180130f84f2bf7f73",
+  "seed": 20261012,
+  "algorithm": "Scalar Pop only; left child on ties; early first-child stop; descend to leaf; ascend on moving <= parent",
+  "assertions": [
+    "Exact (key, unique payload ID) heap array",
+    "Every live handle's owner and index",
+    "Detached handle identity and retained index",
+    "Heap order and no duplicate IDs",
+    "Return values including stale-handle operations"
+  ],
+  "exhaustive": {
+    "keys": [
+      0,
+      1,
+      2
+    ],
+    "by_size": [
+      {
+        "size": 0,
+        "valid_heaps": 1,
+        "pops_checked": 0
+      },
+      {
+        "size": 1,
+        "valid_heaps": 3,
+        "pops_checked": 3
+      },
+      {
+        "size": 2,
+        "valid_heaps": 6,
+        "pops_checked": 12
+      },
+      {
+        "size": 3,
+        "valid_heaps": 14,
+        "pops_checked": 42
+      },
+      {
+        "size": 4,
+        "valid_heaps": 25,
+        "pops_checked": 100
+      },
+      {
+        "size": 5,
+        "valid_heaps": 53,
+        "pops_checked": 265
+      },
+      {
+        "size": 6,
+        "valid_heaps": 100,
+        "pops_checked": 600
+      },
+      {
+        "size": 7,
+        "valid_heaps": 222,
+        "pops_checked": 1554
+      },
+      {
+        "size": 8,
+        "valid_heaps": 386,
+        "pops_checked": 3088
+      },
+      {
+        "size": 9,
+        "valid_heaps": 798,
+        "pops_checked": 7182
+      },
+      {
+        "size": 10,
+        "valid_heaps": 1481,
+        "pops_checked": 14810
+      },
+      {
+        "size": 11,
+        "valid_heaps": 3239,
+        "pops_checked": 35629
+      },
+      {
+        "size": 12,
+        "valid_heaps": 5733,
+        "pops_checked": 68796
+      }
+    ],
+    "valid_heaps": 12061,
+    "pops_checked": 132081
+  },
+  "random": {
+    "heaps": 400,
+    "max_size": 1024,
+    "pops_checked": 198570,
+    "key_distributions": [
+      "0..2",
+      "signed integers in [-10^30, 10^30)"
+    ]
+  },
+  "mixed": {
+    "sequences": 80,
+    "steps_per_sequence": 1000,
+    "operations": {
+      "push": 34528,
+      "pop": 18257,
+      "remove": 9752,
+      "reschedule": 16677,
+      "clear": 786
+    },
+    "extra_final_drains": true
+  },
+  "proof": [
+    "After removing the root, all descendant subheaps are unchanged and valid; replacing it by the last entry leaves only the root potentially out of order.",
+    "Both algorithms follow the same path of minimum children, choosing the left child on equality. Descent writes only ancestors, so subsequent child choices see the same original descendants.",
+    "Keys on that path are nondecreasing. Ordinary sift promotes exactly the strict-less-than-moving prefix and stops before the first greater-or-equal key.",
+    "Floyd descent promotes the full path. Ascending on moving <= parent restores every greater-or-equal suffix entry to its exact original slot, including equal-key payload identities; its final position is therefore the same strict prefix boundary.",
+    "Every promoted/restored entry has its handle index updated with its slot; placing moving fixes its handle. The same removed root is detached before either sift, with the same retained index. Array shrink follows both algorithms identically.",
+    "IDs assigned by initial slot cover all distinct-payload permutations by renaming symmetry: neither algorithm compares IDs. Mixed operations preserve the equality invariant inductively because only scalar Pop differs."
+  ],
+  "assumptions": [
+    "Total, consistent scalar order",
+    "No callbacks or reentrant observation during hole movement",
+    "Memory safety and write barriers are separately audited in native implementation"
+  ]
+}

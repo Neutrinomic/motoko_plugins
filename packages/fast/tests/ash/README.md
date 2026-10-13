@@ -1,6 +1,6 @@
 # Public module tests with Ash
 
-These 26 configurations define **273 test-method executions** (267 distinct
+These 32 configurations define **308 test-method executions** (302 distinct
 Motoko method declarations) on PocketIC through Ash. They exercise the public
 `mo:fast` modules, independent wire and cryptographic vectors, comparisons with
 Core containers, Bitcoin composition, error recovery, persistence, and GC.
@@ -59,16 +59,22 @@ does not require unrelated plugins.
 | [BitcoinCryptoTransaction](BitcoinCryptoTransaction.mo) | 2 | Bitcoin Core/BIP143/BIP341 sighashes, transaction parsing/serialization, txid/wtxid, scripts and prepared hash caches | [Config](BitcoinCryptoTransaction.ash.json) · [Inventory](#bitcoin-transaction-inventory) |
 | [CBOR](CBOR.mo) | 34 | Exact wire vectors, typed decoding, all binary16 patterns, malformed inputs, quotas, retained results | [Config](CBOR.ash.json) · [Inventory](coverage/CBOR.md) |
 | [CandidX](CandidX.mo) | 16 | Canonical bytes, variadic arguments, type joins, recursion, references, quotas | [Config](CandidX.ash.json) · [Inventory](coverage/CandidX.md) |
+| [CandidSize](CandidSize.mo) | 5 | Conservative native-Candid bounds, large integers, zero allocation, recursive limits, references | [Config](CandidSize.ash.json) · [Inventory](coverage/CandidSize.md) |
 | [Comparators](Comparators.mo) | 16 | Automatic scalar ordering, aliases and implicit calls, callback effects, multi-value results, allocation | [Config](Comparators.ash.json) · [Inventory](coverage/Comparators.md) |
 | [Composition](Composition.mo) | 3 | Eight original codec/hash/container plugins together, recovery after failures, retained managed values across messages | [Config](Composition.ash.json) · [Inventory](#composition-inventory) |
 | [CoreAPI](CoreAPI.mo) | 12 | Six identical consumer methods run against Core and Fast; implicit comparators/formatters, Core signatures and types | [Config](CoreAPI.ash.json) · [Inventory](coverage/CoreAPI.md) |
 | [MapConversions](MapConversions.mo) | 4 | Both Map conversions, independent bindings, shared payloads, comparator-equivalent keys | [Config](MapConversions.ash.json) · [Inventory](coverage/MapConversions.md) |
 | [JSON](JSON.mo) | 33 | Independent JSON output, typed decoding, Unicode, numeric limits, duplicates, structured errors | [Config](JSON.ash.json) · [Inventory](coverage/JSON.md) |
 | [HMAC](HMAC.mo) | 4 | RFC4231 SHA256/SHA512 vectors, key/padding boundaries, prepared keys, independent streams and reset | [Config](HMAC.ash.json) · [Inventory](coverage/HMAC.md) |
+| [HistoryRing](HistoryRing.mo) | 8 | Sequence oracle, capacity/wrap boundaries, bulk drops, large Nats, reference release, incremental GC | [Config](HistoryRing.ash.json) · [Inventory](coverage/HistoryRing.md) |
+| [IndexedPriorityQueue](IndexedPriorityQueue.mo) | 11 | Independent model, cancellation/rescheduling, nullable keys, callback traces and reads, mixed scalar/callback dispatch, minimum-priority access | [Config](IndexedPriorityQueue.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
+| [IndexedPriorityQueueGC](IndexedPriorityQueueGC.mo) | 3 | Shared native helpers, cyclic queue/handle references, incremental GC and detached-handle reclamation | [Config](IndexedPriorityQueueGC.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
 | [Map](Map.mo) | 17 | 58 existing functions, mutable aliases, differential operations, B-tree boundaries, scalar keys | [Config](Map.ash.json) · [Inventory](coverage/Map.md) |
 | [P256](P256.mo) | 15 | RFC6979 signatures and digest reduction, SEC1/DER validation, scalar boundaries, normalization and selected Wycheproof cases | [Config](P256.ash.json) · [Inventory](coverage/P256.md) |
 | [PureMap](PureMap.mo) | 22 | 100 existing functions, retained versions, ranges, algebra, builders, callback contracts | [Config](PureMap.ash.json) · [Inventory](coverage/PureMap.md) |
 | [PureSet](PureSet.mo) | 16 | All 70 functions, persistent AVL operations, rank/split/join, algebra, scalar keys | [Config](PureSet.ash.json) · [Inventory](coverage/PureSet.md) |
+| [QueueCollection](QueueCollection.mo) | 5 | Core API parity, differential sequences, chunk boundaries, shared generic payloads, native array exports | [Config](QueueCollection.ash.json) · [Inventory](coverage/QueueCollection.md) |
+| [QueueCollectionGC](QueueCollectionGC.mo) | 3 | Shared helpers, incremental GC, cleared slots and detached chunks | [Config](QueueCollectionGC.ash.json) · [Inventory](coverage/QueueCollection.md) |
 | [RIPEMD160](RIPEMD160.mo) | 4 | Independent binary answers, padding/block boundaries, immutable streaming, malformed states and million-byte input | [Config](RIPEMD160.ash.json) · [Inventory](coverage/RIPEMD160.md) |
 | [SHA256](SHA256.mo) | 5 | Independent known answers, padding/block boundaries, million-byte input, aliases | [Config](SHA256.ash.json) · [Inventory](coverage/SHA256.md) |
 | [SHA512](SHA512.mo) | 5 | SHA512/SHA384 known answers, padding boundaries, streaming partitions, reset and million-byte inputs | [Config](SHA512.ash.json) · [Inventory](coverage/SHA512.md) |
@@ -76,12 +82,12 @@ does not require unrelated plugins.
 | [Set](Set.mo) | 15 | All 66 functions, Core semantics, B-tree removal, nested optional elements, scalar keys | [Config](Set.ash.json) · [Inventory](coverage/Set.md) |
 | [SetGC](SetGC.mo) | 2 | Shared native helpers, mixed element types, incremental GC and write barriers | [Config](SetGC.ash.json) · [Inventory](coverage/SetGC.md) |
 | [Smoke](Smoke.mo) | 7 | Package imports, codec results, hash pipeline, both map modules and Core conversion | [Config](Smoke.ash.json) · [Inventory](#smoke-inventory) |
-| **Total** | **273** | | |
+| **Total** | **308** | | |
 
 `CoreAPI` runs its six source methods twice, once with Core containers and once
 with Fast containers. Every other configuration names one canister. The 12 new
-crypto and Bitcoin configurations contribute 71 executions to the earlier
-14-configuration, 202-execution inventory. A method may contain many vectors;
+crypto and Bitcoin configurations contribute 70 executions to the earlier
+20-configuration, 237-execution inventory. A method may contain many vectors;
 these totals count methods rather than individual assertions or vector rows.
 
 `Map` now exposes 61 functions and `pure/Map` 101; `MapConversions` and
@@ -156,9 +162,11 @@ This is finite behavioral coverage, not proof for every input, native branch,
 or runtime state. Compile-fail cases, expected traps, interpreter agreement,
 and upgrade checks remain in the separate compiler/plugin test suites. The
 inventories identify additional limits and which assertions cover each API.
-The accompanying native suite checks interpreter/Wasm agreement, crypto
-composition, and standalone package loading with missing or present runtimes.
-Rust kernels have separate unit tests against the pinned toolchain.
+The accompanying native suite also checks collection upgrades and composition
+across Queue, HistoryRing, IndexedPriorityQueue, Map, and Set. Packaging checks
+load active compiler-only packages with just their `.cmxs` component, and
+compare direct-file and directory loading. Rust kernels have separate unit
+tests against the pinned toolchain.
 
 Ash's instruction and heap figures measure correctness-test closures, usually
 including setup, independent oracles, and assertions. The asynchronous GC tests

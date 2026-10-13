@@ -44,5 +44,14 @@ let () = Plugin_codegen.register Plugin_codegen.{
         | Ok bytes -> Variant ("ok", Blob (Bytes.to_string bytes))
         | Error message -> Variant ("err", Text message)))},
      (module Generator));
+    ({Mo_values.Compute_plugin.
+      id = "candidx_estimate_size";
+      name = "candid_estimate_size";
+      arguments = Mo_values.Compute_plugin.Shared;
+      type_parameters = [];
+      result_type = (fun _ _ -> Ok Mo_types.Type.nat);
+      evaluate = Mo_values.Compute_plugin.pure (fun _ ts vs ->
+        Ok (Estimate.evaluate ts vs))},
+     (module Estimate));
   ];
 }

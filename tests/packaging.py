@@ -2,6 +2,7 @@
 """Package integration checks; run after scripts/build.sh in the Motoko Nix shell."""
 
 import argparse
+import json
 import os
 from pathlib import Path
 import re
@@ -118,6 +119,38 @@ def check_compatibility(work, source):
     assert "unsupported compute plugin" not in diagnostic, diagnostic
 
 
+def check_collections(work, manifests):
+    # Compiler-only packages must work using their native component alone.
+    # Copying just that component prevents a stray local runtime from masking
+    # an accidental runtime dependency in a generated collection operation.
+    packages = []
+    for manifest in manifests:
+        package = PACKAGES / manifest.parent.name
+        if json.loads(manifest.read_text()).get("runtime_crate") is None:
+            assert not (package / "runtime.wasm").exists(), package
+            copied = work / ("native-" + manifest.parent.name)
+            copied.mkdir()
+            shutil.copyfile(package / "plugin.cmxs", copied / "plugin.cmxs")
+            package = copied
+        packages.append(package)
+
+    core = os.environ.get("MOTOKO_CORE")
+    assert core, "MOTOKO_CORE must point to Core sources; use the Motoko Nix shell"
+    arguments = ["--package", "fast", ROOT / "packages/fast/src",
+                 "--package", "core", core]
+    source = ROOT / "tests/integration/run/collections.mo"
+    expected = compile_program(source, work / "collections.wasm",
+                               [PACKAGES / path.parent.name for path in manifests],
+                               arguments=arguments)
+    actual = compile_program(source, work / "collections-native.wasm", packages,
+                             arguments=arguments)
+    assert expected == actual, "compiler-only package copy changed emitted Wasm"
+    actual = compile_program(source, work / "collections-files.wasm",
+                             [path / "plugin.cmxs" for path in packages],
+                             arguments=arguments)
+    assert expected == actual, "directory and .cmxs loading changed emitted Wasm"
+
+
 def check_crypto_packages(work):
     # Each public primitive must load independently, and its interpreter must
     # remain usable without the canister's Wasm kernel being present.
@@ -168,6 +201,7 @@ def main():
         packages = [PACKAGES / manifest.parent.name for manifest in manifests]
         loaded = compile_program(empty, work / "loaded.wasm", packages)
         assert plain == loaded, "unused plugins changed the output module"
+        check_collections(work, manifests)
         check_crypto_packages(work)
 
         # Typechecking and interpretation can load a compiler component alone.

@@ -20,6 +20,185 @@ See the [package guide](packages/fast/) for the API and storage caveats:
 switching an import does not migrate existing Core container values or stable
 data.
 
+## Current collection performance
+
+The second optimization round reduces costs from the **already delivered
+plugins**, with the same compiler `92b1bde`, original RTS, and ABI 1.
+The Core 2.6.2 column is a separate library comparison; it is not the baseline
+for the round-two percentage. Counts are instructions for the whole batch.
+
+| Workload | Core instructions | Delivered plugin | Current plugin | Round-two change | Allocated B, Core / delivered / current |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Queue: 100,000 FIFO pairs at 100,000 entries | 167,500,519 | 135,668,063 | 118,680,429 | −12.52% | 9,600,000 / 440 / 408 |
+| Queue: pop 100,000 entries from front | 71,200,385 | 79,812,686 | 66,525,182 | −16.65% | 0 / 0 / 0 |
+| HistoryRing: 1,024 overwrites at capacity 1,000 | 1,901,859 | 1,713,443 | 1,150,243 | −32.87% | 98,304 / 0 / 0 |
+| HistoryRing: ten 32-entry tail pages at capacity 1,000 | 2,671,942 | 67,514 | 50,314 | −25.48% | 4,160 / 2,800 / 2,800 |
+| HistoryRing: drop 500 entries at capacity 1,000 | 285,553 | 64,206 | 4,221 | −93.43% | 0 / 0 / 0 |
+| IndexedPriorityQueue: 256 Nat pops at 100,000 entries | — | 2,087,900 | 1,766,338 | −15.40% | — / 10,240 / 10,240 |
+| IndexedPriorityQueue: 256 deadline pops at 100,000 entries | — | 3,749,491 | 3,620,488 | −3.44% | — / 10,240 / 10,240 |
+
+These rows use three identical trials. Queue and HistoryRing have matched Core
+Queue controls. History's Core page adapter scans forward, while the ring uses
+its sequence index; Core can use reverse iteration for a tail-only page. IPQ
+rows use deterministically shuffled priorities, with scalar Nat ordering and a
+custom deadline-record comparator respectively. There is no fresh IPQ-versus-Core
+run in this round; its previous library comparison remains below. Reports
+include other sizes/distributions, repeated controls, and exact protocols.
+Allocation includes temporary garbage and results, not retained live memory.
+
+Tradeoffs remain. A fresh Queue singleton costs **2,831 versus Core's 1,307
+instructions**, allocating **408 versus 96 B**; 16 pushes cost **10,976 versus
+16,202 instructions**. Queue peeks, forward iteration, and full-chunk LIFO
+churn still lose to Core. One-item HistoryRing pages and some nonzero drops
+add small fixed instruction costs versus the delivered plugin. IPQ has small
+push/equal-key regressions and unchanged allocation; generic callbacks retain
+their observable behavior. Layout and algorithm gains can also be implemented
+in Motoko; these measurements do not isolate plugin-boundary overhead.
+
+Queue's matched heap probe with 4,096 separately allocated 4 KiB payloads fell from
+**17,095,680 to 17,091,584 B** above its empty baseline: 32 B saved per chunk.
+Its retained empty chunk after full drain shrank from 440 to 408 B;
+`clear` returns to baseline.
+These are controlled RTS heap observations, not a general live-memory claim.
+Queue's packed metadata **changes its private stable storage shape**; old
+experimental queues need explicit migration or recreation. No legacy adapter
+was added. HistoryRing and IPQ retain their existing representations.
+
+Final reports: [Queue](benchmarks/queue/OPTIMIZATION-ROUND-2.md),
+[HistoryRing](benchmarks/history-ring/round2/README.md),
+[IndexedPriorityQueue](benchmarks/indexed-priority-queue/round2/README.md).
+Algorithm research: [Queue](benchmarks/queue/algorithm-research-round-2.md),
+[HistoryRing](benchmarks/history-ring/algorithm-research-round-2.md),
+[IndexedPriorityQueue](benchmarks/indexed-priority-queue/algorithm-research-round-2.md).
+
+In the matched fourcans application screen, round-two Queue/HistoryRing save
+**0.668% of instructions** (154.731 → 153.698 billion) and **0.043% of
+allocation** (4.205152 → 4.203336 GB). Completion remains **57 rounds**;
+throughput, latency, and aggregate linear-memory capacity are unchanged.
+Physical calls rise from 2,423 to 2,429. This is one candidate run against an
+inherited, byte-identical verified baseline, with unchanged settings and all
+correctness checks passing; IPQ is unused. The
+[application report](https://github.com/Neutrinomic/takt/blob/main/examples/reactor/fourcans/test/results/tuning/fast-collections-round-2/README.md)
+includes sampled heap/GC counters and provenance. The original integration's
+76-to-57-round gain below is historical, not an additional round-two gain.
+
+The [current-library integration recheck](benchmarks/library-integration-round2/README.md)
+separates plugin updates from structure changes: Takt and Reactor retain Map
+deadlines; Takt adopts inline Queue reuse and Rechain adopts an insertion FIFO.
+
+<details>
+<summary>First-delivery application and Core comparisons (before optimization round two)</summary>
+
+## Application workload
+
+Using `Queue` and `HistoryRing` in Takt and Reactor cut full-drain completion
+time by **25%** in the matched fourcans benchmark, with the same compiler, RTS,
+and workload settings. The candidate changes five Takt files and two Reactor
+Queue imports. This comparison includes the collection algorithms and their
+integration; it does not isolate plugin call overhead.
+
+| Metric | Control | Queue + HistoryRing | Change |
+| --- | ---: | ---: | ---: |
+| Completion rounds | 76 | 57 | −25.00% |
+| Endpoint messages/s, full drain | 3,947.37 | 5,263.16 | +33.33% |
+| Physical calls | 2,136 | 2,423 | +13.44% |
+| Instructions | 199.17 billion | 154.73 billion | −22.31% |
+| Workload allocation | 4.708 GB | 4.205 GB | −10.68% |
+| Peak sampled heap, single canister | 312.10 MB | 200.99 MB | −35.60% |
+| Final aggregate linear memory | 6.176 GB | 4.295 GB | −30.46% |
+| Final aggregate sampled heap | 2.069 GB | 3.193 GB | **+54.29%** |
+
+Decimal units. PocketIC ran 16 canisters with four execution partitions,
+1,000 submitted root workflows/s for 30 feed rounds, then full drain, using the
+existing tuned parameters. All 180,000 endpoint messages, 27,600 blocks,
+594,000 visits, and 1,024 canonical-block/tip checks passed without traps or
+rejections. This is one matched candidate observation; a fresh control
+reproduced the original control's counters exactly. These are simulated workload
+rates, not mainnet throughput estimates.
+
+The heap samples include unreclaimed garbage and differ in collector progress;
+they are **not retained live memory**. The final aggregate heap increased even
+though peak sampled heap and linear memory decreased. Rechain source is
+unchanged in this comparison; IndexedPriorityQueue is loaded but unused.
+The [full report and reproduction evidence](https://github.com/Neutrinomic/takt/blob/main/examples/reactor/fourcans/test/results/tuning/fast-collections/README.md)
+record exact source, compiler, RTS, plugin, and harness hashes.
+
+## Queue, history, and priority costs
+
+PocketIC comparisons with Core **2.6.2**, compiler `92b1bde`, and the original
+release RTS. Each row measures the whole operation or batch shown; setup and
+validation are outside the measured interval. Allocated bytes include results
+and temporary garbage, not retained heap.
+
+| Operation / workload | Native baseline | Native instructions | Plugin instructions | Native / plugin | Allocated B, native / plugin |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Queue, 100,000 pushes | Core Queue | 99,300,314 | 64,828,362 | 1.53× | 9,600,000 / 1,375,000 |
+| Queue, 100,000 FIFO pairs at 100,000 entries | Core Queue | 167,500,519 | 135,668,063 | 1.23× | 9,600,000 / 440 |
+| Queue `toArray`, 100,000 entries | Core Queue | 27,201,860 | 8,785,756 | 3.10× | 800,160 / 800,024 |
+| History, 10,000 overwrites at capacity 10,000 | Core Queue append-and-trim | 18,570,291 | 16,730,291 | 1.11× | 960,000 / 0 |
+| History, ten 32-entry tail pages at capacity 10,000 | Core Queue forward scan | 26,431,942 | 67,514 | 391.50× | 4,160 / 2,800 |
+| Priority queue, 256 pops at 100,000 Nat entries | Core PriorityQueue | 6,828,679 | 2,055,451 | 3.32× | 312,344 / 10,240 |
+| Priority queue, 256 reschedules at 100,000 Nat entries | Core Map index adapter | 6,709,338 | 369,435 | 18.16× | 256,360 / 12,288 |
+
+Queue and HistoryRing rows are medians of three identical trials. These IPQ
+100,000-entry rows are single-trial observations; the report also repeats
+selected 10,000-entry cases with identical counters. IPQ setup uses descending
+priorities, and reschedules target the first inserted handles; this is a
+specific workload, not a randomized average-case claim. Core PriorityQueue has
+no cancellation/rescheduling handles, so those operations use a Map adapter.
+
+Queue's storage savings come from its chunked layout, which can also be written
+in Motoko. History paging compares indexed access with Takt Trace's previous
+forward scan; Core `peekBack` is already O(1), and reverse iteration can improve
+a tail-only scan. These compare complete implementations, not isolated plugin
+boundary costs.
+
+Small queues have a crossover: a fresh singleton push costs **3,002 versus
+1,307 instructions**, allocating **440 versus 96 bytes**; 16 pushes cost
+**11,702 versus 16,202 instructions**. Queue peek/pop, forward iteration, and
+full-chunk LIFO churn remain slower than Core in this matrix. IPQ also has
+tradeoffs: compared with Fast Map, pop costs 7.2% more at 100,000 Nat entries
+and 25.3% more at 10,000 composite deadlines. Its `clear` visits every handle,
+and handle/entry storage can cost more heap than simpler containers.
+
+Separate memory probes check reference release across messages. Queue's sampled
+RTS heap above a matched empty baseline was **17,095,680 versus 17,432,576 B**
+with 4,096 separately allocated 4 KiB payloads; both returned to baseline after `clear`.
+HistoryRing retained exactly 1,024 slots and 1 MiB of payload after 65,536
+appends at capacity 1,024, then zero after `clear`. Its Wasm high-water matched
+Core and its historical post-GC heap high-water was higher. IPQ's sampled heap
+delta at 100,000 Nat entries was **16,579,360 versus 6,531,112 B** for Core
+PriorityQueue, which has no handle index. These RTS samples include runtime
+state and possibly unreclaimed garbage; they do not establish retained live
+bytes or a universal memory-footprint improvement.
+
+Full size/operation matrices, memory protocols, and three measured optimization
+passes: [Queue](benchmarks/queue/README.md),
+[HistoryRing](benchmarks/history-ring/README.md), and
+[IndexedPriorityQueue](benchmarks/indexed-priority-queue/README.md).
+
+</details>
+
+## Candid size estimates
+
+When exact bytes are unnecessary, `CandidX.estimateSize(value)` returns a fast,
+conservative bound instead of allocating a Candid Blob. PocketIC measurements
+on the plugin PR compiler compare it with `(to_candid(value)).size()`:
+
+| Value | Native instructions | Estimate instructions | Native / estimate | Allocated bytes, native / estimate |
+| --- | ---: | ---: | ---: | ---: |
+| Fourcans-shaped Fanout request | 10,542 | 2,673 | 3.94× | 952 / 0 |
+| Blob, 1 MiB | 2,098,590 | 481 | 4,362.97× | 2,097,256 / 0 |
+| Fixed-width records, 10,000 | 8,111,467 | 585 | 13,865.76× | 420,152 / 0 |
+| Text array, 1,024 | 328,822 | 79,477 | 4.14× | 24,664 / 0 |
+
+Three identical trials per case. The estimate has slack: these are admission
+checks with different accuracy contracts, not equivalent serialization work.
+Near a limit, estimates can reject values that fit; function references and
+depth/work limits return a rejection-sized sentinel. The
+[full report](benchmarks/candid-size/README.md) includes returned sizes,
+big integers, recursive values, raw samples, and reproduction instructions.
+
 ## Automatic comparator costs
 
 Ordinary `Nat64.compare` lookups at **100,000 entries** now use **25.5–39.6%
@@ -689,6 +868,9 @@ available as historical evidence.
 | [Base58](plugins/base58/) | `Base58.encode`, `decode`; `Base58Check` | Bitcoin Base58 and composed double-SHA256 checksums |
 | [Bech32](plugins/bech32/) | `Bech32.encode`, `decode`; `Segwit` | Bech32/Bech32m, bit conversion, and validated witness addresses |
 | [BLS12-381](plugins/bls12-381/) | `BLS12381.g1Mul`, `pairingCheck`, `verifyIC`, `verifyEthereum` | Group arithmetic, MSM, hash-to-curve, and distinct IC/Ethereum BLS profiles |
+| [Queue](plugins/queue/) | `Queue.pushBack`, `Queue.popFront` | Core-compatible double-ended queue with lazy managed chunks |
+| [History ring](plugins/history-ring/) | `HistoryRing.append`, `HistoryRing.get`, `HistoryRing.page` | Bounded history with direct sequence lookup and shared payloads |
+| [Indexed priority queue](plugins/indexed-priority-queue/) | `IndexedPriorityQueue.push`, `reschedule`, `peekPriority` | Priority scheduling with cancellation and rescheduling handles |
 
 The compiler support is proposed in
 [Motoko PR #6443](https://github.com/caffeinelabs/motoko/pull/6443).
@@ -727,6 +909,9 @@ bin/moc --plugin ../plugins/dist/candidx \
         --plugin ../plugins/dist/mutable-map \
         --plugin ../plugins/dist/mutable-set \
         --plugin ../plugins/dist/pure-set \
+        --plugin ../plugins/dist/queue \
+        --plugin ../plugins/dist/history-ring \
+        --plugin ../plugins/dist/indexed-priority-queue \
         --package fast ../plugins/packages/fast/src \
         --package core ../plugins/packages/fast/.mops/core@2.5.0/src \
         app.mo -o app.wasm
@@ -774,7 +959,7 @@ imports, while `--plugin` loads the matching compiler extension.
 
 The build creates a matching dynamically linked native compiler and independent
 packages in `dist/<name>/`, each containing `plugin.cmxs`. Kernel-based packages
-also contain `runtime.wasm`; the map and set packages emit managed Wasm directly.
+also contain `runtime.wasm`; the collection packages emit managed Wasm directly.
 To build selected plugins, append their names:
 
 ```sh
@@ -814,10 +999,16 @@ plugins/
   mutable-set/
     compiler/         key-only B-tree operations and interpreter reference
     tests/            structural updates, type rejection, and invariants
+  queue/
+    compiler/         managed chunk operations and interpreter reference
+  history-ring/
+    compiler/         sequence-indexed retention and interpreter reference
+  indexed-priority-queue/
+    compiler/         indexed heap operations and interpreter reference
   sha256/
     ...
 packages/fast/        Mops package metadata, README, and license
-  src/                codec, hash, cryptography, Bitcoin, Map, Set modules
+  src/                codec, hash, Map, Set, Queue, HistoryRing, IndexedPriorityQueue modules
     pure/             persistent Map and Set libraries
   tests/              public import, rejection, and trap checks
     ash/              public API and GC canister tests on PocketIC
@@ -847,8 +1038,8 @@ package loading, native kernels, and GC behavior. The
 [benchmark guide](benchmarks/README.md) covers PocketIC instruction counts and
 the CandidX repository's conformance and fuzz tests.
 
-The [public module suite](packages/fast/tests/ash/) contains **273 Ash checks** across
-seventeen plugins and shared Core/Fast API consumers: reference models,
+The [public module suite](packages/fast/tests/ash/) contains **308 Ash checks** across
+twenty plugins and shared Core/Fast API consumers: reference models,
 independent codec/hash vectors, malformed inputs, boundary cases, structural sharing,
 composition, and incremental GC. Run from this repository with an Ash toolchain
 using the matching compiler:

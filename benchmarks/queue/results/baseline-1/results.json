@@ -1,0 +1,4761 @@
+{
+  "recorded_utc": "2026-10-11T23:58:37.831Z",
+  "label": "baseline-1",
+  "trials": 1,
+  "build": {
+    "label": "baseline-1",
+    "command": [
+      "/home/devbox/.local/lib/motoko-compute/moc",
+      "--plugin",
+      "/srv/shared/code/motoko_experiments/plugins/dist/queue",
+      "--package",
+      "fast",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/queue/_out/stage/fast",
+      "--package",
+      "core",
+      "/srv/shared/code/takt/.mops/core@2.6.2/src",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/queue/_out/stage/main.mo",
+      "-o",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/queue/_out/stage/main.wasm"
+    ],
+    "compiler_version": "Motoko compiler (source 2.0.0-14-g92b1bdecb)",
+    "rts_environment": {
+      "MOC_RELEASE_RTS": "/home/devbox/.local/lib/motoko-compute/mo-rts.wasm",
+      "MOC_DEBUG_RTS": "/home/devbox/.local/lib/motoko-compute/mo-rts-debug.wasm"
+    },
+    "core_source_sha256": "a355944d04690e2da5e26c5db957019b19a4c961cf2556af157f0000075e6f5e",
+    "toolchain_sha256": {
+      "/home/devbox/.local/lib/motoko-compute/moc": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+      "/home/devbox/.local/lib/motoko-compute/mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+      "/home/devbox/.local/lib/motoko-compute/mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+    },
+    "archive_sha256": {
+      "dist/build.json": "4a969b17ec760688ee3f6594a30edf7c71ac3806940ce8d40779a4adee0f7aaf",
+      "dist/plugin.cmxs": "88d963784bfe5846db23fe0e25913478a51fff046d7ee0f0eab0294b96c378a7",
+      "main.wasm": "a4467e764352831bef9a5053dfe38df449b4d7d3c8e2eda280f0563d33cf8804",
+      "sources/Queue.mo": "5a891f003021129a6be9b89d8d858467ca3f7b7ad02138b8d0d838dfd28209d9",
+      "sources/build.py": "e25db21ea3ead1c6e8b3ba70a805f3e9cd006eb56a3bb532c9db2fff27084b46",
+      "sources/main.mo": "3f0c9fdd1fa3d2dbfaca9ca0a6d4f943fe0cf4b32bafed0c4f8b684347b205a0",
+      "sources/plugin/README.md": "5cb13d968eeb7e8a97d4248434b0967cc71c6ba56e350e08853515863c784900",
+      "sources/plugin/compiler/generator.ml": "7babfec05900305e91d06665b5f9fc878abc5f1b1820788c324b1a13ea8b887f",
+      "sources/plugin/compiler/reference.ml": "38ae8387168bd8c21007d4186a01b2338ef6910d6acac31bd182b3014243874a",
+      "sources/plugin/compiler/register.ml": "215312a5b2b6cfc86e13baf80867978e5718a60bbe693c68d59c2eeebb6f8195",
+      "sources/plugin/compiler/schema.ml": "19bebf72f5ae2c525da100fc3e23e2ce595d7f70b4e1b83453bdb1e200720c56",
+      "sources/plugin/plugin.json": "5800a0a3defe53e359ac817d2efcb5b4efd32d3d65ec6a97630180baee0d909e",
+      "sources/run.mjs": "0f591cb0d0182768c7b6c6560584928fda77e3c82fd6eddc328b4e8b1bfd6fc7"
+    }
+  },
+  "runtime": {
+    "bun": "1.2.13",
+    "pocket_ic_version": "pocket-ic-server 10.0.0",
+    "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990",
+    "pic_js_version": "0.16.1"
+  },
+  "methodology": "Same canister binary, fresh canister per operation/size/trial. Implementations alternate by trial. Configuration is outside measured scope, clears both queues; four forced GC increments precede each measurement. Raw performanceCounter(0) and allocation deltas include dispatch/loop/checksum overhead; no reply or end-message GC. Live memory is measured separately by memory probe. Counts match and complete post-operation array values are checked against a JS model. Payloads are compact Nat values.",
+  "cases": [
+    {
+      "operation": "push_back",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 339,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 346,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 339,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 346,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9797687861271677
+    },
+    {
+      "operation": "push_front",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 369,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 376,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 369,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 376,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9813829787234043
+    },
+    {
+      "operation": "pop_front",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 399,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 406,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 399,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 406,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9827586206896551
+    },
+    {
+      "operation": "pop_back",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 429,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 436,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 429,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 436,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9839449541284404
+    },
+    {
+      "operation": "peek_front",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 771,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 783,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 771,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 783,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9846743295019157
+    },
+    {
+      "operation": "peek_back",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 801,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 813,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 801,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 813,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.985239852398524
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 0,
+            "instructions": 1678855,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 0,
+            "instructions": 1637930,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 0,
+        "instructions": 1678855,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 0,
+        "instructions": 1637930,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0249858052541927
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 0,
+            "instructions": 1678885,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 0,
+            "instructions": 1578568,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 0,
+        "instructions": 1678885,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 0,
+        "instructions": 1578568,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.063549368795009
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 0,
+            "instructions": 1748035,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 0,
+            "instructions": 1707110,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 0,
+        "instructions": 1748035,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 0,
+        "instructions": 1707110,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.023973264757397
+    },
+    {
+      "operation": "values",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 0,
+            "instructions": 1159,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 0,
+            "instructions": 1566,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 0,
+        "instructions": 1159,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 0,
+        "instructions": 1566,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7401021711366539
+    },
+    {
+      "operation": "reverse_values",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 192,
+            "size": 0,
+            "instructions": 1733,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 0,
+            "instructions": 1596,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 192,
+        "size": 0,
+        "instructions": 1733,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 0,
+        "instructions": 1596,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0858395989974938
+    },
+    {
+      "operation": "from_array",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 120,
+            "size": 0,
+            "instructions": 1416,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 272,
+            "size": 0,
+            "instructions": 2182,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 120,
+        "size": 0,
+        "instructions": 1416,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 272,
+        "size": 0,
+        "instructions": 2182,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6489459211732356
+    },
+    {
+      "operation": "to_array",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 160,
+            "size": 0,
+            "instructions": 1645,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 232,
+            "size": 0,
+            "instructions": 2018,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 160,
+        "size": 0,
+        "instructions": 1645,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 232,
+        "size": 0,
+        "instructions": 2018,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8151635282457879
+    },
+    {
+      "operation": "clone",
+      "size": 0,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 216,
+            "size": 0,
+            "instructions": 2034,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 288,
+            "size": 0,
+            "instructions": 2449,
+            "operations": 0,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 216,
+        "size": 0,
+        "instructions": 2034,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 288,
+        "size": 0,
+        "instructions": 2449,
+        "operations": 0,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8305430788076766
+    },
+    {
+      "operation": "push_back",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 1,
+            "instructions": 1307,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 1,
+            "instructions": 3150,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 1,
+        "instructions": 1307,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 1,
+        "instructions": 3150,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.4149206349206349
+    },
+    {
+      "operation": "push_front",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 1,
+            "instructions": 1337,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 1,
+            "instructions": 3238,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 1,
+        "instructions": 1337,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 1,
+        "instructions": 3238,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.4129092032118592
+    },
+    {
+      "operation": "pop_front",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 1100,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 1305,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 1100,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 1305,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.842911877394636
+    },
+    {
+      "operation": "pop_back",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 1130,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 1277,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 1130,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 1277,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.884886452623336
+    },
+    {
+      "operation": "peek_front",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 817,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 996,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 817,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 996,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.820281124497992
+    },
+    {
+      "operation": "peek_back",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 847,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 1030,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 847,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 1030,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8223300970873786
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1,
+            "instructions": 1718791,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 1584654,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1,
+        "instructions": 1718791,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 1584654,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.084647500337613
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1,
+            "instructions": 1718821,
+            "operations": 1024,
+            "checksum": 524800,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 1525292,
+            "operations": 1024,
+            "checksum": 524800,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1,
+        "instructions": 1718821,
+        "operations": 1024,
+        "checksum": 524800,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 1525292,
+        "operations": 1024,
+        "checksum": 524800,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.126879967901228
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1,
+            "instructions": 1787971,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1,
+            "instructions": 1653834,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1,
+        "instructions": 1787971,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1,
+        "instructions": 1653834,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0811066890631102
+    },
+    {
+      "operation": "values",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 1,
+            "instructions": 1435,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 1,
+            "instructions": 2385,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 1,
+        "instructions": 1435,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 1,
+        "instructions": 2385,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6016771488469602
+    },
+    {
+      "operation": "reverse_values",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 232,
+            "size": 1,
+            "instructions": 2279,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 1,
+            "instructions": 2507,
+            "operations": 1,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 232,
+        "size": 1,
+        "instructions": 2279,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 1,
+        "instructions": 2507,
+        "operations": 1,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9090546469884324
+    },
+    {
+      "operation": "from_array",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 216,
+            "size": 1,
+            "instructions": 2281,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 712,
+            "size": 1,
+            "instructions": 5069,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 216,
+        "size": 1,
+        "instructions": 2281,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 712,
+        "size": 1,
+        "instructions": 5069,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.449990136121523
+    },
+    {
+      "operation": "to_array",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 168,
+            "size": 1,
+            "instructions": 2112,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 240,
+            "size": 1,
+            "instructions": 3017,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 168,
+        "size": 1,
+        "instructions": 2112,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 240,
+        "size": 1,
+        "instructions": 3017,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7000331455087836
+    },
+    {
+      "operation": "clone",
+      "size": 1,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 312,
+            "size": 1,
+            "instructions": 3062,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 728,
+            "size": 1,
+            "instructions": 5856,
+            "operations": 1,
+            "checksum": 1,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 312,
+        "size": 1,
+        "instructions": 3062,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 728,
+        "size": 1,
+        "instructions": 5856,
+        "operations": 1,
+        "checksum": 1,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.5228825136612022
+    },
+    {
+      "operation": "push_back",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 2976,
+            "size": 31,
+            "instructions": 31097,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 31,
+            "instructions": 24990,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 2976,
+        "size": 31,
+        "instructions": 31097,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 31,
+        "instructions": 24990,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.2443777511004401
+    },
+    {
+      "operation": "push_front",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 2976,
+            "size": 31,
+            "instructions": 31127,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 31,
+            "instructions": 26818,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 2976,
+        "size": 31,
+        "instructions": 31127,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 31,
+        "instructions": 26818,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1606756655977328
+    },
+    {
+      "operation": "pop_front",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 22550,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 26775,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 22550,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 26775,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.842203548085901
+    },
+    {
+      "operation": "pop_back",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 22580,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 25007,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 22580,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 25007,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9029471747910585
+    },
+    {
+      "operation": "peek_front",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 11557,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 16896,
+            "operations": 31,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 11557,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 16896,
+        "operations": 31,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6840080492424242
+    },
+    {
+      "operation": "peek_back",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 11587,
+            "operations": 31,
+            "checksum": 930,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 17050,
+            "operations": 31,
+            "checksum": 930,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 11587,
+        "operations": 31,
+        "checksum": 930,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 17050,
+        "operations": 31,
+        "checksum": 930,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6795894428152492
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 31,
+            "instructions": 1718791,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 1584654,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 31,
+        "instructions": 1718791,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 1584654,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.084647500337613
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 31,
+            "instructions": 1718821,
+            "operations": 1024,
+            "checksum": 555520,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 1525292,
+            "operations": 1024,
+            "checksum": 555520,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 31,
+        "instructions": 1718821,
+        "operations": 1024,
+        "checksum": 555520,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 1525292,
+        "operations": 1024,
+        "checksum": 555520,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.126879967901228
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 31,
+            "instructions": 1787971,
+            "operations": 1024,
+            "checksum": 554496,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 31,
+            "instructions": 1653834,
+            "operations": 1024,
+            "checksum": 554496,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 31,
+        "instructions": 1787971,
+        "operations": 1024,
+        "checksum": 554496,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 31,
+        "instructions": 1653834,
+        "operations": 1024,
+        "checksum": 554496,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0811066890631102
+    },
+    {
+      "operation": "values",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 31,
+            "instructions": 9715,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 31,
+            "instructions": 25005,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 31,
+        "instructions": 9715,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 31,
+        "instructions": 25005,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.38852229554089185
+    },
+    {
+      "operation": "reverse_values",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 1432,
+            "size": 31,
+            "instructions": 18659,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 31,
+            "instructions": 27887,
+            "operations": 31,
+            "checksum": 465,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 1432,
+        "size": 31,
+        "instructions": 18659,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 31,
+        "instructions": 27887,
+        "operations": 31,
+        "checksum": 465,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6690931258292394
+    },
+    {
+      "operation": "from_array",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3096,
+            "size": 31,
+            "instructions": 29101,
+            "operations": 31,
+            "checksum": 31,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 712,
+            "size": 31,
+            "instructions": 29399,
+            "operations": 31,
+            "checksum": 31,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3096,
+        "size": 31,
+        "instructions": 29101,
+        "operations": 31,
+        "checksum": 31,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 712,
+        "size": 31,
+        "instructions": 29399,
+        "operations": 31,
+        "checksum": 31,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9898636008027484
+    },
+    {
+      "operation": "to_array",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 408,
+            "size": 31,
+            "instructions": 10272,
+            "operations": 31,
+            "checksum": 61,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 480,
+            "size": 31,
+            "instructions": 25187,
+            "operations": 31,
+            "checksum": 61,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 408,
+        "size": 31,
+        "instructions": 10272,
+        "operations": 31,
+        "checksum": 61,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 480,
+        "size": 31,
+        "instructions": 25187,
+        "operations": 31,
+        "checksum": 61,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.4078294358200659
+    },
+    {
+      "operation": "clone",
+      "size": 31,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3192,
+            "size": 31,
+            "instructions": 34652,
+            "operations": 31,
+            "checksum": 31,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 728,
+            "size": 31,
+            "instructions": 43836,
+            "operations": 31,
+            "checksum": 31,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3192,
+        "size": 31,
+        "instructions": 34652,
+        "operations": 31,
+        "checksum": 31,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 728,
+        "size": 31,
+        "instructions": 43836,
+        "operations": 31,
+        "checksum": 31,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7904918331964595
+    },
+    {
+      "operation": "push_back",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3072,
+            "size": 32,
+            "instructions": 32090,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 32,
+            "instructions": 25718,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3072,
+        "size": 32,
+        "instructions": 32090,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 32,
+        "instructions": 25718,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.2477642118360681
+    },
+    {
+      "operation": "push_front",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3072,
+            "size": 32,
+            "instructions": 32120,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 440,
+            "size": 32,
+            "instructions": 27604,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3072,
+        "size": 32,
+        "instructions": 32120,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 440,
+        "size": 32,
+        "instructions": 27604,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.163599478336473
+    },
+    {
+      "operation": "pop_front",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 23265,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 27624,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 23265,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 27624,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8422024326672459
+    },
+    {
+      "operation": "pop_back",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 23295,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 25798,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 23295,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 25798,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9029769749592992
+    },
+    {
+      "operation": "peek_front",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 32,
+            "instructions": 11915,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 32,
+            "instructions": 17426,
+            "operations": 32,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 32,
+        "instructions": 11915,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 32,
+        "instructions": 17426,
+        "operations": 32,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6837484218983129
+    },
+    {
+      "operation": "peek_back",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 32,
+            "instructions": 11945,
+            "operations": 32,
+            "checksum": 992,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 32,
+            "instructions": 17584,
+            "operations": 32,
+            "checksum": 992,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 32,
+        "instructions": 11945,
+        "operations": 32,
+        "checksum": 992,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 32,
+        "instructions": 17584,
+        "operations": 32,
+        "checksum": 992,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.679310737033667
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 32,
+            "instructions": 1718791,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14080,
+            "size": 32,
+            "instructions": 1659630,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 32,
+        "instructions": 1718791,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14080,
+        "size": 32,
+        "instructions": 1659630,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.035647102064918
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 32,
+            "instructions": 1718821,
+            "operations": 1024,
+            "checksum": 556544,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 450560,
+            "size": 32,
+            "instructions": 3924524,
+            "operations": 1024,
+            "checksum": 556544,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 32,
+        "instructions": 1718821,
+        "operations": 1024,
+        "checksum": 556544,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 450560,
+        "size": 32,
+        "instructions": 3924524,
+        "operations": 1024,
+        "checksum": 556544,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.43796929258172457
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 32,
+            "instructions": 1787971,
+            "operations": 1024,
+            "checksum": 555520,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 225280,
+            "size": 32,
+            "instructions": 2853450,
+            "operations": 1024,
+            "checksum": 555520,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 32,
+        "instructions": 1787971,
+        "operations": 1024,
+        "checksum": 555520,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 225280,
+        "size": 32,
+        "instructions": 2853450,
+        "operations": 1024,
+        "checksum": 555520,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6265997301512205
+    },
+    {
+      "operation": "values",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 32,
+            "instructions": 9991,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 32,
+            "instructions": 25759,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 32,
+        "instructions": 9991,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 32,
+        "instructions": 25759,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3878644357312007
+    },
+    {
+      "operation": "reverse_values",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 1472,
+            "size": 32,
+            "instructions": 19205,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 32,
+            "instructions": 28733,
+            "operations": 32,
+            "checksum": 496,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 1472,
+        "size": 32,
+        "instructions": 19205,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 32,
+        "instructions": 28733,
+        "operations": 32,
+        "checksum": 496,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6683952250026103
+    },
+    {
+      "operation": "from_array",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3192,
+            "size": 32,
+            "instructions": 29995,
+            "operations": 32,
+            "checksum": 32,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 712,
+            "size": 32,
+            "instructions": 30210,
+            "operations": 32,
+            "checksum": 32,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3192,
+        "size": 32,
+        "instructions": 29995,
+        "operations": 32,
+        "checksum": 32,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 712,
+        "size": 32,
+        "instructions": 30210,
+        "operations": 32,
+        "checksum": 32,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9928831512744124
+    },
+    {
+      "operation": "to_array",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 416,
+            "size": 32,
+            "instructions": 10544,
+            "operations": 32,
+            "checksum": 63,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 488,
+            "size": 32,
+            "instructions": 25926,
+            "operations": 32,
+            "checksum": 63,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 416,
+        "size": 32,
+        "instructions": 10544,
+        "operations": 32,
+        "checksum": 63,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 488,
+        "size": 32,
+        "instructions": 25926,
+        "operations": 32,
+        "checksum": 63,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.4066959808686261
+    },
+    {
+      "operation": "clone",
+      "size": 32,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3288,
+            "size": 32,
+            "instructions": 35705,
+            "operations": 32,
+            "checksum": 32,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 728,
+            "size": 32,
+            "instructions": 45102,
+            "operations": 32,
+            "checksum": 32,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3288,
+        "size": 32,
+        "instructions": 35705,
+        "operations": 32,
+        "checksum": 32,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 728,
+        "size": 32,
+        "instructions": 45102,
+        "operations": 32,
+        "checksum": 32,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7916500376923418
+    },
+    {
+      "operation": "push_back",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3168,
+            "size": 33,
+            "instructions": 33083,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 880,
+            "size": 33,
+            "instructions": 28577,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3168,
+        "size": 33,
+        "instructions": 33083,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 880,
+        "size": 33,
+        "instructions": 28577,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1576792525457535
+    },
+    {
+      "operation": "push_front",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3168,
+            "size": 33,
+            "instructions": 33113,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 880,
+            "size": 33,
+            "instructions": 30521,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3168,
+        "size": 33,
+        "instructions": 33113,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 880,
+        "size": 33,
+        "instructions": 30521,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0849251335146293
+    },
+    {
+      "operation": "pop_front",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 23980,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 28685,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 23980,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 28685,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8359769914589507
+    },
+    {
+      "operation": "pop_back",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 24010,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 26801,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 24010,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 26801,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8958620946979591
+    },
+    {
+      "operation": "peek_front",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 33,
+            "instructions": 12273,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 33,
+            "instructions": 17956,
+            "operations": 33,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 33,
+        "instructions": 12273,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 33,
+        "instructions": 17956,
+        "operations": 33,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6835041211851192
+    },
+    {
+      "operation": "peek_back",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 33,
+            "instructions": 12303,
+            "operations": 33,
+            "checksum": 1056,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 33,
+            "instructions": 18118,
+            "operations": 33,
+            "checksum": 1056,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 33,
+        "instructions": 12303,
+        "operations": 33,
+        "checksum": 1056,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 33,
+        "instructions": 18118,
+        "operations": 33,
+        "checksum": 1056,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6790484600949332
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 33,
+            "instructions": 1718791,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14080,
+            "size": 33,
+            "instructions": 1659630,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 33,
+        "instructions": 1718791,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14080,
+        "size": 33,
+        "instructions": 1659630,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.035647102064918
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 33,
+            "instructions": 1718821,
+            "operations": 1024,
+            "checksum": 557568,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 33,
+            "instructions": 1525292,
+            "operations": 1024,
+            "checksum": 557568,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 33,
+        "instructions": 1718821,
+        "operations": 1024,
+        "checksum": 557568,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 33,
+        "instructions": 1525292,
+        "operations": 1024,
+        "checksum": 557568,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.126879967901228
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 33,
+            "instructions": 1787971,
+            "operations": 1024,
+            "checksum": 556544,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 450560,
+            "size": 33,
+            "instructions": 4053066,
+            "operations": 1024,
+            "checksum": 556544,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 33,
+        "instructions": 1787971,
+        "operations": 1024,
+        "checksum": 556544,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 450560,
+        "size": 33,
+        "instructions": 4053066,
+        "operations": 1024,
+        "checksum": 556544,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.44114036139554597
+    },
+    {
+      "operation": "values",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 33,
+            "instructions": 10267,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 33,
+            "instructions": 26578,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 33,
+        "instructions": 10267,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 33,
+        "instructions": 26578,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3862969373165776
+    },
+    {
+      "operation": "reverse_values",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 1512,
+            "size": 33,
+            "instructions": 19751,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 33,
+            "instructions": 29644,
+            "operations": 33,
+            "checksum": 528,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 1512,
+        "size": 33,
+        "instructions": 19751,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 33,
+        "instructions": 29644,
+        "operations": 33,
+        "checksum": 528,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6662731075428417
+    },
+    {
+      "operation": "from_array",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3288,
+            "size": 33,
+            "instructions": 30889,
+            "operations": 33,
+            "checksum": 33,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1152,
+            "size": 33,
+            "instructions": 33152,
+            "operations": 33,
+            "checksum": 33,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3288,
+        "size": 33,
+        "instructions": 30889,
+        "operations": 33,
+        "checksum": 33,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1152,
+        "size": 33,
+        "instructions": 33152,
+        "operations": 33,
+        "checksum": 33,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9317386583011583
+    },
+    {
+      "operation": "to_array",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 424,
+            "size": 33,
+            "instructions": 10816,
+            "operations": 33,
+            "checksum": 65,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 496,
+            "size": 33,
+            "instructions": 26730,
+            "operations": 33,
+            "checksum": 65,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 424,
+        "size": 33,
+        "instructions": 10816,
+        "operations": 33,
+        "checksum": 65,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 496,
+        "size": 33,
+        "instructions": 26730,
+        "operations": 33,
+        "checksum": 65,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.4046389824167602
+    },
+    {
+      "operation": "clone",
+      "size": 33,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 3384,
+            "size": 33,
+            "instructions": 36758,
+            "operations": 33,
+            "checksum": 33,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1168,
+            "size": 33,
+            "instructions": 48564,
+            "operations": 33,
+            "checksum": 33,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 3384,
+        "size": 33,
+        "instructions": 36758,
+        "operations": 33,
+        "checksum": 33,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1168,
+        "size": 33,
+        "instructions": 48564,
+        "operations": 33,
+        "checksum": 33,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7568981138291738
+    },
+    {
+      "operation": "push_back",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96000,
+            "size": 1000,
+            "instructions": 993314,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14080,
+            "size": 1000,
+            "instructions": 796483,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96000,
+        "size": 1000,
+        "instructions": 993314,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14080,
+        "size": 1000,
+        "instructions": 796483,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.2471251740464016
+    },
+    {
+      "operation": "push_front",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96000,
+            "size": 1000,
+            "instructions": 993344,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14080,
+            "size": 1000,
+            "instructions": 854513,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96000,
+        "size": 1000,
+        "instructions": 993344,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14080,
+        "size": 1000,
+        "instructions": 854513,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1624679788370686
+    },
+    {
+      "operation": "pop_front",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 715385,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 856028,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 715385,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 856028,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8357028041138841
+    },
+    {
+      "operation": "pop_back",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 715415,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 798058,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 715415,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 798058,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.896444869921735
+    },
+    {
+      "operation": "peek_front",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 1000,
+            "instructions": 358459,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1000,
+            "instructions": 530466,
+            "operations": 1000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 1000,
+        "instructions": 358459,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1000,
+        "instructions": 530466,
+        "operations": 1000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6757435914837143
+    },
+    {
+      "operation": "peek_back",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 1000,
+            "instructions": 358489,
+            "operations": 1000,
+            "checksum": 999000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1000,
+            "instructions": 534496,
+            "operations": 1000,
+            "checksum": 999000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 1000,
+        "instructions": 358489,
+        "operations": 1000,
+        "checksum": 999000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1000,
+        "instructions": 534496,
+        "operations": 1000,
+        "checksum": 999000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6707047386697
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1000,
+            "instructions": 1718791,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14080,
+            "size": 1000,
+            "instructions": 1659630,
+            "operations": 1024,
+            "checksum": 523776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1000,
+        "instructions": 1718791,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14080,
+        "size": 1000,
+        "instructions": 1659630,
+        "operations": 1024,
+        "checksum": 523776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.035647102064918
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1000,
+            "instructions": 1718821,
+            "operations": 1024,
+            "checksum": 1547776,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 1000,
+            "instructions": 1525292,
+            "operations": 1024,
+            "checksum": 1547776,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1000,
+        "instructions": 1718821,
+        "operations": 1024,
+        "checksum": 1547776,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 1000,
+        "instructions": 1525292,
+        "operations": 1024,
+        "checksum": 1547776,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.126879967901228
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 98304,
+            "size": 1000,
+            "instructions": 1787971,
+            "operations": 1024,
+            "checksum": 1546752,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 225280,
+            "size": 1000,
+            "instructions": 2853450,
+            "operations": 1024,
+            "checksum": 1546752,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 98304,
+        "size": 1000,
+        "instructions": 1787971,
+        "operations": 1024,
+        "checksum": 1546752,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 225280,
+        "size": 1000,
+        "instructions": 2853450,
+        "operations": 1024,
+        "checksum": 1546752,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6265997301512205
+    },
+    {
+      "operation": "values",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 1000,
+            "instructions": 277159,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 1000,
+            "instructions": 757646,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 1000,
+        "instructions": 277159,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 1000,
+        "instructions": 757646,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3658159615440456
+    },
+    {
+      "operation": "reverse_values",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 40192,
+            "size": 1000,
+            "instructions": 547733,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 1000,
+            "instructions": 849676,
+            "operations": 1000,
+            "checksum": 499500,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 40192,
+        "size": 1000,
+        "instructions": 547733,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 1000,
+        "instructions": 849676,
+        "operations": 1000,
+        "checksum": 499500,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.644637485347356
+    },
+    {
+      "operation": "from_array",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96120,
+            "size": 1000,
+            "instructions": 895387,
+            "operations": 1000,
+            "checksum": 1000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14352,
+            "size": 1000,
+            "instructions": 881319,
+            "operations": 1000,
+            "checksum": 1000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96120,
+        "size": 1000,
+        "instructions": 895387,
+        "operations": 1000,
+        "checksum": 1000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14352,
+        "size": 1000,
+        "instructions": 881319,
+        "operations": 1000,
+        "checksum": 1000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0159624381183203
+    },
+    {
+      "operation": "to_array",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 8160,
+            "size": 1000,
+            "instructions": 273840,
+            "operations": 1000,
+            "checksum": 1999,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 8232,
+            "size": 1000,
+            "instructions": 743293,
+            "operations": 1000,
+            "checksum": 1999,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 8160,
+        "size": 1000,
+        "instructions": 273840,
+        "operations": 1000,
+        "checksum": 1999,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 8232,
+        "size": 1000,
+        "instructions": 743293,
+        "operations": 1000,
+        "checksum": 1999,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3684146090438091
+    },
+    {
+      "operation": "clone",
+      "size": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96216,
+            "size": 1000,
+            "instructions": 1055009,
+            "operations": 1000,
+            "checksum": 1000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 14368,
+            "size": 1000,
+            "instructions": 1338666,
+            "operations": 1000,
+            "checksum": 1000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96216,
+        "size": 1000,
+        "instructions": 1055009,
+        "operations": 1000,
+        "checksum": 1000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 14368,
+        "size": 1000,
+        "instructions": 1338666,
+        "operations": 1000,
+        "checksum": 1000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7881047251517556
+    },
+    {
+      "operation": "push_back",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960000,
+            "size": 10000,
+            "instructions": 9930314,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 137720,
+            "size": 10000,
+            "instructions": 7947294,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960000,
+        "size": 10000,
+        "instructions": 9930314,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 137720,
+        "size": 10000,
+        "instructions": 7947294,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.2495214094256486
+    },
+    {
+      "operation": "push_front",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960000,
+            "size": 10000,
+            "instructions": 9930344,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 137720,
+            "size": 10000,
+            "instructions": 8527324,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960000,
+        "size": 10000,
+        "instructions": 9930344,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 137720,
+        "size": 10000,
+        "instructions": 8527324,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1645322729615997
+    },
+    {
+      "operation": "pop_front",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 7150385,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 8556600,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 7150385,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 8556600,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8356572704111446
+    },
+    {
+      "operation": "pop_back",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 7150415,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 0,
+            "instructions": 7976630,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 7150415,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 0,
+        "instructions": 7976630,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8964205435127366
+    },
+    {
+      "operation": "peek_front",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 10000,
+            "instructions": 3580459,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 10000,
+            "instructions": 5300466,
+            "operations": 10000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 10000,
+        "instructions": 3580459,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 10000,
+        "instructions": 5300466,
+        "operations": 10000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6754989089638533
+    },
+    {
+      "operation": "peek_back",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 10000,
+            "instructions": 3580489,
+            "operations": 10000,
+            "checksum": 99990000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 10000,
+            "instructions": 5340496,
+            "operations": 10000,
+            "checksum": 99990000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 10000,
+        "instructions": 3580489,
+        "operations": 10000,
+        "checksum": 99990000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 10000,
+        "instructions": 5340496,
+        "operations": 10000,
+        "checksum": 99990000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6704412848544404
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960000,
+            "size": 10000,
+            "instructions": 16780519,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 137280,
+            "size": 10000,
+            "instructions": 16201542,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960000,
+        "size": 10000,
+        "instructions": 16780519,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 137280,
+        "size": 10000,
+        "instructions": 16201542,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.035735919457543
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960000,
+            "size": 10000,
+            "instructions": 16780549,
+            "operations": 10000,
+            "checksum": 149995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 10000,
+            "instructions": 14890556,
+            "operations": 10000,
+            "checksum": 149995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960000,
+        "size": 10000,
+        "instructions": 16780549,
+        "operations": 10000,
+        "checksum": 149995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 10000,
+        "instructions": 14890556,
+        "operations": 10000,
+        "checksum": 149995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1269256164779877
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960000,
+            "size": 10000,
+            "instructions": 17455579,
+            "operations": 10000,
+            "checksum": 149985000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 2200000,
+            "size": 10000,
+            "instructions": 27860586,
+            "operations": 10000,
+            "checksum": 149985000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960000,
+        "size": 10000,
+        "instructions": 17455579,
+        "operations": 10000,
+        "checksum": 149985000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 2200000,
+        "size": 10000,
+        "instructions": 27860586,
+        "operations": 10000,
+        "checksum": 149985000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.626533088715363
+    },
+    {
+      "operation": "values",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 96,
+            "size": 10000,
+            "instructions": 2761159,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 10000,
+            "instructions": 7561911,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 96,
+        "size": 10000,
+        "instructions": 2761159,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 10000,
+        "instructions": 7561911,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3651403725857128
+    },
+    {
+      "operation": "reverse_values",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 400192,
+            "size": 10000,
+            "instructions": 5461733,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 168,
+            "size": 10000,
+            "instructions": 8481941,
+            "operations": 10000,
+            "checksum": 49995000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 400192,
+        "size": 10000,
+        "instructions": 5461733,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 168,
+        "size": 10000,
+        "instructions": 8481941,
+        "operations": 10000,
+        "checksum": 49995000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.643924898793802
+    },
+    {
+      "operation": "from_array",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960120,
+            "size": 10000,
+            "instructions": 8941387,
+            "operations": 10000,
+            "checksum": 10000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 137992,
+            "size": 10000,
+            "instructions": 8779130,
+            "operations": 10000,
+            "checksum": 10000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960120,
+        "size": 10000,
+        "instructions": 8941387,
+        "operations": 10000,
+        "checksum": 10000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 137992,
+        "size": 10000,
+        "instructions": 8779130,
+        "operations": 10000,
+        "checksum": 10000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0184821275001055
+    },
+    {
+      "operation": "to_array",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 80160,
+            "size": 10000,
+            "instructions": 2721840,
+            "operations": 10000,
+            "checksum": 19999,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 80232,
+            "size": 10000,
+            "instructions": 7412558,
+            "operations": 10000,
+            "checksum": 19999,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 80160,
+        "size": 10000,
+        "instructions": 2721840,
+        "operations": 10000,
+        "checksum": 19999,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 80232,
+        "size": 10000,
+        "instructions": 7412558,
+        "operations": 10000,
+        "checksum": 19999,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.3671930796359367
+    },
+    {
+      "operation": "clone",
+      "size": 10000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 960216,
+            "size": 10000,
+            "instructions": 10532009,
+            "operations": 10000,
+            "checksum": 10000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 138008,
+            "size": 10000,
+            "instructions": 13349742,
+            "operations": 10000,
+            "checksum": 10000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 960216,
+        "size": 10000,
+        "instructions": 10532009,
+        "operations": 10000,
+        "checksum": 10000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 138008,
+        "size": 10000,
+        "instructions": 13349742,
+        "operations": 10000,
+        "checksum": 10000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7889297785680053
+    },
+    {
+      "operation": "push_back",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 9600000,
+            "size": 100000,
+            "instructions": 99300314,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1375000,
+            "size": 100000,
+            "instructions": 79459666,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 9600000,
+        "size": 100000,
+        "instructions": 99300314,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1375000,
+        "size": 100000,
+        "instructions": 79459666,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.2496945808959228
+    },
+    {
+      "operation": "push_front",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 9600000,
+            "size": 100000,
+            "instructions": 99300344,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1375000,
+            "size": 100000,
+            "instructions": 85259696,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 9600000,
+        "size": 100000,
+        "instructions": 99300344,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1375000,
+        "size": 100000,
+        "instructions": 85259696,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.1646809531199829
+    },
+    {
+      "operation": "pop_front",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 11590128,
+            "size": 0,
+            "instructions": 183055367,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 11590128,
+            "size": 0,
+            "instructions": 197117726,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 11590128,
+        "size": 0,
+        "instructions": 183055367,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 11590128,
+        "size": 0,
+        "instructions": 197117726,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9286600992951796
+    },
+    {
+      "operation": "pop_back",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 19140624,
+            "size": 0,
+            "instructions": 255728919,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 19140624,
+            "size": 0,
+            "instructions": 263991278,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 19140624,
+        "size": 0,
+        "instructions": 255728919,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 19140624,
+        "size": 0,
+        "instructions": 263991278,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9687021515915386
+    },
+    {
+      "operation": "peek_front",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 0,
+            "size": 100000,
+            "instructions": 35800459,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 0,
+            "size": 100000,
+            "instructions": 53000466,
+            "operations": 100000,
+            "checksum": 0,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 0,
+        "size": 100000,
+        "instructions": 35800459,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 0,
+        "size": 100000,
+        "instructions": 53000466,
+        "operations": 100000,
+        "checksum": 0,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6754744194135953
+    },
+    {
+      "operation": "peek_back",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 19280592,
+            "size": 100000,
+            "instructions": 221376187,
+            "operations": 100000,
+            "checksum": 9999900000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 19280592,
+            "size": 100000,
+            "instructions": 238976194,
+            "operations": 100000,
+            "checksum": 9999900000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 19280592,
+        "size": 100000,
+        "instructions": 221376187,
+        "operations": 100000,
+        "checksum": 9999900000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 19280592,
+        "size": 100000,
+        "instructions": 238976194,
+        "operations": 100000,
+        "checksum": 9999900000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.9263524675600114
+    },
+    {
+      "operation": "fifo_churn",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 21190128,
+            "size": 100000,
+            "instructions": 279355501,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 12965128,
+            "size": 100000,
+            "instructions": 273577383,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 21190128,
+        "size": 100000,
+        "instructions": 279355501,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 12965128,
+        "size": 100000,
+        "instructions": 273577383,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0211205982623206
+    },
+    {
+      "operation": "lifo_churn",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 28993344,
+            "size": 100000,
+            "instructions": 354461485,
+            "operations": 100000,
+            "checksum": 14999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 63393344,
+            "size": 100000,
+            "instructions": 569861717,
+            "operations": 100000,
+            "checksum": 14999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 28993344,
+        "size": 100000,
+        "instructions": 354461485,
+        "operations": 100000,
+        "checksum": 14999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 63393344,
+        "size": 100000,
+        "instructions": 569861717,
+        "operations": 100000,
+        "checksum": 14999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.6220131558688299
+    },
+    {
+      "operation": "both_ends_churn",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 28993344,
+            "size": 100000,
+            "instructions": 361211515,
+            "operations": 100000,
+            "checksum": 14999850000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 41393344,
+            "size": 100000,
+            "instructions": 465261747,
+            "operations": 100000,
+            "checksum": 14999850000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 28993344,
+        "size": 100000,
+        "instructions": 361211515,
+        "operations": 100000,
+        "checksum": 14999850000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 41393344,
+        "size": 100000,
+        "instructions": 465261747,
+        "operations": 100000,
+        "checksum": 14999850000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7763619453546006
+    },
+    {
+      "operation": "values",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 11590224,
+            "size": 100000,
+            "instructions": 139156141,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 11590296,
+            "size": 100000,
+            "instructions": 187159673,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 11590224,
+        "size": 100000,
+        "instructions": 139156141,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 11590296,
+        "size": 100000,
+        "instructions": 187159673,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7435156236888703
+    },
+    {
+      "operation": "reverse_values",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 23140816,
+            "size": 100000,
+            "instructions": 238830237,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 19140792,
+            "size": 100000,
+            "instructions": 269033225,
+            "operations": 100000,
+            "checksum": 4999950000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 23140816,
+        "size": 100000,
+        "instructions": 238830237,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 19140792,
+        "size": 100000,
+        "instructions": 269033225,
+        "operations": 100000,
+        "checksum": 4999950000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.8877351003765427
+    },
+    {
+      "operation": "from_array",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 9600120,
+            "size": 100000,
+            "instructions": 89401387,
+            "operations": 100000,
+            "checksum": 100000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1375272,
+            "size": 100000,
+            "instructions": 87761502,
+            "operations": 100000,
+            "checksum": 100000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 9600120,
+        "size": 100000,
+        "instructions": 89401387,
+        "operations": 100000,
+        "checksum": 100000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1375272,
+        "size": 100000,
+        "instructions": 87761502,
+        "operations": 100000,
+        "checksum": 100000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1.0186856988842328
+    },
+    {
+      "operation": "to_array",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 800160,
+            "size": 100000,
+            "instructions": 27201840,
+            "operations": 100000,
+            "checksum": 199999,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 800232,
+            "size": 100000,
+            "instructions": 74105338,
+            "operations": 100000,
+            "checksum": 199999,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 800160,
+        "size": 100000,
+        "instructions": 27201840,
+        "operations": 100000,
+        "checksum": 199999,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 800232,
+        "size": 100000,
+        "instructions": 74105338,
+        "operations": 100000,
+        "checksum": 199999,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.36706991337115286
+    },
+    {
+      "operation": "clone",
+      "size": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "core": {
+            "allocated": 9600216,
+            "size": 100000,
+            "instructions": 105302009,
+            "operations": 100000,
+            "checksum": 100000,
+            "reclaimed": 0
+          },
+          "fast": {
+            "allocated": 1375288,
+            "size": 100000,
+            "instructions": 133464894,
+            "operations": 100000,
+            "checksum": 100000,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "core": {
+        "allocated": 9600216,
+        "size": 100000,
+        "instructions": 105302009,
+        "operations": 100000,
+        "checksum": 100000,
+        "reclaimed": 0
+      },
+      "fast": {
+        "allocated": 1375288,
+        "size": 100000,
+        "instructions": 133464894,
+        "operations": 100000,
+        "checksum": 100000,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 0.7889865705059489
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+//MOC-FLAG --package fast ../../src --plugin ../../../../dist/indexed-priority-queue --sanity-checks
+import Q "mo:fast/IndexedPriorityQueue";
+func compare(a : Nat, b : Nat) : Q.Order {if (a < b) #less else if (a == b) #equal else #greater};
+let q = Q.empty<Nat, Text>();
+assert Q.isEmpty(q);
+let a = Q.push(q, compare, 9, "nine");
+let b = Q.push(q, compare, 1, "one");
+let c = Q.push(q, compare, 5, "five");
+assert Q.peek(q) == ?(1, "one");
+assert Q.get(a) == ?(9, "nine");
+assert Q.reschedule(a, compare, 0);
+assert Q.pop(q, compare) == ?(0, "nine");
+assert Q.get(a) == null;
+assert not Q.reschedule(a, compare, 20);
+assert Q.replace(c, compare, 2, "two") == ?(5, "five");
+assert Q.remove(b, compare) == ?(1, "one");
+assert Q.remove(b, compare) == null;
+assert Q.size(q) == 1;
+Q.clear(q);
+assert Q.get(c) == null;
+assert Q.isEmpty(q);
+assert Q.pop(q, compare) == null;
+var i = 0;
+while (i < 300) {ignore Q.push(q, compare, 300 - i, "item"); i += 1};
+i := 1;
+while (i <= 300) {assert Q.pop(q, compare) == ?(i, "item"); i += 1};
+assert Q.peek(q) == null;

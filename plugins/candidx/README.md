@@ -34,6 +34,36 @@ This is a typed intrinsic: inferred aliases preserve specialization, while
 ordinary function annotations cannot erase its identity. Wrap calls in an
 explicitly typed Motoko function when passing an encoder as a callback.
 
+## Fast size estimates
+
+`CandidX.estimateSize(...) : Nat` estimates the byte size of ordinary Motoko
+`to_candid(...)`, including its original type table. Use it when an admission
+bound is sufficient; it does not estimate the canonical encoder's exact output.
+
+```motoko
+if (CandidX.estimateSize(value) > byteLimit) { /* reject or defer */ };
+```
+
+The compiler calculates schema bounds and fixed payload widths. Generated Wasm
+reads Blob/Text byte lengths directly, multiplies fixed-width array lengths,
+and visits only value-dependent structures. Compact Nat/Int values use a
+nine-byte bound; larger integers use magnitude tiers without allocating,
+including negative Ints. No encoding buffer or scratch heap is allocated.
+Argument construction can still allocate in the caller.
+
+The result conservatively bounds every Blob ordinary `to_candid` can produce.
+Estimates can be loose and reject values whose actual encoding would fit.
+Functions encountered in the value, dynamic traversal depth above 256, exhausted one-million
+dynamic-visit budget, or a saturated size return **`2 ** 61 - 1`**. Treat this
+sentinel as too large or too expensive to estimate. A deeply nested small value
+can therefore be rejected. Shared service references are supported; absent
+options and unselected variants containing functions do not trigger rejection.
+Values erased to `Any` have no Candid payload and are not traversed.
+
+[PocketIC results](../../benchmarks/candid-size/README.md) compare the estimator
+with allocating an ordinary Candid Blob for its exact size. These are different
+size contracts, not an encoding throughput comparison.
+
 See [the design and validation](../../docs/design.md) and
 [benchmark reproduction](../../benchmarks/README.md). Compiler and runtime
 sources retain their MIT license files.

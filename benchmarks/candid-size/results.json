@@ -1,0 +1,752 @@
+{
+  "recorded_utc": "2026-10-11T23:38:12.310Z",
+  "trials": 3,
+  "build": {
+    "command": [
+      "/home/devbox/.local/lib/motoko-compute/moc",
+      "--plugin",
+      "/srv/shared/code/motoko_experiments/plugins/dist/candidx",
+      "--package",
+      "fast",
+      "/srv/shared/code/motoko_experiments/plugins/packages/fast/src",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/main.mo",
+      "-o",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/_out/main.wasm"
+    ],
+    "cwd": "/srv/shared/code/motoko_experiments/plugins",
+    "rts_environment": {
+      "MOC_RELEASE_RTS": "/home/devbox/.local/lib/motoko-compute/mo-rts.wasm",
+      "MOC_DEBUG_RTS": "/home/devbox/.local/lib/motoko-compute/mo-rts-debug.wasm"
+    },
+    "compiler_version": "Motoko compiler (source 2.0.0-14-g92b1bdecb)",
+    "compiler_revision": "92b1bdecbc7bc67fd51ad226f8d147d15494fc09",
+    "compiler_plugin_build_moc_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+    "sha256": {
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/build.py": "c10689f3df4410515fd27e9fc7c302984d786cb0e14af1b5c7694023a350a060",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/main.mo": "3de093543fbaa20c67e2af1676f3f47842b17c3623a1d1d2621b4d89a4c535bb",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/run.mjs": "a3b1b70611a2cc11d2c30b5864d38c519cdcf29717a996b8b01ed9f8b624f548",
+      "/srv/shared/code/motoko_experiments/plugins/packages/fast/src/CandidX.mo": "451f12f3f5c71efcfd388b9606782279ff66dadc993f7f6572caa4c98e20821a",
+      "/srv/shared/code/motoko_experiments/plugins/dist/candidx/plugin.cmxs": "ec3ea70fc5a21bc74a97bb41ad863ead08ced7efe295dc92dd276bfc9cb9993e",
+      "/srv/shared/code/motoko_experiments/plugins/dist/candidx/runtime.wasm": "56aa3b8adf35ce10751b6f815dbefaceb03cebbb8c5d421e56635a17f964d33a",
+      "/srv/shared/code/motoko_experiments/plugins/dist/candidx/build.json": "39e548bfbb360b35a271692c08f7ae9cfed09769211273cba241d81442ad6b20",
+      "/home/devbox/.local/lib/motoko-compute/moc": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+      "/home/devbox/.local/lib/motoko-compute/mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+      "/home/devbox/.local/lib/motoko-compute/mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9",
+      "/srv/shared/code/motoko_experiments/plugins/benchmarks/candid-size/_out/main.wasm": "62035bec0a2a129f4db1e4d3545d2ee7088533b0323f42a22e1e12987faff2f8"
+    }
+  },
+  "runtime": {
+    "bun": "1.2.13",
+    "pocket_ic_version": "pocket-ic-server 10.0.0",
+    "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990",
+    "ash_transport_sha256": "8bf509e1d94267549e557191d4c4c2e3839211420fd7a2799f8a9546e93badad",
+    "pic_js_version": "0.16.1"
+  },
+  "methodology": "Fresh canister per case/trial. Inputs configured outside measurement. Four forced GC increments before each phase; order alternates by trial. Raw single-call performanceCounter(0), total-allocation and reclaimed deltas include dispatch/counter/assignment overhead; reply and end-of-message GC excluded. Exact phase executes ordinary (to_candid(value)).size() with the plugin PR compiler, without the discarded compiler optimization. Its actual Blob size is the independent bound oracle. No repeated serializer call occurs in the measured estimate path.",
+  "cases": [
+    {
+      "name": "nat_42",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 28,
+            "instructions": 382,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 88,
+            "size": 8,
+            "instructions": 1190,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 88,
+            "size": 8,
+            "instructions": 1190,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 28,
+            "instructions": 382,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 28,
+            "instructions": 382,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 88,
+            "size": 8,
+            "instructions": 1190,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 28,
+        "instructions": 382,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 88,
+        "size": 8,
+        "instructions": 1190,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 3.115183246073298,
+      "estimate_to_exact_size": 3.5
+    },
+    {
+      "name": "fanout_request",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 731,
+            "instructions": 2673,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 952,
+            "size": 439,
+            "instructions": 10542,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 952,
+            "size": 439,
+            "instructions": 10542,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 731,
+            "instructions": 2673,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 731,
+            "instructions": 2673,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 952,
+            "size": 439,
+            "instructions": 10542,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 731,
+        "instructions": 2673,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 952,
+        "size": 439,
+        "instructions": 10542,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 3.9438832772166106,
+      "estimate_to_exact_size": 1.6651480637813212
+    },
+    {
+      "name": "blob_1KiB",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 1055,
+            "instructions": 455,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 2152,
+            "size": 1035,
+            "instructions": 3436,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 2152,
+            "size": 1035,
+            "instructions": 3436,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 1055,
+            "instructions": 455,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 1055,
+            "instructions": 455,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 2152,
+            "size": 1035,
+            "instructions": 3436,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 1055,
+        "instructions": 455,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 2152,
+        "size": 1035,
+        "instructions": 3436,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 7.5516483516483515,
+      "estimate_to_exact_size": 1.0193236714975846
+    },
+    {
+      "name": "blob_1MiB",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 1048607,
+            "instructions": 481,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 2097256,
+            "size": 1048588,
+            "instructions": 2098590,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 2097256,
+            "size": 1048588,
+            "instructions": 2098590,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 1048607,
+            "instructions": 481,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 1048607,
+            "instructions": 481,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 2097256,
+            "size": 1048588,
+            "instructions": 2098590,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 1048607,
+        "instructions": 481,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 2097256,
+        "size": 1048588,
+        "instructions": 2098590,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 4362.972972972973,
+      "estimate_to_exact_size": 1.0000181196046494
+    },
+    {
+      "name": "fixed_records_0",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 81,
+            "instructions": 533,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 152,
+            "size": 33,
+            "instructions": 1363,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 152,
+            "size": 33,
+            "instructions": 1363,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 81,
+            "instructions": 533,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 81,
+            "instructions": 533,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 152,
+            "size": 33,
+            "instructions": 1363,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 81,
+        "instructions": 533,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 152,
+        "size": 33,
+        "instructions": 1363,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 2.5572232645403377,
+      "estimate_to_exact_size": 2.4545454545454546
+    },
+    {
+      "name": "fixed_records_1024",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 21585,
+            "instructions": 559,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 43160,
+            "size": 21538,
+            "instructions": 831905,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 43160,
+            "size": 21538,
+            "instructions": 831905,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 21585,
+            "instructions": 559,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 21585,
+            "instructions": 559,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 43160,
+            "size": 21538,
+            "instructions": 831905,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 21585,
+        "instructions": 559,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 43160,
+        "size": 21538,
+        "instructions": 831905,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 1488.2021466905187,
+      "estimate_to_exact_size": 1.002182189618349
+    },
+    {
+      "name": "fixed_records_10000",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 210081,
+            "instructions": 585,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 420152,
+            "size": 210034,
+            "instructions": 8111467,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 420152,
+            "size": 210034,
+            "instructions": 8111467,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 210081,
+            "instructions": 585,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 210081,
+            "instructions": 585,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 420152,
+            "size": 210034,
+            "instructions": 8111467,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 210081,
+        "instructions": 585,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 420152,
+        "size": 210034,
+        "instructions": 8111467,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 13865.755555555555,
+      "estimate_to_exact_size": 1.0002237732938477
+    },
+    {
+      "name": "texts_1024",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 21533,
+            "instructions": 79477,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 24664,
+            "size": 12293,
+            "instructions": 328822,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 24664,
+            "size": 12293,
+            "instructions": 328822,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 21533,
+            "instructions": 79477,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 21533,
+            "instructions": 79477,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 24664,
+            "size": 12293,
+            "instructions": 328822,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 21533,
+        "instructions": 79477,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 24664,
+        "size": 12293,
+        "instructions": 328822,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 4.13732274746153,
+      "estimate_to_exact_size": 1.7516472789392337
+    },
+    {
+      "name": "big_nats_128",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 18851,
+            "instructions": 35091,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 23032,
+            "size": 5926,
+            "instructions": 1749747,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 23032,
+            "size": 5926,
+            "instructions": 1749747,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 18851,
+            "instructions": 35091,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 18851,
+            "instructions": 35091,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 23032,
+            "size": 5926,
+            "instructions": 1749747,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 18851,
+        "instructions": 35091,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 23032,
+        "size": 5926,
+        "instructions": 1749747,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 49.86312729759767,
+      "estimate_to_exact_size": 3.1810664866689167
+    },
+    {
+      "name": "recursive_tree_64",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 1306,
+            "instructions": 15524,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 1432,
+            "size": 677,
+            "instructions": 41905,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 1432,
+            "size": 677,
+            "instructions": 41905,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 1306,
+            "instructions": 15524,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 1306,
+            "instructions": 15524,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 1432,
+            "size": 677,
+            "instructions": 41905,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 1306,
+        "instructions": 15524,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 1432,
+        "size": 677,
+        "instructions": 41905,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 2.699368719402216,
+      "estimate_to_exact_size": 1.9290989660265878
+    },
+    {
+      "name": "negative_int_minus_2pow4096",
+      "measurements": [
+        {
+          "trial": 0,
+          "estimate": {
+            "allocated": 0,
+            "size": 2360,
+            "instructions": 1038,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 6104,
+            "size": 593,
+            "instructions": 684646,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 1,
+          "exact": {
+            "allocated": 6104,
+            "size": 593,
+            "instructions": 684646,
+            "reclaimed": 0
+          },
+          "estimate": {
+            "allocated": 0,
+            "size": 2360,
+            "instructions": 1038,
+            "reclaimed": 0
+          }
+        },
+        {
+          "trial": 2,
+          "estimate": {
+            "allocated": 0,
+            "size": 2360,
+            "instructions": 1038,
+            "reclaimed": 0
+          },
+          "exact": {
+            "allocated": 6104,
+            "size": 593,
+            "instructions": 684646,
+            "reclaimed": 0
+          }
+        }
+      ],
+      "estimate": {
+        "allocated": 0,
+        "size": 2360,
+        "instructions": 1038,
+        "reclaimed": 0
+      },
+      "exact": {
+        "allocated": 6104,
+        "size": 593,
+        "instructions": 684646,
+        "reclaimed": 0
+      },
+      "instruction_speedup": 659.5818882466282,
+      "estimate_to_exact_size": 3.9797639123102866
+    }
+  ]
+}
