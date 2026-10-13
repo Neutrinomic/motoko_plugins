@@ -29,5 +29,14 @@ performance comparisons.
 
 ## Validation
 
-Source fixtures are ready. Execution awaits the prepared-handle SDK build; the
-installed pre-feature compiler cannot validate these new primitive types.
+On 2026-10-13, the public direct and prepared run fixtures both passed the
+Motoko, IR and lowered interpreters plus compiled Wasm. All **12 prepared Ash
+methods** and the unchanged **17 direct methods** passed against SDK
+`9f6ebeedc` and runtime `104aedb9…`, including the reclamation assertion.
+
+The private source-Ash runner selects that SDK explicitly, preserving the
+installed compiler. Its 42 source-file hashes and the complete logs are recorded
+in [public validation](../../../../../plugins/ml-dsa/tests/prepared/public-validation.json).
+An initial test annotation attempted to assign an intrinsic directly to an
+ordinary function type; the corrected test uses an explicit wrapper. No plugin
+or SDK correction was required.

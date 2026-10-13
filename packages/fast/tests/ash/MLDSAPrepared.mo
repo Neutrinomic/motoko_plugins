@@ -147,7 +147,8 @@ persistent actor {
       );
       assert order == "callee;key;message;context;";
       assert signature == #ok(v.signature);
-      let verify : (MLDSA.PreparedPublicKey, Blob, Blob, Blob) -> MLDSA.Result<Bool> = MLDSA.verifyPrepared;
+      let verify : (MLDSA.PreparedPublicKey, Blob, Blob, Blob) -> MLDSA.Result<Bool> =
+        func(key, message, signature, context) { MLDSA.verifyPrepared(key, message, signature, context) };
       assert verify(unwrap(MLDSA.preparePublicKey(v.publicKey)), v.message, v.signature, v.context) == #ok(true);
       assert MLDSA.signPrepared(keys[0], v.message, v.context) == signature;
     })
