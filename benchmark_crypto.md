@@ -372,11 +372,11 @@ See [optimization results](benchmarks/crypto/round2/RESULTS.md) for before/after
 
 ## BLS verification optimization — round six
 
-The BLS plugin now uses fixed-width partial products for widening multiplication,
+Round six introduced fixed-width partial products for widening multiplication,
 simpler modular subtraction and a shorter final-exponentiation schedule. The
 compiler, SDK, validation rules, public API and prepared-key layouts are unchanged.
 
-| Verification | Before: instructions | Current: instructions | Reduction | Allocated B, before / current |
+| Verification | Before: instructions | Round six: instructions | Reduction | Allocated B, before / round six |
 | --- | ---: | ---: | ---: | ---: |
 | IC, direct | 210,673,356 | 127,630,963 | 39.42% | 64 / 64 |
 | IC, prepared key | 167,427,790 | 101,276,827 | 39.51% | 64 / 64 |
@@ -391,6 +391,33 @@ Three identical fresh-canister trials per workload and revision on PocketIC
 [Full 15-workload comparison and reproduction](benchmarks/crypto/bls-verify-round6/README.md) ·
 [Independent arithmetic review and validation](tests/crypto-audit/round6/bls12-381/README.md).
 
+## BLS verification optimization — round seven
+
+The next round improves multiply-add carry handling and subtraction, uses
+Karatsuba multiplication in extension fields, and shortens fixed group
+multiplication. All five changes improved isolated PocketIC screens; the table
+measures their combined effect against round six.
+
+| Verification | Round six: instructions | Current: instructions | Reduction | Allocated B, before / current |
+| --- | ---: | ---: | ---: | ---: |
+| IC, direct | 127,630,963 | 107,949,293 | 15.42% | 64 / 64 |
+| IC, prepared key | 101,276,827 | 85,442,830 | 15.63% | 64 / 64 |
+| Ethereum, direct | 167,544,868 | 141,664,860 | 15.45% | 64 / 64 |
+| Ethereum, prepared key | 161,204,207 | 136,101,721 | 15.57% | 64 / 64 |
+| IC aggregate, 2 distinct keys, prepared | 124,128,212 | 105,067,570 | 15.36% | 544 / 544 |
+| Ethereum aggregate, 8 distinct keys, prepared | 600,858,961 | 509,781,620 | 15.16% | 181,552 / 181,552 |
+
+Three identical fresh-canister trials per workload and revision; all 15 measured
+operations improve. Prepared verification excludes setup. Allocation, prepared
+layouts and sampled memory are unchanged. Runtime Wasm shrinks **617,967 →
+342,359 B**; every measured primitive canister shrinks by **275,053 B**.
+Compiler, SDK, public APIs and validation rules are unchanged.
+
+The independent review passed 138 vendor tests, 32 runtime tests, six public
+Motoko programs and six Ash methods, plus algebra and source-pin checks.
+[Full results and reproduction](benchmarks/crypto/bls-verify-round7/README.md) ·
+[Independent arithmetic review](tests/crypto-audit/round7/bls12-381/README.md).
+
 ## IC certified-data relay verification
 
 An untrusted client can carry A's certificate and Merkle witness to B. Caching
@@ -399,11 +426,11 @@ that root skip repeated BLS verification.
 
 | Verification path | Instructions, 1,000 entries | Instructions, 100,000 entries | Allocated B, 1,000 / 100,000 entries |
 | --- | ---: | ---: | ---: |
-| Cold: root delegation and subnet signatures | 257,292,031 | 257,631,383 | 102,320 / 117,552 |
-| Cached verified delegation and prepared subnet key | 102,586,047 | 102,925,399 | 65,408 / 80,640 |
+| Cold: root delegation and subnet signatures | 217,928,691 | 218,268,043 | 102,320 / 117,552 |
+| Cached verified delegation and prepared subnet key | 86,752,050 | 87,091,402 | 65,408 / 80,640 |
 | Cached authenticated A root; application proof only | **565,546** | **904,898** | **26,176 / 41,408** |
 
-Remeasured after the BLS optimization on 2026-10-13 with PocketIC 10.0.0,
+Remeasured after round seven on 2026-10-13 with PocketIC 10.0.0,
 compiler `9f6ebeedc`, our BLS/SHA plugins and the unchanged bounded Motoko
 certificate decoder. Authentic NNS-delegated
 certificates; 32-byte values and 8-byte labels; three identical trials per case.
@@ -412,5 +439,5 @@ excluded. Allocation is cumulative, not retained heap. Snapshots retain their
 signed-time expiry; previously unseen roots still require signature checks.
 This is a research prototype, not a production certificate verifier.
 [Cache design and initial measurements](benchmarks/crypto/ic-certified-relay/README.md) ·
-[Current comparison and reproduction](benchmarks/crypto/bls-verify-round6/README.md) ·
-[45 current observations and 12 rejection controls](benchmarks/crypto/bls-verify-round6/relay-results.json).
+[Current comparison and reproduction](benchmarks/crypto/bls-verify-round7/README.md) ·
+[45 current observations and 12 rejection controls](benchmarks/crypto/bls-verify-round7/relay-results.json).

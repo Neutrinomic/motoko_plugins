@@ -1,10 +1,10 @@
 # Client-relayed IC certified data
 
-This report preserves the initial measurements before the round-six BLS
-optimization. The same fixtures and verifier have since been remeasured:
-100,000-entry cold verification now costs **257,631,383 instructions**, and the
-cached-delegation/prepared-key path costs **102,925,399**. Root-cache proof cost
-remains **904,898**. [Current results and comparison](../bls-verify-round6/README.md).
+This report preserves the initial measurements before the subsequent BLS
+optimizations. The same fixtures and verifier have since been remeasured:
+100,000-entry cold verification now costs **218,268,043 instructions**, and the
+cached-delegation/prepared-key path costs **87,091,402**. Root-cache proof cost
+remains **904,898**. [Current results and comparison](../bls-verify-round7/README.md).
 
 Canister B can authenticate data committed by canister A using a certificate and
 Merkle witness carried by an untrusted client. Our PocketIC prototype measures
