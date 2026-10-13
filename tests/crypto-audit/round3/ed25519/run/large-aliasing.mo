@@ -1,0 +1,24 @@
+//MOC-FLAG --plugin ../../../../../dist/ed25519 --package fast ../../../../../packages/fast/src --sanity-checks
+import Ed "mo:fast/Ed25519";
+import Prim "mo:⛔";
+let seed : Blob = "\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29";
+let key : Blob = "\fa\48\34\14\7f\6e\69\0c\36\93\ef\f6\13\36\04\64\03\cd\8a\e2\a1\4f\31\b3\c4\07\35\85\69\23\95\65";
+assert Ed.keyPairFromSeed(seed) == #ok({secretKey=seed;publicKey=key});
+let large = Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(65_536,func(i) {Prim.natToNat8(i % 251)}));
+let seedSignature : Blob = "\d8\31\08\96\49\05\87\20\3f\ad\07\49\52\df\7d\69\25\4a\f5\d5\5e\00\9c\d2\25\fa\2e\15\34\93\b7\cc\23\7c\6b\f0\1e\f2\92\12\ed\12\9b\8c\4a\11\3c\09\b7\98\d2\15\e9\ca\52\13\35\45\f1\0b\8b\9f\37\09";
+assert Ed.sign(seed,seed) == #ok(seedSignature);
+assert Ed.verify(key,seed,seedSignature) == #ok(true);
+let keySignature : Blob = "\94\3d\2f\8e\72\a2\bd\e0\25\73\c7\d2\48\12\aa\a4\a8\3d\00\4d\b5\a4\e5\6c\ab\3b\6d\1f\6d\7d\f8\cb\e9\58\94\a3\70\56\58\46\d0\d9\4f\f2\cc\ed\fe\38\ac\9a\42\82\de\28\4e\f7\e0\58\16\17\23\db\76\04";
+assert Ed.sign(seed,key) == #ok(keySignature);
+assert Ed.verify(key,key,keySignature) == #ok(true);
+let largeSignature : Blob = "\42\d4\4b\6a\0e\a2\ce\04\29\19\d1\8e\07\69\72\fe\d9\4c\14\d2\87\14\eb\c6\fe\12\39\dc\62\37\7f\c8\0c\29\d2\96\13\55\d1\e3\37\da\05\a8\a5\a5\92\fc\ce\c3\33\27\1e\bd\35\8b\1a\28\58\89\8a\d3\97\05";
+assert Ed.sign(seed,large) == #ok(largeSignature);
+assert Ed.verify(key,large,largeSignature) == #ok(true);
+assert Ed.sign("",large) == #err(#invalidSecretKey);
+assert Ed.verify(key,large,"") == #err(#invalidSignature);
+assert Ed.verify(key,large,largeSignature) == #ok(true);
+assert seed == "\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29\29";
+assert key == "\fa\48\34\14\7f\6e\69\0c\36\93\ef\f6\13\36\04\64\03\cd\8a\e2\a1\4f\31\b3\c4\07\35\85\69\23\95\65";
+let retained = [seedSignature,keySignature,largeSignature];
+for (sig in retained.values()) { assert sig.size() == 64 };
+assert Ed.verify(key,seed,retained[0]) == #ok(true);
