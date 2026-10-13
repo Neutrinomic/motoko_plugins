@@ -1,0 +1,521 @@
+{
+  "recorded_utc": "2026-10-13T14:21:51.667Z",
+  "methodology": "Actual PocketIC NNS+application certificates, independently SDK verified. Fresh B per case and trial; cache initialization and four GC increments precede performanceCounter(0), cumulative allocation/reclamation counters around synchronous verifier. Ingress Candid decode and reply encoding are excluded. Mode parse-and-hash-only is a component, not a verifier. Input value32B, keylabel8B. SourceA identity and trust anchor are fixed; Prim.rootKey checked against fixture root. Cached snapshots preserve signed certificate and delegation times, not refreshed on hit.",
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "compiler_version": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "wasm_sha256": "1ddbad1270e6ef45398cf4c94935511837cc30a99f3b1a0e4201f5ad73638aee",
+  "wasm_bytes": 944000,
+  "source_sha256": {
+    "main.mo": "03f737096c29d8df272318078077899067784a3422acdcabb4c20d5133dd7b1d",
+    "Verify.mo": "bc065347445587e36406d1006d06c254c8a1ed1f14f250e189e70ff2c5651d2e",
+    "Fixture.mo": "8b8ff8f16e42f595d4d18e0afe2713774d205ba402c2d525af2839671a3c1c52",
+    "fixtures.json": "48897d8e09544bb961b167d297d364939d3310e266c7d0047f28e97e8568f77f",
+    "run.mjs": "5ef836cc8b419dd282ee7ae85ae410b0f81b153725b34a18c36a1bc50a53186b",
+    "pocket.mjs": "48318ef44e3dbe40de77e3c922a9dbed8b69540866dc26da6d7177d183217682",
+    "capture.mjs": "6dc3628e00a4c4998aeff003aa24298e8874a569b83029079b17ad45ec49153b",
+    "source.mo": "33b3795a7194892d12040fab6b7fcff900b687f534d59021450658588cec77c6"
+  },
+  "plugins": {
+    "sha256": {
+      "plugin.cmxs": "483ab9ad52c7c3c6fabd2e19ff8279b6e6b749b7500018062eb1bcb2c9285025",
+      "runtime.wasm": "1ac37ddbda7f90b3154bef3214882079b97d00e53a6494a5a24791c9b6759a78"
+    },
+    "bls12-381": {
+      "plugin.cmxs": "9e48433795eba69324c90ec19abdbdfa9593ee24d01e23416ae1894cfdeb15fd",
+      "runtime.wasm": "a2b0689d10224ffea6478e266fad65a32bd7b69911124b93fbd4fb9202fab4c1"
+    }
+  },
+  "fixtures": [
+    {
+      "count": 1000,
+      "depth": 10,
+      "certificate_bytes": 910,
+      "witness_bytes": 430,
+      "payload_bytes": 32,
+      "key_label_bytes": 8
+    },
+    {
+      "count": 100000,
+      "depth": 17,
+      "certificate_bytes": 910,
+      "witness_bytes": 696,
+      "payload_bytes": 32,
+      "key_label_bytes": 8
+    }
+  ],
+  "trials": 3,
+  "cases": [
+    {
+      "scenario": "cold-two-signatures",
+      "mode": 0,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 257292031,
+          "allocated_bytes": 102320,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 257292031,
+          "allocated_bytes": 102320,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 257292031,
+          "allocated_bytes": 102320,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cold-prepared-root-key",
+      "mode": 8,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 230902526,
+          "allocated_bytes": 100128,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 230902526,
+          "allocated_bytes": 100128,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 230902526,
+          "allocated_bytes": 100128,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-delegation-raw-key",
+      "mode": 1,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 128940200,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 128940200,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 128940200,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-delegation-prepared-key",
+      "mode": 2,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 102586047,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 102586047,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 102586047,
+          "allocated_bytes": 65408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-certified-root",
+      "mode": 3,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 565546,
+          "allocated_bytes": 26176,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 565546,
+          "allocated_bytes": 26176,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 565546,
+          "allocated_bytes": 26176,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "parse-and-hash-only",
+      "mode": 4,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1873056,
+          "allocated_bytes": 93000,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 1873056,
+          "allocated_bytes": 93000,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 1873056,
+          "allocated_bytes": 93000,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "prepare-subnet-key",
+      "mode": 5,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 26421838,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 26421838,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 26421838,
+          "allocated_bytes": 19736,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "subnet-signature-and-tree-hash-raw",
+      "mode": 6,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 128066439,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 128066439,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 128066439,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "subnet-signature-and-tree-hash-prepared",
+      "mode": 7,
+      "leaf_count": 1000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 101712249,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 101712249,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 101712249,
+          "allocated_bytes": 16504,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cold-two-signatures",
+      "mode": 0,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 257631383,
+          "allocated_bytes": 117552,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 257631383,
+          "allocated_bytes": 117552,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 257631383,
+          "allocated_bytes": 117552,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cold-prepared-root-key",
+      "mode": 8,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 231241878,
+          "allocated_bytes": 115360,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 231241878,
+          "allocated_bytes": 115360,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 231241878,
+          "allocated_bytes": 115360,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-delegation-raw-key",
+      "mode": 1,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 129279552,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 129279552,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 129279552,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-delegation-prepared-key",
+      "mode": 2,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 102925399,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 102925399,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 102925399,
+          "allocated_bytes": 80640,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "cached-certified-root",
+      "mode": 3,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 904898,
+          "allocated_bytes": 41408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 904898,
+          "allocated_bytes": 41408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 904898,
+          "allocated_bytes": 41408,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "scenario": "parse-and-hash-only",
+      "mode": 4,
+      "leaf_count": 100000,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2212408,
+          "allocated_bytes": 108232,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 1,
+          "instructions": 2212408,
+          "allocated_bytes": 108232,
+          "reclaimed_bytes": 0,
+          "correct": true
+        },
+        {
+          "trial": 2,
+          "instructions": 2212408,
+          "allocated_bytes": 108232,
+          "reclaimed_bytes": 0,
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "negative_checks": [
+    {
+      "name": "changed payload",
+      "rejected": true
+    },
+    {
+      "name": "changed label",
+      "rejected": true
+    },
+    {
+      "name": "changed witness",
+      "rejected": true
+    },
+    {
+      "name": "truncated witness",
+      "rejected": true
+    },
+    {
+      "name": "changed subnet signature",
+      "rejected": true
+    },
+    {
+      "name": "changed root delegation signature",
+      "rejected": true
+    },
+    {
+      "name": "valid certificate for different source canister",
+      "rejected": true
+    },
+    {
+      "name": "changed signed certificate time",
+      "rejected": true
+    },
+    {
+      "name": "outside authorized canister range",
+      "rejected": true
+    },
+    {
+      "name": "substituted delegation identity against warm key cache",
+      "rejected": true
+    },
+    {
+      "name": "expired cached snapshot does not refresh on hit",
+      "rejected": true
+    },
+    {
+      "name": "future signed timestamp rejected using earlier trusted IC time",
+      "rejected": true
+    }
+  ],
+  "complete": true
+}

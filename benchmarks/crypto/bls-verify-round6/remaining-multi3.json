@@ -1,0 +1,23 @@
+{
+  "stages": [
+    {
+      "stage": "field",
+      "callsites": [
+        {
+          "caller": "00403c func[13] <_RNvMs5_NtCskeAnWWDRK4K_5alloc7raw_vecNtB5_11RawVecInner11finish_growCs8KUsYakbccu_24motoko_compute_bls12_381>:",
+          "call": "00405a: 10 f6 80 80 80 00          | call 118 <__multi3>"
+        }
+      ]
+    },
+    {
+      "stage": "integration",
+      "callsites": [
+        {
+          "caller": "00403d func[13] <_RNvMs5_NtCskeAnWWDRK4K_5alloc7raw_vecNtB5_11RawVecInner11finish_growCs8KUsYakbccu_24motoko_compute_bls12_381>:",
+          "call": "00405b: 10 f7 80 80 80 00          | call 119 <__multi3>"
+        }
+      ]
+    }
+  ],
+  "explanation": "The only residual widening-multiply helper call is alloc::raw_vec::RawVecInner::finish_grow: checked allocation-size multiplication. It is not in Fp/Scalar multiplication, extension-field arithmetic, or the pairing loop; do not change allocator arithmetic as part of this crypto optimization."
+}
