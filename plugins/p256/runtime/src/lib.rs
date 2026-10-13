@@ -4,18 +4,20 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(not(test), feature(simd_wasm64))]
 
-use ecdsa::hazmat::{DigestPrimitive, SignPrimitive};
+use ecdsa::hazmat::DigestPrimitive;
 use p256::ecdsa::Signature;
 use p256::elliptic_curve::subtle::{ConditionallySelectable, ConstantTimeEq};
 use p256::elliptic_curve::{
+    Curve, FieldBytesEncoding,
     bigint::U256,
+    ff::PrimeField,
     group::Group,
     ops::{Invert, Reduce},
     point::AffineCoordinates,
     sec1::ToEncodedPoint,
-    zeroize::Zeroize,
+    zeroize::{Zeroize, Zeroizing},
 };
-use p256::{NistP256, ProjectivePoint, PublicKey, Scalar, SecretKey};
+use p256::{AffinePoint, NistP256, ProjectivePoint, PublicKey, Scalar, SecretKey};
 
 const INVALID_SECRET_KEY: i64 = -1;
 const INVALID_PUBLIC_KEY: i64 = -2;
@@ -163,10 +165,11 @@ const GENERATOR_COMB: [[u8; 65]; 15] = [
 // Fixed-base comb: entry bits select G, 2^64 G, 2^128 G, 2^192 G.
 // All scalar-dependent selection scans the complete table in fixed time.
 fn generator_comb(scalar: &Scalar) -> ProjectivePoint {
-    let mut table = [ProjectivePoint::IDENTITY; 16];
+    let mut table = [AffinePoint::IDENTITY; 16];
     for i in 1..16 {
-        table[i] =
-            ProjectivePoint::from(PublicKey::from_sec1_bytes(&GENERATOR_COMB[i - 1]).unwrap());
+        table[i] = *PublicKey::from_sec1_bytes(&GENERATOR_COMB[i - 1])
+            .unwrap()
+            .as_affine();
     }
     let mut bytes = scalar.to_bytes();
     let mut result = ProjectivePoint::IDENTITY;
@@ -177,7 +180,7 @@ fn generator_comb(scalar: &Scalar) -> ProjectivePoint {
             let pos = bit + 64 * column;
             digit |= ((bytes[31 - pos / 8] >> (pos & 7)) & 1) << column;
         }
-        let mut selected = ProjectivePoint::IDENTITY;
+        let mut selected = AffinePoint::IDENTITY;
         for i in 1..16 {
             selected.conditional_assign(&table[i], digit.ct_eq(&(i as u8)));
         }
@@ -207,30 +210,40 @@ fn convert_public_key(input: &[u8], compressed: bool, output: &mut [u8]) -> Resu
 fn sign_prehash(key: &[u8], hash: &[u8], output: &mut [u8]) -> Result<usize, i64> {
     let key = secret(key)?;
     digest(hash)?;
-    // RustCrypto uses RFC6979 HMAC-SHA256. Preserve S exactly; normalization is
-    // an explicit API so the published RFC6979 vectors remain byte-identical.
-    // ecdsa 0.16.9 forwards this digest into rfc6979::generate_k, whose
-    // contract requires bits2octets (reduction modulo the scalar order).
-    // Reducing also preserves ECDSA's z modulo n in the signature equation.
-    let reduced = <Scalar as Reduce<U256>>::reduce_bytes(hash.into()).to_bytes();
-    // The SigningKey wrapper eagerly derives and caches a verifying key.
-    // Signing needs only the scalar, so invoke the same upstream primitive
-    // directly and avoid an otherwise unused generator multiplication.
-    let mut scalar = key.to_nonzero_scalar();
-    let signed = scalar
-        .as_ref()
-        .try_sign_prehashed_rfc6979::<<NistP256 as DigestPrimitive>::Digest>(&reduced, &[]);
-    // Preserve SigningKey's explicit zeroization of its secret scalar copy.
-    scalar.zeroize();
-    let sig: Signature = signed.map_err(|_| INVALID_SIGNATURE)?.0;
+    // Preserve upstream RFC6979 bits2octets and ECDSA arithmetic, but reuse
+    // the constant-time fixed-base comb for k*G. Preserve S exactly; callers
+    // explicitly request normalization when their protocol requires low S.
+    let reduced = <Scalar as Reduce<U256>>::reduce_bytes(hash.into());
+    let scalar = Zeroizing::new(key.to_nonzero_scalar());
+    let secret_bytes = Zeroizing::new(scalar.to_repr());
+    let nonce_bytes = Zeroizing::new(rfc6979::generate_k::<
+        <NistP256 as DigestPrimitive>::Digest,
+        _,
+    >(
+        &secret_bytes,
+        &NistP256::ORDER.encode_field_bytes(),
+        &reduced.to_bytes(),
+        &[],
+    ));
+    // generate_k guarantees 0 < k < n. Inversion must stay constant-time:
+    // invert_vartime is used exclusively by public signature verification.
+    let nonce = Zeroizing::new(Scalar::from_repr(*nonce_bytes).unwrap());
+    let inverse = Zeroizing::new(nonce.invert().unwrap());
+    let point = generator_comb(&nonce).to_affine();
+    let r = <Scalar as Reduce<U256>>::reduce_bytes(&point.x());
+    let product = Zeroizing::new(r * scalar.as_ref());
+    let numerator = Zeroizing::new(reduced + *product);
+    let s = *inverse * *numerator;
+    // Upstream validation rejects the vanishingly rare zero r or s case.
+    let sig = Signature::from_scalars(r, s).map_err(|_| INVALID_SIGNATURE)?;
     output[..64].copy_from_slice(&sig.to_bytes());
     Ok(64)
 }
 
 // Verification scalars are derived exclusively from the public key, digest and
 // signature. Direct table indexing and zero-digit branches below therefore do
-// not depend on secret data. Signing nonce multiplication uses upstream
-// constant-time arithmetic; public-key derivation uses the separate comb.
+// not depend on secret data. Signing and public-key derivation use the separate
+// constant-time fixed-base comb.
 fn verification_lincomb(u1: &Scalar, q: &ProjectivePoint, u2: &Scalar) -> ProjectivePoint {
     fn table(point: &ProjectivePoint) -> [ProjectivePoint; 8] {
         let mut points = [ProjectivePoint::IDENTITY; 8];
@@ -633,6 +646,60 @@ mod tests {
             assert_eq!(sign_prehash(&hex(SECRET), &hex(hash), &mut out), Ok(64));
             assert_eq!(&out[..], hex(expected));
             assert_eq!(verify_prehash(&hex(PUBLIC), &hex(hash), &out), Ok(true));
+        }
+    }
+
+    #[test]
+    fn comb_signing_matches_upstream() {
+        use ecdsa::hazmat::SignPrimitive;
+        use sha2::{Digest, Sha256};
+        let order = NistP256::ORDER.encode_field_bytes();
+        let before_order = (-Scalar::ONE).to_bytes();
+        let mut keys = vec![Scalar::ONE, Scalar::from(2u64), -Scalar::ONE];
+        let hashes = [
+            [0u8; 32],
+            Scalar::ONE.to_bytes().into(),
+            before_order.into(),
+            order.into(),
+            [0xffu8; 32],
+            hex(HASH).try_into().unwrap(),
+        ];
+        for bit in 0..256 {
+            let mut bytes = [0u8; 32];
+            bytes[31 - bit / 8] = 1 << (bit & 7);
+            keys.push(Scalar::from_repr(bytes.into()).unwrap());
+        }
+        for i in 0u32..256 {
+            keys.push(<Scalar as Reduce<U256>>::reduce_bytes(&Sha256::digest(
+                i.to_be_bytes(),
+            )));
+        }
+        for (i, scalar) in keys.iter().enumerate() {
+            let hash: [u8; 32] = if i < 3 {
+                // Boundary secrets exercise every digest boundary below.
+                hashes[i]
+            } else {
+                Sha256::digest((i as u32).to_le_bytes()).into()
+            };
+            let selected = if i < 3 {
+                hashes.as_slice()
+            } else {
+                core::slice::from_ref(&hash)
+            };
+            for hash in selected {
+                let reduced = <Scalar as Reduce<U256>>::reduce_bytes(hash.into()).to_bytes();
+                let expected: Signature = scalar
+                    .try_sign_prehashed_rfc6979::<Sha256>(&reduced, &[])
+                    .unwrap()
+                    .0;
+                let mut output = [0u8; 64];
+                assert_eq!(sign_prehash(&scalar.to_bytes(), hash, &mut output), Ok(64));
+                assert_eq!(output.as_slice(), expected.to_bytes().as_slice());
+                let key = (ProjectivePoint::GENERATOR * scalar)
+                    .to_affine()
+                    .to_encoded_point(true);
+                assert_eq!(verify_prehash(key.as_bytes(), hash, &output), Ok(true));
+            }
         }
     }
 
