@@ -108,6 +108,33 @@ impl<'a, 'b> Mul<&'b Fp2> for &'a Fp2 {
 impl_binops_additive!(Fp2, Fp2);
 impl_binops_multiplicative!(Fp2, Fp2);
 
+#[test]
+fn test_karatsuba_matches_interleaved() {
+    use rand_core::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    let mut rng = XorShiftRng::from_seed([0x27; 16]);
+    let edges = [Fp::zero(), Fp::one(), -Fp::one()];
+    for a0 in edges {
+        for a1 in edges {
+            for b0 in edges {
+                for b1 in edges {
+                    let a = Fp2 { c0: a0, c1: a1 };
+                    let b = Fp2 { c0: b0, c1: b1 };
+                    assert_eq!(a * b, a.mul_interleaved(&b));
+                }
+            }
+        }
+    }
+    for _ in 0..4096 {
+        let a = Fp2::random(&mut rng);
+        let b = Fp2::random(&mut rng);
+        assert_eq!(a * b, a.mul_interleaved(&b));
+        assert_eq!(a * a, a.square());
+        assert_eq!(a * -a, a.mul_interleaved(&-a));
+    }
+}
+
 impl Fp2 {
     #[inline]
     pub const fn zero() -> Fp2 {
@@ -203,6 +230,18 @@ impl Fp2 {
     }
 
     pub fn mul(&self, rhs: &Fp2) -> Fp2 {
+        // Three-product Karatsuba for u^2 = -1. Unlike interleaved
+        // multiplication, this trades one product for one reduction.
+        let a = self.c0 * rhs.c0;
+        let b = self.c1 * rhs.c1;
+        Fp2 {
+            c0: a - b,
+            c1: (self.c0 + self.c1) * (rhs.c0 + rhs.c1) - a - b,
+        }
+    }
+
+    #[cfg(test)]
+    fn mul_interleaved(&self, rhs: &Fp2) -> Fp2 {
         // F_{p^2} x F_{p^2} multiplication implemented with operand scanning (schoolbook)
         // computes the result as:
         //
