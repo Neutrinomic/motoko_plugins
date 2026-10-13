@@ -8,8 +8,36 @@ pub const fn adc(a: u64, b: u64, carry: u64) -> (u64, u64) {
 /// Compute a - (b + borrow), returning the result and the new borrow.
 #[inline(always)]
 pub const fn sbb(a: u64, b: u64, borrow: u64) -> (u64, u64) {
-    let ret = (a as u128).wrapping_sub((b as u128) + ((borrow >> 63) as u128));
-    (ret as u64, (ret >> 64) as u64)
+    let (ret, borrow_a) = a.overflowing_sub(b);
+    let (ret, borrow_b) = ret.overflowing_sub(borrow >> 63);
+    (ret, 0u64.wrapping_sub((borrow_a | borrow_b) as u64))
+}
+
+#[test]
+fn test_sbb_matches_wide_arithmetic() {
+    fn check(a: u64, b: u64, borrow: u64) {
+        let expected = (a as u128).wrapping_sub((b as u128) + ((borrow >> 63) as u128));
+        assert_eq!(sbb(a, b, borrow), (expected as u64, (expected >> 64) as u64));
+    }
+
+    let edges = [
+        0, 1, 2, 0xffff_fffe, 0xffff_ffff, 0x1_0000_0000,
+        0x1_0000_0001, 0xffff_ffff_0000_0000, 0xffff_ffff_0000_0001,
+        0x7fff_ffff_ffff_ffff, 0x8000_0000_0000_0000, u64::MAX - 1, u64::MAX,
+    ];
+    for a in edges {
+        for b in edges {
+            for borrow in edges {
+                check(a, b, borrow);
+            }
+        }
+    }
+    use rand_core::{RngCore, SeedableRng};
+    use rand_xorshift::XorShiftRng;
+    let mut rng = XorShiftRng::from_seed([0x73; 16]);
+    for _ in 0..100_000 {
+        check(rng.next_u64(), rng.next_u64(), rng.next_u64());
+    }
 }
 
 /// Compute a + (b * c) + carry, returning the result and the new carry over.
