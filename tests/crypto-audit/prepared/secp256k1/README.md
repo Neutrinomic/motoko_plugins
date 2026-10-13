@@ -27,6 +27,14 @@ to 2,584,269 for Schnorr signing. Setup is separate: 484,693 / 485,205 / 2,517,3
 instructions respectively. These fixture-specific counters justify the cache;
 the integration report owns the larger reuse/cold-call benchmark cohort.
 
+[Independent final numeric review](final-benchmark-review.json) verifies all 117
+final observations, all 81 format-screen observations, and all twelve reported
+cold/reuse table rows against their raw results. The final cohort uses the
+approved runtime above. Actual preparation-plus-reuse batches become cheaper
+than direct calls at two operations for each measured fixture. Allocation claims
+distinguish the prepared payload, preparation allocation and per-call allocation;
+no isolated live-heap or secure-erasure result is inferred.
+
 This directory owns only audit fixtures, generators, reports and their native
 harness. [Vendor provenance](vendor-evidence.json) independently checks all 34
 original files and reapplies the exact patch from the pinned crate archive.
