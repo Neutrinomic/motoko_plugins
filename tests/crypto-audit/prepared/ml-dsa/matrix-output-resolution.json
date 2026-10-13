@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "4657a21",
+  "runtimeSha256": "104aedb9853a4f039c825e14136db44af879d17edb692812751ab75393f44696",
+  "keygenOutput": "Original 16,608-byte (public, private) pair; optional third pointer receives matrix only when nonzero.",
+  "sinkGuard": [
+    "    block  ;; label = @1",
+    "      local.get 2",
+    "      i64.eqz",
+    "      br_if 0 (;@1;)"
+  ],
+  "sinkBlockCopies": 16,
+  "bytesPerCopy": 1024,
+  "callers": [
+    {
+      "function": "$_RNvCskkmlHYvOQH5_21motoko_compute_ml_dsa4sign",
+      "instructions": [
+        "        local.set 1",
+        "        br 1 (;@1;)",
+        "      end",
+        "      local.get 9",
+        "      i64.const 16608",
+        "      i64.add",
+        "      local.get 0",
+        "      i64.const 0",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "passesNullSink": true
+    },
+    {
+      "function": "$mldsa_prepare_secret_key",
+      "instructions": [
+        "      i32.const 0",
+        "      i64.const 16384",
+        "      memory.fill",
+        "      local.get 3",
+        "      i64.const 32992",
+        "      i64.add",
+        "      local.get 0",
+        "      local.get 3",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "passesNullSink": false
+    },
+    {
+      "function": "$mldsa_public_key",
+      "instructions": [
+        "        br_if 0 (;@2;)",
+        "        i64.const 0",
+        "        local.set 1",
+        "        local.get 3",
+        "        i64.const 16608",
+        "        i64.add",
+        "        local.get 0",
+        "        i64.const 0",
+        "        call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "passesNullSink": true
+    }
+  ],
+  "verdict": "Direct publicKey and direct sign pass null. The entire matrix clone block is skipped. No unconditional 16 KiB returned matrix copy remains."
+}

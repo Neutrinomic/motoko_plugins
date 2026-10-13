@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "completedAtUtc": "2026-10-13T05:01:05.705579+00:00",
+  "verdict": "Approved for correctness, nominal type boundary, native scratch and GC retention for these frozen artifacts; no unresolved blocking finding. Performance comparison is a separately executed benchmark scope.",
+  "productionSourceCommit": "4657a21d1e350cb2b30bff73ab39b3af79b456a3",
+  "runtimeSha256": "104aedb9853a4f039c825e14136db44af879d17edb692812751ab75393f44696",
+  "pluginSha256": "213365588b45552c5330cd6e30586f348a9eb75780a27836b30e66ae81dd06bb",
+  "mocExecutableSha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "commands": [
+    {
+      "gate": "positive all-engine",
+      "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+      "argv": [
+        "nix",
+        "develop",
+        "--command",
+        "bash",
+        "-c",
+        "export PATH=/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin:$PATH; test-runner -b /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/tests/crypto-audit/prepared/ml-dsa/run"
+      ],
+      "log": "logs/test-runner-positive.log",
+      "exitCode": 0,
+      "logSha256": "65d1507aac3a0be12634595fa52eb8025706e74721ee83cb3fc82348faf2318d"
+    },
+    {
+      "gate": "negative expectations generated",
+      "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+      "argv": [
+        "nix",
+        "develop",
+        "--command",
+        "bash",
+        "-c",
+        "export PATH=/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin:$PATH; test-runner -b -a /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/tests/crypto-audit/prepared/ml-dsa/fail"
+      ],
+      "log": "logs/test-runner-negative-accept.log",
+      "exitCode": 0,
+      "logSha256": "16d0e4b6d3b7c760641fce9feec26699f3a7fc761551be58856bdfdd6f9947ab"
+    },
+    {
+      "gate": "negative expectations checked",
+      "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+      "argv": [
+        "nix",
+        "develop",
+        "--command",
+        "bash",
+        "-c",
+        "export PATH=/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin:$PATH; test-runner -b /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/tests/crypto-audit/prepared/ml-dsa/fail"
+      ],
+      "log": "logs/test-runner-negative-check.log",
+      "exitCode": 0,
+      "logSha256": "55504db7eaa149f04081cc1cbfbd99f5572546fe744e9fe7962e3b4b148fa3e7"
+    },
+    {
+      "gate": "actual GC retention",
+      "cwd": "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa",
+      "argv": [
+        "bun",
+        "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/rsa/_build/prepared-validation/ash-local/src/index.ts",
+        "test",
+        "/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa/tests/crypto-audit/prepared/ml-dsa/Retained.ash.json",
+        "--verbose"
+      ],
+      "log": "logs/ash-retained.log",
+      "exitCode": 0,
+      "logSha256": "c28ba076b5870079cdbc5623103376b3d904b54b47f764e826d01454f2ae003e"
+    },
+    {
+      "gate": "native release",
+      "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+      "argv": [
+        "nix",
+        "develop",
+        "--command",
+        "bash",
+        "-c",
+        "cd /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa; cargo test --offline --release -p motoko-compute-ml-dsa"
+      ],
+      "log": "logs/native-release.log",
+      "exitCode": 0,
+      "logSha256": "b488f4cf3876de86cee3059d86d542c18e1508e24c230311038a4a1e78b073ea"
+    },
+    {
+      "gate": "native debug",
+      "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+      "argv": [
+        "nix",
+        "develop",
+        "--command",
+        "bash",
+        "-c",
+        "cd /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/ml-dsa; cargo test --offline -p motoko-compute-ml-dsa"
+      ],
+      "log": "logs/native-debug.log",
+      "exitCode": 0,
+      "logSha256": "45edd0a688856b328677c301d70f5bd5423cc2b2affb2fe02ba46b2d343dd019"
+    }
+  ],
+  "testSourcesAndExpectationsSha256": {
+    "Cases.mo": "a86440303665a29c4cb987bdc8b7ca2af2e567a08c86a249e6b3611fbf8fb47e",
+    "Retained.mo": "a5a3975da5e9d03fc0b392672baf42aed73bc4aad748cab1c5fc2928710281b2",
+    "Retained.ash.json": "e13e8d9cf22a6a092dbf943f9209b1d7b2b11b8a89b00375a127e58f13162d9b",
+    "run/independent.mo": "a31a1f951d4e259f2c9cb38490c250fe1504040d2fa48563e8da11c998cb2ac7",
+    "fail/blob-cannot-forge-public.mo": "5a5e5a048ef68e1c77805bf3f41335fca0fcd2f5d023d65cfccb4ece2b09d043",
+    "fail/blob-cannot-forge-secret.mo": "d6d534145ffa474a2415d2d346ff767febf3a74fd1abce28fd73716db6d205e4",
+    "fail/candid-cannot-forge-prepared.mo": "6dba36ad955b40e804263440d21378cfe2a2597f42ed4521e8a939b55f87eb41",
+    "fail/prepared-is-not-blob.mo": "f79cfbfc91e1566077bc23b70225e4fda819af64f62931d920fa01a04b4cfd77",
+    "fail/prepared-is-not-candid.mo": "0d1d1f903b58173001847478203ed8e144274fd44855afe5e039ed11dc5c0e6f",
+    "fail/prepared-is-not-debug-text.mo": "88eacdf05e1340bb3ee500c665eb6f016a1b23c1d6106733acb5e4c8a73a3437",
+    "fail/prepared-is-not-shared.mo": "61b8ce89d162e43f7d1f0f14caa0ce7707ae61d5ad7e79fa599f3f8858c24c97",
+    "fail/prepared-is-not-stable.mo": "3f2394cad5344cb098b04fd7530ba51effc3d1323a3c430ea4cc0fcaa5d94445",
+    "fail/public-is-not-secret.mo": "1e839b8d09c4fc9afc239f0e42c347feb59539aa6c7e14071e64eecb4239dcdb",
+    "fail/secret-is-not-public.mo": "b5168a7ad0827c1fdc4741efbceeaf1eeb45f48c5e0e949553df77fa42d70723",
+    "fail/ok/blob-cannot-forge-public.tc-human.ok": "3f398bef4ac98e4641881dedf9a66a6021efff1b4ff9ce09064a3fed52d65269",
+    "fail/ok/blob-cannot-forge-public.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/blob-cannot-forge-public.tc.ok": "382faeaea04d6564371dcffbc5df44f23472b6c7671b9d009bd8c5444e65f4c7",
+    "fail/ok/blob-cannot-forge-public.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/blob-cannot-forge-secret.tc-human.ok": "7b0bc93ae4ad45296fca4c62ae7809b077e383168db455d0c06935d5dc2cd1b4",
+    "fail/ok/blob-cannot-forge-secret.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/blob-cannot-forge-secret.tc.ok": "8169b48f97954d95a350ae55f843060ca25a7819c8f961c1b0bf60dc7c3b40e2",
+    "fail/ok/blob-cannot-forge-secret.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/candid-cannot-forge-prepared.tc-human.ok": "1f93d4940fe0054f5cc7b6617e32e098aae991e73722ccfced1b2fa1bac78cfc",
+    "fail/ok/candid-cannot-forge-prepared.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/candid-cannot-forge-prepared.tc.ok": "c7a01b24c64168ebf72240788f61b6b38adb6ab09fb67a6cbe33aadd57bb4e99",
+    "fail/ok/candid-cannot-forge-prepared.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-blob.tc-human.ok": "9432ca25b69725992f3a0b409dbf8d649df48f1ca3c5f7d02f99124b7881d5fd",
+    "fail/ok/prepared-is-not-blob.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-blob.tc.ok": "2e60d7b47b38dcd407b235633e8e3ad162aa796932182ba144fbe18ea2bab4f1",
+    "fail/ok/prepared-is-not-blob.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-candid.tc-human.ok": "b2bc4a5adf9b34bcb439d8c1ee586a64d5de18b5aa2d42c318e74acaba8cd6c8",
+    "fail/ok/prepared-is-not-candid.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-candid.tc.ok": "11953604cefeab823450d7231f3039c563d0be7f87e96ccd997e243fca1af29a",
+    "fail/ok/prepared-is-not-candid.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-debug-text.tc-human.ok": "81951d36051e9fb46da13c8532e41f38adee15429b95d2ca8bc1657bc502f1ce",
+    "fail/ok/prepared-is-not-debug-text.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-debug-text.tc.ok": "20f4a8e23031dec92992b82d83c50bc9658c84516643129c73554959ae3aa8b3",
+    "fail/ok/prepared-is-not-debug-text.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-shared.tc-human.ok": "f155829cb5253e4b523c770f6401409c3686448b14854ca4a3e67c3be015d3ae",
+    "fail/ok/prepared-is-not-shared.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-shared.tc.ok": "54ea46fabed150c3509190bdf1aa5458f7e9fce5396b72a312b0d2ea9f2746b1",
+    "fail/ok/prepared-is-not-shared.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-stable.tc-human.ok": "2a4686cad9a7c7c5089fa0c20475c76186afc751274b450317bfc93de8c8bef0",
+    "fail/ok/prepared-is-not-stable.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/prepared-is-not-stable.tc.ok": "77e6412b2e688717b710a16a23fb69d11179a917ab2d975785b092b723539f62",
+    "fail/ok/prepared-is-not-stable.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/public-is-not-secret.tc-human.ok": "8106bc87dda7c72e11c50745ab5d198b14163bb57aa2ea5d9c8d70e3d282eff6",
+    "fail/ok/public-is-not-secret.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/public-is-not-secret.tc.ok": "d4bd32c5c522749315d72f66561cd9844e650448649d7899697ad2b9a6d9cc97",
+    "fail/ok/public-is-not-secret.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/secret-is-not-public.tc-human.ok": "1057265330d5b55418ceba8c3eb2e7336fc6d9b21af998c944af0030558a0352",
+    "fail/ok/secret-is-not-public.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "fail/ok/secret-is-not-public.tc.ok": "01e7daa841a33125d84d87e0e8bebadfd5f046a41d2b57830bebe9159603c053",
+    "fail/ok/secret-is-not-public.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135"
+  },
+  "silentAllEngineOutputSuffixes": [
+    "tc",
+    "comp",
+    "valid",
+    "run",
+    "run-ir",
+    "diff-ir",
+    "run-low",
+    "diff-low",
+    "wasm-run"
+  ],
+  "generatedWasmSha256": {
+    "independent": "593795d083829ddbc1b81decd947f72d02c69885739edf70d503b0c933be53e7",
+    "ashRetention": "a8c1fbca69639103f0120c64ad24cdea43ea21f6183e63f133e096db592b5c19"
+  },
+  "gcEvidence": {
+    "completedMessageBoundaries": 13,
+    "minimumReclaimedBytesAsserted": 4194304,
+    "distinctKeyPairsRetained": 2,
+    "roots": "Transient actor state, array/record, async frame and closure",
+    "metricScope": "Printed529 instructions/0B are the empty final Test.test block, not crypto or GC cost."
+  },
+  "limitations": [
+    "Prepared secret bytes remain sensitive managed heap data; no secure-erasure promise.",
+    "Signing retains upstream variable rejection behavior, including documented u16 loop limitation.",
+    "Static bound covers native Wasm shadow stack only; no constant instruction bound.",
+    "Production plugin is wasm64; this audit does not claim a separately executed wasm32 build.",
+    "Some Nix launches logged an explicitly ignored eval-cache SQLite busy warning; actual tests executed and returned success."
+  ]
+}

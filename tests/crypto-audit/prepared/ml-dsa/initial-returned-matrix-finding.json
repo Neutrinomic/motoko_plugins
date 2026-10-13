@@ -1,0 +1,35 @@
+{
+  "sourceCommit": "958a8ee",
+  "runtimeSha256": "d15fb5652f6a5b0929878cf43f684437113c1b889b6968c97acfb8a833deb3fe",
+  "finding": "Direct key generation unnecessarily returns/copies and drops a 16 KiB matrix that is used only by prepared factories.",
+  "evidence": {
+    "helper": "key_gen_internal_with_matrix",
+    "copyBytes": 16384,
+    "resultByteOffset": 16608,
+    "watInstructions": [
+      "    local.get 0",
+      "    i64.const 16608",
+      "    i64.add",
+      "    local.get 2",
+      "    i64.const 8672",
+      "    i64.add",
+      "    i64.const 16384",
+      "    memory.copy"
+    ],
+    "callers": [
+      {
+        "line": 28172,
+        "caller": "$_RNvCskkmlHYvOQH5_21motoko_compute_ml_dsa4sign"
+      },
+      {
+        "line": 42210,
+        "caller": "$mldsa_prepare_secret_key"
+      },
+      {
+        "line": 42404,
+        "caller": "$mldsa_public_key"
+      }
+    ]
+  },
+  "resolution": "Replace triple return with original (public, private) return and optional mutable matrix output; regenerate evidence for rebuilt artifact."
+}

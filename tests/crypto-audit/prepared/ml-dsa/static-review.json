@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-13T04:45:31.058261+00:00",
+  "scope": "Static source review of prepared ML-DSA-44 arithmetic, cache format, runtime wrappers and compiler binding; not overall release approval.",
+  "verdict": "No blocking source defect found in the pinned files.",
+  "reviewedSourcesSha256": {
+    "plugins/ml-dsa/runtime/vendor/fips204/src/lib.rs": "4e301d742735c3c08c8d25c2fcb2ec98a61e38351a6c4df0d91606aa483f034b",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/ml_dsa.rs": "03dc9260f2a19d072000a7d5a635296f1d1dc91869a7a6550a72950178155246",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/motoko_prepared.rs": "5b3ee14220d80313394bb9cc5fdcfdad57a3f2a4dd62826db8f346a058cc5c13",
+    "plugins/ml-dsa/runtime/src/lib.rs": "4b9a0899f02842dae0316817f62921b08e4795167ec901d68f639d01524b0b7c",
+    "plugins/ml-dsa/compiler/register.ml": "ac932533c24b79cd80e61edcd609eabce9973d7ab60fe5fd75958da4b2e12138",
+    "plugins/ml-dsa/compiler/prepared_types.ml": "fe23130266dee34abc2e083ce8d77302a523a6e35083df3f5526d15cae1be345",
+    "plugins/ml-dsa/runtime/Cargo.toml": "795a2e575736730015d59266a3d62e5c03eacb37712b203d3d216fdf6806ffb5"
+  },
+  "upstream": {
+    "crate": "fips204",
+    "version": "0.4.6",
+    "publishedCrateSha256": "c9fb5a367b9846933e271a3c2a992930743f82ae5e8cb7faa780715a80fa0b15",
+    "vcsCommit": "8d456d989dce681233ef963d3c3306da8f76d7c7",
+    "comparison": "Local crates.io registry extraction compared byte-for-byte with vendored directory.",
+    "baseFileCount": 32,
+    "vendorFileCount": 28,
+    "unchangedFileCount": 25,
+    "modified": [
+      {
+        "path": "src/lib.rs",
+        "baseSha256": "fb073c02f39284431c072b587e8f97abe930c4b53fc40e47cd33f2e4c571ea0f",
+        "vendorSha256": "4e301d742735c3c08c8d25c2fcb2ec98a61e38351a6c4df0d91606aa483f034b"
+      },
+      {
+        "path": "src/ml_dsa.rs",
+        "baseSha256": "8cd47b247be255f6eb2ea5e1ab9928b1fa3b27f0fafb1b06fa364c50e96013e8",
+        "vendorSha256": "03dc9260f2a19d072000a7d5a635296f1d1dc91869a7a6550a72950178155246"
+      }
+    ],
+    "added": [
+      {
+        "path": "src/motoko_prepared.rs",
+        "sha256": "5b3ee14220d80313394bb9cc5fdcfdad57a3f2a4dd62826db8f346a058cc5c13"
+      }
+    ],
+    "removedMetadataOrCI": [
+      ".cargo-ok",
+      ".cargo_vcs_info.json",
+      ".github/workflows/provenance.yaml",
+      ".github/workflows/test.yml",
+      ".gitignore"
+    ]
+  },
+  "cacheFormat": {
+    "representation": "Immutable protected managed Blob; explicit signed i32 little-endian coefficients; no native struct layout, padding, pointers or alignment assumptions.",
+    "public": {
+      "bytes": 20576,
+      "fieldsInOrder": [
+        [
+          "rho",
+          32
+        ],
+        [
+          "tr",
+          64
+        ],
+        [
+          "t1_d2_hat_mont",
+          4096
+        ],
+        [
+          "A_hat",
+          16384
+        ]
+      ]
+    },
+    "secret": {
+      "bytes": 28800,
+      "fieldsInOrder": [
+        [
+          "rho",
+          32
+        ],
+        [
+          "K",
+          32
+        ],
+        [
+          "tr",
+          64
+        ],
+        [
+          "s1_hat_mont",
+          4096
+        ],
+        [
+          "s2_hat_mont",
+          4096
+        ],
+        [
+          "t0_hat_mont",
+          4096
+        ],
+        [
+          "A_hat",
+          16384
+        ]
+      ]
+    },
+    "arrayOrder": "Key vectors: polynomial then coefficient. Matrix: row r then column s then coefficient; ExpandA samples rho || s || r.",
+    "domains": "A_hat retains upstream ordinary NTT coefficients; key polynomial fields retain upstream Montgomery representation. Reader uses i32::from_le_bytes without normalization.",
+    "decoderTrust": "Fixed cache lengths and coefficient invariants come from the matching factory and SDK protected-type provenance; arbitrary cache import is not allowed."
+  },
+  "conclusions": [
+    "Key generation retains its original key-pair return and local matrix scope. Only prepared construction requests a copy into an initialized matrix output; public preparation expands the canonical raw key and matrix once.",
+    "Signing and verification substitute only the supplied matrix. NTT/arithmetic/hashing/encodings modules are byte-identical to upstream; key/signature acceptance, hint checks, z norm and rejection sampling are unchanged.",
+    "Pure ML-DSA message/context framing, challenge hashes, signing rnd, masks and responses remain recomputed per call. ML-DSA-44 constants match upstream.",
+    "Runtime factories enforce raw key lengths and publish exactly initialized cache bytes only on success. Consumers validate context, signature and randomness lengths as applicable.",
+    "Compiler allocates outputs before forming borrowed payload pointers. Consumers create initialized temporary stack objects; no callback, GC safepoint, cache mutation or pointer retention occurs inside these runtime calls.",
+    "Upstream temporary key/polynomial Drop zeroization remains active. The retained managed secret cache is not securely erased by GC; no comprehensive scratch-erasure claim is made."
+  ],
+  "limitationsAndPendingGates": [
+    "SDK nominal unforgeability and nonshared/nonstable enforcement are assumed; this source review does not prove the compiler/type-system boundary.",
+    "At the time of static review, executable vectors, interpreter/Wasm parity, GC retention, release Wasm stack bounds and measured performance approval were pending. Subsequent correctness/GC/stack evidence is linked below; performance remains a separate benchmark scope.",
+    "The optional output sink removed the source-level matrix return. Subsequent matrix-output-resolution.json confirms direct callers skip copying, and stack.json pins final frame bounds; instruction regression comparisons belong to the benchmark report.",
+    "Existing upstream unchecked u16 rejection-counter and incomplete raw-byte/SHAKE scratch-erasure limitations are not changed by this patch."
+  ],
+  "references": [
+    "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf",
+    "https://docs.rs/crate/fips204/0.4.6/source/src/ml_dsa.rs"
+  ],
+  "keyGenerationRevisionReview": {
+    "directPath": "key_gen_internal passes None, returns the original (PublicKey, PrivateKey), and executes the upstream arithmetic unchanged. No matrix is returned in the tuple.",
+    "preparedPath": "prepare_secret initializes all 16 matrix polynomials to zero, passes Some(&mut matrix), and clone_from overwrites every coefficient before serialization. All 28,800 cache bytes remain initialized.",
+    "dropBehavior": "The local generated matrix is dropped at its original upstream block boundary. The optional cloned matrix owns separate polynomial arrays; dropping the source cannot erase the destination. Public/secret key temporaries and prepared matrix retain their existing Drop behavior.",
+    "branch": "The added branch depends solely on the caller choosing None or Some; no new key-, message- or randomness-dependent decision is introduced.",
+    "otherReviewedChange": "Compiler register.ml now selects specialization.C.argument_types instead of specialization.P.argument_types; operand order, allocation-before-pointer formation and protected unwrap/wrap behavior are unchanged.",
+    "executionAndStackStatus": "Source review alone did not establish generated code behavior. Subsequent validation.json, stack.json and matrix-output-resolution.json record executed and Wasm evidence."
+  },
+  "subsequentExecutionEvidence": "validation.json"
+}
