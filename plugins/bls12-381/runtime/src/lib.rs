@@ -274,9 +274,8 @@ fn map_g2(bytes: &[u8]) -> Result<G2Projective, u32> {
 }
 
 fn pair_equal(a: G1Affine, b: G2Affine, c: G1Affine, d: G2Affine) -> bool {
-    let b = dynamic_g2_preparation(b);
-    let d = dynamic_g2_preparation(d);
-    prepared_miller_loop(&[(&a, pairing_source(&b)), (&-c, pairing_source(&d))])
+    bls12_381::plugin_prepared::two_term_miller_loop(
+        [(&a, &b), (&-c, &d)], &G2_GENERATOR_TABLE.0)
         .final_exponentiation() == Gt::identity()
 }
 

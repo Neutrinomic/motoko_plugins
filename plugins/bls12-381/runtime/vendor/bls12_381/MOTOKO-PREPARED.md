@@ -47,6 +47,25 @@ the complete result with the original final-exponentiation formula for
 nonzero values. The remaining formula and nonzero Miller-result invariant
 are unchanged.
 
+## Two-term streaming pairing
+
+`two_term_miller_loop` computes each dynamic G2 coefficient immediately before
+the existing `ell` operation, using the upstream Miller loop, doubling and
+addition formulas. Fixed G2 generator operands borrow the immutable generator
+table. Identity G2 operands substitute generator state and mask their
+contribution exactly as upstream preparation does; G1 identity also remains
+neutral. The runtime uses this path for two-term pairing equality checks.
+General aggregate products and prepared IC verification retain their existing
+owned/borrowed paths. No public Motoko API, prepared payload or validation rule
+changes.
+
+The driver owns exactly two curve states, bounded to 1,024 bytes by a unit test,
+and allocates no coefficient tables. This bounds Rust driver state, not the
+total compiled Wasm stack frame or peak stack use. Tests compare both raw
+Miller results and final pairings with the existing owned and borrowed/mixed
+loops across generators, all identity positions, negatives and cancellation,
+seeded subgroup points and hash-derived points with the experimental feature.
+
 ## Payload contract
 
 These hooks implement a private payload for the matching Motoko plugin build.

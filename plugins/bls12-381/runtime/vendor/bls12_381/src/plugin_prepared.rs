@@ -226,6 +226,100 @@ pub fn multi_miller_loop(terms: &[(&G1Affine, G2PreparedSource<'_>)]) -> MillerL
     MillerLoopResult(miller_loop(&mut Adder { terms, index: 0 }))
 }
 
+// Only two states are needed by signature/proof equality checks. General
+// aggregate loops retain their existing precomputation/consolidation path.
+struct StreamingTerm<'a> {
+    point: &'a G1Affine,
+    cur: G2Projective,
+    base: G2Affine,
+    skip: Choice,
+    generator: bool,
+}
+
+impl<'a> StreamingTerm<'a> {
+    fn new(point: &'a G1Affine, q: &G2Affine) -> Self {
+        let infinity = q.is_identity();
+        // Match G2Prepared::from: compute harmless generator coefficients for
+        // an identity Q, then mask its contribution to the Miller product.
+        let base = G2Affine::conditional_select(q, &G2Affine::generator(), infinity);
+        Self {
+            point,
+            cur: G2Projective::from(base),
+            base,
+            skip: point.is_identity() | infinity,
+            generator: q == &G2Affine::generator(),
+        }
+    }
+}
+
+struct StreamingPair<'a> {
+    terms: [StreamingTerm<'a>; 2],
+    generator: &'a [u8; G2_PREPARED_BYTES],
+    index: usize,
+}
+
+impl StreamingPair<'_> {
+    fn step(&mut self, mut f: Fp12, addition: bool) -> Fp12 {
+        for term in &mut self.terms {
+            let coefficient = if term.generator {
+                let start = self.index * COEFFICIENT_BYTES;
+                read_coefficient_trusted(&self.generator[start..start + COEFFICIENT_BYTES])
+            } else if addition {
+                addition_step(&mut term.cur, &term.base)
+            } else {
+                doubling_step(&mut term.cur)
+            };
+            let new_f = ell(f, &coefficient, term.point);
+            f = Fp12::conditional_select(&new_f, &f, term.skip);
+        }
+        self.index += 1;
+        f
+    }
+}
+
+impl MillerLoopDriver for StreamingPair<'_> {
+    type Output = Fp12;
+
+    fn doubling_step(&mut self, f: Fp12) -> Fp12 {
+        self.step(f, false)
+    }
+    fn addition_step(&mut self, f: Fp12) -> Fp12 {
+        self.step(f, true)
+    }
+    fn square_output(f: Fp12) -> Fp12 {
+        f.square()
+    }
+    fn conjugate(f: Fp12) -> Fp12 {
+        f.conjugate()
+    }
+    fn one() -> Fp12 {
+        Fp12::one()
+    }
+}
+
+/// Runs a two-term Miller product without allocating dynamic coefficient tables.
+///
+/// `generator` must be the unchanged output of `write_g2_prepared` for this
+/// crate's G2 generator. Generator operands borrow that immutable table; other
+/// operands compute each coefficient immediately before its existing `ell`
+/// operation. Identity operands remain neutral. The driver owns exactly two
+/// bounded curve states and uses the existing Miller loop and curve formulas.
+/// No input reference or mutable state survives the call.
+pub fn two_term_miller_loop(
+    terms: [(&G1Affine, &G2Affine); 2],
+    generator: &[u8; G2_PREPARED_BYTES],
+) -> MillerLoopResult {
+    let mut driver = StreamingPair {
+        terms: [
+            StreamingTerm::new(terms[0].0, terms[0].1),
+            StreamingTerm::new(terms[1].0, terms[1].1),
+        ],
+        generator,
+        index: 0,
+    };
+    MillerLoopResult(miller_loop(&mut driver))
+}
+
 #[cfg(test)]
 #[path = "plugin_prepared_tests.rs"]
 mod tests;

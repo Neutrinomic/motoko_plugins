@@ -213,3 +213,160 @@ fn neutral_and_cancelling_terms_preserve_pairing_semantics() {
         expected
     );
 }
+
+fn assert_streaming_pair(
+    points: [G1Affine; 2],
+    qs: [G2Affine; 2],
+    generator: &[u8; G2_PREPARED_BYTES],
+) -> Gt {
+    let owned = qs.map(G2Prepared::from);
+    let expected = upstream_miller_loop(&[(&points[0], &owned[0]), (&points[1], &owned[1])]);
+    let actual = two_term_miller_loop([(&points[0], &qs[0]), (&points[1], &qs[1])], generator);
+    assert_eq!(actual.0, expected.0);
+
+    // Trusted tables intentionally cannot represent identity. Keep those terms
+    // owned, exercising the independent borrowed/mixed driver for every input.
+    let bytes = qs.map(|q| {
+        if bool::from(q.is_identity()) {
+            None
+        } else {
+            Some(table(q))
+        }
+    });
+    let sources = core::array::from_fn::<_, 2, _>(|i| {
+        (
+            &points[i],
+            match &bytes[i] {
+                Some(bytes) => G2PreparedSource::TrustedBytes(bytes),
+                None => G2PreparedSource::Owned(&owned[i]),
+            },
+        )
+    });
+    let borrowed = multi_miller_loop(&sources);
+    assert_eq!(actual.0, borrowed.0);
+    let result = actual.final_exponentiation();
+    assert_eq!(result, expected.final_exponentiation());
+    assert_eq!(result, borrowed.final_exponentiation());
+    result
+}
+
+#[test]
+fn streaming_identity_in_every_operand_matches_prepared_loops() {
+    let generator = table(G2Affine::generator());
+    let p = G1Affine::from(G1Projective::generator() * Scalar::from(17));
+    let q = G2Affine::from(G2Projective::generator() * Scalar::from(23));
+    for q in [G2Affine::generator(), q] {
+        for mask in 0..16 {
+            let points = core::array::from_fn(|i| {
+                if mask & (1 << (2 * i)) != 0 {
+                    G1Affine::identity()
+                } else {
+                    p
+                }
+            });
+            let qs = core::array::from_fn(|i| {
+                if mask & (2 << (2 * i)) != 0 {
+                    G2Affine::identity()
+                } else {
+                    q
+                }
+            });
+            let result = assert_streaming_pair(points, qs, &generator);
+            if mask & 3 != 0 && mask & 12 != 0 {
+                assert_eq!(result, Gt::identity());
+            }
+        }
+    }
+}
+
+#[test]
+fn streaming_generators_and_cancellation_match_prepared_loops() {
+    let g1 = G1Affine::generator();
+    let g2 = G2Affine::generator();
+    let generator = table(g2);
+    let p = G1Affine::from(G1Projective::generator() * Scalar::from(17));
+    let q = G2Affine::from(G2Projective::generator() * Scalar::from(23));
+    for points in [[g1, p], [p, g1], [g1, g1], [p, -g1]] {
+        for qs in [[g2, q], [q, g2], [g2, g2], [-g2, q]] {
+            assert_streaming_pair(points, qs, &generator);
+        }
+    }
+    for q in [g2, -g2, q, -q] {
+        assert_eq!(
+            assert_streaming_pair([p, -p], [q, q], &generator),
+            Gt::identity()
+        );
+        assert_eq!(
+            assert_streaming_pair([p, p], [q, -q], &generator),
+            Gt::identity()
+        );
+    }
+}
+
+#[test]
+fn streaming_seeded_subgroup_points_match_prepared_loops() {
+    use rand_core::{RngCore, SeedableRng};
+    let mut rng = rand_xorshift::XorShiftRng::from_seed(*b"streaming-pairs!");
+    let generator = table(G2Affine::generator());
+    for _ in 0..8 {
+        let scalars: [Scalar; 4] = core::array::from_fn(|_| {
+            let mut bytes = [0; 64];
+            rng.fill_bytes(&mut bytes);
+            Scalar::from_bytes_wide(&bytes)
+        });
+        assert_streaming_pair(
+            [
+                G1Affine::from(G1Projective::generator() * scalars[0]),
+                G1Affine::from(G1Projective::generator() * scalars[1]),
+            ],
+            [
+                G2Affine::from(G2Projective::generator() * scalars[2]),
+                G2Affine::from(G2Projective::generator() * scalars[3]),
+            ],
+            &generator,
+        );
+    }
+}
+
+#[cfg(feature = "experimental")]
+#[test]
+fn streaming_hash_derived_points_match_prepared_loops() {
+    use crate::hash_to_curve::{ExpandMsgXmd, HashToCurve};
+    let generator = table(G2Affine::generator());
+    let long_message = [0xa5; 1025];
+    for message in [&b""[..], &b"streaming pairing"[..], &long_message[..]] {
+        let p = G1Affine::from(
+            <G1Projective as HashToCurve<ExpandMsgXmd<sha2::Sha256>>>::hash_to_curve(
+                message,
+                b"BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_",
+            ),
+        );
+        let q = G2Affine::from(
+            <G2Projective as HashToCurve<ExpandMsgXmd<sha2::Sha256>>>::hash_to_curve(
+                message,
+                b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_",
+            ),
+        );
+        assert_streaming_pair(
+            [p, -G1Affine::generator()],
+            [q, G2Affine::generator()],
+            &generator,
+        );
+        assert_streaming_pair(
+            [G1Affine::generator(), -p],
+            [G2Affine::generator(), q],
+            &generator,
+        );
+        assert_eq!(
+            assert_streaming_pair([p, -p], [q, q], &generator),
+            Gt::identity()
+        );
+    }
+}
+
+#[test]
+fn streaming_driver_state_is_bounded_to_two_terms() {
+    // This bounds the owned driver state, not compiler-generated stack frames
+    // or peak stack use including arithmetic temporaries and called functions.
+    assert!(core::mem::size_of::<StreamingPair<'_>>() <= 1024);
+}
