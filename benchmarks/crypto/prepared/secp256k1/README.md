@@ -14,15 +14,38 @@ Each cell below is the instruction count from three identical, independently che
 | Odd points and endomorphisms | 1,024 B | 562,935 | 2,366,800 | 563,447 | 2,160,616 | 1,080 B |
 | **Odd points; derive endomorphisms** | **512 B** | **484,693** | **2,367,381** | **485,205** | **2,161,197** | **568 B** |
 
-The selected cache halves the 1,024-byte representation while adding only 581 hot-call instructions (about 0.025%) and reducing preparation by about 14%. It saves roughly 89,000 instructions per verification relative to affine-only caching. Only the selected representation remains in production code.
+The selected cache halves the 1,024-byte representation while adding only 581 hot-call instructions (about 0.025%) and reducing preparation by about 14%. It saves about 88,000 instructions per verification relative to affine-only caching. Only the selected representation remains in production code.
 
 With the selected artifact, direct ECDSA/Schnorr verification costs 2,618,931 / 2,413,083 instructions. All direct/prepared verifications allocate 32 bytes for their result. Preparation amortizes after two verifications for these fixtures.
 
 Schnorr signing costs 5,099,447 instructions directly, 2,517,394 to prepare, and 2,584,269 with the prepared secret: **49.3% fewer hot-call instructions**, amortizing after two signatures. Each operation allocates 120 bytes. These are independent RFC6979/Python-ecdsa and official BIP340 fixtures, not universal costs for every input.
 
+## Measured preparation plus reuse
+
+These are complete measured batches including preparation once; they are not projections. The direct API is cheaper for one call. Preparation pays off at two calls for all three fixtures.
+
+| Operation | Reuse | Direct instructions | Prepare + calls | Reduction |
+|---|---:|---:|---:|---:|
+| ECDSA verify | 1 | 2,618,931 | 2,851,935 | -8.90% |
+| ECDSA verify | 2 | 5,237,984 | 5,219,361 | 0.36% |
+| ECDSA verify | 10 | 26,188,928 | 24,157,905 | 7.76% |
+| ECDSA verify | 100 | 261,887,048 | 237,216,525 | 9.42% |
+| Schnorr verify | 1 | 2,413,083 | 2,646,263 | -9.66% |
+| Schnorr verify | 2 | 4,826,288 | 4,807,505 | 0.39% |
+| Schnorr verify | 10 | 24,130,448 | 22,096,577 | 8.43% |
+| Schnorr verify | 100 | 241,302,248 | 216,598,637 | 10.24% |
+| Schnorr sign | 1 | 5,099,447 | 5,101,493 | -0.04% |
+| Schnorr sign | 2 | 10,198,954 | 7,685,776 | 24.64% |
+| Schnorr sign | 10 | 50,993,778 | 28,359,176 | 44.39% |
+| Schnorr sign | 100 | 509,935,548 | 260,934,926 | 48.83% |
+
+Hot calls keep the same managed allocation as direct calls: 32 bytes per verification and 120 bytes per signature. Cold batches add the one-time preparation allocation: 568 bytes for each public cache or 120 bytes for the secret cache.
+
+The separate lifecycle audit retains nine handles containing 3,264 bytes of prepared payload and verifies them across real collection, dropping, and preparation again. Both phases assert more than 16 MiB reclaimed. This demonstrates correct lifetime handling; it does **not** isolate per-handle live heap or establish secure erasure.
+
 ## Reproduction and scope
 
-At this source checkpoint, native tests and the 81 screening observations pass. The independent executable audit and full 39-case reuse cohort are pending; their evidence is recorded separately when complete.
+All 39 final cases passed three identical PocketIC trials: **117 final observations**, in addition to the 81 format-screening observations. The [final summary](final-summary.json) pins the exact raw result/build hashes. The independent audit passed 17 native tests in both debug and release, 17 all-engine fixtures, nine nominal-type rejection cases and the actual-GC lifecycle test.
 
 `generate.py` produces matched preparation, direct, prepared and actual preparation-plus-reuse cases for 1, 2, 10 and 100 operations. Use the shared [prepared benchmark protocol](../README.md) with the exact compiler executable `SDK/src/moc`; `SDK/bin/moc` is a shell wrapper and has a different hash. Historical format stages retain their own original generators and source snapshots.
 
