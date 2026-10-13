@@ -1,0 +1,116 @@
+{
+  "status": "approved",
+  "baseline_plugins_revision": "0e1e96a",
+  "candidate": "destination-only restrict plus public50/100-limb specialization",
+  "approval_time_utc": "2026-10-13T06:17:29.256688+00:00",
+  "production_patch_paths": [
+    "plugins/rsa/runtime/vendor/bearssl/src/int/i31_montmul.c",
+    "plugins/rsa/runtime/vendor/bearssl/LOCAL_CHANGES.md"
+  ],
+  "verified_implementation_files": 62,
+  "plugin_artifacts": {
+    "runtime.wasm": "8254c40d33afd9b474475a9c27e0737901da5883ae23939cce68f9e9a5e544b9",
+    "plugin.cmxs": "84ba0d4fc20a045a7162db3b55d40452f1db447800be1f419538515311da42bd"
+  },
+  "plugin_build_sha256": "f6b3cb0950789f666e7564868bece793b5ea123ce6fd28e28840d267b754d910",
+  "compiler_sha256": {
+    "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/moc": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88",
+    "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/src/_build/default/exes/moc.exe": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2"
+  },
+  "gates": {
+    "O3_ASan_UBSan": "pass",
+    "portable_OCaml": "pass",
+    "compiled_Wasm_sanity": "pass",
+    "api_cases": 272,
+    "layout_oracles": 211,
+    "wycheproof_cases": 108,
+    "public_arithmetic_cases": 1223,
+    "private_arithmetic_cases": 68,
+    "shaped_fault_injections": 20,
+    "key_interleavings": 12,
+    "raw_Montgomery_cases": 1824,
+    "raw_destination_placements": 7296,
+    "all_instrumented_Montgomery_calls": 831481,
+    "ordinary_import_forms": 7,
+    "restricted_import_rejections": 16
+  },
+  "arithmetic_body_check": {
+    "status": "identical after moving public length parameter",
+    "sha256": "df09229cbdc81e7e6d3440a9dcc78b7f53f5141d309a972bb200353bf5701ac9"
+  },
+  "alias_review": "Every production destination range is disjoint from all inputs, including direct CRT scratch slots and prepared context subarrays. Input squaring x==y remains valid. Nested helper restrict association is valid.",
+  "actual_Wasm_review": {
+    "kernel_sha256": "918158ba7fdf64c0aa74e44ef795e998aa83615d14368cc8aea912f4c0da989f",
+    "conditional_branches": 14,
+    "condition_sources": "Public announced lengths and fixed loop counters only; no operand-derived branches or addresses.",
+    "stack_frame_bytes": 0,
+    "direct_calls": [
+      "memset",
+      "br_i31_sub"
+    ],
+    "stack_bounds_regenerated_independently": true
+  },
+  "native_stack_chain_upper_bound_bytes": {
+    "direct_sign": 11664,
+    "prepared_sign": 9568,
+    "compiler_reserve": 4194304
+  },
+  "runtime_bytes": 31212,
+  "baseline_runtime_bytes": 30264,
+  "evidence": "final/round4-report.json",
+  "prior_type_GC_evidence": "../../prepared/rsa/review.json",
+  "prior_type_GC_evidence_scope": "SDK, module, registration, managed layouts and pointer/GC boundaries unchanged; no new GC suite claimed for this arithmetic-only delta.",
+  "benchmark_evidence": [
+    {
+      "path": "../../../../benchmarks/crypto/round4/rsa/candidate2-comparison.json",
+      "sha256": "db5e420b3f6e28aef92dabb110da0302a2f6b4eed0a91b520ad0bb3c4eceb02f",
+      "cases": 4,
+      "trials_per_revision_per_case": 3,
+      "source_and_artifact_pins_verified": true,
+      "allocation_unchanged": true
+    },
+    {
+      "path": "../../../../benchmarks/crypto/round4/rsa/final-extra-comparison.json",
+      "sha256": "120d5550cd0fd40cbee576ec6dde6e46b1500f7516cd5daa82edff5d0643a839",
+      "cases": 10,
+      "trials_per_revision_per_case": 3,
+      "source_and_artifact_pins_verified": true,
+      "allocation_unchanged": true,
+      "payload_unchanged": true,
+      "verified_target_source_pins": 57
+    }
+  ],
+  "benchmark_evidence_status": "All14 final paired rows verified:4 reused selected-screen rows plus10 extra rows,84 total observations acrossbaseline/candidate.",
+  "scope_limits": [
+    "Sanitizers do not detect all restrict contract violations; source review and explicit accessed-range checks supply additional evidence.",
+    "Source and Wasm inspection plus differential tests are not a formal constant-time proof or comprehensive cryptanalysis.",
+    "Stack bound excludes Motoko caller and engine value-stack frames."
+  ],
+  "unresolved_findings": [],
+  "build_warning_review": {
+    "status": "pre-existing ineffective macro flags; no semantic mismatch",
+    "effective_BR_MAX_RSA_SIZE": 4096,
+    "effective_BR_MAX_RSA_FACTOR": 2080,
+    "direct_workspace_U_words": 70,
+    "direct_workspace_array_words": 2591,
+    "fixed_profile_fwlen_words": 52,
+    "prepared_exponentiation_workspace_words": 1716,
+    "explanation": "Unconditional upstream header macros override command-line -D values in both runtime build and native audit. Actual Wasm stack bounds and all executed tests use effective defaults. No secret loop length or arithmetic change introduced by round4. Removal of ineffective flags is optional follow-up cleanup.",
+    "direct_workspace_array_bytes": 10364,
+    "prepared_exponentiation_workspace_bytes": 6864,
+    "current_window_bits": 5,
+    "historical_direct_windows": {
+      "8U": {
+        "q": 2,
+        "p": 2
+      },
+      "9U": {
+        "q": 3,
+        "p": 2
+      }
+    },
+    "historical_correction": "Earlier9U prose describing both windows as2 was incorrect; measured costs and frozen artifacts remain valid and unchanged.",
+    "disposition": "Documented pre-existing macro flags and corrected historical explanatory window claims. Owner agreed to preserve selected production bytes and old evidence; ineffective flag removal deferred as separate cleanup."
+  },
+  "final_recheck": "All62 implementation files, both artifacts and all executed audit sources match after final84 paired performance observations."
+}
