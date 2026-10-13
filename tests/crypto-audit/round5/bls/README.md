@@ -1,7 +1,8 @@
 # BLS round-five protocol audit
 
 No production defect was found. This change adds tests only; public types,
-compiler implementation, runtime implementation, ABI and artifacts are unchanged.
+compiler implementation, runtime implementation and ABI are unchanged. Central
+source-pin rebuilding reproduced the byte-identical BLS runtime.
 
 Review covered the public module, compiler schema/generator/reference, canonical
 group decoding, raw and prepared verification, aggregation, proof reuse, scalar
@@ -58,6 +59,10 @@ test-runner -b -j2 "$lane/packages/fast/tests/run/crypto-bls-protocol.mo" \
   "$lane/packages/fast/tests/fail/crypto-bls-prepared-pop-required.mo"
 ```
 
-Execution results and hashes are recorded in `report.json`. Actual GC pressure,
-full arithmetic corpora, full-stack limits and side-channel behavior are outside
-this new focused suite. Earlier evidence is not reported as a fresh run.
+Execution results and hashes are recorded in `report.json`: four native tests,
+three public/fail fixtures and all four central Ash methods passed. Central
+`PreparedComposition` also passed its shared actual-GC test, including BLS IC
+prepared-key verification after confirmed collection and collection after
+references are released. This does not establish exact live memory or erasure.
+Full arithmetic corpora, full-stack limits and side-channel behavior remain
+outside this focused suite. Earlier evidence is not reported as a fresh run.

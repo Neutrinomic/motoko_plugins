@@ -62,7 +62,29 @@
     "log": "_build/round5-bls/validate.log",
     "log_sha256": "045b85e7eced41a879dd778323625ca335149f610195d812d09adb7fe91083c4",
     "warning_note": "31 existing warnings from unchanged vendored bls12_381 (deprecated generic-array and must_use attributes); no new test warnings.",
-    "ash": "Four shared-suite methods added; execution delegated to central integration, not claimed here."
+    "ash": {
+      "runner": "Central integration, frozen SDK and private Ash source",
+      "checkout": "/srv/shared/code/motoko_experiments/plugins/_build/crypto-audit5/integration",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "inputs_match_lane": true,
+      "log": "_build/round5/logs/ash-BLS12381Protocol.log",
+      "log_sha256": "daf2aa7294037fecbc97e6ae253f5fd42eed532d6b42de8fdc649fe994340ddb",
+      "runtime_wasm": "ebc5fa2fd9fc6ed3698bd523f5101d4883ef51c0e7bf4783f4b2da64d691972c",
+      "plugin_cmxs": "e839d705dadde699b781de65b97987876658465185b1eb8e11544b5fc4927e41",
+      "build_manifest_sha256": "5c5fc87fce55102b2c07c50db4e2dd18ece571a31437b3f638074f161cd34328",
+      "build_note": "Central conservative source-pin rebuild refreshed manifests; BLS runtime is byte-identical to the baseline."
+    },
+    "central_prepared_gc": {
+      "suite": "PreparedComposition",
+      "passed": 1,
+      "failed": 0,
+      "log": "_build/round5/logs/ash-PreparedComposition.log",
+      "log_sha256": "0984650e879e142d4800715dba8a0610939c7a04d45c997fb89c06dd74f41fdc",
+      "source_sha256": "a859b6f138168a24d6530e9b3f754a803bd06b3c291ed5873df2322f61cb9f53",
+      "scope": "Shared composition retains and verifies BLS IC prepared keys after confirmed collection (>4 MiB reclaimed), then releases references and confirms further collection. Not an exact live-memory or secure-erasure claim."
+    }
   },
   "inputs_sha256": {
     "packages/fast/tests/ash/BLS12381Protocol.ash.json": "7fb356494e0d7ec2424f572e584afba08f20bcfc21042f012e22deaeeeeb70a6",
@@ -129,9 +151,9 @@
     }
   },
   "limitations": [
-    "No new actual-GC-pressure evidence.",
+    "Fresh GC evidence comes from the shared central PreparedComposition suite, not a new BLS-only stress corpus.",
     "Full archived arithmetic/malformed corpora inspected, not rerun in this lane; shared integration runs native workspace coverage.",
     "No formal proof, total Wasm stack bound or empirical side-channel certification.",
-    "No production runtime rebuild or performance claim, because only test code changed."
+    "The lane reused baseline artifacts; central source-pin rebuilding reproduced the same BLS runtime. No new performance claim."
   ]
 }
