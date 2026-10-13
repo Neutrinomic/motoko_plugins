@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "approved": true,
+  "findings": [],
+  "scope": "Prepared Ed25519 public and secret key APIs, narrow vendored math hooks, compiler binding and portable reference, against frozen prepared-type SDK24d8d0b9.",
+  "validation": {
+    "native_passed": 8,
+    "public_fixtures_passed": 3,
+    "execution_engines": [
+      "source interpreter",
+      "IR interpreter",
+      "lowered interpreter",
+      "compiled Wasm"
+    ],
+    "verification_cases": 290,
+    "wycheproof_cases": 151,
+    "valid_mixed_order": 8,
+    "cofactor_only_invalid": 8,
+    "independent_signing_answers": 18,
+    "largest_message_bytes": 65536,
+    "nominal_negative_cases": 9,
+    "owner_ash_tests_reviewed": 5,
+    "actual_gc": "Both prepared key types in arrays/records/coreMap survived13awaits and proved >4MiB reclaimed; continued signing/verification passed."
+  },
+  "source_review": [
+    "Prepared public payload is canonicalA32 plus32canonical field encodings for8odd multiples of -A; no native pointers, Rust layouts, mutable global cache or incomplete bytes. Canary/guard tests verify complete initialization and field/scalar bounds.",
+    "Prepared verification preserves canonical/on-curve/non-small-order R and S<L guards. It hashes original R/A/message, multiplies positive reduced k by cached -A, and compares exact compressed R, preserving mixed-order strict semantics.",
+    "Prepared secret scalar,prefix and compressedpublicA come from one validatedseed. Secret restoration does not reclamp; prepared signing retains original fixed-base and constant-time scalar arithmetic.",
+    "Codegen unwraps nominal keys, allocates managed results before borrowing pointers, and has no callback/GC while runtime borrows input. Protected types reject Blob forging, public-secret interchange, raw extraction, stable/shared/Candid/debug boundaries.",
+    "Managed prepared secret bytes persist until collection and are not zeroized on GC; this is explicitly documented. No raw prepared-key import is exposed."
+  ],
+  "hook_source_sha256": {
+    "plugins/ed25519/runtime/vendor/curve25519-dalek/src/edwards.rs": "8ec142377ef023089d88a6c6927899bbcd79a2d506723c9a215f98ece04c8afc",
+    "plugins/ed25519/runtime/vendor/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs": "546cdc80fa958ec55c00e41c2804e03ccd9252766c8aed6267d67b0e752ab1f2",
+    "plugins/ed25519/runtime/vendor/ed25519-dalek/src/signing.rs": "c5ce257ac1b05b4ac263d7bd06d9eb5a86efdcf9588f2b2c85c3bffa0587750b"
+  },
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "rts_sha256": {
+    "mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+  },
+  "artifact_sha256": {
+    "build.json": "fdbad79d0fae34ed879c7c523743f59c51f9f3c566a316d1b9403f3e0a5caf73",
+    "plugin.cmxs": "088ffd5c376dc8c65de8697559fc60aa7a549c3ba0a987a5c2143a522ee96f3c",
+    "runtime.wasm": "b03a5cf70216b84f747c1ec72059da75d18c059612083d7b01ba7db97efd1cf9"
+  },
+  "evidence_sha256": "fb6b61860888e6739b8843cbe078538fba2af9d60dda212a225fd94a21d06ad5",
+  "gc_review_sha256": "3ebae968d9c060811bcc6603413aa3e450f4267436a4a5441a7a503de4b8d864",
+  "owner_validation": {
+    "path": "benchmarks/crypto/prepared/ed25519/validation/result.json",
+    "sha256": "7a2ad6ee594d96b05ba9de2ebe574e5026deb51773a97f79622f76ca99befe67"
+  },
+  "harness_corrections": "Initial run passed all runtime checks; two forged-literal fixtures were strengthened to explicit Blob, and debug_show diagnostic matcher corrected for promoted Any. Initial evidence retained in initial/.",
+  "integration_followup": "Actual cross-plugin prepared-type substitutions are assigned to prepared_integration once all plugin artifacts coexist."
+}
