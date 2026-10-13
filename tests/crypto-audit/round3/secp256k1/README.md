@@ -10,6 +10,10 @@ implementation commits are `fdaec67` and `041412e`. The tested runtime hash is
 `8dc0a4d19b68de3c7858410c73f276f2b876441ec57ad9e910c17f90d122ab57`,
 identical to the selected measured artifact. No unresolved findings remain.
 
+The later predicate-allocation cleanup is independently approved in
+[predicate/README.md](predicate/README.md), including the final artifact hashes,
+eager-effect/error/alias tests and nine Ash methods with confirmed GC.
+
 ## Reproduction
 
 From the matching compiler checkout, inside its Nix development shell:
