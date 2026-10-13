@@ -60,11 +60,22 @@ also allocate their fixed output buffer, which becomes collectible garbage.
 Managed secret caches are not securely erased by GC.
 
 The separate [matched memory experiment](memory/README.md) preserves its original
-**failed absolute quiet-window qualification**: forced GC calls allocate
-bookkeeping scratch, so absolute occupancy does not become flat under that
-schedule. Any paired analysis is labeled separately and does not turn that
-failure into an exact-live-heap claim. Existing independent GC tests retain
-correct prepared keys through actual reclamation of more than 4 MiB.
+**failed absolute quiet-window qualification**: each forced GC call allocates
+17,504 bytes of bookkeeping scratch in every mode. A separately reviewed,
+post-hoc analysis compares matching trial/stage/GC indices instead:
+
+| Prepared key | Observed paired heap overhead per key | Paired residual after dropping |
+|---|---:|---:|
+| Public | 20,600 B | 0 B |
+| Secret | 28,824 B | 0 B |
+
+These differences repeat at all 24 indices across three trials of 32 separately
+prepared objects and equal payload plus a 24-byte Blob header. All retained-key
+and dropped-root correctness checks pass. Extra reclamation accounts for the
+disappearing increment. This is observed paired heap overhead, **not an exact
+live-heap or collection-completion guarantee**; the original absolute-window
+qualification remains false. Independent GC tests additionally retain correct
+prepared keys through actual reclamation of more than 4 MiB.
 
 ## Evidence
 
