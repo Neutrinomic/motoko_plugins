@@ -409,7 +409,21 @@ impl Fp {
 
     #[inline]
     pub const fn sub(&self, rhs: &Fp) -> Fp {
-        (&rhs.neg()).add(self)
+        // Reduced inputs imply -p < self - rhs < p. Add p exactly when the
+        // six-limb subtraction borrowed; the result is already reduced.
+        let (d0, borrow) = sbb(self.0[0], rhs.0[0], 0);
+        let (d1, borrow) = sbb(self.0[1], rhs.0[1], borrow);
+        let (d2, borrow) = sbb(self.0[2], rhs.0[2], borrow);
+        let (d3, borrow) = sbb(self.0[3], rhs.0[3], borrow);
+        let (d4, borrow) = sbb(self.0[4], rhs.0[4], borrow);
+        let (d5, borrow) = sbb(self.0[5], rhs.0[5], borrow);
+        let (d0, carry) = adc(d0, MODULUS[0] & borrow, 0);
+        let (d1, carry) = adc(d1, MODULUS[1] & borrow, carry);
+        let (d2, carry) = adc(d2, MODULUS[2] & borrow, carry);
+        let (d3, carry) = adc(d3, MODULUS[3] & borrow, carry);
+        let (d4, carry) = adc(d4, MODULUS[4] & borrow, carry);
+        let (d5, _) = adc(d5, MODULUS[5] & borrow, carry);
+        Fp([d0, d1, d2, d3, d4, d5])
     }
 
     /// Returns `c = a.zip(b).fold(0, |acc, (a_i, b_i)| acc + a_i * b_i)`.
@@ -647,6 +661,53 @@ impl Fp {
         let (t11, _) = adc(t11, 0, carry);
 
         Self::montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
+    }
+}
+
+#[test]
+fn test_direct_subtraction_matches_negation_addition() {
+    use rand_core::SeedableRng;
+    use rand_xorshift::XorShiftRng;
+
+    fn check(a: Fp, b: Fp) {
+        let result = a.sub(&b);
+        assert_eq!(result, b.neg().add(&a));
+        assert_eq!(result.add(&b), a);
+        let mut borrow = 0;
+        for i in 0..6 {
+            borrow = sbb(result.0[i], MODULUS[i], borrow).1;
+        }
+        assert_eq!(borrow, u64::MAX, "subtraction output must be reduced");
+    }
+
+    let mut maximum = MODULUS;
+    maximum[0] -= 1;
+    let edges = [Fp::zero(), Fp::one(), -Fp::one(), Fp(maximum), Fp([1, 0, 0, 0, 0, 0])];
+    for a in edges {
+        for b in edges {
+            check(a, b);
+        }
+    }
+    // Isolate propagation across every full low limb; all of these are below p.
+    for width in 1..=5 {
+        let mut limbs = [0; 6];
+        limbs[..width].fill(u64::MAX);
+        let a = Fp(limbs);
+        for b in edges {
+            check(a, b);
+            check(b, a);
+        }
+        limbs[..width].fill(0);
+        limbs[width] = 1;
+        check(Fp(limbs), Fp([1, 0, 0, 0, 0, 0]));
+    }
+    let mut rng = XorShiftRng::from_seed([0x6f; 16]);
+    for _ in 0..4096 {
+        let a = Fp::random(&mut rng);
+        let b = Fp::random(&mut rng);
+        check(a, b);
+        check(b, a);
+        check(a, a);
     }
 }
 
