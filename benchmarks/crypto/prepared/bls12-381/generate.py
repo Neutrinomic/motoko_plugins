@@ -156,7 +156,7 @@ def generate():
                     'shared_repeated_key': fixture.get('share_repeated_key', False),
                 },
             })
-    assert len(cases) == 21
+    assert len(cases) == 24
     outputs[HERE / 'cases.json'] = json.dumps({
         'methodology': 'Seven independent valid fixtures; public direct, preparation and prepared calls use the same oracle. Preparation verifies only in bytesResult. Repeated n8 prepares one key and retains eight references.',
         'cases': cases,
