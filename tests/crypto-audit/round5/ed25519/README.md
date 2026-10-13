@@ -53,7 +53,10 @@ corrected before the successful run; there was no production failure. Native
 flags match `plugin.json`: `curve25519_dalek_bits="32"` and
 `curve25519_dalek_backend="serial"`. The native wrapper is discovered by the
 shared test script; public fixtures and `Ed25519Audit5.ash.json` are also normally
-discovered. The integration lane owns the Ash execution/results.
+discovered. Central integration also passed **2/2 Ash methods** against the same
+frozen SDK and baseline runtime; its report owns the Ash execution evidence.
+Local validation ran offline; set `CARGO_NET_OFFLINE=true` to enforce that mode.
+The maintained native runner permits fetching locked dependencies on fresh checkouts.
 
 The exact baseline `dist/ed25519` was copied without rebuilding; all recorded
 Ed25519 source/artifact hashes and the compiler hash matched before testing:
