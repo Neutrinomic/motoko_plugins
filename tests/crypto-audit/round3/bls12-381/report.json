@@ -1,0 +1,122 @@
+{
+  "status": "functional-and-source-pass-performance-pending",
+  "source_review": "No unresolved source findings after the generated-condition fix and preservation of ordinary aggregate functions.",
+  "source_sha256": {
+    "packages/fast/src/BLS12381.mo": "ac58104df256fbde848f5790271fe8140848776c88e63794a6e8bb0051881c8d",
+    "plugins/bls12-381/compiler/generator.ml": "e84482e8ac7ced1bac86e4fb280ba29244e4666f98cca96caa01858f909538ee",
+    "plugins/bls12-381/compiler/reference.ml": "e024857de7009d7bfcab0bc416b59ee7d6bbec2e3fe1bc6457173b776113e9cc",
+    "plugins/bls12-381/compiler/register.ml": "7467496b2076aa192a4f7a757eb569c821eba0c42f0f1114ce21fb3d54be84ac",
+    "plugins/bls12-381/compiler/schema.ml": "220839d4582dcc983e7989bbaed6baed9a138986507cf5665a8df572aeb3b6fd",
+    "plugins/bls12-381/runtime/src/lib.rs": "643261918ab8f9719a550c7a7b7f3922d4d28a6b45c11ecf0992d2c5fb686e9f",
+    "plugins/bls12-381/README.md": "53292a7eb9a56be120b0323f064020c9f4adacdd6d0327ceb3240cf1498840e2"
+  },
+  "review": {
+    "public_types": "Public aggregate functions remain ordinary, first-class functions with unchanged argument/result types. Three thin wrappers invoke fused typed intrinsics; shapes are checked before descriptor allocation. No unchecked key/proof option is exposed.",
+    "points": "Every untrusted point reaches canonical, curve and prime-order subgroup decoding. Signature/key identities remain rejected. Hash-to-curve points are generated internally and stay decoded.",
+    "ic_distinctness": "Pairwise exact Blob equality is preserved; larger batches sort bounded indices using a length-then-byte total order. Duplicate messages are rejected before signature validation.",
+    "proof_cache": "Only an exact key/proof byte pair already verified successfully earlier in this synchronous call can reuse its decoded key. Different proofs for repeated keys are checked; no retained cache exists.",
+    "ethereum_messages": "Only messages of at most 1024 bytes may reuse an earlier same-call hash; equality compares exact bytes, and all PoPs are checked before constructing aggregate terms.",
+    "error_order": "IC: shapes/limits, duplicate messages, signature then keys. General Ethereum: shapes/limits, signature then all proofs. Fast Ethereum: shapes/limits, all proofs, signature decoding, aggregate-key/signature identity. Both operands of an individual PoP decode before identity checks.",
+    "domains": "IC NUL, Ethereum POP signature and Ethereum POP proof DSTs are unchanged; APIs still accept raw protocol-framed messages, with framing performed by callers.",
+    "gc_and_lifetimes": "Compiler-owned Blob/Array helpers resolve forwarding. Descriptor and payload raw pointers are borrowed only within the generated synchronous operation; SDK allocation has no GC safepoint. Runtime stores no native state. Temporary Rust Vec allocations use ephemeral managed Blob scratch reclaimed by later GC.",
+    "bounds": "Compiler and runtime bound general aggregates to 127 and fast aggregates to 128. Descriptor rows are 48 bytes on the memory64 target, at most 6144 bytes; native input descriptors are a bounded 128-element stack array. Final general pairing has at most 128 terms. Message bytes are borrowed, never duplicated by the bridge.",
+    "pairing": "The extracted pairing_product helper receives only decoded/subgroup-checked points or internal hash-to-curve results. Existing validated bilinear consolidation is unchanged. No malformed input is removed before validation.",
+    "source_simplification": "Public Motoko wrapper packing, repeated point decompression, and intermediate hash compression are removed without weakening validation."
+  },
+  "corrections": [
+    {
+      "kind": "documentation",
+      "issue": "README claimed a merge sort after moving to index sort_unstable.",
+      "resolution": "Owner changed wording to bounded index sort."
+    },
+    {
+      "kind": "documentation",
+      "issue": "README claimed removal of raw-message packing, though old wrapper packed intermediate compressed points.",
+      "resolution": "Owner corrected to packing/re-decoding intermediate points."
+    },
+    {
+      "kind": "blocking-codegen",
+      "issue": "Raw i64.compare instructions produce i32 conditions, but SDK B.E.if1 expects its 64-bit condition representation. Both array shape and count-limit checks generated invalid Wasm.",
+      "evidence": "evidence/pre-generator-fix/independent-public-validate.log",
+      "resolution": "Owner used B.compile_comparison for both raw comparisons and rebuilt; the full native/interpreter/validated-memory64-Wasm suite now passes."
+    },
+    {
+      "kind": "public-capability",
+      "issue": "Aliases changed three previously ordinary aggregate functions to intrinsic controls, preventing use as typed callbacks.",
+      "resolution": "Owner restored three thin ordinary public wrappers around fused intrinsics. All21 audit commands pass, including typed record and higher-order callback tests on both backends."
+    }
+  ],
+  "limitations": [
+    "Functional and source audit, not formal verification or empirical side-channel certification.",
+    "Performance promotion awaits separately reviewed PocketIC measurements on identical source/artifacts."
+  ],
+  "initial_test_fixture_corrections": [
+    {
+      "issue": "The n=2 duplicate generator accidentally assigned the last entry to itself.",
+      "resolution": "Use unique earlier positions; 246 native cases plus8bounds and270public cases remain.",
+      "evidence": "evidence/initial-test-generator-native.log"
+    },
+    {
+      "issue": "Generated Motoko test used record-literal position braces for a statement block.",
+      "resolution": "Generate do { ... } blocks.",
+      "evidence": "evidence/initial-test-syntax-interpreter.log"
+    }
+  ],
+  "validation": {
+    "commands": 21,
+    "all_exit_codes_zero": true,
+    "source_and_artifacts_unchanged": true,
+    "build_manifest_sources_verified": 30,
+    "native_profile_cases": 246,
+    "native_bounds_cases": 8,
+    "public_cases_per_backend": 270,
+    "public_backends": [
+      "Motoko source interpreter",
+      "compiled and validated memory64 Wasm"
+    ],
+    "additional_suites": [
+      "plugins/bls12-381/tests/run/aggregate-boundaries.mo",
+      "packages/fast/tests/run/crypto-bls-round2.mo",
+      "tests/crypto-audit/round2/bls/cache-cap.mo",
+      "plugins/bls12-381/tests/run/aggregate-functions.mo"
+    ],
+    "report": "evidence/all-report.json",
+    "cache_message_sizes_bytes": [
+      1023,
+      1024,
+      1025,
+      65536
+    ],
+    "ordinary_function_callback_cases_per_backend": 6,
+    "callback_test_relocation": "evidence/callback-test-relocation.json"
+  },
+  "artifacts": {
+    "build.json": "49b9b7b27015203046b786c5b148120f942fa2df7722b331f47350c8e735c400",
+    "plugin.cmxs": "b1fa42b427f38ef9ee7fcc9b05897e2192c979a25d0c79e58de6c8ea8e03c93b",
+    "runtime.wasm": "ad996135b0692a595f900f61f1e0a40631c649257583c2abcfa92b07bc21bf5e"
+  },
+  "compiler_binary_sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc",
+  "compiled_test_wasm_sha256": {
+    "cache-cap.wasm": "266f25497715559bcc6b81318787ada16f2641c297fe21bce97797659a9e4270",
+    "retained-round2.wasm": "06d9e6871b4d9d3983f821c699a08195cc38ad7767d90959f0062558cd83aeb8",
+    "first-class.wasm": "b36434db11658fe92e1402ac11ebe4e98247220a97efbcb3a9a67d409e8aa618",
+    "independent-public.wasm": "b47d79f09bb085961bf2e42568a7625065bf7899c1ab26066ab02ed73e7e2662",
+    "aggregate-boundaries.wasm": "9c8d3d461d2969ab983761d94063c9bd1067483882154d9eb1de8b14904c25b6"
+  },
+  "test_inputs_sha256": {
+    "tests/crypto-audit/round3/bls12-381/FrozenWrapper.mo": "324d5b764e0aab8bc9b3335db2770e5b569d0771d512bc8b8d6c04f301ab6ef0",
+    "tests/crypto-audit/round3/bls12-381/generate.py": "6acfd38b256e134172e1d852887fdff9c56013025cb86c3e5cadc38ab3677640",
+    "tests/crypto-audit/round3/bls12-381/Cargo.toml": "02333dcd69f1161cb64715fcd0e98deab1f7ce88e00c3bc502456f9f7cba6da1",
+    "tests/crypto-audit/round3/bls12-381/run.py": "7238d194691f73a1380968df1cf96ed4d0cc5531b1f1638120f597e4caf4d4f7",
+    "tests/crypto-audit/round3/bls12-381/native.rs": "45090cf8e5fae191d9f224464fc13981547d4352094418e5b857b2fadca0a1a3",
+    "tests/crypto-audit/round3/bls12-381/README.md": "660beea7dd31c2871a9af3847995370c7b796595df6b36a34ba04d0101526eb8",
+    "tests/crypto-audit/round3/bls12-381/blobs.tsv": "bb30161aaa2175b3904f3c46d8b058813410b2a57fc39c3e1e6d814d3e406227",
+    "tests/crypto-audit/round3/bls12-381/public.mo": "98eb4df0c4c933ff13624e5465c55fde06d54877046d89f28fff44d29638c169",
+    "tests/crypto-audit/round3/bls12-381/provenance.json": "14849cd8e15653f82d32bba741e0fa83ebb804a86e89231a09740a305bcacf2e",
+    "tests/crypto-audit/round3/bls12-381/cases.json": "f4d2e9298aea08fc443e09ec0dc4640678f1290c39ef300df9ff7412882761f9",
+    "tests/crypto-audit/round3/bls12-381/Cargo.lock": "e18598e7932b255ec0ca1b2c69a5377e54b5946d890087ec73b7c45ecb66460b",
+    "tests/crypto-audit/round3/bls12-381/cases.tsv": "9aeb4019e415a28e6ca3a0cf58612c704ed2338f8e23a039d1ba2489b82e2b65",
+    "plugins/bls12-381/tests/run/aggregate-functions.mo": "f99f4c34682f06287ca59011595529ef53ea680bb0069fa0252d50decb3740d1"
+  },
+  "audited_production_commit": "fa74cad5cb259f869e23dcfb12b0c828c7e7410b"
+}
