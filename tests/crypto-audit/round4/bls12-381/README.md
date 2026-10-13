@@ -50,5 +50,30 @@ python3 tests/crypto-audit/round4/bls12-381/run.py \
 
 The runner pins the compiler and original RTS, caps native jobs/test threads
 at two, writes a fresh evidence directory, and rejects source/artifact changes
-during execution. It never overwrites previous test evidence. Performance
-review is pending the complete paired benchmark cohort.
+during execution. It never overwrites previous test evidence.
+
+The final [performance review](performance-review.json) also **passes**.
+`review-performance.py` independently rehashes 5,478 frozen inputs and 48 Wasms
+across six stages, verifies all 144 observations, and recomputes every reported
+median, range, memory snapshot and paired delta. Ninety observations compare
+baseline and final source across 15 cases; 54 observations cover intermediate
+screens. Actor sources, commands, compiler, RTS, public module and dependencies
+match across each comparison, and final artifacts match the correctness audit.
+
+Final verification instruction savings are 1.80–6.16%, with preparation savings
+up to 13.36%. IC direct and Ethereum direct/prepared singles allocate 64 bytes;
+eight Ethereum PoP factories allocate 1,688 bytes instead of 315,416. Fast
+Ethereum direct verification allocates 416 bytes instead of 118,064. These are
+temporary-allocation reductions; prepared payload sizes remain unchanged.
+
+The accepted costs are explicit: runtime Wasm grows by 47,054 bytes, and every
+measured canister grows by 45,621 bytes. Streaming alone adds 4,558 instructions
+(0.002722%) to prepared IC verification versus C2; the final implementation still
+saves 2.73% versus baseline. No peak-memory or live-heap improvement is claimed:
+all benchmark reclamation counters remain zero, and snapshots describe occupied
+heap. The owner's [report](../../../../benchmarks/crypto/round4/bls12-381/README.md)
+correctly separates preparation, retained payload, allocation, and static code.
+
+No production findings remain. This is functional/source review, not formal
+verification or empirical side-channel certification. Source and exact-artifact
+correctness plus the measured benefits justify approval with the stated costs.

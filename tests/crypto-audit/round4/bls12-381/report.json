@@ -1,5 +1,5 @@
 {
-  "status": "correctness-pass-performance-pending",
+  "status": "pass",
   "baseline_commit": "0e1e96a",
   "production_commit": "5e72dabe5edbc53e1efcde9ca1f1635a258ed232",
   "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
@@ -51,7 +51,25 @@
   "limitations": [
     "Functional/source review, not formal verification or empirical side-channel certification.",
     "The owner tests bound StreamingPair driver state to 1,024 B; this is not measured total Wasm stack or peak memory.",
-    "Payload/ABI unchanged; performance and allocation conclusions await independent paired evidence review."
+    "All benchmark reclamation counters are zero; occupied-heap snapshots do not measure retained live heap or peak memory. Prepared payload sizes are unchanged."
   ],
-  "approval": "Frozen source and exact-artifact correctness approved; final performance approval pending."
+  "approval": "Frozen source and exact-artifact correctness plus independently verified paired performance approved with the explicitly reported Wasm growth and tiny C3 prepared-IC instruction regression; no production findings.",
+  "performance_validation": {
+    "status": "pass",
+    "review": "performance-review.json",
+    "review_sha256": "c8f8a966c02e0c688bfd1623ef0e760fb163905cf3956f23afd65b00fd6eacb0",
+    "script": "review-performance.py",
+    "script_sha256": "c0696f96520a8a0cff5e253d1e8e64798abf093e15a50934077f78db1064ed1f",
+    "owner_report_commit": "4c75799",
+    "frozen_inputs_rehashed": 5478,
+    "wasm_artifacts_rehashed": 48,
+    "observations_verified": 144,
+    "final_paired_observations": 90,
+    "final_case_count": 15,
+    "runtime_wasm_growth_bytes": 47054,
+    "actor_wasm_growth_bytes": 45621,
+    "c3_incremental_prepared_ic_regression_instructions": 4558,
+    "all_reclamation_counters_zero": true,
+    "notes": "Owner prose corrected key-preparation wording and avoided attributing the small instruction regression to an unprofiled code-generation cause. No numerical evidence or production source changed."
+  }
 }
