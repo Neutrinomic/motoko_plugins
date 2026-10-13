@@ -1,0 +1,38 @@
+{
+  "source_commit": "8d67a9fee0e59c482bb867ee8a7b2c2f758f2f69",
+  "scope": "Native validation after seeded signing reuses the matrix already expanded during key generation. Earlier source/artifact checkpoints remain preserved separately; the independent audit owns final stack and public delta checks.",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "runtime_sha256": "07ae75432d55ddcbb4741f0d0aa40bb0d086f365d1c68c0648bde3dd20850c3f",
+  "native_plugin_sha256": "213365588b45552c5330cd6e30586f348a9eb75780a27836b30e66ae81dd06bb",
+  "commands": [
+    "cargo test --offline --release -p motoko-compute-ml-dsa",
+    "cargo test --offline -p motoko-compute-ml-dsa",
+    "scripts/build.sh --motoko /srv/shared/code/motoko_experiments/prepared-crypto/sdk --skip-motoko-build ml-dsa"
+  ],
+  "environment": "nix develop in the prepared SDK checkout; commands run in this plugin worktree",
+  "results": {
+    "release": {
+      "groups": 10,
+      "passed": 10,
+      "exit_code": 0
+    },
+    "debug": {
+      "groups": 10,
+      "passed": 10,
+      "exit_code": 0
+    },
+    "plugin_build": {
+      "exit_code": 0
+    }
+  },
+  "coverage": [
+    "25 official keygen, 30 official signing and 15 official verification cases",
+    "Prepared exact official signatures and verification answers",
+    "Context/randomness/length/error precedence, immutable caches and unaligned guarded ABI inputs"
+  ],
+  "logs": {
+    "native-debug-shared-matrix.log": "e8f9560f7ea365fc59411fcc456d020117c3fa0088af500a7b2bb30f651fabda",
+    "native-release-shared-matrix.log": "275eefbd60716a373bc071a2e28a707ed40e52f2917e354e85fed442a418a8dc",
+    "build-shared-matrix.log": "197d8be9ddd4ce2b39fa7765e5d50d0e593995492b9c6068ce75796e5a783e34"
+  }
+}
