@@ -68,7 +68,8 @@ pub fn prepare_public(public: &[u8; 1312], output: &mut [u8; PUBLIC_LEN]) -> Res
 /// Retains the matrix already computed by key generation, without expanding it
 /// a second time. Expanded secret-key encodings are never imported.
 pub fn prepare_secret(seed: &[u8; 32], output: &mut [u8; SECRET_LEN]) {
-    let (_public, key, matrix) = key_gen_internal_with_matrix::<false, 4, 4, 1312, 2560>(2, seed);
+    let mut matrix = core::array::from_fn(|_| core::array::from_fn(|_| T([0; 256])));
+    let (_public, key) = key_gen_internal_with_matrix::<false, 4, 4, 1312, 2560>(2, seed, Some(&mut matrix));
     let mut writer = Writer { bytes: output, offset: 0 };
     writer.bytes(&key.rho);
     writer.bytes(&key.cap_k);

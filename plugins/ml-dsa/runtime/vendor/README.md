@@ -9,7 +9,8 @@ Local changes are confined to `src/lib.rs`, `src/ml_dsa.rs`, and the new
 `src/motoko_prepared.rs`. The existing arithmetic, NTT, hashing, encoding,
 rejection sampling, and acceptance rules are unchanged. Existing entry points
 call the same bodies with no cached matrix. The prepared factories retain the
-matrix from key generation or expand a public key once; consumers pass it to
+matrix from key generation through an optional output (the direct path still
+returns only its original key pair) or expand a public key once; consumers pass it to
 those same algorithm bodies. Direct verification still rejects malformed hints
 before expanding a matrix.
 

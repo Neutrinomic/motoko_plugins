@@ -63,8 +63,7 @@ pub(crate) fn key_gen_internal<
 >(
     eta: i32, xi: &[u8; 32],
 ) -> (PublicKey<K, L>, PrivateKey<K, L>) {
-    let (pk, sk, _) = key_gen_internal_with_matrix::<CTEST, K, L, PK_LEN, SK_LEN>(eta, xi);
-    (pk, sk)
+    key_gen_internal_with_matrix::<CTEST, K, L, PK_LEN, SK_LEN>(eta, xi, None)
 }
 
 
@@ -76,8 +75,8 @@ pub(crate) fn key_gen_internal_with_matrix<
     const PK_LEN: usize,
     const SK_LEN: usize,
 >(
-    eta: i32, xi: &[u8; 32],
-) -> (PublicKey<K, L>, PrivateKey<K, L>, [[T; L]; K]) {
+    eta: i32, xi: &[u8; 32], matrix_out: Option<&mut [[T; L]; K]>,
+) -> (PublicKey<K, L>, PrivateKey<K, L>) {
     //
     // 1: (rho, rho′, 𝐾) ∈ 𝔹^{32} × 𝔹^{64} × 𝔹^{32} ← H(𝜉||IntegerToBytes(𝑘,1)||IntegerToBytes(ℓ,1),128)
     let mut h2 = h256_xof(&[xi, &[K.to_le_bytes()[0]], &[L.to_le_bytes()[0]]]);
@@ -96,8 +95,9 @@ pub(crate) fn key_gen_internal_with_matrix<
     // 3: cap_a_hat ← ExpandA(ρ)    ▷ A is generated and stored in NTT representation as Â
     // 5: t ← NTT−1(cap_a_hat ◦ NTT(s_1)) + s_2    ▷ Compute t = As1 + s2
     // 6: (t_1, t_0) ← Power2Round(t, d)    ▷ Compress t
-    let cap_a_hat: [[T; L]; K] = expand_a::<CTEST, K, L>(&rho);
     let (t_1, t_0): ([R; K], [R; K]) = {
+        let cap_a_hat: [[T; L]; K] = expand_a::<CTEST, K, L>(&rho);
+        if let Some(output) = matrix_out { output.clone_from(&cap_a_hat); }
         let s_1_hat: [T; L] = ntt(&s_1);
         let as1_hat: [T; K] = mat_vec_mul(&cap_a_hat, &s_1_hat);
         let t_not_reduced: [R; K] = add_vector_ntt(&inv_ntt(&as1_hat), &s_2);
@@ -144,8 +144,8 @@ pub(crate) fn key_gen_internal_with_matrix<
     // Now we have everything we need for private key struct
     let sk = PrivateKey { rho, cap_k, tr, s_1_hat_mont, s_2_hat_mont, t_0_hat_mont };
 
-    // 11: return (pk, sk), plus the already computed matrix for prepared callers
-    (pk, sk, cap_a_hat)
+    // 11: return (pk, sk)
+    (pk, sk)
 }
 
 
