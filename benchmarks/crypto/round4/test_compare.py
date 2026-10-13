@@ -81,7 +81,7 @@ class CompareTests(unittest.TestCase):
         self.assertEqual(hot["change"]["instructions"], {"delta": -10, "saving_percent": 25, "speedup": 40 / 30})
         self.assertEqual(hot["change"]["payload_bytes"]["delta"], -8)
         self.assertEqual(hot["candidate"]["runtime_wasm_bytes"]["test"], len("optimized implementationruntime.wasm"))
-        self.assertIn("cold includes one factory plus N calls", REPORT.markdown(report))
+        self.assertIn("cold includes preparation plus N calls", REPORT.markdown(report))
         self.assertIn("neither peak memory nor retained live data", REPORT.markdown(report))
         self.assertNotIn("models", report)
 
