@@ -89,9 +89,11 @@ subgroup. `validatePublicKey` does not prove ownership or subgroup membership.
 
 The runtime performs encoding checks before the upstream verification equation.
 [Dalek's strict verifier](https://docs.rs/ed25519-dalek/2.2.0/ed25519_dalek/struct.VerifyingKey.html#method.verify_strict)
-uses the same equation and small-order checks. Since typed errors require us to
-validate R first, using its ordinary verifier afterwards avoids decoding R a
-second time. No strict check is omitted.
+uses the same equation and small-order checks. The runtime retains the validated
+R point and canonical S scalar, then compares points with Dalek's projective
+equality. This avoids encoding the computed point and its field inversion.
+Canonical R validation makes this equivalent to comparing compressed bytes;
+no strict check is omitted.
 
 Validation order is public key then signature. Malformed, noncanonical or
 small-order values return `#err`; well-formed values whose equation fails return

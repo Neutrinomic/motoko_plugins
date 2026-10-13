@@ -4,11 +4,11 @@
 #![cfg_attr(not(test), feature(simd_wasm64))]
 
 use curve25519_dalek::{
-    edwards::{CompressedEdwardsY, PreparedVartimeEdwardsTable},
+    edwards::{CompressedEdwardsY, EdwardsPoint, PreparedVartimeEdwardsTable},
     scalar::Scalar,
 };
 use ed25519_dalek::{
-    Signature, Signer, SigningKey, Verifier, VerifyingKey, hazmat::ExpandedSecretKey,
+    Signer, SigningKey, VerifyingKey, hazmat::ExpandedSecretKey,
 };
 use sha2::{Digest, Sha512};
 use zeroize::Zeroizing;
@@ -51,7 +51,13 @@ fn public(input: &[u8]) -> Result<VerifyingKey, i64> {
     Ok(key)
 }
 
-fn signature(input: &[u8]) -> Result<Signature, i64> {
+struct CheckedSignature {
+    r_bytes: [u8; 32],
+    r_point: EdwardsPoint,
+    s: Scalar,
+}
+
+fn signature(input: &[u8]) -> Result<CheckedSignature, i64> {
     let bytes: &[u8; 64] = input.try_into().map_err(|_| INVALID_SIGNATURE)?;
     let mut r = [0; 32];
     r.copy_from_slice(&bytes[..32]);
@@ -66,10 +72,17 @@ fn signature(input: &[u8]) -> Result<Signature, i64> {
     }
     let mut s = [0; 32];
     s.copy_from_slice(&bytes[32..]);
-    if !bool::from(Scalar::from_canonical_bytes(s).is_some()) {
-        return Err(INVALID_SIGNATURE);
-    }
-    Ok(Signature::from_bytes(bytes))
+    let s = Option::<Scalar>::from(Scalar::from_canonical_bytes(s))
+        .ok_or(INVALID_SIGNATURE)?;
+    Ok(CheckedSignature { r_bytes: r, r_point: point, s })
+}
+
+fn challenge(r: &[u8; 32], key: &[u8], message: &[u8]) -> Scalar {
+    let mut hash = Sha512::new();
+    hash.update(r);
+    hash.update(key);
+    hash.update(message);
+    Scalar::from_bytes_mod_order_wide(&hash.finalize().into())
 }
 
 fn public_key(seed: &[u8], output: &mut [u8; 32]) -> Result<(), i64> {
@@ -85,10 +98,14 @@ fn sign(seed: &[u8], message: &[u8], output: &mut [u8; 64]) -> Result<(), i64> {
 fn verify(key: &[u8], message: &[u8], sig: &[u8]) -> Result<bool, i64> {
     let key = public(key)?;
     let sig = signature(sig)?;
-    // The checks above implement verify_strict's small-order and scalar rules
-    // plus canonical A/R encodings. Calling verify here avoids decompressing R
-    // twice while retaining the same uncofactored equation, not ZIP-215 rules.
-    Ok(key.verify(message, &sig).is_ok())
+    let k = challenge(&sig.r_bytes, key.as_bytes(), message);
+    let expected_r = EdwardsPoint::vartime_double_scalar_mul_basepoint(
+        &k, &(-key.to_edwards()), &sig.s,
+    );
+    // Canonical R has one encoding. Compare its already validated point using
+    // upstream projective equality, avoiding a final field inversion. This is
+    // the same uncofactored equation, including for mixed-order A and R.
+    Ok(expected_r == sig.r_point)
 }
 
 // Prepared payloads are immutable SDK-protected managed Blobs. Their explicit
@@ -137,17 +154,11 @@ fn verify_prepared(
     sig: &[u8],
 ) -> Result<bool, i64> {
     let sig = signature(sig)?;
-    let r = sig.r_bytes();
-    let s = Scalar::from_bytes_mod_order(*sig.s_bytes());
-    let mut challenge = Sha512::new();
-    challenge.update(r);
-    challenge.update(&key[..32]);
-    challenge.update(message);
-    let k = Scalar::from_bytes_mod_order_wide(&challenge.finalize().into());
+    let k = challenge(&sig.r_bytes, &key[..32], message);
     let table = PreparedVartimeEdwardsTable::from_trusted_bytes(key[32..].try_into().unwrap());
     // Cache -A, not a negated scalar modulo L: those differ for mixed-order A.
-    let expected_r = table.vartime_double_scalar_mul_basepoint(&k, &s).compress();
-    Ok(expected_r.as_bytes() == r)
+    let expected_r = table.vartime_double_scalar_mul_basepoint(&k, &sig.s);
+    Ok(expected_r == sig.r_point)
 }
 
 unsafe fn input<'a>(ptr: *const u8, len: usize) -> &'a [u8] {

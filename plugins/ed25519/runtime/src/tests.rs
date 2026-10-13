@@ -1,4 +1,5 @@
 use super::*;
+use ed25519_dalek::Signature;
 
 fn hex(value: &str) -> Vec<u8> {
     (0..value.len())
