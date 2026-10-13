@@ -1,0 +1,39 @@
+{
+  "status": "source-and-native-pass-public-and-gc-running",
+  "production_commit": "347d1c3",
+  "sdk_commit": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "artifacts_sha256": {
+    "build.json": "e25815fafb441ac44e45ff039298be0f95cc4078d90fd9a3eea9d175796f2849",
+    "plugin.cmxs": "1f6d2f11d238a3c56264b2bbdf1a3c666b936aea3e35840424b31d45cdbf18ec",
+    "runtime.wasm": "c92dec902a68035e877fdffc92943f496a73d490bf0964799d1888ba53e5350d"
+  },
+  "source_review": {
+    "protected_contract": "Three distinct factory-only local types: IC G2 prepared table; Ethereum decoded G1; Ethereum decoded G1 with verified PoP. No byte import/export or plain-to-PoP conversion.",
+    "validation": "Factories check canonical encoding, curve, prime subgroup and nonidentity before initializing output. PoP factory decodes both inputs before identity rejection and returns invalidProof for a false equation. Consumers still validate every untrusted signature and retain exact IC message distinctness.",
+    "profiles": "IC NUL and Ethereum POP signature/proof DSTs unchanged; caller framing unchanged. General size127 and fast128 unchanged. IC duplicate precedes signature errors; fast cancellation checks malformed signature before aggregate-key identity.",
+    "storage": "IC19680 bytes =96 canonical+19584 coefficient bytes; Ethereum144 =48 canonical+96 initialized affine limbs. Explicit LE Montgomery limbs; no padding, Vec metadata, native pointers or hidden retained state.",
+    "borrowing": "Factory/single output allocated before borrowing. Aggregates allocate descriptor, borrow through compiler Blob/Array forwarding barriers, then allocate one output byte before calling native. SDK explicitly excludes collection within the synchronous frame, including these allocations. Published payloads are never mutated; pointers never survive the call.",
+    "key_comparison": "IC same-key consolidation compares canonical prefix from the validated factory, leaving shared tables borrowed. Ethereum prepared aggregates consume only the distinct proof-validated type; unproved single-verifier keys cannot enter them.",
+    "arithmetic": "Narrow vendored hooks reuse unchanged upstream Miller driver, ell and final exponentiation. Independent hook review verifies40 upstream file hashes. The shared immutable generator table is used by direct and prepared paths and independently compared with fresh upstream preparation.",
+    "interpreter": "Reference protects canonical public-key bytes using the matching nominal descriptor and reuses existing mathematical equations. It intentionally does not expose or emulate the private native limb representation."
+  },
+  "findings": [],
+  "test_harness_corrections": [
+    {
+      "issue": "Missing explicit return type on generated keys helper defaults to Unit in Motoko.",
+      "evidence": "evidence/initial/independent-interpreter.log",
+      "resolution": "Added explicit Keys return type; production unchanged."
+    },
+    {
+      "issue": "Empty string argument to generic repeat inferred Text rather than Blob.",
+      "evidence": "evidence/public-final/independent-interpreter.log",
+      "resolution": "Specified repeat<Blob>; production unchanged."
+    }
+  ],
+  "limitations": [
+    "Source/functional review, not formal verification or empirical side-channel certification.",
+    "Raw native trusted-payload entry points require protected factory outputs; arbitrary forged private limb payloads are intentionally outside their contract.",
+    "Prepared values are caller-owned local managed Blobs, not a stable wire format; they must be recreated after upgrades."
+  ]
+}

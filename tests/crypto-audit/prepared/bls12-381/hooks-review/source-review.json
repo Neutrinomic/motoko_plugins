@@ -1,0 +1,93 @@
+{
+  "scope": "Independent source-only review of prepared BLS vendored hooks; no build or executable tests run by this reviewer.",
+  "status": "source-review-pass",
+  "reviewed_source_sha256": {
+    "Cargo.toml": "ae9950953879872c94b9b9f219710fa878241848e332f00e60bb1e804e9809da",
+    "Cargo.toml.orig": "e05d0b96f00a90cea93573ac1710131eabd4ecc3808dda4b453df43272ff6237",
+    "MOTOKO-PREPARED.md": "3ae272a2b81756d5b533b058f294b5f3d6dbf6fa302048abaeda95250b3507fa",
+    "UPSTREAM-SHA256.json": "b98682ab61a468958ddadfac088aaef1151f79381324c1e61015f306975e2776",
+    "examples/motoko_g2_generator.rs": "87f0c91972a77f83f55517b8c86ec363ed040b3ae93130955305250b93643915",
+    "src/fp.rs": "dfdef2d9afe913e4b1d657852f0967614e2eb64520d1c62807c2edec67c1cd6d",
+    "src/fp12.rs": "ac9a00e65176848efa10f59d8507722e44582f17bf9ef81062d77bb44d46fc06",
+    "src/fp2.rs": "2d3a3ef99b5da7b591d5c4466ec8ee953a8c36ee096c4712b2d039a94d889630",
+    "src/g1.rs": "81be155f7dc7d76abe21fd4c9c8d2e3c9b0b1b1e7e8c39652f5d0d8bc3dccb6c",
+    "src/lib.rs": "f23b15621ca44a4e1dc5179dffde058274864927c44fa2d13d428534cfcaeef6",
+    "src/pairings.rs": "40fe884fe7cfde27c1da70cfa19fd8231706e3793b7cc3ed9fd35c05c846e962",
+    "src/plugin_prepared.rs": "54165ff685787a4db237bca9b2e58c486ca3da0f6fe4bfd7f3f716f937709398",
+    "src/plugin_prepared_tests.rs": "7804c4cf914068b040f6567a850711eef0dd01ecee750d4177b174e03d92dbee"
+  },
+  "upstream_archive_sha256": "d7bc6d6292be3a19e6379786dac800f551e5865a5bb51ebbe3064ab80433f403",
+  "upstream_comparison": {
+    "unchanged_files": 35,
+    "changed_files": [
+      "Cargo.toml",
+      "Cargo.toml.orig",
+      "src/g1.rs",
+      "src/lib.rs",
+      "src/pairings.rs"
+    ],
+    "missing_files": []
+  },
+  "findings": [],
+  "checked_invariants": [
+    "Only new feature hooks, G1 constructor and manifests differ from published arithmetic. Upstream scalar/field/curve/hash-to-curve/pairing arithmetic is unchanged.",
+    "G1 is exactly x then y, each six explicit LE u64 Montgomery limbs. G2 is 68 coefficient triples, each tuple0/1/2 then Fp2 c0/c1 then six LE limbs.",
+    "Every output byte is initialized for successful exact-size writes; identity rejection precedes any write. No struct bytes, padding, uninitialized memory or host endianness dependence.",
+    "Canonical point decoding and existing reduced field arithmetic produce each stored Montgomery value in [0,p). Readers intentionally trust only immutable factory-produced same-version payloads.",
+    "Writer and reader invoke the same upstream Miller driver. Independent BLS_X traversal gives 63 doubling and 5 addition steps, including the final doubling: total 68.",
+    "Owned/borrowed terms use the original ell, square, conjugate, Fp12 identity and identity masking. Direct-path arithmetic is unchanged.",
+    "No unsafe code, pointer casts, mutable static state, retained references or allocation occurs in the new hooks. Borrowed slices are lifetime-bound to the synchronous call; one coefficient is decoded into stack values.",
+    "The generator utility encodes G2Affine::generator through the exact approved writer into a fully initialized 19,584-byte buffer. Runtime include_bytes supplies one immutable static in an 8-byte-aligned wrapper, with no native pointers or mutable cache.",
+    "Both direct and prepared-key IC verification borrow the same immutable generator table. Ordinary dynamic pairing paths substitute the constant only when the validated G2 point equals the canonical generator; all other points retain Owned preparation.",
+    "The shared generator changes storage/preparation only: sign convention, operand order, ell, Miller driver and final exponentiation remain unchanged. Owned identity handling stays intact.",
+    "Runtime test source compares the complete generator fixture against freshly written generator coefficients, checks alignment, and compares final exponentiation against upstream ordinary preparation."
+  ],
+  "limits": [
+    "This is a source review, not an external cryptographic audit or a claim of executed tests.",
+    "Trusted payload unforgeability, GC/lifetime bridge behavior, public error semantics, module/compiler integration and benchmark evidence are reviewed elsewhere.",
+    "Any arithmetic or payload-layout source change invalidates this source fingerprint and needs review."
+  ],
+  "requested_test_evidence": [
+    "Raw G2 coefficient parity with upstream G2Prepared for multiple points; scalar and hash-to-curve fixtures.",
+    "Each serialized field integer < p; all byte alignments, output sentinel guards, distinct initial fill patterns.",
+    "Identity writers leave output untouched; G1 coordinate roundtrips preserve compressed bytes.",
+    "Mixed Owned/Trusted, empty and identity terms match upstream final exponentiation and pairing."
+  ],
+  "provenance_manifest_verified_against_archive": true,
+  "test_source_review": {
+    "test_functions": 6,
+    "status": "reviewed-not-executed",
+    "coverage": [
+      "exact upstream coefficient triples on both signs of 5 compressed G2 fixtures",
+      "G1 coordinates and compressed bytes match both signs of 5 validated compressed fixtures",
+      "all serialized fields reduced below independent base-field modulus",
+      "distinct fill patterns prove all bytes written; identity leaves output unchanged",
+      "offsets 0 through 7 with prefix and suffix sentinels",
+      "mixed and borrowed loops match upstream at 0,1,2,8,127,128 terms; reversed term order",
+      "G1 identity, owned G2 identity, empty and cancelling terms"
+    ]
+  },
+  "reviewed_production_commit": "347d1c3b0c91969bfaa678398e537c187142bdf7",
+  "reviewed_worktree_head": "56e0ee9245af5d58544dab346cd875e94060413d",
+  "shared_generator_runtime_sha256": {
+    "plugins/bls12-381/runtime/src/lib.rs": "8952a770ceaaf985d0121ea1c7569a350e30cc17f28caec6d52fd0c36247f9e0",
+    "plugins/bls12-381/runtime/src/prepared_tests.rs": "e9a73a71c0ad2cda4448ea28a99f6fbc70c62fe98b55e3c29cfa0bfd39c82696",
+    "plugins/bls12-381/runtime/vectors/g2-generator-prepared.bin": "d3beb10abcde94f7448f4fecf097a394a6530bc43b6ba0464aeb801174232131"
+  },
+  "reviewed_tracked_paths_match_production_commit": true,
+  "fixed_generator_review": {
+    "bytes": 19584,
+    "sha256": "d3beb10abcde94f7448f4fecf097a394a6530bc43b6ba0464aeb801174232131",
+    "all_408_montgomery_fields_independently_checked_less_than_modulus": true,
+    "native_crypto_tests_executed_by_this_reviewer": false
+  },
+  "owner_evidence_review": {
+    "vendor_report_sha256": "04c9d31994217de73a2e38cd06399a0b8164276371910bccc761bb021c09602a",
+    "all_vendor_source_and_evidence_hashes_match": true,
+    "vendor_tests_passed_in_owner_log": 6,
+    "vendor_tests_filtered_out_in_owner_log": 98,
+    "runtime_tests_passed_in_owner_log": 28,
+    "runtime_log_sha256": "424fd3fbb6a9396802e76476338583d84694d48cd29e6676938a193d42dc1202",
+    "note": "Owner-run logs and hashes were inspected; this reviewer did not execute those tests."
+  }
+}
