@@ -155,7 +155,9 @@ persistent actor {
       assert saved == #ok(v.signature);
       let randomized = MLDSA.signRandomized;
       assert randomized(v.seed, v.message, v.context, filled(32, 0)) == saved;
-      let verify : (Blob, Blob, Blob, Blob) -> MLDSA.Result<Bool> = MLDSA.verify;
+      let verify : (Blob, Blob, Blob, Blob) -> MLDSA.Result<Bool> = func(pk, msg, sig, ctx) {
+        MLDSA.verify(pk, msg, sig, ctx)
+      };
       assert verify(v.publicKey, v.message, v.signature, v.context) == #ok(true);
       assert MLDSA.publicKey(Vectors.keyGen[0].seed) == #ok(Vectors.keyGen[0].publicKey);
       assert MLDSA.sign("", "", "") == #err(#invalidSecretKey);

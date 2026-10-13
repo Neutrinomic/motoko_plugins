@@ -43,5 +43,12 @@ On 2026-10-13, all **7 native Rust tests passed** in release mode with Rust
 OCaml reference also matched all 70 official answers. The public Motoko run
 fixture passes `moc --check` against the built plugin.
 
-Interpreter/Wasm and Ash execution remain pending; typechecking is not counted
-as execution.
+All **17 Ash methods passed** using the source checkout at `/srv/shared/code/ash`
+with `--sanity-checks` and `--force-gc`. The installed Ash release does not
+accept the required `mocArgs` configuration, so the source checkout was used.
+The first source compilation found an invalid test annotation treating an
+intrinsic as an ordinary function; the test now uses an explicit wrapper.
+No compiler or plugin change was required.
+
+Interpreter/Wasm test-runner execution remains pending; typechecking is not
+counted as execution.
