@@ -62,3 +62,17 @@ The algorithmic background is the [libsecp256k1 multiplication design](https://g
 which also uses endomorphism splitting and non-adjacent digits. This patch
 uses the existing RustCrypto point operations rather than importing new
 field formulas or C implementations.
+
+The final rebuild refreshes the vendor patch ledger and documentation;
+`final-build.json` pins the final source. `final-artifact.json` verifies its
+runtime and native plugin bytes are identical to the measured NAF stage.
+Frozen screen archives preserve their original metadata rather than being
+rewritten after measurement.
+
+Final independent audit passed against those exact artifacts: eight fixtures
+through source, IR, lowered IR, Wasm execution and Wasm validation, covering
+476 Wycheproof vectors, all 19 BIP340 vectors, 18 RFC6979 boundary cases,
+32 additional random ECDSA/Schnorr cases, arithmetic and malformed-key cases,
+and constructed ECDSA infinity and rare X-coordinate reduction cases.
+Independent 10x26 versus 5x52 versus BigUint tests passed in debug and release.
+See [the retained audit](../../../../tests/crypto-audit/round3/secp256k1/).
