@@ -56,6 +56,16 @@ def discover(names):
         ):
             fail(f"{path}: ocaml_packages must be a list of findlib package names")
         manifest["ocaml_packages"] = packages
+        cfg = manifest.get("runtime_cfg", [])
+        if not isinstance(cfg, list) or not all(
+            isinstance(value, str) and re.fullmatch(
+                r'[A-Za-z_][A-Za-z0-9_]*(?:="[A-Za-z0-9_.-]+")?', value
+            ) for value in cfg
+        ):
+            fail(f"{path}: runtime_cfg must be a list of Rust cfg names or quoted values")
+        if cfg and crate is None:
+            fail(f"{path}: runtime_cfg requires runtime_crate")
+        manifest["runtime_cfg"] = cfg
         available[name] = manifest
     if not available:
         fail("No plugins/*/plugin.json manifests found")
@@ -150,20 +160,25 @@ def compiler_plugin(manifest, includes, work, env):
     return output
 
 
+def runtime_rustflags(manifest, env):
+    # Flags are argument tokens, never shell text. A manifest may select a
+    # dependency's documented backend, but cannot supply arbitrary rustc flags.
+    caller_flags = (
+        env["CARGO_ENCODED_RUSTFLAGS"].split("\x1f")
+        if env.get("CARGO_ENCODED_RUSTFLAGS") else shlex.split(env.get("RUSTFLAGS", ""))
+    )
+    flags = [f"--remap-path-prefix={ROOT}=.", "-C", "link-arg=--import-memory"]
+    flags += caller_flags
+    for cfg in manifest["runtime_cfg"]:
+        flags += ["--cfg", cfg]
+    return flags
+
+
 def runtimes(manifests, motoko, env):
     outputs = {}
     manifests = [m for m in manifests if m.get("runtime_crate") is not None]
     if not manifests:
         return outputs
-    runtime_env = env.copy()
-    flags = [f"--remap-path-prefix={ROOT}=.", "-C", "link-arg=--import-memory"]
-    # Keep caller flags, including profiling/debug options, while ensuring the
-    # shared-memory ABI is used. This matches the compiler's own RTS target.
-    caller_flags = (
-        env["CARGO_ENCODED_RUSTFLAGS"].split("\x1f")
-        if env.get("CARGO_ENCODED_RUSTFLAGS") else shlex.split(env.get("RUSTFLAGS", ""))
-    )
-    runtime_env["CARGO_ENCODED_RUSTFLAGS"] = "\x1f".join(flags + caller_flags)
     cargo_target = ROOT / "_build/cargo"
     target = motoko / "rts/motoko-rts/wasm64-none-shared.json"
     if not target.is_file():
@@ -174,6 +189,8 @@ def runtimes(manifests, motoko, env):
         "-Zjson-target-spec", "-Zbuild-std=core,alloc",
     ]
     for manifest in manifests:
+        runtime_env = env.copy()
+        runtime_env["CARGO_ENCODED_RUSTFLAGS"] = "\x1f".join(runtime_rustflags(manifest, env))
         # Cargo unifies dependency features across packages in one invocation.
         # These runtimes are independent libraries: e.g. BLS enables group/alloc,
         # while P256 and secp256k1 deliberately have no global allocator. Build
@@ -291,7 +308,9 @@ def main():
             if compiler_source_hashes(motoko) != compiler_sources or sha256(moc) != moc_hash:
                 fail("Compiler inputs changed during the build; retry on a stable snapshot")
             (staged / "build.json").write_text(json.dumps(
-                {"name": name, **metadata, "source_sha256": inputs[name], "sha256": hashes}, indent=2,
+                {"name": name, **metadata,
+                 "runtime_rustflags": runtime_rustflags(manifest, env) if name in runtime_outputs else [],
+                 "source_sha256": inputs[name], "sha256": hashes}, indent=2,
             ) + "\n")
             destination = ROOT / "dist" / name
             destination.parent.mkdir(exist_ok=True)

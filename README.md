@@ -865,6 +865,9 @@ available as historical evidence.
 | [HMAC](plugins/hmac-sha2/) | `HMAC.sha256`, `sha512`, `prepareSha512` | HMAC-SHA256/SHA512, reusable keys, and streaming |
 | [secp256k1](plugins/secp256k1/) | `Secp256k1.signPrehash`, `verifyPrehash`, `schnorrVerify` | Bitcoin curve operations, deterministic ECDSA, BIP340 Schnorr, and key tweaks |
 | [P-256](plugins/p256/) | `P256.signPrehash`, `verifyPrehash`, `publicKey` | NIST P-256 keys, deterministic ECDSA, and signature encoding |
+| [Ed25519](plugins/ed25519/) | `Ed25519.derivePublicKey`, `sign`, `verify` | Ed25519 signatures from 32-byte seeds, with strict public-key and signature validation |
+| [RSA](plugins/rsa/) | `RSA.derivePublicKey`, `signPrehash`, `verifyPrehash` | RSA-3072 PSS with SHA-256, fixed exponent 65537, and an OpenSSL key import tool |
+| [ML-DSA](plugins/ml-dsa/) | `MLDSA.publicKey`, `sign`, `signRandomized`, `verify` | ML-DSA-44 post-quantum signatures, including seed expansion and context support |
 | [Base58](plugins/base58/) | `Base58.encode`, `decode`; `Base58Check` | Bitcoin Base58 and composed double-SHA256 checksums |
 | [Bech32](plugins/bech32/) | `Bech32.encode`, `decode`; `Segwit` | Bech32/Bech32m, bit conversion, and validated witness addresses |
 | [BLS12-381](plugins/bls12-381/) | `BLS12381.g1Mul`, `pairingCheck`, `verifyIC`, `verifyEthereum` | Group arithmetic, MSM, hash-to-curve, and distinct IC/Ethereum BLS profiles |

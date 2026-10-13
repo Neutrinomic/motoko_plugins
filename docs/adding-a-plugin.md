@@ -46,6 +46,13 @@ component; no dummy Wasm module is needed. The root Cargo workspace discovers `p
 one lockfile and release profile across plugins. Update `Cargo.lock` when
 adding a crate or dependency.
 
+An optional `runtime_cfg` list selects documented Rust dependency backends,
+for example `["curve25519_dalek_bits=\"32\"", "curve25519_dalek_backend=\"serial\""]`.
+Each item becomes a `--cfg` argument only for that plugin's separate Cargo
+invocation. The manifest pins the choice; `build.json` records the effective
+runtime Rust flags. This field accepts cfg names and quoted values, not arbitrary
+compiler options.
+
 From the Motoko checkout in its Nix development shell:
 
 ```sh

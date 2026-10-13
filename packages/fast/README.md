@@ -15,6 +15,9 @@ its calls specialize directly to the plugin implementation.
 | `mo:fast/HMAC` | HMAC-SHA256/SHA512, prepared keys, streaming | `hmac-sha2` |
 | `mo:fast/Secp256k1` | Key operations, deterministic ECDSA, BIP340 Schnorr, tweaks | `secp256k1` |
 | `mo:fast/P256` | P-256 keys, deterministic ECDSA and signature encoding | `p256` |
+| `mo:fast/Ed25519` | Seed-derived keys, deterministic signing and strict verification | `ed25519` |
+| `mo:fast/RSA` | RSA-3072 PSS with SHA-256, key validation, signing and verification | `rsa` |
+| `mo:fast/MLDSA` | FIPS 204 ML-DSA-44 keys, deterministic/hedged signing and verification | `ml-dsa` |
 | `mo:fast/Base58` | Bitcoin alphabet encode/decode | `base58` |
 | `mo:fast/Base58Check` | Base58 with a double-SHA256 checksum | `base58`, `sha256` |
 | `mo:fast/Bech32`, `mo:fast/Segwit` | Bech32/Bech32m and witness addresses | `bech32` |
@@ -32,6 +35,14 @@ its own plugin; HMAC and curve signing include their internal hash operations.
 Streaming state is held in managed Motoko values, and a digest can be finalized
 without consuming its saved state. Individual modules document malformed-input
 errors, output/batch limits, scalar byte order, and signature encoding.
+
+Signature plugins accept caller-owned key bytes and do not generate entropy or
+retain private keys. Ed25519 and ML-DSA derive keys from 32-byte secret seeds;
+RSA imports externally generated 3072-bit CRT keys. RSA-PSS signing takes a
+fresh 32-byte salt, and ML-DSA hedged signing takes an explicit 32-byte random
+value. Use a cryptographically secure source for those inputs. ML-DSA signing
+expands its seed on every call; the benchmark includes that cost. See each
+module's documentation for its exact key format and verification policy.
 
 `BLS12381` distinguishes the IC profile (G1 signatures, G2 keys) from the
 Ethereum proof-of-possession profile (G2 signatures, G1 keys). Its aggregate

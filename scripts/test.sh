@@ -63,6 +63,7 @@ export MOTOKO_ROOT=$motoko_root
 export PATH="$motoko_root/bin:$PATH"
 
 cd -- "$plugins_root"
+python3 "$plugins_root/tests/build-config.py"
 cargo test --manifest-path "$plugins_root/Cargo.toml" --locked \
   --target-dir "$plugins_root/_build/native-tests"
 
