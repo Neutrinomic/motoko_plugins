@@ -227,7 +227,7 @@ const G2: Scalar = Scalar::from_bytes_unchecked(&[
  */
 
 /// Find r1 and r2 given k, such that r1 + r2 * lambda == k mod n.
-fn decompose_scalar(k: &Scalar) -> (Scalar, Scalar) {
+pub(super) fn decompose_scalar(k: &Scalar) -> (Scalar, Scalar) {
     // these _vartime calls are constant time since the shift amount is constant
     let c1 = WideScalar::mul_shift_vartime(k, &G1, 384) * MINUS_B1;
     let c2 = WideScalar::mul_shift_vartime(k, &G2, 384) * MINUS_B2;
@@ -364,7 +364,7 @@ fn lincomb(
 
 /// Width-five non-adjacent form of a nonnegative scalar smaller than 2^128.
 /// Only used for public verification scalars after the existing GLV split.
-fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
+pub(super) fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
     let bytes = k.to_bytes();
     debug_assert!(bytes[..16].iter().all(|&b| b == 0));
     let lo = u64::from_be_bytes(bytes[24..32].try_into().unwrap());
@@ -386,46 +386,6 @@ fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
         position += 5;
     }
     digits
-}
-
-impl ProjectivePoint {
-    /// Computes `x*k + y*l` using variable-time public-data arithmetic.
-    ///
-    /// Scalars AND points must be public. Never use this for signing, secret
-    /// key derivation, ECDH, or any secret-dependent multiplication.
-    pub fn lincomb_vartime(x: &Self, k: &Scalar, y: &Self, l: &Scalar) -> Self {
-        let mut tables = [[Self::IDENTITY; 8]; 4];
-        let mut digits = [[0i8; 129]; 4];
-        for (index, (point, scalar)) in [(x, k), (y, l)].into_iter().enumerate() {
-            let (r1, r2) = decompose_scalar(scalar);
-            let sign1 = bool::from(r1.is_high());
-            let sign2 = bool::from(r2.is_high());
-            digits[index * 2] = wnaf_128_vartime(&if sign1 { -r1 } else { r1 });
-            digits[index * 2 + 1] = wnaf_128_vartime(&if sign2 { -r2 } else { r2 });
-            // Build odd multiples once; derive the second table by the cheap
-            // endomorphism instead of another series of projective additions.
-            let double = point.double();
-            let mut odd = *point;
-            for j in 0..8 {
-                tables[index * 2][j] = if sign1 { -odd } else { odd };
-                let endo = odd.endomorphism();
-                tables[index * 2 + 1][j] = if sign2 { -endo } else { endo };
-                if j != 7 { odd += double; }
-            }
-        }
-        let mut acc = Self::IDENTITY;
-        for bit in (0..129).rev() {
-            acc = acc.double();
-            for term in 0..4 {
-                let digit = digits[term][bit];
-                if digit != 0 {
-                    let point = tables[term][(digit.unsigned_abs() as usize - 1) / 2];
-                    acc += if digit < 0 { -point } else { point };
-                }
-            }
-        }
-        acc
-    }
 }
 
 /// Lazily computed basepoint table.

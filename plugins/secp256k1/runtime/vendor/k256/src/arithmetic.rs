@@ -5,6 +5,7 @@ mod field;
 #[cfg(feature = "hash2curve")]
 mod hash2curve;
 mod mul;
+mod prepared;
 pub(crate) mod projective;
 pub(crate) mod scalar;
 

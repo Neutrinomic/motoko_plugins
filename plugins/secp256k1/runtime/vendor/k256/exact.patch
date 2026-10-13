@@ -4,9 +4,281 @@
 +
 +# Keep upstream development targets outside the enclosing plugin workspace.
 +[workspace]
+--- a/src/arithmetic.rs
++++ b/src/arithmetic.rs
+@@ -7,0 +8 @@
++mod prepared;
+--- a/src/arithmetic/field.rs
++++ b/src/arithmetic/field.rs
+@@ -6,0 +7,4 @@
++// Wasm64 has native 64-bit multiplication but no 128-bit multiplication.
++// Reuse the upstream 10x26 backend whose products fit in u64.
++// Scalar arithmetic and the constant-time curve formulas are unchanged.
++
+@@ -8 +12 @@
+-    if #[cfg(target_pointer_width = "32")] {
++    if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
+@@ -10 +14 @@
+-    } else if #[cfg(target_pointer_width = "64")] {
++    } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
+@@ -23 +27 @@
+-            if #[cfg(target_pointer_width = "32")] {
++            if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
+@@ -25 +29 @@
+-            } else if #[cfg(target_pointer_width = "64")] {
++            } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
+--- a/src/arithmetic/field/field_impl.rs
++++ b/src/arithmetic/field/field_impl.rs
+@@ -11 +11 @@
+-#[cfg(target_pointer_width = "32")]
++#[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))]
+@@ -14 +14 @@
+-#[cfg(target_pointer_width = "64")]
++#[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))]
+--- a/src/arithmetic/mul.rs
++++ b/src/arithmetic/mul.rs
+@@ -230 +230 @@
+-fn decompose_scalar(k: &Scalar) -> (Scalar, Scalar) {
++pub(super) fn decompose_scalar(k: &Scalar) -> (Scalar, Scalar) {
+@@ -364,0 +365,26 @@
++/// Width-five non-adjacent form of a nonnegative scalar smaller than 2^128.
++/// Only used for public verification scalars after the existing GLV split.
++pub(super) fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
++    let bytes = k.to_bytes();
++    debug_assert!(bytes[..16].iter().all(|&b| b == 0));
++    let lo = u64::from_be_bytes(bytes[24..32].try_into().unwrap());
++    let hi = u64::from_be_bytes(bytes[16..24].try_into().unwrap());
++    let mut digits = [0i8; 129];
++    let mut position = 0;
++    let mut carry = 0;
++    while position < 128 || carry != 0 {
++        let bits = if position < 64 {
++            (lo >> position) | if position > 59 { hi << (64 - position) } else { 0 }
++        } else if position < 128 { hi >> (position - 64) } else { 0 };
++        let window = (bits & 31) as i8 + carry;
++        if window & 1 == 0 {
++            position += 1;
++            continue;
++        }
++        carry = i8::from(window >= 16);
++        digits[position] = window - (carry << 5);
++        position += 5;
++    }
++    digits
++}
++
+--- /dev/null
++++ b/src/arithmetic/prepared.rs
+@@ -0,0 +1,146 @@
++//! Public verification caches. Explicit canonical coordinates, never Rust layouts.
++//! All table indices and branches below depend only on public verification data.
++use super::{AffinePoint, FieldElement, ProjectivePoint, Scalar};
++use super::mul::{decompose_scalar, wnaf_128_vartime};
++use super::projective::ENDOMORPHISM_BETA;
++use elliptic_curve::{BatchNormalize, scalar::IsHigh};
++
++// Odd G multiples followed by their endomorphisms. Shared by direct and
++// prepared verification, so neither caller pays repeated generator setup.
++const GENERATOR: [AffinePoint; 16] = [
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x79,0xbe,0x66,0x7e,0xf9,0xdc,0xbb,0xac,0x55,0xa0,0x62,0x95,0xce,0x87,0x0b,0x07,0x02,0x9b,0xfc,0xdb,0x2d,0xce,0x28,0xd9,0x59,0xf2,0x81,0x5b,0x16,0xf8,0x17,0x98]),
++        FieldElement::from_bytes_unchecked(&[0x48,0x3a,0xda,0x77,0x26,0xa3,0xc4,0x65,0x5d,0xa4,0xfb,0xfc,0x0e,0x11,0x08,0xa8,0xfd,0x17,0xb4,0x48,0xa6,0x85,0x54,0x19,0x9c,0x47,0xd0,0x8f,0xfb,0x10,0xd4,0xb8])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xf9,0x30,0x8a,0x01,0x92,0x58,0xc3,0x10,0x49,0x34,0x4f,0x85,0xf8,0x9d,0x52,0x29,0xb5,0x31,0xc8,0x45,0x83,0x6f,0x99,0xb0,0x86,0x01,0xf1,0x13,0xbc,0xe0,0x36,0xf9]),
++        FieldElement::from_bytes_unchecked(&[0x38,0x8f,0x7b,0x0f,0x63,0x2d,0xe8,0x14,0x0f,0xe3,0x37,0xe6,0x2a,0x37,0xf3,0x56,0x65,0x00,0xa9,0x99,0x34,0xc2,0x23,0x1b,0x6c,0xb9,0xfd,0x75,0x84,0xb8,0xe6,0x72])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x2f,0x8b,0xde,0x4d,0x1a,0x07,0x20,0x93,0x55,0xb4,0xa7,0x25,0x0a,0x5c,0x51,0x28,0xe8,0x8b,0x84,0xbd,0xdc,0x61,0x9a,0xb7,0xcb,0xa8,0xd5,0x69,0xb2,0x40,0xef,0xe4]),
++        FieldElement::from_bytes_unchecked(&[0xd8,0xac,0x22,0x26,0x36,0xe5,0xe3,0xd6,0xd4,0xdb,0xa9,0xdd,0xa6,0xc9,0xc4,0x26,0xf7,0x88,0x27,0x1b,0xab,0x0d,0x68,0x40,0xdc,0xa8,0x7d,0x3a,0xa6,0xac,0x62,0xd6])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x5c,0xbd,0xf0,0x64,0x6e,0x5d,0xb4,0xea,0xa3,0x98,0xf3,0x65,0xf2,0xea,0x7a,0x0e,0x3d,0x41,0x9b,0x7e,0x03,0x30,0xe3,0x9c,0xe9,0x2b,0xdd,0xed,0xca,0xc4,0xf9,0xbc]),
++        FieldElement::from_bytes_unchecked(&[0x6a,0xeb,0xca,0x40,0xba,0x25,0x59,0x60,0xa3,0x17,0x8d,0x6d,0x86,0x1a,0x54,0xdb,0xa8,0x13,0xd0,0xb8,0x13,0xfd,0xe7,0xb5,0xa5,0x08,0x26,0x28,0x08,0x72,0x64,0xda])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xac,0xd4,0x84,0xe2,0xf0,0xc7,0xf6,0x53,0x09,0xad,0x17,0x8a,0x9f,0x55,0x9a,0xbd,0xe0,0x97,0x96,0x97,0x4c,0x57,0xe7,0x14,0xc3,0x5f,0x11,0x0d,0xfc,0x27,0xcc,0xbe]),
++        FieldElement::from_bytes_unchecked(&[0xcc,0x33,0x89,0x21,0xb0,0xa7,0xd9,0xfd,0x64,0x38,0x09,0x71,0x76,0x3b,0x61,0xe9,0xad,0xd8,0x88,0xa4,0x37,0x5f,0x8e,0x0f,0x05,0xcc,0x26,0x2a,0xc6,0x4f,0x9c,0x37])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x77,0x4a,0xe7,0xf8,0x58,0xa9,0x41,0x1e,0x5e,0xf4,0x24,0x6b,0x70,0xc6,0x5a,0xac,0x56,0x49,0x98,0x0b,0xe5,0xc1,0x78,0x91,0xbb,0xec,0x17,0x89,0x5d,0xa0,0x08,0xcb]),
++        FieldElement::from_bytes_unchecked(&[0xd9,0x84,0xa0,0x32,0xeb,0x6b,0x5e,0x19,0x02,0x43,0xdd,0x56,0xd7,0xb7,0xb3,0x65,0x37,0x2d,0xb1,0xe2,0xdf,0xf9,0xd6,0xa8,0x30,0x1d,0x74,0xc9,0xc9,0x53,0xc6,0x1b])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xf2,0x87,0x73,0xc2,0xd9,0x75,0x28,0x8b,0xc7,0xd1,0xd2,0x05,0xc3,0x74,0x86,0x51,0xb0,0x75,0xfb,0xc6,0x61,0x0e,0x58,0xcd,0xde,0xed,0xdf,0x8f,0x19,0x40,0x5a,0xa8]),
++        FieldElement::from_bytes_unchecked(&[0x0a,0xb0,0x90,0x2e,0x8d,0x88,0x0a,0x89,0x75,0x82,0x12,0xeb,0x65,0xcd,0xaf,0x47,0x3a,0x1a,0x06,0xda,0x52,0x1f,0xa9,0x1f,0x29,0xb5,0xcb,0x52,0xdb,0x03,0xed,0x81])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xd7,0x92,0x4d,0x4f,0x7d,0x43,0xea,0x96,0x5a,0x46,0x5a,0xe3,0x09,0x5f,0xf4,0x11,0x31,0xe5,0x94,0x6f,0x3c,0x85,0xf7,0x9e,0x44,0xad,0xbc,0xf8,0xe2,0x7e,0x08,0x0e]),
++        FieldElement::from_bytes_unchecked(&[0x58,0x1e,0x28,0x72,0xa8,0x6c,0x72,0xa6,0x83,0x84,0x2e,0xc2,0x28,0xcc,0x6d,0xef,0xea,0x40,0xaf,0x2b,0xd8,0x96,0xd3,0xa5,0xc5,0x04,0xdc,0x9f,0xf6,0xa2,0x6b,0x58])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xbc,0xac,0xe2,0xe9,0x9d,0xa0,0x18,0x87,0xab,0x01,0x02,0xb6,0x96,0x90,0x23,0x25,0x87,0x28,0x44,0x06,0x7f,0x15,0xe9,0x8d,0xa7,0xbb,0xa0,0x44,0x00,0xb8,0x8f,0xcb]),
++        FieldElement::from_bytes_unchecked(&[0x48,0x3a,0xda,0x77,0x26,0xa3,0xc4,0x65,0x5d,0xa4,0xfb,0xfc,0x0e,0x11,0x08,0xa8,0xfd,0x17,0xb4,0x48,0xa6,0x85,0x54,0x19,0x9c,0x47,0xd0,0x8f,0xfb,0x10,0xd4,0xb8])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xdf,0x6e,0xdf,0x03,0x73,0x1f,0x9b,0x4b,0x8d,0xcd,0x8d,0xcf,0x2a,0x28,0xfa,0x2f,0x8a,0xf1,0xe0,0x22,0xc6,0xdc,0x8e,0x1c,0xf7,0xf0,0x72,0x8c,0x77,0x20,0x6b,0x2f]),
++        FieldElement::from_bytes_unchecked(&[0x38,0x8f,0x7b,0x0f,0x63,0x2d,0xe8,0x14,0x0f,0xe3,0x37,0xe6,0x2a,0x37,0xf3,0x56,0x65,0x00,0xa9,0x99,0x34,0xc2,0x23,0x1b,0x6c,0xb9,0xfd,0x75,0x84,0xb8,0xe6,0x72])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x33,0x7b,0x52,0xe3,0xac,0xda,0x49,0xdf,0xf7,0x9f,0x54,0xfb,0xcc,0xb9,0x46,0x71,0xa0,0x45,0x69,0x3e,0xe0,0xd0,0x97,0xcc,0x13,0x8c,0x69,0x46,0x95,0xa8,0x36,0x68]),
++        FieldElement::from_bytes_unchecked(&[0xd8,0xac,0x22,0x26,0x36,0xe5,0xe3,0xd6,0xd4,0xdb,0xa9,0xdd,0xa6,0xc9,0xc4,0x26,0xf7,0x88,0x27,0x1b,0xab,0x0d,0x68,0x40,0xdc,0xa8,0x7d,0x3a,0xa6,0xac,0x62,0xd6])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x13,0xf2,0x6e,0x75,0x4b,0xea,0x0b,0x77,0xa4,0xfe,0xc4,0xd1,0xc0,0x95,0xc0,0x6e,0x0d,0x3b,0x20,0xe2,0x0f,0xaf,0x7a,0xaa,0x3b,0xc4,0x68,0x6e,0x4e,0x53,0xbc,0x94]),
++        FieldElement::from_bytes_unchecked(&[0x6a,0xeb,0xca,0x40,0xba,0x25,0x59,0x60,0xa3,0x17,0x8d,0x6d,0x86,0x1a,0x54,0xdb,0xa8,0x13,0xd0,0xb8,0x13,0xfd,0xe7,0xb5,0xa5,0x08,0x26,0x28,0x08,0x72,0x64,0xda])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x87,0xb4,0x04,0x03,0x7e,0x44,0xe8,0x19,0x7b,0x65,0x58,0xaf,0xec,0x58,0xab,0x20,0xb5,0x65,0xcd,0xf5,0xef,0x6d,0x44,0xe1,0x20,0xcd,0x91,0x2e,0x65,0x95,0x3a,0x52]),
++        FieldElement::from_bytes_unchecked(&[0xcc,0x33,0x89,0x21,0xb0,0xa7,0xd9,0xfd,0x64,0x38,0x09,0x71,0x76,0x3b,0x61,0xe9,0xad,0xd8,0x88,0xa4,0x37,0x5f,0x8e,0x0f,0x05,0xcc,0x26,0x2a,0xc6,0x4f,0x9c,0x37])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x51,0xf4,0xd3,0xd1,0x17,0x1d,0xac,0x1d,0x8d,0x89,0x7c,0x41,0xbe,0xbf,0x1a,0x26,0x79,0x85,0x9b,0xb7,0x0b,0x5f,0xf6,0x20,0xc5,0xff,0x43,0x34,0xbb,0x20,0x9c,0xe7]),
++        FieldElement::from_bytes_unchecked(&[0xd9,0x84,0xa0,0x32,0xeb,0x6b,0x5e,0x19,0x02,0x43,0xdd,0x56,0xd7,0xb7,0xb3,0x65,0x37,0x2d,0xb1,0xe2,0xdf,0xf9,0xd6,0xa8,0x30,0x1d,0x74,0xc9,0xc9,0x53,0xc6,0x1b])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0xf1,0x4d,0x58,0x37,0x4b,0xb8,0x90,0xa2,0x07,0x04,0x6c,0x45,0x78,0xfc,0x78,0x3b,0x32,0x90,0x7e,0xd7,0x4a,0x3d,0x05,0x62,0x60,0xaa,0xee,0x6a,0x47,0x5f,0xb6,0x78]),
++        FieldElement::from_bytes_unchecked(&[0x0a,0xb0,0x90,0x2e,0x8d,0x88,0x0a,0x89,0x75,0x82,0x12,0xeb,0x65,0xcd,0xaf,0x47,0x3a,0x1a,0x06,0xda,0x52,0x1f,0xa9,0x1f,0x29,0xb5,0xcb,0x52,0xdb,0x03,0xed,0x81])),
++    AffinePoint::new(FieldElement::from_bytes_unchecked(&[0x80,0x5f,0x11,0x05,0xf5,0xf9,0x45,0x4a,0x0e,0x1b,0x48,0x25,0x51,0x2b,0x69,0x48,0x05,0xcc,0x3b,0xc9,0xc1,0xc0,0xa6,0x39,0x3a,0xc0,0xa4,0x0c,0x71,0xb1,0xb3,0xb4]),
++        FieldElement::from_bytes_unchecked(&[0x58,0x1e,0x28,0x72,0xa8,0x6c,0x72,0xa6,0x83,0x84,0x2e,0xc2,0x28,0xcc,0x6d,0xef,0xea,0x40,0xaf,0x2b,0xd8,0x96,0xd3,0xa5,0xc5,0x04,0xdc,0x9f,0xf6,0xa2,0x6b,0x58])),
++];
++
++fn digits(k: &Scalar, l: &Scalar) -> [[i8; 129]; 4] {
++    let mut result = [[0i8; 129]; 4];
++    for (i, scalar) in [k, l].into_iter().enumerate() {
++        let (a, b) = decompose_scalar(scalar);
++        for (j, component) in [a, b].into_iter().enumerate() {
++            let negative = bool::from(component.is_high());
++            let mut ds = wnaf_128_vartime(&if negative { -component } else { component });
++            if negative { for d in &mut ds { *d = -*d; } }
++            result[i * 2 + j] = ds;
++        }
++    }
++    result
++}
++
++fn odd_multiples(point: &ProjectivePoint) -> [ProjectivePoint; 8] {
++    let mut table = [*point; 8];
++    let double = point.double();
++    for i in 1..8 { table[i] = table[i - 1] + double; }
++    table
++}
++
++fn odd_table(point: &ProjectivePoint) -> [ProjectivePoint; 16] {
++    let mut table = [ProjectivePoint::IDENTITY; 16];
++    for (i, odd) in odd_multiples(point).into_iter().enumerate() {
++        table[i] = odd;
++        table[i + 8] = odd.endomorphism();
++    }
++    table
++}
++
++fn decode_affine(bytes: &[u8]) -> AffinePoint {
++    AffinePoint::new(
++        FieldElement::from_bytes_unchecked(bytes[..32].try_into().unwrap()),
++        FieldElement::from_bytes_unchecked(bytes[32..64].try_into().unwrap()))
++}
++
++impl ProjectivePoint {
++    /// Serialize a validated nonidentity public point as eight odd multiples,
++    /// each canonical X || Y. Output must be 512 bytes. This pointer-free format
++    /// is private to factory-created prepared handles, never a Rust layout.
++    pub fn prepare_verification_key(point: &AffinePoint, output: &mut [u8]) {
++        assert_eq!(output.len(), 512);
++        let projective = odd_multiples(&Self::from(*point));
++        let affine = <Self as BatchNormalize<[Self; 8]>>::batch_normalize(&projective);
++        for (point, bytes) in affine.iter().zip(output.chunks_exact_mut(64)) {
++            bytes[..32].copy_from_slice(&point.x.to_bytes());
++            bytes[32..].copy_from_slice(&point.y.to_bytes());
++        }
++    }
++
++    /// Compute k*G+l*Q for public verification using a shared immutable G table.
++    /// Never use variable-time methods with secret scalars or points.
++    pub fn lincomb_generator_vartime(k: &Scalar, q: &Self, l: &Scalar) -> Self {
++        let digits = digits(k, l);
++        let table = odd_table(q);
++        let mut acc = Self::IDENTITY;
++        for bit in (0..129).rev() {
++            acc = acc.double();
++            for term in 0..4 {
++                let digit = digits[term][bit];
++                if digit == 0 { continue; }
++                let index = (term % 2) * 8 + (digit.unsigned_abs() as usize - 1) / 2;
++                if term < 2 {
++                    let point = GENERATOR[index];
++                    acc += if digit < 0 { -point } else { point };
++                } else {
++                    let point = table[index];
++                    acc += if digit < 0 { -point } else { point };
++                }
++            }
++        }
++        acc
++    }
++
++    /// Compute k*G+l*Q from an immutable factory-created verification cache.
++    /// Coordinates/table relations are trusted, not revalidated. Only use with
++    /// the matching cache factory and public scalars. No secret data is allowed.
++    pub fn lincomb_generator_prepared_vartime(k: &Scalar, prepared: &[u8], l: &Scalar) -> Self {
++        assert_eq!(prepared.len(), 512);
++        let digits = digits(k, l);
++        let mut table = [AffinePoint::IDENTITY; 16];
++        for (i, bytes) in prepared.chunks_exact(64).enumerate() {
++            let point = decode_affine(bytes);
++            table[i] = point;
++            // The same public endomorphism as ProjectivePoint::endomorphism:
++            // beta * X, Y. Deriving it saves 512 retained bytes per key.
++            table[i + 8] = AffinePoint::new(point.x * &ENDOMORPHISM_BETA, point.y);
++        }
++        let mut acc = Self::IDENTITY;
++        for bit in (0..129).rev() {
++            acc = acc.double();
++            for term in 0..4 {
++                let digit = digits[term][bit];
++                if digit == 0 { continue; }
++                let index = (term % 2) * 8 + (digit.unsigned_abs() as usize - 1) / 2;
++                let point = if term < 2 { GENERATOR[index] } else { table[index] };
++                acc += if digit < 0 { -point } else { point };
++            }
++        }
++        acc
++    }
++}
+--- a/src/arithmetic/projective.rs
++++ b/src/arithmetic/projective.rs
+@@ -29 +29 @@
+-const ENDOMORPHISM_BETA: FieldElement = FieldElement::from_bytes_unchecked(&[
++pub(super) const ENDOMORPHISM_BETA: FieldElement = FieldElement::from_bytes_unchecked(&[
 --- a/src/schnorr/signing.rs
 +++ b/src/schnorr/signing.rs
-@@ -140,5 +140,2 @@
+@@ -12 +12 @@
+-    zeroize::{Zeroize, ZeroizeOnDrop},
++    zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing},
+@@ -98,3 +98,23 @@
+-        let mut t = tagged_hash(AUX_TAG).chain_update(aux_rand).finalize();
+-
+-        for (a, b) in t.iter_mut().zip(self.secret_key.to_bytes().iter()) {
++        Self::sign_raw_prepared(&self.secret_key, &self.verifying_key.to_bytes(), msg, aux_rand)
++    }
++
++    /// Sign using a previously normalized secret scalar and its cached public X.
++    ///
++    /// # Warning
++    ///
++    /// The caller must supply the matching pair produced by an existing
++    /// [`SigningKey`]: its [`Self::as_nonzero_scalar`] and the bytes of its
++    /// [`Self::verifying_key`]. The scalar must correspond to the even-Y public
++    /// point. This low-level helper deliberately does not derive the public key
++    /// again; it must not be used to import untrusted serialized key pairs.
++    /// Secret-dependent arithmetic is the same constant-time path as `sign_raw`.
++    pub fn sign_raw_prepared(
++        normalized_secret: &NonZeroScalar,
++        public_x: &FieldBytes,
++        msg: &[u8],
++        aux_rand: &[u8; 32],
++    ) -> Result<Signature> {
++        let mut t = Zeroizing::new(tagged_hash(AUX_TAG).chain_update(aux_rand).finalize());
++        let secret_bytes = Zeroizing::new(normalized_secret.to_bytes());
++
++        for (a, b) in t.iter_mut().zip(secret_bytes.iter()) {
+@@ -104,3 +124,3 @@
+-        let rand = tagged_hash(NONCE_TAG)
+-            .chain_update(t)
+-            .chain_update(self.verifying_key.as_affine().x.to_bytes())
++        let rand = Zeroizing::new(tagged_hash(NONCE_TAG)
++            .chain_update(&*t)
++            .chain_update(public_x)
+@@ -108,3 +128,3 @@
+-            .finalize();
+-
+-        let k = NonZeroScalar::try_from(&*rand)
++            .finalize());
++
++        let k = NonZeroScalar::try_from(rand.as_slice())
+@@ -114 +133,0 @@
+-        let secret_key = k.secret_key;
+@@ -121 +140 @@
+-                .chain_update(self.verifying_key.to_bytes())
++                .chain_update(public_x)
+@@ -126 +145 @@
+-        let s = *secret_key + e * *self.secret_key;
++        let s = *k.secret_key + e * **normalized_secret;
+@@ -131 +150 @@
+-        self.verifying_key.verify_prehash(msg, &sig)?;
++        VerifyingKey::from_bytes(public_x)?.verify_prehash(msg, &sig)?;
+@@ -140,5 +159,2 @@
 -        let odd = (ProjectivePoint::GENERATOR * *secret_key)
 -            .to_affine()
 -            .y
@@ -14,15 +286,15 @@
 -            .is_odd();
 +        let mut public_point = (ProjectivePoint::GENERATOR * *secret_key).to_affine();
 +        let odd = public_point.y.normalize().is_odd();
-@@ -146,0 +144 @@
+@@ -146,0 +163 @@
 +        public_point.conditional_assign(&-public_point, odd);
-@@ -149 +147,4 @@
+@@ -149 +166,4 @@
 -            inner: PublicKey::from_secret_scalar(&secret_key),
 +            // A nonzero scalar times the prime-order generator is nonidentity.
 +            // Negating both the scalar and point preserves their correspondence.
 +            inner: PublicKey::from_affine(public_point)
 +                .expect("nonzero secret scalar produces a nonidentity point"),
-@@ -252,0 +254,41 @@
+@@ -252,0 +273,41 @@
 +#[cfg(test)]
 +mod constructor_tests {
 +    use super::*;
@@ -61,102 +333,6 @@
 +
 +        assert_eq!(even_points, 32);
 +        assert_eq!(odd_points, 32);
-+    }
-+}
-+
---- a/src/arithmetic/field.rs
-+++ b/src/arithmetic/field.rs
-@@ -6,0 +7,4 @@
-+// Wasm64 has native 64-bit multiplication but no 128-bit multiplication.
-+// Reuse the upstream 10x26 backend whose products fit in u64.
-+// Scalar arithmetic and the constant-time curve formulas are unchanged.
-+
-@@ -8 +12 @@
--    if #[cfg(target_pointer_width = "32")] {
-+    if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
-@@ -10 +14 @@
--    } else if #[cfg(target_pointer_width = "64")] {
-+    } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
-@@ -23 +27 @@
--            if #[cfg(target_pointer_width = "32")] {
-+            if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
-@@ -25 +29 @@
--            } else if #[cfg(target_pointer_width = "64")] {
-+            } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
---- a/src/arithmetic/field/field_impl.rs
-+++ b/src/arithmetic/field/field_impl.rs
-@@ -11 +11 @@
--#[cfg(target_pointer_width = "32")]
-+#[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))]
-@@ -14 +14 @@
--#[cfg(target_pointer_width = "64")]
-+#[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))]
---- a/src/arithmetic/mul.rs
-+++ b/src/arithmetic/mul.rs
-@@ -364,0 +365,66 @@
-+/// Width-five non-adjacent form of a nonnegative scalar smaller than 2^128.
-+/// Only used for public verification scalars after the existing GLV split.
-+fn wnaf_128_vartime(k: &Scalar) -> [i8; 129] {
-+    let bytes = k.to_bytes();
-+    debug_assert!(bytes[..16].iter().all(|&b| b == 0));
-+    let lo = u64::from_be_bytes(bytes[24..32].try_into().unwrap());
-+    let hi = u64::from_be_bytes(bytes[16..24].try_into().unwrap());
-+    let mut digits = [0i8; 129];
-+    let mut position = 0;
-+    let mut carry = 0;
-+    while position < 128 || carry != 0 {
-+        let bits = if position < 64 {
-+            (lo >> position) | if position > 59 { hi << (64 - position) } else { 0 }
-+        } else if position < 128 { hi >> (position - 64) } else { 0 };
-+        let window = (bits & 31) as i8 + carry;
-+        if window & 1 == 0 {
-+            position += 1;
-+            continue;
-+        }
-+        carry = i8::from(window >= 16);
-+        digits[position] = window - (carry << 5);
-+        position += 5;
-+    }
-+    digits
-+}
-+
-+impl ProjectivePoint {
-+    /// Computes `x*k + y*l` using variable-time public-data arithmetic.
-+    ///
-+    /// Scalars AND points must be public. Never use this for signing, secret
-+    /// key derivation, ECDH, or any secret-dependent multiplication.
-+    pub fn lincomb_vartime(x: &Self, k: &Scalar, y: &Self, l: &Scalar) -> Self {
-+        let mut tables = [[Self::IDENTITY; 8]; 4];
-+        let mut digits = [[0i8; 129]; 4];
-+        for (index, (point, scalar)) in [(x, k), (y, l)].into_iter().enumerate() {
-+            let (r1, r2) = decompose_scalar(scalar);
-+            let sign1 = bool::from(r1.is_high());
-+            let sign2 = bool::from(r2.is_high());
-+            digits[index * 2] = wnaf_128_vartime(&if sign1 { -r1 } else { r1 });
-+            digits[index * 2 + 1] = wnaf_128_vartime(&if sign2 { -r2 } else { r2 });
-+            // Build odd multiples once; derive the second table by the cheap
-+            // endomorphism instead of another series of projective additions.
-+            let double = point.double();
-+            let mut odd = *point;
-+            for j in 0..8 {
-+                tables[index * 2][j] = if sign1 { -odd } else { odd };
-+                let endo = odd.endomorphism();
-+                tables[index * 2 + 1][j] = if sign2 { -endo } else { endo };
-+                if j != 7 { odd += double; }
-+            }
-+        }
-+        let mut acc = Self::IDENTITY;
-+        for bit in (0..129).rev() {
-+            acc = acc.double();
-+            for term in 0..4 {
-+                let digit = digits[term][bit];
-+                if digit != 0 {
-+                    let point = tables[term][(digit.unsigned_abs() as usize - 1) / 2];
-+                    acc += if digit < 0 { -point } else { point };
-+                }
-+            }
-+        }
-+        acc
 +    }
 +}
 +

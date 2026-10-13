@@ -325,26 +325,34 @@ let ec_der_to_compact curve der =
 let tagged_hash tag message =
   let tag = Sha256.digest tag in Sha256.digest (tag ^ tag ^ message)
 
-let schnorr_sign_option secret message aux =
-  if String.length secret <> 32 || String.length aux <> 32 then None
+let schnorr_normalized_key_option secret =
+  if String.length secret <> 32 then None
   else
     let d = of_bytes secret in
     if not (valid_scalar secp256k1 d) then None
     else match multiply secp256k1 d (generator secp256k1) with
     | Infinity -> None
     | Point (px,py) ->
-      let d = if Z.testbit py 0 then Z.sub secp256k1.n d else d in
-      let d_bytes = to_bytes 32 d in
-      let aux_hash = tagged_hash "BIP0340/aux" aux in
-      let t = String.init 32 (fun i -> Char.chr (Char.code d_bytes.[i] lxor Char.code aux_hash.[i])) in
-      let k = modulo (of_bytes (tagged_hash "BIP0340/nonce" (t ^ to_bytes 32 px ^ message))) secp256k1.n in
-      if Z.equal k Z.zero then None
-      else match multiply secp256k1 k (generator secp256k1) with
-      | Infinity -> None
-      | Point (rx,ry) ->
-        let k = if Z.testbit ry 0 then Z.sub secp256k1.n k else k in
-        let e = modulo (of_bytes (tagged_hash "BIP0340/challenge" (to_bytes 32 rx ^ to_bytes 32 px ^ message))) secp256k1.n in
-        Some (to_bytes 32 rx ^ to_bytes 32 (modulo (Z.add k (Z.mul e d)) secp256k1.n))
+      Some ((if Z.testbit py 0 then Z.sub secp256k1.n d else d), px)
+
+(* Both ordinary and factory-owned prepared signing use this same equation. *)
+let schnorr_sign_normalized_option d px message aux =
+  let d_bytes = to_bytes 32 d in
+  let aux_hash = tagged_hash "BIP0340/aux" aux in
+  let t = String.init 32 (fun i -> Char.chr (Char.code d_bytes.[i] lxor Char.code aux_hash.[i])) in
+  let k = modulo (of_bytes (tagged_hash "BIP0340/nonce" (t ^ to_bytes 32 px ^ message))) secp256k1.n in
+  if Z.equal k Z.zero then None
+  else match multiply secp256k1 k (generator secp256k1) with
+  | Infinity -> None
+  | Point (rx,ry) ->
+    let k = if Z.testbit ry 0 then Z.sub secp256k1.n k else k in
+    let e = modulo (of_bytes (tagged_hash "BIP0340/challenge" (to_bytes 32 rx ^ to_bytes 32 px ^ message))) secp256k1.n in
+    Some (to_bytes 32 rx ^ to_bytes 32 (modulo (Z.add k (Z.mul e d)) secp256k1.n))
+
+let schnorr_sign_option secret message aux =
+  if String.length aux <> 32 then None
+  else let* d, px = schnorr_normalized_key_option secret in
+    schnorr_sign_normalized_option d px message aux
 
 let schnorr_verify_bool public message signature =
   if String.length public <> 32 || String.length signature <> 64 then false
@@ -438,3 +446,44 @@ let schnorr_verify public message signature =
      || Z.compare (of_bytes (String.sub signature 32 32)) secp256k1.n >= 0
   then Error "invalidSignature"
   else Ok (schnorr_verify_bool public message signature)
+
+(* Opaque verification cache: eight canonical affine odd multiples Q..15Q. *)
+let prepare_public_point point =
+  let delta = add secp256k1 point point in
+  let rec collect remaining point odd =
+    match point with
+    | Infinity -> Error "invalidPublicKey"
+    | Point (x, y) ->
+      let odd = (to_bytes 32 x ^ to_bytes 32 y) :: odd in
+      if remaining = 1 then Ok (String.concat "" (List.rev odd))
+      else collect (remaining - 1) (add secp256k1 point delta) odd
+  in collect 8 point []
+
+let prepare_public_key public =
+  let@ point = public_point public in
+  prepare_public_point point
+
+let prepare_schnorr_public_key public =
+  let@ point = xonly_point public in
+  prepare_public_point point
+
+let ecdsa_verify_prepared prepared message signature =
+  if String.length prepared <> 512 then Error "invalidPublicKey"
+  else ecdsa_verify ("\x04" ^ String.sub prepared 0 64) message signature
+
+let schnorr_verify_prepared prepared message signature =
+  if String.length prepared <> 512 then Error "invalidPublicKey"
+  else schnorr_verify (String.sub prepared 0 32) message signature
+
+let prepare_schnorr_secret_key secret =
+  let@ d, px = result "invalidSecretKey" (schnorr_normalized_key_option secret) in
+  Ok (to_bytes 32 d ^ to_bytes 32 px)
+
+let schnorr_sign_prepared prepared message aux =
+  if String.length prepared <> 64 then Error "invalidSecretKey"
+  else
+    let@ d = secret_scalar (String.sub prepared 0 32) in
+    if String.length aux <> 32 then Error "invalidAuxiliaryRandomness"
+    else
+      let px = of_bytes (String.sub prepared 32 32) in
+      result "invalidSignature" (schnorr_sign_normalized_option d px message aux)

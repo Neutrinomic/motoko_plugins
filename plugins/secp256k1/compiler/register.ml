@@ -16,6 +16,15 @@ let result encode = function
 let blob_result = result (fun bytes -> V.Blob bytes)
 let bool_result = result (fun value -> V.Bool value)
 
+let public_key = C.Prepared.create ~owner:"secp256k1" ~name:"Secp256k1PreparedPublicKey"
+let schnorr_public = C.Prepared.create ~owner:"secp256k1" ~name:"Secp256k1PreparedSchnorrPublicKey"
+let schnorr_secret = C.Prepared.create ~owner:"secp256k1" ~name:"Secp256k1PreparedSchnorrSecretKey"
+let prepared_result descriptor = result (C.Prepared.wrap descriptor)
+let prepared_input = function
+  | 18 -> Some public_key | 20 -> Some schnorr_public | 22 -> Some schnorr_secret | _ -> None
+let prepared_output = function
+  | 17 -> Some public_key | 19 -> Some schnorr_public | 21 -> Some schnorr_secret | _ -> None
+
 type operation = { name : string; op : int; arity : int; size : int;
   predicate : bool; evaluate : string list -> (V.value, string) result }
 
@@ -54,13 +63,25 @@ let operations = [
     evaluate=(function [a;b] -> blob_result (R.xonly_tweak_add a b) | _ -> assert false)};
   {name="tweakXOnlySecretKey"; op=16; arity=2; size=32; predicate=false;
     evaluate=(function [a;b] -> blob_result (R.xonly_tweak_secret a b) | _ -> assert false)};
+  {name="preparePublicKey"; op=17; arity=1; size=512; predicate=false;
+    evaluate=(function [a] -> prepared_result public_key (R.prepare_public_key a) | _ -> assert false)};
+  {name="verifyPrehashPrepared"; op=18; arity=3; size=0; predicate=true;
+    evaluate=(function [a;b;c] -> bool_result (R.ecdsa_verify_prepared a b c) | _ -> assert false)};
+  {name="prepareSchnorrPublicKey"; op=19; arity=1; size=512; predicate=false;
+    evaluate=(function [a] -> prepared_result schnorr_public (R.prepare_schnorr_public_key a) | _ -> assert false)};
+  {name="schnorrVerifyPrepared"; op=20; arity=3; size=0; predicate=true;
+    evaluate=(function [a;b;c] -> bool_result (R.schnorr_verify_prepared a b c) | _ -> assert false)};
+  {name="prepareSchnorrSecretKey"; op=21; arity=1; size=64; predicate=false;
+    evaluate=(function [a] -> prepared_result schnorr_secret (R.prepare_schnorr_secret_key a) | _ -> assert false)};
+  {name="schnorrSignPrepared"; op=22; arity=3; size=64; predicate=false;
+    evaluate=(function [a;b;c] -> blob_result (R.schnorr_sign_prepared a b c) | _ -> assert false)};
 ]
 
 module Generator (Operation : sig val operation : operation end) = struct
   module Make (B : P.Backend) = struct
     open B
     let num n = compile_unboxed_const (Int64.of_int n)
-    let compile env _specialization arguments =
+    let compile env specialization arguments =
       let operation = Operation.operation in
       let locals = List.mapi (fun i argument ->
         let set, get = new_local env ("secp256k1_arg" ^ string_of_int i) in
@@ -73,9 +94,15 @@ module Generator (Operation : sig val operation : operation end) = struct
           let set_output, output = new_local env "secp256k1_output" in
           let pointer = output ^^ Blob.payload_ptr_unskewed env in
           let success = if operation.op = 9 then pointer ^^ status ^^ Blob.of_ptr_size env
-            else output in
+            else match prepared_output operation.op with
+              | None -> output
+              | Some descriptor -> Prepared.wrap descriptor output in
           alloc_blob env (num operation.size) ^^ set_output, pointer, success in
-      let args = List.map snd locals in
+      let args = List.mapi (fun i (_, get) ->
+        match i, prepared_input operation.op with
+        | 0, Some descriptor ->
+            Prepared.unwrap descriptor (List.nth specialization.C.argument_types i) get
+        | _ -> get) locals in
       let input i = if i < List.length args then List.nth args i else List.hd args in
       let input_pair i =
         input i ^^ Blob.payload_ptr_unskewed env ^^
@@ -98,19 +125,28 @@ end
 let binding operation =
   let generator = (module Generator (struct let operation = operation end) : P.Generator) in
   let binding = C.{ id="secp256k1_" ^ operation.name; name="secp256k1_" ^ operation.name;
-    arguments=Fixed (fun _ -> Ok (List.init operation.arity (fun _ -> T.blob)));
+    arguments=Fixed (fun _ -> Ok (List.init operation.arity (fun i ->
+      match i, prepared_input operation.op with
+      | 0, Some descriptor -> C.Prepared.typ descriptor | _ -> T.blob)));
     type_parameters=[];
-    result_type=(fun _ _ -> Ok (result_type (if operation.predicate then T.bool else T.blob)));
+    result_type=(fun _ _ -> Ok (result_type (if operation.predicate then T.bool else
+      match prepared_output operation.op with
+      | Some descriptor -> C.Prepared.typ descriptor | None -> T.blob)));
     evaluate=C.pure (fun _ _ values ->
-      let rec blobs = function
+      let rec blobs i = function
         | [] -> Some []
-        | V.Blob bytes :: rest -> Option.map (fun rest -> bytes :: rest) (blobs rest)
-        | _ -> None in
-      match blobs values with
+        | value :: rest ->
+          let bytes = match i, prepared_input operation.op, value with
+            | 0, Some descriptor, _ -> Some (C.Prepared.unwrap descriptor value)
+            | _, _, V.Blob bytes -> Some bytes
+            | _ -> None in
+          Option.bind bytes (fun bytes ->
+            Option.map (fun rest -> bytes :: rest) (blobs (i + 1) rest)) in
+      match blobs 0 values with
       | Some values when List.length values = operation.arity -> operation.evaluate values
-      | _ -> Error ("secp256k1_" ^ operation.name ^ " expects Blob arguments")) } in
+      | _ -> Error ("secp256k1_" ^ operation.name ^ " expects its declared key and Blob arguments")) } in
   binding, generator
 
-let () = P.register P.{abi=1; name="secp256k1"; runtime=Some "runtime.wasm";
+let () = P.register P.{abi=1; name="secp256k1"; types=[public_key; schnorr_public; schnorr_secret]; runtime=Some "runtime.wasm";
   imports=["secp256k1_call", List.init 8 (fun _ -> I64Type), [I64Type]];
   bindings=List.map binding operations}

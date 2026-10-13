@@ -9,6 +9,18 @@ module {
   };
   public type Result<T> = { #ok : T; #err : Error };
 
+  /// Opaque cached ECDSA verification key. Create with preparePublicKey.
+  /// Use the original public-key bytes for key equality or map keys.
+  /// Local only: not shared or stable; rebuild from the public key after upgrade.
+  public type PreparedPublicKey = Prim.Secp256k1PreparedPublicKey;
+  /// Opaque cached BIP340 verification key, normalized to the even-Y point.
+  /// Local only: not shared or stable; rebuild from the x-only key after upgrade.
+  public type PreparedSchnorrPublicKey = Prim.Secp256k1PreparedSchnorrPublicKey;
+  /// Opaque cached BIP340 signing key. Contains secret key material.
+  /// Local only: not shared or stable. Managed copies remain until GC, with no
+  /// secure-erasure guarantee; keep this value as private as the original secret.
+  public type PreparedSchnorrSecretKey = Prim.Secp256k1PreparedSchnorrSecretKey;
+
   /// Secret keys are exactly 32 big-endian bytes, in [1, n). Output is SEC1 compressed.
   public let derivePublicKey = Prim.secp256k1_derivePublicKey;
   public let compressPublicKey = Prim.secp256k1_compressPublicKey;
@@ -39,6 +51,10 @@ module {
   /// Standard ECDSA verification accepts both low-S and high-S compact signatures.
   /// Invalid encodings are errors; well-formed signatures with a failed equation are #ok(false).
   public let verifyPrehash = Prim.secp256k1_verifyPrehash;
+  /// Validate a canonical SEC1 key once and cache data for repeated ECDSA verification.
+  public let preparePublicKey = Prim.secp256k1_preparePublicKey;
+  /// Same digest, compact-signature and error rules as verifyPrehash.
+  public let verifyPrehashPrepared = Prim.secp256k1_verifyPrehashPrepared;
   /// DER conversion enforces minimal positive integers and rejects trailing data.
   public let signatureToDer = Prim.secp256k1_signatureToDer;
   public let signatureFromDer = Prim.secp256k1_signatureFromDer;
@@ -50,6 +66,15 @@ module {
   /// aux must be exactly 32 bytes; callers supply auxiliary randomness explicitly.
   public let schnorrSign = Prim.secp256k1_schnorrSign;
   public let schnorrVerify = Prim.secp256k1_schnorrVerify;
+  /// Validate an x-only key once and cache data for repeated BIP340 verification.
+  public let prepareSchnorrPublicKey = Prim.secp256k1_prepareSchnorrPublicKey;
+  /// Same message, signature and error rules as schnorrVerify.
+  public let schnorrVerifyPrepared = Prim.secp256k1_schnorrVerifyPrepared;
+  /// Derive the public point and normalize the secret once for repeated signing.
+  /// Accepts the same 32-byte secret key as schnorrSign; the result is secret.
+  public let prepareSchnorrSecretKey = Prim.secp256k1_prepareSchnorrSecretKey;
+  /// Sign raw message bytes with a cached secret key; aux must be exactly 32 bytes.
+  public let schnorrSignPrepared = Prim.secp256k1_schnorrSignPrepared;
   /// Lift the x-only key to even Y and add tweak*G. Compressed SEC1 output retains
   /// the output parity for Taproot control blocks; caller computes the tagged tweak hash.
   public let tweakXOnlyPublicKey = Prim.secp256k1_tweakXOnlyPublicKey;

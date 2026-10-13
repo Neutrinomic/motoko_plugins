@@ -3,6 +3,10 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(not(test), feature(simd_wasm64))]
 
+mod prepared_sign;
+
+const PUBLIC_CACHE_SIZE: usize = 512;
+
 use k256::{ProjectivePoint, PublicKey, Scalar, SecretKey};
 use k256::ecdsa::{Signature, hazmat::SignPrimitive};
 use k256::elliptic_curve::{PrimeField, group::Group, sec1::ToEncodedPoint, bigint::U256, ops::{Reduce, Invert}};
@@ -34,18 +38,18 @@ fn public(bytes: &[u8]) -> Result<PublicKey> {
 fn signature(bytes: &[u8]) -> Result<Signature> {
     Signature::from_slice(bytes).map_err(|_| SIGNATURE)
 }
-fn write(bytes: &[u8], output: &mut [u8; 72]) -> i64 {
+fn write(bytes: &[u8], output: &mut [u8]) -> i64 {
     output[..bytes.len()].copy_from_slice(bytes);
     bytes.len() as i64
 }
-fn encoded(point: ProjectivePoint, compressed: bool, output: &mut [u8; 72]) -> Result<i64> {
+fn encoded(point: ProjectivePoint, compressed: bool, output: &mut [u8]) -> Result<i64> {
     if bool::from(point.is_identity()) { return Err(INFINITY); }
     Ok(write(point.to_affine().to_encoded_point(compressed).as_bytes(), output))
 }
 
 // Successful blob operations return their byte length; successful predicates
 // return 0 or 1. Negative results are stable typed input/identity errors.
-fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Result<i64> {
+fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8]) -> Result<i64> {
     match op {
         0 => {
             let key = SecretKey::from_slice(a).map_err(|_| SECRET)?;
@@ -84,8 +88,11 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             let (sig, _) = result.map_err(|_| SIGNATURE)?;
             Ok(write(&sig.to_bytes(), out))
         }
-        8 => {
-            let key = public(a)?;
+        8 | 18 => {
+            let key = if op == 8 { Some(public(a)?) } else {
+                if a.len() != PUBLIC_CACHE_SIZE { return Err(PUBLIC); }
+                None
+            };
             let digest: [u8; 32] = b.try_into().map_err(|_| DIGEST)?;
             let sig = signature(c)?;
             // Same upstream verification equation and high-S acceptance; all
@@ -93,9 +100,12 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             let z = <Scalar as Reduce<U256>>::reduce_bytes(&digest.into());
             let (r, s) = sig.split_scalars();
             let inverse = *s.invert_vartime();
-            let point = ProjectivePoint::lincomb_vartime(
-                &ProjectivePoint::GENERATOR, &(z * inverse),
-                &key.to_projective(), &(*r * inverse));
+            let point = match key {
+                Some(key) => ProjectivePoint::lincomb_generator_vartime(
+                    &(z * inverse), &key.to_projective(), &(*r * inverse)),
+                None => ProjectivePoint::lincomb_generator_prepared_vartime(
+                    &(z * inverse), a, &(*r * inverse)),
+            };
             Ok(i64::from(*r == <Scalar as Reduce<U256>>::reduce_bytes(&point.to_affine().x())))
         }
         9 => Ok(write(signature(a)?.to_der().as_bytes(), out)),
@@ -116,10 +126,17 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             let sig = key.sign_raw(b, aux).map_err(|_| SIGNATURE)?;
             Ok(write(&sig.to_bytes(), out))
         }
-        14 => {
-            // k256 0.13's from_bytes panics on a wrong-sized x coordinate.
-            if a.len() != 32 { return Err(PUBLIC); }
-            let key = k256::schnorr::VerifyingKey::from_bytes(a).map_err(|_| PUBLIC)?;
+        14 | 20 => {
+            // Prepared keys are factory-validated even-Y points; only the
+            // direct API decodes the external x coordinate on each call.
+            let key = if op == 14 {
+                if a.len() != 32 { return Err(PUBLIC); }
+                Some(k256::schnorr::VerifyingKey::from_bytes(a).map_err(|_| PUBLIC)?)
+            } else {
+                if a.len() != PUBLIC_CACHE_SIZE { return Err(PUBLIC); }
+                None
+            };
+            let public_x = &a[..32];
             // BIP340 permits zero r/s in the input range checks. k256 0.13's
             // Signature type excludes those values; use its audited point and
             // scalar operations directly for the specified verification equation.
@@ -136,10 +153,13 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             const TAG: [u8; 32] = [0x7b, 0xb5, 0x2d, 0x7a, 0x9f, 0xef, 0x58, 0x32, 0x3e, 0xb1, 0xbf, 0x7a, 0x40, 0x7d, 0xb3, 0x82, 0xd2, 0xf3, 0xf2, 0xd8, 0x1b, 0xb1, 0x22, 0x4f, 0x49, 0xfe, 0x51, 0x8f, 0x6d, 0x48, 0xd3, 0x7c];
             let tag = TAG;
             let challenge = Sha256::new().chain_update(tag).chain_update(tag)
-                .chain_update(&c[..32]).chain_update(a).chain_update(b).finalize();
+                .chain_update(&c[..32]).chain_update(public_x).chain_update(b).finalize();
             let e = <Scalar as Reduce<U256>>::reduce_bytes(&challenge);
-            let r = ProjectivePoint::lincomb_vartime(&ProjectivePoint::GENERATOR, &s,
-                &ProjectivePoint::from(*key.as_affine()), &-e);
+            let r = match key {
+                Some(key) => ProjectivePoint::lincomb_generator_vartime(
+                    &s, &ProjectivePoint::from(*key.as_affine()), &-e),
+                None => ProjectivePoint::lincomb_generator_prepared_vartime(&s, a, &-e),
+            };
             if bool::from(r.is_identity()) { return Ok(0); }
             let point = r.to_affine();
             Ok(i64::from(!bool::from(point.y_is_odd()) && point.x()[..] == c[..32]))
@@ -172,13 +192,24 @@ fn operation(op: usize, a: &[u8], b: &[u8], c: &[u8], out: &mut [u8; 72]) -> Res
             tweaked.zeroize();
             result
         }
+        17 | 19 => {
+            let affine = if op == 17 { *public(a)?.as_affine() } else {
+                if a.len() != 32 { return Err(PUBLIC); }
+                *k256::schnorr::VerifyingKey::from_bytes(a).map_err(|_| PUBLIC)?.as_affine()
+            };
+            ProjectivePoint::prepare_verification_key(&affine, &mut out[..PUBLIC_CACHE_SIZE]);
+            Ok(PUBLIC_CACHE_SIZE as i64)
+        }
+        21 => prepared_sign::prepare(a, out),
+        22 => prepared_sign::sign(a, b, c, out),
         _ => Err(SIGNATURE),
     }
 }
 
 fn output_capacity(op: usize) -> usize {
     match op { 0 | 1 | 3 | 4 | 5 | 6 | 15 => 33, 2 => 65,
-        7 | 10 | 11 | 13 => 64, 9 => 72, 12 | 16 => 32, _ => 0 }
+        7 | 10 | 11 | 13 | 21 | 22 => 64, 9 => 72, 12 | 16 => 32,
+        17 | 19 => PUBLIC_CACHE_SIZE, _ => 0 }
 }
 
 /// # Safety
@@ -196,13 +227,19 @@ pub unsafe extern "C" fn secp256k1_call(
     let c = unsafe { core::slice::from_raw_parts(c, clen) };
     // Use initialized stack scratch, never make a Rust reference to the
     // uninitialized managed Blob. Initialize the entire output on every path.
+    if op == 17 || op == 19 {
+        let mut bytes = [0u8; PUBLIC_CACHE_SIZE];
+        let result = operation(op, a, b, c, &mut bytes).unwrap_or_else(|error| error);
+        unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, PUBLIC_CACHE_SIZE) };
+        return result;
+    }
     let mut bytes = [0u8; 72];
     let result = operation(op, a, b, c, &mut bytes).unwrap_or_else(|error| error);
     let capacity = output_capacity(op);
     if capacity != 0 {
         unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), output, capacity) };
     }
-    if op == 16 { bytes.zeroize(); }
+    if op == 16 || op == 21 { bytes.zeroize(); }
     result
 }
 
@@ -329,9 +366,9 @@ mod tests {
         assert_eq!(run(10, &trailing, &[], &[]), Err(SIGNATURE));
     }
     #[test]
-    fn public_variable_time_lincomb_matches_constant_time() {
+    fn fixed_generator_and_prepared_lincomb_match_constant_time_at_scalar_boundaries() {
         use k256::elliptic_curve::ops::LinearCombination;
-        let points = [ProjectivePoint::IDENTITY, ProjectivePoint::GENERATOR,
+        let points = [ProjectivePoint::GENERATOR,
             -ProjectivePoint::GENERATOR, ProjectivePoint::GENERATOR * Scalar::from(17u64)];
         let mut scalars = vec![Scalar::ZERO, Scalar::ONE, -Scalar::ONE];
         // Boundaries around all bits exercise GLV splitting and NAF carries.
@@ -348,10 +385,12 @@ mod tests {
         }
         for (i, k) in scalars.iter().enumerate() {
             let l = &scalars[(i * 73 + 19) % scalars.len()];
-            let x = &points[i % points.len()];
-            let y = &points[(i / points.len()) % points.len()];
-            assert_eq!(ProjectivePoint::lincomb_vartime(x, k, y, l),
-                ProjectivePoint::lincomb(x, k, y, l), "pair {i}");
+            let y = &points[i % points.len()];
+            let expected = ProjectivePoint::lincomb(&ProjectivePoint::GENERATOR, k, y, l);
+            assert_eq!(ProjectivePoint::lincomb_generator_vartime(k, y, l), expected, "direct pair {i}");
+            let mut table = [0; 512];
+            ProjectivePoint::prepare_verification_key(&y.to_affine(), &mut table);
+            assert_eq!(ProjectivePoint::lincomb_generator_prepared_vartime(k, &table, l), expected, "table pair {i}");
         }
     }
 
@@ -388,4 +427,79 @@ mod tests {
         assert_eq!(out[0], 0xa5); assert_eq!(out[73], 0xa5);
         assert_eq!(&out[34..73], &[0xa5; 39]);
     }
+    #[test]
+    fn prepared_public_tables_and_fixed_generator_match_vetted_multiplication() {
+        use k256::elliptic_curve::ops::LinearCombination;
+        let mut scalars = vec![Scalar::ZERO, Scalar::ONE, -Scalar::ONE];
+        for i in 0u64..64 {
+            let hash = Sha256::new().chain_update(b"prepared-public-crosscheck")
+                .chain_update(i.to_be_bytes()).finalize();
+            scalars.push(<Scalar as Reduce<U256>>::reduce_bytes(&hash));
+        }
+        for (i, k) in scalars.iter().enumerate() {
+            let l = scalars[(i * 19 + 1) % scalars.len()];
+            let q = ProjectivePoint::GENERATOR * Scalar::from(i as u64 + 1);
+            let mut table = [0xa5; 512];
+            ProjectivePoint::prepare_verification_key(&q.to_affine(), &mut table);
+            for j in 0..8 {
+                let point = q * Scalar::from(2 * j as u64 + 1);
+                let encoded = point.to_affine().to_encoded_point(false);
+                assert_eq!(&table[j * 64..(j + 1) * 64], &encoded.as_bytes()[1..]);
+            }
+            let expected = ProjectivePoint::lincomb(&ProjectivePoint::GENERATOR, k, &q, &l);
+            assert_eq!(ProjectivePoint::lincomb_generator_vartime(k, &q, &l), expected, "direct {i}");
+            assert_eq!(ProjectivePoint::lincomb_generator_prepared_vartime(k, &table, &l), expected, "table {i}");
+        }
+    }
+
+    #[test]
+    fn prepared_sign_and_verify_preserve_vectors_and_errors() {
+        for row in include_str!("../../tests/vectors/bip340.csv").lines().skip(1) {
+            let fields: Vec<_> = row.split(',').collect();
+            let public = hex(fields[2]);
+            let message = hex(fields[4]);
+            let sig = hex(fields[5]);
+            let mut key = [0u8; PUBLIC_CACHE_SIZE];
+            let prepared = operation(19, &public, &[], &[], &mut key);
+            let direct = operation(14, &public, &message, &sig, &mut []);
+            if prepared.is_ok() {
+                assert_eq!(operation(20, &key, &message, &sig, &mut []), direct, "vector {}", fields[0]);
+            } else { assert_eq!(prepared, Err(PUBLIC)); assert_eq!(direct, Err(PUBLIC)); }
+        }
+        let secret = [1; 32];
+        let digest = [2; 32];
+        let public = run(0, &secret, &[], &[]).unwrap();
+        let sig = run(7, &secret, &digest, &[]).unwrap();
+        let mut key = [0u8; PUBLIC_CACHE_SIZE];
+        assert_eq!(operation(17, &public, &[], &[], &mut key), Ok(PUBLIC_CACHE_SIZE as i64));
+        assert_eq!(operation(18, &key, &digest, &sig, &mut []), Ok(1));
+        assert_eq!(operation(18, &key, &[3; 32], &sig, &mut []), Ok(0));
+        assert_eq!(operation(18, &key, &[], &[], &mut []), Err(DIGEST));
+        assert_eq!(operation(18, &key, &digest, &[], &mut []), Err(SIGNATURE));
+        let secret_cache = run(21, &secret, &[], &[]).unwrap();
+        assert_eq!(run(22, &secret_cache, &digest, &[0; 32]), run(13, &secret, &digest, &[0; 32]));
+        assert_eq!(run(22, &secret_cache, &digest, &[]), Err(AUXILIARY));
+    }
+
+    #[test]
+    fn prepared_ffi_initializes_exact_capacity_and_never_mutates_inputs() {
+        let secret = [1; 32];
+        let public = run(0, &secret, &[], &[]).unwrap();
+        for op in [17, 19, 21] {
+            let input = match op { 17 => public.clone(), 19 => public[1..].to_vec(), _ => secret.to_vec() };
+            let saved = input.clone();
+            let capacity = output_capacity(op);
+            for valid in [true, false] {
+                let mut output = vec![0xa5; capacity + 2];
+                let len = if valid { input.len() } else { 0 };
+                let result = unsafe { secp256k1_call(op, input.as_ptr(), len, input.as_ptr(), 0,
+                    input.as_ptr(), 0, output.as_mut_ptr().add(1)) };
+                assert_eq!(result, if valid { capacity as i64 } else if op == 21 { SECRET } else { PUBLIC });
+                assert_eq!((output[0], output[capacity + 1]), (0xa5, 0xa5));
+                if !valid { assert!(output[1..=capacity].iter().all(|&b| b == 0)); }
+                assert_eq!(input, saved);
+            }
+        }
+    }
+
 }

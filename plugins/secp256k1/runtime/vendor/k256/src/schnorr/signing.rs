@@ -9,7 +9,7 @@ use elliptic_curve::{
     ops::Reduce,
     rand_core::CryptoRngCore,
     subtle::ConditionallySelectable,
-    zeroize::{Zeroize, ZeroizeOnDrop},
+    zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing},
 };
 use sha2::{Digest, Sha256};
 use signature::{
@@ -95,40 +95,59 @@ impl SigningKey {
     ///
     /// The preferred interfaces are the [`Signer`] or [`RandomizedSigner`] traits.
     pub fn sign_raw(&self, msg: &[u8], aux_rand: &[u8; 32]) -> Result<Signature> {
-        let mut t = tagged_hash(AUX_TAG).chain_update(aux_rand).finalize();
+        Self::sign_raw_prepared(&self.secret_key, &self.verifying_key.to_bytes(), msg, aux_rand)
+    }
 
-        for (a, b) in t.iter_mut().zip(self.secret_key.to_bytes().iter()) {
+    /// Sign using a previously normalized secret scalar and its cached public X.
+    ///
+    /// # Warning
+    ///
+    /// The caller must supply the matching pair produced by an existing
+    /// [`SigningKey`]: its [`Self::as_nonzero_scalar`] and the bytes of its
+    /// [`Self::verifying_key`]. The scalar must correspond to the even-Y public
+    /// point. This low-level helper deliberately does not derive the public key
+    /// again; it must not be used to import untrusted serialized key pairs.
+    /// Secret-dependent arithmetic is the same constant-time path as `sign_raw`.
+    pub fn sign_raw_prepared(
+        normalized_secret: &NonZeroScalar,
+        public_x: &FieldBytes,
+        msg: &[u8],
+        aux_rand: &[u8; 32],
+    ) -> Result<Signature> {
+        let mut t = Zeroizing::new(tagged_hash(AUX_TAG).chain_update(aux_rand).finalize());
+        let secret_bytes = Zeroizing::new(normalized_secret.to_bytes());
+
+        for (a, b) in t.iter_mut().zip(secret_bytes.iter()) {
             *a ^= b
         }
 
-        let rand = tagged_hash(NONCE_TAG)
-            .chain_update(t)
-            .chain_update(self.verifying_key.as_affine().x.to_bytes())
+        let rand = Zeroizing::new(tagged_hash(NONCE_TAG)
+            .chain_update(&*t)
+            .chain_update(public_x)
             .chain_update(msg)
-            .finalize();
+            .finalize());
 
-        let k = NonZeroScalar::try_from(&*rand)
+        let k = NonZeroScalar::try_from(rand.as_slice())
             .map(Self::from)
             .map_err(|_| Error::new())?;
 
-        let secret_key = k.secret_key;
         let verifying_point = AffinePoint::from(k.verifying_key);
         let r = verifying_point.x.normalize();
 
         let e = <Scalar as Reduce<U256>>::reduce_bytes(
             &tagged_hash(CHALLENGE_TAG)
                 .chain_update(r.to_bytes())
-                .chain_update(self.verifying_key.to_bytes())
+                .chain_update(public_x)
                 .chain_update(msg)
                 .finalize(),
         );
 
-        let s = *secret_key + e * *self.secret_key;
+        let s = *k.secret_key + e * **normalized_secret;
         let s = Option::from(NonZeroScalar::new(s)).ok_or_else(Error::new)?;
         let sig = Signature { r, s };
 
         #[cfg(debug_assertions)]
-        self.verifying_key.verify_prehash(msg, &sig)?;
+        VerifyingKey::from_bytes(public_x)?.verify_prehash(msg, &sig)?;
 
         Ok(sig)
     }

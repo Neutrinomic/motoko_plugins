@@ -37,3 +37,9 @@ val xonly_tweak_add : string -> string -> (string, string) result
 val xonly_tweak_secret : string -> string -> (string, string) result
 val schnorr_sign : string -> string -> string -> (string, string) result
 val schnorr_verify : string -> string -> string -> (bool, string) result
+val prepare_public_key : string -> (string, string) result
+val prepare_schnorr_public_key : string -> (string, string) result
+val ecdsa_verify_prepared : string -> string -> string -> (bool, string) result
+val schnorr_verify_prepared : string -> string -> string -> (bool, string) result
+val prepare_schnorr_secret_key : string -> (string, string) result
+val schnorr_sign_prepared : string -> string -> string -> (string, string) result

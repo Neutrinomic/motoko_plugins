@@ -8,13 +8,16 @@ the archive records upstream commit `5ac8f5d77f11399ff48d87b0554935f6eddda342`.
 `upstream-source.json` records every original file's hash, changed files'
 before/after hashes, and the hash of `exact.patch`.
 
-Five upstream files differ:
+Seven upstream files differ, and one focused arithmetic module is added:
 
 - `Cargo.toml` adds an empty workspace to keep upstream development targets
   outside the enclosing plugin workspace. Dependencies, features and package
   identity retain the published values.
 - `src/schnorr/signing.rs` reuses the affine point already computed by
   `SigningKey::from(NonZeroScalar)` and adds one constructor regression test.
+  Direct and prepared Schnorr signing share the original nonce/sign equation
+  through `sign_raw_prepared`, which accepts the normalized secret and matching
+  public X created by a validated factory. Secret temporary buffers are zeroized.
   Previously, the constructor calculated `dG` to obtain parity, normalized the
   scalar, and calculated the normalized scalar's public point a second time.
   It now conditionally negates the existing point using the same parity bit.
@@ -25,21 +28,32 @@ Five upstream files differ:
   5x52 uses `u128` products that need software expansion on this target.
   Other targets and scalar arithmetic retain their upstream selection.
 
-- `src/arithmetic/mul.rs` adds an explicitly variable-time `lincomb_vartime`
-  method for **public verification inputs only**. It reuses the existing GLV
-  decomposition and point formulas with width-five non-adjacent digits. Odd
-  multiples are built once per input point; endomorphism images supply the
-  second table. Fixed-size stack arrays bound scratch space. The existing
+- `src/arithmetic/mul.rs` exposes its existing GLV scalar decomposition to
+  the prepared module and retains the width-five non-adjacent recoder for
+  **public verification inputs only**. Fixed-size arrays bound scratch space. The existing
   `LinearCombination`, `Mul` and `MulByGenerator` implementations are untouched.
 
-The plugin calls the new method only for ECDSA and BIP340 verification.
+- `src/arithmetic/projective.rs` exposes its existing beta constant to the
+  sibling prepared module; the endomorphism operation itself is unchanged.
+
+- `src/arithmetic.rs` registers the added `src/arithmetic/prepared.rs`. That
+  module reuses the same GLV split and width-five recoder, with immutable affine
+  generator constants shared by direct and prepared verification. A factory
+  serializes validated public points/table entries as canonical X/Y bytes;
+  hot verification trusts only opaque immutable handles created by that factory.
+  Eight odd multiples occupy 512 bytes; their endomorphism images are derived
+  with the existing beta multiplication when borrowed.
+  Existing complete mixed-add formulas replace projective additions where an
+  affine cached entry is available. No field or scalar formula is added.
+
+The plugin calls the variable-time helpers only for ECDSA and BIP340 verification.
 It never calls it for signing, secret key derivation, generic point/scalar
 operations or tweaks. The ECDSA wrapper preserves the upstream verification
 formula, full scalar/point validation, and acceptance of both low and high S.
 BIP340 input-range, identity, parity and X-coordinate checks are unchanged.
 
 The original secret multiplication, scalar conditional assignment, nonce/signing
-implementation, hashing, and `SigningKey` zeroization remain unchanged. Point
+equation, hashing, and `SigningKey` zeroization remain unchanged. Point
 negation and selection use existing upstream `AffinePoint` implementations.
 Both scalar and point normalization use `ConditionallySelectable`; no branch
 depends on the parity bit. `PublicKey::from_affine` checks nonidentity. Its
@@ -93,7 +107,7 @@ are provenance, this document, the patch, and the standalone comparator audit.
 
 ## Round-three validation and measurements
 
-The plugin's eight native unit tests include 1,283 direct variable-time versus
+The round-three plugin native tests include 1,283 direct variable-time versus
 unchanged constant-time linear-combination comparisons over zero, order and
 bit boundaries, deterministic random scalars and identity/equal/opposite
 points. The retained independent recoding model checks 180,208 values and
@@ -106,3 +120,22 @@ The backend-only checkpoint and the subsequent verifier optimization are
 measured separately, including allocations and complete canister Wasm sizes.
 This local patch has regression and independent source review coverage; it
 has not received an external cryptographic audit.
+
+## Prepared handles
+
+Prepared public keys contain explicit initialized canonical field encodings,
+with no pointers, padding or Rust-layout serialization. ECDSA and Schnorr handles
+are separate nominal types; the latter is constructed only through the even-Y
+BIP340 lift. The immutable generator table benefits direct calls as well.
+
+The prepared Schnorr secret is normalized scalar32 || public-X32. Its factory
+uses the existing constant-time key constructor, and signing reuses the shared
+nonce/sign implementation without repeating long-term public-key derivation.
+It accepts explicit caller auxiliary randomness exactly as the direct API does.
+No public-data table or variable-time verification helper is used by signing.
+The factory clears its temporary stack output; managed secret values and their
+copies can persist until collection and do not provide guaranteed erasure.
+
+Prepared performance, format selection and independent executable audit are
+recorded separately by the enclosing prepared-key workflow. These changes have
+not received an external cryptographic audit.
