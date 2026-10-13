@@ -1,5 +1,5 @@
 {
-  "status": "functional-and-source-pass-performance-pending",
+  "status": "pass",
   "source_review": "No unresolved source findings after the generated-condition fix and preservation of ordinary aggregate functions.",
   "source_sha256": {
     "packages/fast/src/BLS12381.mo": "ac58104df256fbde848f5790271fe8140848776c88e63794a6e8bb0051881c8d",
@@ -48,7 +48,8 @@
   ],
   "limitations": [
     "Functional and source audit, not formal verification or empirical side-channel certification.",
-    "Performance promotion awaits separately reviewed PocketIC measurements on identical source/artifacts."
+    "Fixed-input fresh-canister instruction/allocation measurements, not wall-time saturation testing.",
+    "Occupied-heap snapshots are neither peak nor live memory; all reclamation counters remain zero."
   ],
   "initial_test_fixture_corrections": [
     {
@@ -109,14 +110,57 @@
     "tests/crypto-audit/round3/bls12-381/Cargo.toml": "02333dcd69f1161cb64715fcd0e98deab1f7ce88e00c3bc502456f9f7cba6da1",
     "tests/crypto-audit/round3/bls12-381/run.py": "7238d194691f73a1380968df1cf96ed4d0cc5531b1f1638120f597e4caf4d4f7",
     "tests/crypto-audit/round3/bls12-381/native.rs": "45090cf8e5fae191d9f224464fc13981547d4352094418e5b857b2fadca0a1a3",
-    "tests/crypto-audit/round3/bls12-381/README.md": "660beea7dd31c2871a9af3847995370c7b796595df6b36a34ba04d0101526eb8",
+    "tests/crypto-audit/round3/bls12-381/README.md": "f6bb9c7db16e76289ef581884be0aa87b0cb4004a908764ebc8cfd5b03e7e1b9",
     "tests/crypto-audit/round3/bls12-381/blobs.tsv": "bb30161aaa2175b3904f3c46d8b058813410b2a57fc39c3e1e6d814d3e406227",
     "tests/crypto-audit/round3/bls12-381/public.mo": "98eb4df0c4c933ff13624e5465c55fde06d54877046d89f28fff44d29638c169",
     "tests/crypto-audit/round3/bls12-381/provenance.json": "14849cd8e15653f82d32bba741e0fa83ebb804a86e89231a09740a305bcacf2e",
     "tests/crypto-audit/round3/bls12-381/cases.json": "f4d2e9298aea08fc443e09ec0dc4640678f1290c39ef300df9ff7412882761f9",
     "tests/crypto-audit/round3/bls12-381/Cargo.lock": "e18598e7932b255ec0ca1b2c69a5377e54b5946d890087ec73b7c45ecb66460b",
     "tests/crypto-audit/round3/bls12-381/cases.tsv": "9aeb4019e415a28e6ca3a0cf58612c704ed2338f8e23a039d1ba2489b82e2b65",
-    "plugins/bls12-381/tests/run/aggregate-functions.mo": "f99f4c34682f06287ca59011595529ef53ea680bb0069fa0252d50decb3740d1"
+    "plugins/bls12-381/tests/run/aggregate-functions.mo": "f99f4c34682f06287ca59011595529ef53ea680bb0069fa0252d50decb3740d1",
+    "tests/crypto-audit/round3/bls12-381/review-performance.py": "b023d82d6e6701e0ac1c852eaa045c04ebc16dcac1c6f919802fb9ccaf63e145",
+    "tests/crypto-audit/round3/bls12-381/performance-review.json": "46066f900132f0b56b0e0b79e13560098ee9256f5ff9f4f03c4f1a193c72ae67"
   },
-  "audited_production_commit": "fa74cad5cb259f869e23dcfb12b0c828c7e7410b"
+  "audited_production_commit": "fa74cad5cb259f869e23dcfb12b0c828c7e7410b",
+  "performance_review": {
+    "status": "approved",
+    "report": "performance-review.json",
+    "reproducer": "review-performance.py",
+    "observations": 102,
+    "actor_cases": 17,
+    "trials_per_side": 3,
+    "frozen_files_rehashed": 1433,
+    "measured_wasm_artifacts_rehashed": 34,
+    "same_compiler_commands_and_dependencies": true,
+    "same_compiler_rts_runner_and_pocket_ic": true,
+    "measured_sources_match_audited_production": true,
+    "instruction_reduction_percent": {
+      "ic_aggregate": [
+        30.753869971017757,
+        33.58961079607627
+      ],
+      "ethereum_repeated_key_message": [
+        20.34525480089758,
+        43.35507537373861
+      ],
+      "ethereum_distinct": [
+        4.114647531190685,
+        4.139860719728794,
+        11.636055481509345,
+        13.181013277323473
+      ],
+      "ethereum_fast": [
+        4.114647531190685,
+        4.139860719728794
+      ]
+    },
+    "regressions": [
+      "IC duplicate rejection n2: 1896 to 7891 instructions and 216 extra allocated bytes.",
+      "IC duplicate rejection n8: 8175 to 10886 instructions and 504 extra allocated bytes.",
+      "IC duplicate rejection n127: 4096 extra allocated bytes despite 2.13% fewer instructions.",
+      "Wasm artifacts grow 11042 to23669 bytes.",
+      "Raw pairing instructions increase 19/28; single-verifier instruction counts and allocations are unchanged."
+    ],
+    "assessment": "Valid aggregate gains justify promotion while publishing invalid-input and code-size costs explicitly."
+  }
 }
