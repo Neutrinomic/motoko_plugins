@@ -3,10 +3,12 @@
 This pass reduces ECDSA signing by **36.5%**, direct Schnorr signing by **47.4%**,
 and prepared Schnorr signing by **46.8%** relative to the previously optimized
 plugin. APIs, validation, deterministic signatures, caller-supplied auxiliary
-randomness and prepared-key formats are unchanged. There is no runtime cache.
+randomness and prepared-key formats are unchanged. The generator table is
+immutable; no lazy initialization or mutable global cache is added.
 
-All 132 PocketIC observations passed: the same 11 cases, three fresh-canister
-trials each, across the baseline and three incremental candidates. Every
+All **168 PocketIC observations** passed: 132 across the same 11 cases and
+four incremental stages, plus 36 matched observations of actual ten-call
+batches including preparation. Every case uses three fresh-canister trials. Every
 instruction/allocation triple was identical. The [final comparison](final-comparison.json)
 pins both complete result/build manifests and runtime hashes. These are retained
 independent RFC6979 and official BIP340 fixtures; costs are input-specific.
@@ -36,6 +38,24 @@ All measured allocations are unchanged. Runtime Wasm grows from **154,876 to
 generator table. Full canister Wasm sizes and outside-interval heap/capacity
 snapshots are retained in the raw results; snapshots do not measure peak heap
 or isolate retained live bytes. No secure erasure of managed secrets is claimed.
+
+## Including preparation and ten uses
+
+These are measured complete batches using the final plugin. Prepared calls
+include one factory call inside the measured interval, followed by ten uses.
+The [extra comparison](extra-comparison.json) also pins matched measurements
+of these six workloads with the previous plugin.
+
+| Operation | Ten direct calls | Prepare + ten calls | Saving from preparation | Direct / prepared allocation |
+|---|---:|---:|---:|---:|
+| ECDSA verify | 24,539,878 | 22,508,855 | 8.28% | 320 / 888 B |
+| Schnorr verify | 24,135,788 | 22,101,917 | 8.43% | 320 / 888 B |
+| Schnorr sign | 26,812,948 | 15,060,120 | 43.83% | 1,200 / 1,320 B |
+
+Compared with the previous plugin's same preparation-plus-ten batches,
+ECDSA verification improves 6.83% and Schnorr signing improves 46.90%.
+Schnorr verification increases by 5,340 instructions per ten-call batch
+(0.024%), matching the small hot-call regression above. Allocations are unchanged.
 
 ## Three narrow changes
 
@@ -72,8 +92,17 @@ The final native suite passes **19 tests in debug and release**. It includes
 1,283 scalar-square comparisons against general multiplication, official
 BIP340 and independent RFC6979 signatures, prepared-key equivalence, validation
 errors, and constructed rare `x >= n` / forbidden field-wrap / identity cases.
-Independent final executable audit results are recorded separately under
-[`tests/crypto-audit/round4/secp256k1`](../../../../tests/crypto-audit/round4/secp256k1/).
+The independent audit passes **22 native tests in both profiles, 19 all-engine
+fixtures and nine nominal-type rejection checks**. It independently checks
+280 embedded generator points, 1,283 scalar-square expectations and 231 FFI
+cases, including 36 constructed ECDSA points. Review of emitted Wasm confirms
+fixed table scans and fixed-offset squaring without secret-dependent branches
+in the changed routines. All four comparison summaries match the raw counters.
+Evidence is under [`tests/crypto-audit/round4/secp256k1`](../../../../tests/crypto-audit/round4/secp256k1/).
+
+The SDK, runtime bridge, borrowing rules and prepared layouts are unchanged;
+the [previous actual-GC lifecycle audit](../../../../tests/crypto-audit/prepared/secp256k1/)
+remains applicable.
 
 The SDK is unchanged: commit `9f6ebeedc`, compiler executable SHA-256
 `24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2`,
@@ -81,11 +110,14 @@ with its original RTS. Plugin baseline is `0e1e96a`. Final runtime SHA-256 is
 `1b34c5dc19da1421e64d1fa2e55e94401616efd06b3e4cba161ea1a29ab62ce7`.
 
 `generate.py` emits the matched 11-case cohort using the shared prepared
-benchmark protocol. The shared builder freezes source, plugin artifacts,
+benchmark protocol. `generate_extra.py` reuses the six retained direct10/cold10
+workload sources without changing the original screen fixtures. The shared builder freezes source, plugin artifacts,
 compiler, RTS, dependency locks and independent expected outputs before
 compilation. Retained stages are `prepared-round4-secp256k1-c1-baseline`,
 `prepared-round4-secp256k1-c1-candidate`, `prepared-round4-secp256k1-c2-candidate`
-and `prepared-round4-secp256k1-c3-candidate`. `summarize.py` checks exact cohort,
+and `prepared-round4-secp256k1-c3-candidate`; the extra paired stages are
+`prepared-round4-secp256k1-extra-baseline` and `prepared-round4-secp256k1-extra-final`.
+`summarize.py` checks exact cohort,
 compiler, source and oracle equality before creating incremental summaries.
 
 Primary algorithm references are the [upstream k256 fixed-base schedule](https://raw.githubusercontent.com/RustCrypto/elliptic-curves/k256/v0.13.4/k256/src/arithmetic/mul.rs),
