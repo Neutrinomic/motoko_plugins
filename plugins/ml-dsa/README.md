@@ -106,8 +106,12 @@ The public module has interpreter/Wasm checks and an
 [Ash suite](../../packages/fast/tests/ash/MLDSA.mo) covering errors, domain
 separation, malformed hints, boundary lengths and GC composition.
 
-Recorded PocketIC instruction and allocation costs will appear in
+Recorded direct costs remain in
 [the round-three benchmark](../../benchmarks/crypto/round3/ml-dsa/).
+The [matched prepared-key report](../../benchmarks/crypto/prepared/ml-dsa/report.md)
+measures 1.73–1.98× faster hot verification and 1.19–1.88× faster hot signing
+across four official fixtures. Preparation pays for itself on the second use
+in the model, confirmed by actual two-call batches for the small fixture.
 
 Prepared-key validation and matched reuse benchmarks are tracked under
 [prepared ML-DSA](../../benchmarks/crypto/prepared/ml-dsa/). The native suite

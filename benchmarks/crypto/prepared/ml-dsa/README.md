@@ -2,8 +2,8 @@
 
 These fixtures compare direct and prepared ML-DSA-44 calls using the **same new
 compiler, RTS and plugin build**. They reuse exact official NIST ACVP answers
-already pinned by the direct plugin tests. This directory contains source, not
-measurement results.
+already pinned by the direct plugin tests. The [measured report](report.md) covers 135 successful PocketIC calls and links
+the frozen raw evidence.
 
 | Corpus case | Message | Context | Signing mode | Purpose |
 | --- | ---: | ---: | --- | --- |
@@ -57,5 +57,5 @@ infer that cost from allocation totals or these snapshots.
 Build and run `all-cases.json` with the
 [prepared crypto harness](../README.md), using the prepared SDK's explicit
 compiler path and matching plugin artifact. The installed pre-feature compiler
-is incompatible with these opaque handle primitives. Actual execution and
-results are owned by integration; no benchmark pass or speedup is claimed here.
+is incompatible with these opaque handle primitives. The final 45-actor cohort passed all 135 measured calls with exact official
+answers. See the [measured report](report.md) for costs and limitations.
