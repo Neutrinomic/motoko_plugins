@@ -1,8 +1,8 @@
 # Hash and HMAC audit, round five
 
 No new production defect was found. Production modules, compiler bridges and
-runtimes are unchanged. Native and public interpreter/Wasm validation passed;
-central integration owns the pending `HashLifecycle` Ash run.
+runtimes are unchanged. Native, public interpreter/Wasm, and central
+`HashLifecycle` Ash validation all passed.
 
 The review covered SHA256, SHA512/SHA384, RIPEMD160, HMAC-SHA256/SHA512 and
 BLAKE3: immutable state ownership, serialization/length policies, non-consuming
@@ -34,7 +34,9 @@ those corpora.
 
 `run-native.sh` passed **25 tests** (2 new tests and 23 included production unit
 tests) in 13.25 seconds with two test threads. The public fixture passed source,
-IR, lowered IR and Wasm with RTS sanity checks in 6.67 seconds. It is silent by
+IR, lowered IR and Wasm with RTS sanity checks in 6.67 seconds. Central Ash
+passed **1/1** canister tests, including both confirmed GC phases. The run
+fixture is silent by
 design and has no expected-output files. Fixture type inference initially
 required explicit class field types; this was a test-only correction.
 
