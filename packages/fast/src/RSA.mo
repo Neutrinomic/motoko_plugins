@@ -16,6 +16,17 @@ module {
   };
   public type Result<T> = { #ok : T; #err : Error };
 
+  /// Validated public-key context for repeated verification. This nominal
+  /// type is immutable, garbage collected, non-shared and non-stable: it
+  /// cannot be serialized, sent between actors or preserved across upgrades.
+  public type PreparedPublicKey = Prim.RSAPreparedPublicKey;
+
+  /// Validated private CRT context for repeated signing, with the same
+  /// lifetime restrictions as PreparedPublicKey. Its secret material remains
+  /// in the managed heap until reclaimed; releasing a handle does not promise
+  /// erasure, and does not erase the original private-key Blob.
+  public type PreparedSecretKey = Prim.RSAPreparedSecretKey;
+
   /// Derive the public modulus after validating the private CRT components.
   public let publicKey = Prim.rsa_public_key;
 
@@ -53,4 +64,30 @@ module {
   /// Validation order is public key, digest, then signature.
   /// Signature error and mismatch semantics are identical to verify.
   public let verifyPrehash = Prim.rsa_verify_prehash;
+
+  /// Validate a public modulus and prepare reusable arithmetic context.
+  /// Keep the raw public key separately if it must survive an upgrade.
+  public let preparePublicKey = Prim.rsa_prepare_public_key;
+
+  /// Validate private CRT components once and prepare reusable context.
+  /// Validation has the same scope as validatePrivateKey, including no
+  /// primality proof. Every subsequent signature retains its public fault
+  /// check before returning the result.
+  public let prepareSecretKey = Prim.rsa_prepare_secret_key;
+
+  /// Sign a message using prepared context and fresh caller-supplied 32-byte
+  /// salt. Hashing and signature format match sign; salt length is checked.
+  public let signPrepared = Prim.rsa_sign_prepared;
+
+  /// Sign an exactly 32-byte digest with prepared context. Validates digest
+  /// length before the required 32-byte salt; format matches signPrehash.
+  public let signPrehashPrepared = Prim.rsa_sign_prehash_prepared;
+
+  /// Verify a message with prepared context. Signature encoding and mismatch
+  /// semantics match verify; preparation has already validated the key.
+  public let verifyPrepared = Prim.rsa_verify_prepared;
+
+  /// Verify an exactly 32-byte digest with prepared context. Validates digest
+  /// before signature; signature semantics match verifyPrehash.
+  public let verifyPrehashPrepared = Prim.rsa_verify_prehash_prepared;
 }

@@ -25,7 +25,9 @@
 #include "inner.h"
 
 #define U      (2 + ((BR_MAX_RSA_FACTOR + 30) / 31))
-#define TLEN   (8 * U)
+/* Fixed bounded scratch lets both unchanged exponentiation calls use the
+ * existing constant-time five-bit window at the 1536-bit factor profile. */
+#define TLEN   (37 * U)
 
 /* see bearssl_rsa.h */
 uint32_t
@@ -36,7 +38,7 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	size_t fwlen;
 	uint32_t p0i, q0i;
 	size_t xlen, u;
-	uint32_t tmp[1 + TLEN];
+	uint32_t tmp[1 + TLEN] = { 0 };
 	long z;
 	uint32_t *mp, *mq, *s1, *s2, *t1, *t2, *t3;
 	uint32_t r;
