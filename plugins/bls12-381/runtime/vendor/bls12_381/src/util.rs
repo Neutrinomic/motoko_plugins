@@ -15,8 +15,64 @@ pub const fn sbb(a: u64, b: u64, borrow: u64) -> (u64, u64) {
 /// Compute a + (b * c) + carry, returning the result and the new carry over.
 #[inline(always)]
 pub const fn mac(a: u64, b: u64, c: u64, carry: u64) -> (u64, u64) {
-    let ret = (a as u128) + ((b as u128) * (c as u128)) + (carry as u128);
-    (ret as u64, (ret >> 64) as u64)
+    // WebAssembly has no widening multiply. Keep the four 32-bit products
+    // inline instead of calling the compiler's generic u128 multiply helper.
+    const MASK: u64 = 0xffff_ffff;
+    let low = (b & MASK) * (c & MASK);
+    let middle = (b >> 32) * (c & MASK) + (low >> 32);
+    let cross = (b & MASK) * (c >> 32) + (middle & MASK);
+    let high = (b >> 32) * (c >> 32) + (middle >> 32) + (cross >> 32);
+    let low = (cross << 32) | (low & MASK);
+    let (low, carry_a) = low.overflowing_add(a);
+    let (low, carry_b) = low.overflowing_add(carry);
+    (low, high + (carry_a as u64) + (carry_b as u64))
+}
+
+#[test]
+fn test_mac_matches_wide_arithmetic() {
+    fn check(a: u64, b: u64, c: u64, carry: u64) {
+        let expected = (a as u128) + (b as u128) * (c as u128) + (carry as u128);
+        assert_eq!(
+            mac(a, b, c, carry),
+            (expected as u64, (expected >> 64) as u64)
+        );
+    }
+
+    let edges = [
+        0,
+        1,
+        2,
+        0xffff_fffe,
+        0xffff_ffff,
+        0x1_0000_0000,
+        0x1_0000_0001,
+        0xffff_ffff_0000_0000,
+        0xffff_ffff_0000_0001,
+        0x7fff_ffff_ffff_ffff,
+        0x8000_0000_0000_0000,
+        u64::MAX - 1,
+        u64::MAX,
+    ];
+    for a in edges {
+        for b in edges {
+            for c in edges {
+                for carry in edges {
+                    check(a, b, c, carry);
+                }
+            }
+        }
+    }
+    use rand_core::{RngCore, SeedableRng};
+    use rand_xorshift::XorShiftRng;
+    let mut rng = XorShiftRng::from_seed([0xa7; 16]);
+    for _ in 0..100_000 {
+        check(
+            rng.next_u64(),
+            rng.next_u64(),
+            rng.next_u64(),
+            rng.next_u64(),
+        );
+    }
 }
 
 macro_rules! impl_add_binop_specify_output {
