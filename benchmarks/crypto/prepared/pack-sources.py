@@ -232,11 +232,13 @@ def pack(stages, here=HERE):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--evidence-root', type=Path, default=HERE)
     parser.add_argument('--stage', action='append', help='Repeat for an explicit completed-stage cohort; default all prepared stages')
     args = parser.parse_args()
-    stages = args.stage or [path.parent.name for path in sorted((HERE/'results').glob('prepared-*/build.json'))]
+    here = args.evidence_root.resolve()
+    stages = args.stage or [path.parent.name for path in sorted((here/'results').glob('prepared-*/build.json'))]
     assert len(set(stages)) == len(stages), 'Duplicate stage argument'
-    pack(stages)
+    pack(stages, here=here)
 
 
 if __name__ == '__main__':

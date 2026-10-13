@@ -73,11 +73,12 @@ def verify(here=HERE, restored=None, restored_stage=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--evidence-root', type=Path, default=HERE)
     parser.add_argument('--restored', type=Path, help='Optional reconstructed source directory')
     parser.add_argument('--stage', help='Stage reconstructed under --restored')
     parser.add_argument('--out', type=Path, help='Optional new integrity report; never overwrites')
     args = parser.parse_args()
-    report = verify(restored=args.restored, restored_stage=args.stage)
+    report = verify(here=args.evidence_root.resolve(), restored=args.restored, restored_stage=args.stage)
     if args.out:
         with args.out.open('xb') as output:
             output.write(sources.encoded(report))

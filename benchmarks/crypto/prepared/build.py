@@ -8,6 +8,7 @@ def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--manifest',type=Path,required=True)
 p.add_argument('--stage',required=True)
+p.add_argument('--evidence-root',type=Path,default=PREPARED,help='Directory containing results/ for this benchmark round')
 p.add_argument('--bundle',type=Path,required=True,help='Directory containing the matching release/debug RTS')
 p.add_argument('--moc',type=Path,required=True)
 p.add_argument('--case-root',type=Path,default=HERE,help='benchmarks/crypto directory containing the selected fixtures')
@@ -17,7 +18,7 @@ p.add_argument('--plugin-roots',type=Path,help='JSON map plugin name to an isola
 p.add_argument('--implementation',default='.')
 a=p.parse_args(); bundle=a.bundle.resolve(); moc=a.moc.resolve(); case_root=a.case_root.resolve()
 assert re.fullmatch(r'prepared-[a-zA-Z0-9_-]+', a.stage), 'Unsafe prepared stage name'
-archive=PREPARED/'results'/a.stage
+archive=a.evidence_root.resolve()/'results'/a.stage
 archive.mkdir(parents=True,exist_ok=False)
 manifest=json.loads(a.manifest.read_text()); cases=manifest['cases'] if isinstance(manifest,dict) else manifest
 cases=[c for c in cases if re.search(a.filter,c['name']) and re.search(a.implementation,c['implementation'])]
@@ -56,13 +57,20 @@ relocations={}
 pinned_sources=[]
 paths={moc,bundle/'mo-rts.wasm',bundle/'mo-rts-debug.wasm',a.manifest.resolve(),Path(__file__),PREPARED/'run.mjs',deps/'mops.toml',deps/'mops.lock'}
 paths.update(p for p in PREPARED.iterdir() if p.is_file() and p.suffix in ['.py','.mjs','.md'])
+owner_roots=set()
+manifest_path=a.manifest.resolve()
+if manifest_path.is_relative_to(case_root):
+  relative=manifest_path.relative_to(case_root)
+  if relative.parts[0] in ['prepared','round4'] and len(relative.parts)>2:
+    owner_roots.add(case_root/relative.parts[0]/relative.parts[1])
 for case in cases:
   for relative in [case['source'],case['prepared']['fixture_source']]:
     src=case_root/relative
     paths.add(src);relocations[src]=Path('benchmarks/crypto')/relative
   # Freeze source-local imports and each owner's generator/oracle resources.
   relative=Path(case['source'])
-  owner_root=case_root/'prepared'/relative.parts[1] if relative.parts[0]=='prepared' and len(relative.parts)>2 else (case_root/relative).parent
+  owner_roots.add(case_root/relative.parts[0]/relative.parts[1] if relative.parts[0] in ['prepared','round4'] and len(relative.parts)>2 else (case_root/relative).parent)
+for owner_root in owner_roots:
   for src in owner_root.rglob('*'):
     if src.is_file() and not any(part in ['__pycache__','_out','target','node_modules','results'] for part in src.relative_to(owner_root).parts):
       paths.add(src);relocations[src]=Path('benchmarks/crypto')/src.relative_to(case_root)

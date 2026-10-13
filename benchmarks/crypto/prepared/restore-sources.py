@@ -26,10 +26,11 @@ def restore(stage, out, here=HERE):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--evidence-root', type=Path, default=HERE)
     parser.add_argument('--stage', required=True)
     parser.add_argument('--out', required=True, type=Path)
     args = parser.parse_args()
-    print(restore(args.stage, args.out))
+    print(restore(args.stage, args.out, here=args.evidence_root.resolve()))
 
 
 if __name__ == '__main__':
