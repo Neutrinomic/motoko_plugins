@@ -60,7 +60,7 @@ let () =
     List.map (binding bits) [""; "_init"; "_update"; "_sum"; "_prepared"])
     [256; 512] in
   P.register P.{
-    abi = 1; name = "hmac-sha2"; runtime = Some "runtime.wasm";
+    abi = 1; types = []; name = "hmac-sha2"; runtime = Some "runtime.wasm";
     imports = List.map snd operations;
     bindings = List.map fst operations;
   }

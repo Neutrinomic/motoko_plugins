@@ -34,7 +34,7 @@ let binding = Mo_values.Compute_plugin.{
 
 let () =
   P.register P.{
-    abi = 1;
+    abi = 1; types = [];
     name = "sha256";
     runtime = Some "runtime.wasm";
     imports = ["sha256_digest",

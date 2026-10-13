@@ -17,6 +17,6 @@ let binding operation =
     end
   end in binding, (module Generated : P.Generator)
 let () = P.register P.{
-  abi = 1; name = "indexed_priority_queue"; runtime = None; imports = [];
+  abi = 1; types = []; name = "indexed_priority_queue"; runtime = None; imports = [];
   bindings = List.map binding [Push; Peek; Peek_priority; Pop; Get; Remove; Reschedule; Replace; Clear];
 }

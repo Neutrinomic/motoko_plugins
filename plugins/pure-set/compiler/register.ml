@@ -23,7 +23,7 @@ let binding operation ordering =
   binding, (module Generated : P.Generator)
 
 let () = P.register P.{
-  abi = 1;
+  abi = 1; types = [];
   name = "pure_set";
   runtime = None;
   imports = [];

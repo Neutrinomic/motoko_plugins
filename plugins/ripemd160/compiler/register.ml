@@ -53,7 +53,7 @@ let binding operation = C.{
 }
 
 let () = P.register P.{
-  abi = 1; name = "ripemd160"; runtime = Some "runtime.wasm";
+  abi = 1; types = []; name = "ripemd160"; runtime = Some "runtime.wasm";
   imports = [
     "ripemd160_digest", [I64Type; I64Type; I64Type], [];
     "ripemd160_init", [I64Type], [];

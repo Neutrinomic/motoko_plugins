@@ -29,7 +29,7 @@ let convert = binding "convert_bits" [T.blob; T.Prim T.Nat8; T.Prim T.Nat8; T.Pr
 let signature name args returns = "bech32_" ^ name,
  List.init args (fun _ -> Wasm_exts.Types.I64Type), List.init returns (fun _ -> Wasm_exts.Types.I64Type)
 let () = P.register P.{
- abi = 1; name = "bech32"; runtime = Some "runtime.wasm";
+ abi = 1; types = []; name = "bech32"; runtime = Some "runtime.wasm";
  imports = [signature "encode" 6 1; signature "decode" 3 1;
    signature "convert_size" 5 1; signature "convert" 6 0];
  bindings = [encode, (module Generator.Encode); decode, (module Generator.Decode); convert, (module Generator.Convert)];

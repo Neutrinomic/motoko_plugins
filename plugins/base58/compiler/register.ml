@@ -16,7 +16,7 @@ let decode = C.{
   evaluate = C.pure Reference.decode;
 }
 let () = P.register P.{
-  abi = 1; name = "base58"; runtime = Some "runtime.wasm";
+  abi = 1; types = []; name = "base58"; runtime = Some "runtime.wasm";
   imports = List.map (fun name -> name,
     [I64Type; I64Type; I64Type; I64Type], [I64Type])
     ["base58_encode"; "base58_decode"];

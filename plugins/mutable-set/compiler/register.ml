@@ -19,7 +19,7 @@ let binding operation ordering =
     end
   end in binding, (module Generated : P.Generator)
 let () = P.register P.{
-  abi = 1; name = "mutable_set"; runtime = None; imports = [];
+  abi = 1; types = []; name = "mutable_set"; runtime = None; imports = [];
   bindings = List.concat_map (fun ordering ->
     List.map (fun operation -> binding operation ordering)
       [Contains; Add; Insert; Remove; Delete]) [Callback; Static];

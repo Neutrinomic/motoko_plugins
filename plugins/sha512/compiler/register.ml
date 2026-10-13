@@ -61,7 +61,7 @@ let update = binding "sha512_update" 2 (T.Opt T.blob) (function
 let () =
   let open Wasm_exts.Types in
   P.register P.{
-    abi = 1;
+    abi = 1; types = [];
     name = "sha512";
     runtime = Some "runtime.wasm";
     imports = [

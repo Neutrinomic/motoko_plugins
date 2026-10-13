@@ -109,7 +109,7 @@ let () =
     let module Generated = Generator (S) in
     binding spec, (module Generated : P.Generator)) specs in
   P.register P.{
-    abi = 1; name = "blake3"; runtime = Some "runtime.wasm";
+    abi = 1; types = []; name = "blake3"; runtime = Some "runtime.wasm";
     imports = [
       "blake3_run", List.init 8 (fun _ -> Wasm_exts.Types.I64Type), [Wasm_exts.Types.I64Type];
       "blake3_digest", List.init 3 (fun _ -> Wasm_exts.Types.I64Type), [];

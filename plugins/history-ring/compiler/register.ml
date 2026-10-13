@@ -13,5 +13,5 @@ let binding operation =
       let compile env specialization arguments = Visitor.compile operation env specialization arguments
     end
   end in binding, (module Generated : P.Generator)
-let () = P.register P.{abi = 1; name = "history_ring"; runtime = None; imports = [];
+let () = P.register P.{abi = 1; types = []; name = "history_ring"; runtime = None; imports = [];
   bindings = List.map binding Schema.[Append; Get; Pop_front; Drop; Page]}

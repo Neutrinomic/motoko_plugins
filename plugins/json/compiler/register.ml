@@ -21,7 +21,7 @@ let decode = C.{
 let signature name params results = "json_" ^ name, params, results
 let i n = List.init n (fun _ -> I64Type)
 let () = P.register P.{
-  abi = 1; name = "json"; runtime = Some "runtime.wasm";
+  abi = 1; types = []; name = "json"; runtime = Some "runtime.wasm";
   imports = List.map (fun (name, args, results) -> signature name (i args) (i results)) [
     "new",2,1; "done",1,0; "ok",1,1; "enter",1,1; "leave",1,0; "finish",1,0;
     "collection",2,1; "check_string",2,1; "check_bigint",2,1;

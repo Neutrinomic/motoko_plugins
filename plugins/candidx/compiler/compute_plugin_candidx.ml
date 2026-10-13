@@ -2,7 +2,7 @@ open Codegen
 open Wasm_exts.Types
 
 let () = Plugin_codegen.register Plugin_codegen.{
-  abi = 1;
+  abi = 1; types = [];
   name = "candidx";
   runtime = Some "runtime.wasm";
   imports = [

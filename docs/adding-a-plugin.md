@@ -71,6 +71,7 @@ intermediates are ignored by Git.
 Register a `Codegen.Plugin_codegen.plugin` during native module initialization.
 Choose unique package names, internal function IDs, and public Prim names.
 Private Wasm export names may be reused by separate packages.
+Set `types = []` for a plugin without prepared value types.
 
 Pin the required compiler ABI in the source, currently `abi = 1`. It remains
 at 1 during development of the compiler PR. Do not read
@@ -128,6 +129,48 @@ errors, and the matching compiler's `src/codegen/plugin_codegen.mli` for the
 exact interface. All plugin bindings are compiler intrinsics. Inferred aliases
 preserve their specialization; explicit Motoko wrappers provide ordinary
 function values when an application needs callbacks.
+
+### Prepared values
+
+A plugin can validate and precompute a key once, then return an opaque value
+that the application keeps in its records or maps. Create a descriptor with
+`Compute_plugin.Prepared.create ~owner:"example" ~name:"ExamplePreparedKey"`
+and list it in the registration's `types` field. The owner must exactly match
+the registered plugin name. Prim type names are global, so prefix them with
+the plugin name; the public module can export a shorter alias:
+
+```motoko
+public type PreparedKey = Prim.ExamplePreparedKey;
+```
+
+Use `Compute_plugin.Prepared.typ` in binding schemas. Reference evaluators use
+`Prepared.wrap` and `Prepared.unwrap`; generators use `Backend.Prepared.wrap`
+on a completed immutable Blob and `Backend.Prepared.unwrap` with the declared
+argument type before borrowing its bytes. Wrapping and unwrapping add no Wasm
+instructions. Ownership and exact nominal type compatibility are checked when
+the compiler generates the call. Ordinary Blob helpers still resolve forwarding
+on every borrow.
+
+The private payload contains fully initialized, pointer-free bytes, aligned to
+eight bytes. Serialize fields explicitly: a native struct can contain padding,
+native pointers or a backend-specific layout. Validate the input in the factory
+and never mutate a published payload, retain its native address between calls,
+or expose a public Blob-to-prepared cast. Reference and Wasm implementations may
+use different private byte layouts while preserving the same typed behavior.
+
+Prepared types are nominal, nonshared and nonstable. Keep them in transient
+application state and recreate them after upgrades from the original key.
+Erasing a value to `Any` does not provide a way to recover its prepared type.
+The backing bytes use ordinary managed memory: copies can remain until GC, and
+neither dropping a handle nor upgrading guarantees secure erasure of secrets.
+
+Name factories `preparePublicKey` or `prepareSecretKey`, with an explicit
+algorithm profile where needed. Append `Prepared` to existing operations, such
+as `verifyPrehashPrepared`. Return typed errors for recoverable input failures;
+an operation that cannot fail with a valid handle need not invent an error case.
+Benchmark preparation separately from reuse, including payload size and actual
+allocation. Test handles retained in application records and maps across
+message boundaries and confirmed garbage collection.
 
 ## Public Motoko module
 

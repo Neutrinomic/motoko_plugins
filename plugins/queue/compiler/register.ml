@@ -21,7 +21,7 @@ let binding operation =
   binding, (module Generated : P.Generator)
 
 let () = P.register P.{
-  abi = 1; name = "queue"; runtime = None; imports = [];
+  abi = 1; types = []; name = "queue"; runtime = None; imports = [];
   bindings = List.map binding
     [Push_front; Push_back; Pop_front; Pop_back; Peek_front; Peek_back; To_array; To_var_array];
 }
