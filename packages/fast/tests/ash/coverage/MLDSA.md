@@ -50,5 +50,7 @@ The first source compilation found an invalid test annotation treating an
 intrinsic as an ordinary function; the test now uses an explicit wrapper.
 No compiler or plugin change was required.
 
-Interpreter/Wasm test-runner execution remains pending; typechecking is not
-counted as execution.
+The public `crypto-mldsa.mo` test and independently authored `independent.mo`
+both passed `test-runner` on 2026-10-13, exercising the Motoko, IR and lowered
+interpreters plus compiled Wasm. All seven native Rust tests also passed with
+debug assertions enabled. These are execution checks, not only typechecking.
