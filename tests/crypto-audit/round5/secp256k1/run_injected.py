@@ -115,7 +115,7 @@ def main():
     import os
     env = dict(os.environ, SECP_AUDIT_FORCED_VECTORS=str(forced), CARGO_BUILD_JOBS="2")
     for mode in ["debug", "release"]:
-        command = ["cargo", "test", "--offline", "--locked", "--jobs", "2", "--manifest-path", str(stage / harness_relative / "Cargo.toml"), "--target-dir", str(out / "target"), "--features", "injected-hashes"]
+        command = ["cargo", "test", "--locked", "--jobs", "2", "--manifest-path", str(stage / harness_relative / "Cargo.toml"), "--target-dir", str(out / "target"), "--features", "injected-hashes"]
         if mode == "release": command.append("--release")
         command += ["audit5_rare_", "--", "--test-threads=1", "--nocapture"]
         log = out / (mode + ".log")

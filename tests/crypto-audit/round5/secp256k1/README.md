@@ -51,6 +51,14 @@ Reproduce native checks inside the selected SDK environment:
 bash tests/crypto-audit/round5/secp256k1/run-native.sh
 ```
 
-The hook runs offline using its scoped Cargo.lock and pinned test-only oracle.
-The ordinary public Motoko/Ash fixture is `Secp256k1Audit5`; its execution against
-the rebuilt runtime and focused performance checks are integration-owned.
+The hook uses its scoped Cargo.lock and pinned test-only oracle. A fresh checkout
+may fetch locked Cargo dependencies; set `CARGO_NET_OFFLINE=true` for cached runs.
+
+Central validation against the rebuilt runtime passed all 13 public/composition
+fixtures and packaging checks. Both Secp256k1 fixtures passed source, IR, lowered
+and Wasm execution plus Wasm validation. Ash passed all nine existing Secp256k1
+tests, both new `Secp256k1Audit5` tests, and the prepared-composition test that
+requires an actual collection. [Public evidence](public-evidence.json) records
+artifact and log hashes. Runtime SHA256 is
+`730329b0a01941777375b0b60f7d4454ae7f609cb3d7cab3c127896ebd074d02`.
+Focused performance and emitted-Wasm review remain integration-owned.

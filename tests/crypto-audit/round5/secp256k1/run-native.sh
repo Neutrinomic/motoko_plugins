@@ -10,7 +10,7 @@ python3 "$lane/generate.py" --reference "$lane/oracle/reference.py" --check
 for mode in debug release; do
   flags=()
   if [[ "$mode" == release ]]; then flags+=(--release); fi
-  cargo test --offline --locked --jobs 2 --manifest-path "$lane/native/Cargo.toml" \
+  cargo test --locked --jobs 2 --manifest-path "$lane/native/Cargo.toml" \
     --target-dir "$out/native-target" "${flags[@]}" -- --test-threads=2 \
     >"$out/native-$mode.log" 2>&1
 done
