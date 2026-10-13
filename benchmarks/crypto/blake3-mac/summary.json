@@ -1,0 +1,161 @@
+{
+  "recorded_utc": "2026-10-13T13:01:10.848Z",
+  "stage": "blake3-mac-verify-20261013",
+  "scope": "BLAKE3 keyed MAC, with a shared secret; not a public-key signature.",
+  "input": {
+    "message_bytes": 1024,
+    "message_pattern": "byte i = i % 251",
+    "key_bytes": 32,
+    "key_ascii": "whats the Elvish word for friend",
+    "tag_bytes": 32,
+    "expected_tag_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4"
+  },
+  "methodology": "Median of three fresh-canister trials per case. Inputs and supplied tags prepared before timing. Generation calls mo:fast/BLAKE3.keyedHash; verification recomputes keyedHash then accumulates XOR/OR over all 32 tag bytes before returning Bool. No byte-dependent early exit. Result serialization/checking is outside timing. Allocation is cumulative managed heap, not peak or retained memory.",
+  "checks": "Every verification configure checks the official valid tag; rejects each of the 32 one-byte tag mutations, 31- and 33-byte tags, a modified key, and a modified message before the timed run. Measured first/last mismatches return false.",
+  "compiler": {
+    "version": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+    "sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2"
+  },
+  "pocket_ic": {
+    "version": "pocket-ic-server 10.0.0",
+    "sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+  },
+  "pins": {
+    "benchmarks/crypto/blake3-mac/generate.py": "86884bf320f72bc805f5f5ff92fa97dc431422cb675e6d1c17763f0532ed12e9",
+    "benchmarks/crypto/blake3-mac/cases.json": "18d167ae1c955cb18879cf01011ee46c6880d1d8c222fbdd44e64338e8ed9c84",
+    "benchmarks/crypto/common.py": "8aa63a8bb61c4273e066b9eddb24d5f6e29850a007f18ccab7aef5fcaf5e92cc",
+    "benchmarks/crypto/build.py": "9c6fbf4ea2fda64517c14aeeffaa635e99f82947dbd8503b8e6cacbea19bd77f",
+    "benchmarks/crypto/run.mjs": "c006feb71780abe7035a4d3c5b0857b474cc64551f9afa8228a8716f2a7e0c80",
+    "benchmarks/crypto/fixtures/blake3-official-vectors.txt": "e9a8ea1a5abd8aae441a3a79f29cdddf1e49940c4149577c62f02992d986fe5f",
+    "packages/fast/src/BLAKE3.mo": "2dc77b9555c34823bfacb8055d8238d717a701c0a72d034702b07e7a0c959b09",
+    "dist/blake3/build.json": "6b9895145cc88503122ea9aca516e2fcb647dc3d577e24e1f6795df8f700de38",
+    "dist/blake3/runtime.wasm": "72e041c77aa80ed05fc455c07299d0b37154fe1b2f49f5615c1678ca291e9aa7",
+    "dist/blake3/plugin.cmxs": "68657a8f242c282061f98d7aef1605b0c61def2ac385c81c802809915909279d",
+    "/home/devbox/.local/lib/motoko-compute/mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "/home/devbox/.local/lib/motoko-compute/mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+  },
+  "wasm_comparison_review": {
+    "verified_wasm_sha256": "7c5c025c3f394e92611039e63cbd2e0d42380f671ad403a4c00ecc374c000a19",
+    "local_excerpt": "_build/blake3-mac-verify-20261013/compare-loop.wat",
+    "excerpt_sha256": "d35c0b1c06600b2d3fa8407abd8ce6fd76d4361bf8a0947443bff6e08d4edaaf",
+    "finding": "The emitted verifyMac loop contains two indexed load8 operations and an i64.xor/i64.or accumulator. Loop branches depend on the public index/bounds; equality is a single i64.eqz after all 32 bytes. Valid, first-byte mismatch, and last-byte mismatch costs are identical."
+  },
+  "cases": [
+    {
+      "name": "blake3-mac-generate-1024",
+      "source": "blake3-mac/cases/blake3-mac-generate-1024/plugin/main.mo",
+      "source_sha256": "cd573de68fc0d28558320e10b4c0fa7615db1a0d039e908fa32f75d5a592a78e",
+      "wasm_sha256": "567f4c798d362dcf5aa2d3aa64c9054ea388c39dc35fda9340a9024227436be7",
+      "wasm_bytes": 275215,
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "instructions": [
+        35935,
+        35935,
+        35935
+      ],
+      "allocated_bytes": [
+        88,
+        88,
+        88
+      ],
+      "reclaimed_bytes": [
+        0,
+        0,
+        0
+      ],
+      "median_instructions": 35935,
+      "median_allocated_bytes": 88,
+      "all_correct": true
+    },
+    {
+      "name": "blake3-mac-verify-1024-valid",
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-valid/plugin/main.mo",
+      "source_sha256": "e1158521bee9ba36455e604a8782891b500806c3ea6052993520ec5e6c391e38",
+      "wasm_sha256": "7c5c025c3f394e92611039e63cbd2e0d42380f671ad403a4c00ecc374c000a19",
+      "wasm_bytes": 278473,
+      "expected_hex": "01",
+      "instructions": [
+        40819,
+        40819,
+        40819
+      ],
+      "allocated_bytes": [
+        88,
+        88,
+        88
+      ],
+      "reclaimed_bytes": [
+        0,
+        0,
+        0
+      ],
+      "median_instructions": 40819,
+      "median_allocated_bytes": 88,
+      "all_correct": true
+    },
+    {
+      "name": "blake3-mac-verify-1024-mismatch-first",
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-mismatch-first/plugin/main.mo",
+      "source_sha256": "f4f89166e49d920b352704a45f47aec883e2623dafd50b5a900e59ebe58ad6b9",
+      "wasm_sha256": "30802cef1ac1984b6ac99852f13361a4a92044aa39a042bdb3fd05f02da07315",
+      "wasm_bytes": 278479,
+      "expected_hex": "00",
+      "instructions": [
+        40819,
+        40819,
+        40819
+      ],
+      "allocated_bytes": [
+        88,
+        88,
+        88
+      ],
+      "reclaimed_bytes": [
+        0,
+        0,
+        0
+      ],
+      "median_instructions": 40819,
+      "median_allocated_bytes": 88,
+      "all_correct": true
+    },
+    {
+      "name": "blake3-mac-verify-1024-mismatch-last",
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-mismatch-last/plugin/main.mo",
+      "source_sha256": "59c1d6e692f368505c3f1963e6355270fe833edefa07d9c8efd158847df39ff3",
+      "wasm_sha256": "329e6a6532cf8209f2ef3dcfda2cd2a6b3827f073fb182bbc76aeae59ff6e97c",
+      "wasm_bytes": 278480,
+      "expected_hex": "00",
+      "instructions": [
+        40819,
+        40819,
+        40819
+      ],
+      "allocated_bytes": [
+        88,
+        88,
+        88
+      ],
+      "reclaimed_bytes": [
+        0,
+        0,
+        0
+      ],
+      "median_instructions": 40819,
+      "median_allocated_bytes": 88,
+      "all_correct": true
+    }
+  ],
+  "retained_local_archive": "_build/blake3-mac-verify-20261013/archive",
+  "raw_artifacts": {
+    "build.json": "199eb45c68a133b396a308db67063d333df7b466b0e9f7100b2bc1445af9682b",
+    "results.json": "6eb016701a745d422859225cb7a16ce49b221e9f622b8f4f4f767023cd40e072",
+    "results.json.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "reproduce_from_repository_root": [
+    "python3 benchmarks/crypto/blake3-mac/generate.py",
+    "python3 benchmarks/crypto/build.py --manifest benchmarks/crypto/blake3-mac/cases.json --stage blake3-mac-verify-20261013",
+    "node benchmarks/crypto/run.mjs --build benchmarks/crypto/results/blake3-mac-verify-20261013/build.json --out benchmarks/crypto/results/blake3-mac-verify-20261013/results.json --trials 3"
+  ],
+  "commands_notes": "The original completed results directory was moved intact to retained_local_archive after validation. The recorded build commands preserve their original paths. Reproduction creates a fresh directory; use another stage name if it already exists."
+}

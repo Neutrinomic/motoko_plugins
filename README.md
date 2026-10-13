@@ -22,7 +22,7 @@ data.
 
 ## Current signature performance
 
-Round four improves the already delivered plugins with the **same compiler and SDK**: `9f6ebeedc`, compiler ELF `24d8d0b9…`, original RTS, ABI 1. These are PocketIC instruction medians from three fresh canisters per workload and revision; wall-clock timings are not compared.
+Round four and the subsequent BLS optimization improve the delivered plugins with the **same compiler and SDK**: `9f6ebeedc`, compiler ELF `24d8d0b9…`, original RTS, ABI 1. These are PocketIC instruction medians from three fresh canisters per workload and revision; wall-clock timings are not compared. The BLS row compares the round-four implementation with the new round-six implementation; other rows retain their round-four comparison.
 
 | Direct operation | Delivered plugin | Selected plugin | Fewer instructions |
 |---|---:|---:|---:|
@@ -32,9 +32,9 @@ Round four improves the already delivered plugins with the **same compiler and S
 | P256 ECDSA sign | 7,252,878 | 4,791,659 | **33.93%** |
 | RSA-3072 PSS sign / digest | 447,476,438 | 400,505,033 | **10.50%** |
 | ML-DSA-44 verify / ACVP 4 | 3,810,844 | 3,656,399 | **4.05%** |
-| BLS IC single verify | 222,072,725 | 210,673,356 | **5.13%** |
+| BLS IC single verify | 210,673,356 | 127,630,963 | **39.42%** |
 
-A [correctness followup](tests/crypto-audit/round5/README.md) fixes rare BIP340 signing boundaries and aligns portable ECDSA errors with the native contract. The Secp256k1 costs on this page include its **33 new observations across 11 unchanged workloads**; other scheme costs retain their round-four measurements.
+A [correctness followup](tests/crypto-audit/round5/README.md) fixes rare BIP340 signing boundaries and aligns portable ECDSA errors with the native contract. The Secp256k1 costs on this page include its **33 new observations across 11 unchanged workloads**. The [BLS followup](benchmarks/crypto/bls-verify-round6/README.md) replaces generic widening-multiply helpers with fixed-width arithmetic and simplifies final exponentiation: **90 matched observations across 15 workloads**, with unchanged allocation and prepared layouts. Other scheme costs retain their round-four measurements.
 
 Current public-operation costs follow. Prepared keys are opaque, immutable GC-managed values; preparation is separate from the hot call. ECDSA signing rows use the existing direct APIs; dashes mean no prepared-signing API was measured.
 
@@ -52,15 +52,17 @@ Current public-operation costs follow. Prepared keys are opaque, immutable GC-ma
 | RSA-3072 PSS verify / same digest | 9,162,600 | 3,642,309 | 7,722,884 | 824 | 32 / 880 / 32 |
 | ML-DSA-44 sign / ACVP 4 | 13,039,211 | 4,862,444 | 8,890,133 | 28,800 | 2,480 / 28,856 / 2,480 |
 | ML-DSA-44 verify / ACVP 4 | 3,656,399 | 2,371,114 | 1,787,636 | 20,576 | 32 / 20,632 / 32 |
-| BLS IC single verify | 210,673,356 | 43,312,942 | 167,427,790 | 19,680 | 64 / 19,736 / 64 |
-| BLS Ethereum single verify | 274,974,367 | 11,144,375 | 263,831,154 | 144 | 64 / 200 / 64 |
-| BLS Ethereum aggregate / 8 distinct keys | 3,175,970,967 | 2,199,794,662 | 976,180,848 | 1,152 | 181,112 / 1,688 / 181,552 |
+| BLS IC single verify | 127,630,963 | 26,421,512 | 101,276,827 | 19,680 | 64 / 19,736 / 64 |
+| BLS Ethereum single verify | 167,544,868 | 6,341,823 | 161,204,207 | 144 | 64 / 200 / 64 |
+| BLS Ethereum aggregate / 8 distinct keys | 1,941,213,088 | 1,340,358,670 | 600,858,961 | 1,152 | 181,112 / 1,688 / 181,552 |
 
 Direct Ed25519 signing is unchanged. Secp256k1 Schnorr verification adds **534 instructions** per direct/prepared call (about 0.02%); other small candidate regressions are retained in the full report. ML-DSA costs depend on its rejection-sampling input; ACVP 4 uses a one-byte message and 59-byte context.
 
 Setup matters: actual P256 preparation plus one check costs **22.91M** versus **11.96M** direct; preparation plus 100 checks costs **342.00M** versus **1,196.17M** direct. Actual Secp256k1 ECDSA preparation plus ten checks costs **22.51M** versus **24.54M** direct. These are measured batches, not setup-plus-hot estimates.
 
-Managed allocation is unchanged outside the measured BLS reductions: IC single verification **19,672 → 64 B**, Ethereum single **39,280 → 64 B**, eight-key proof-of-possession preparation **315,416 → 1,688 B**, and that aggregate's direct verification **494,840 → 181,112 B**. Prepared payload sizes are unchanged. Runtime Wasm grows **26,909 B for Secp256k1**, **14,570 B for P256**, **948 B for RSA**, **585 B for ML-DSA**, and **47,054 B for BLS**; Ed25519 shrinks **1,041 B**. The correctness followup adds 875 runtime bytes and 872 bytes to each measured Secp256k1 canister; direct/prepared Schnorr signing adds 218/236 instructions with unchanged allocation. Full round-four linked-canister size changes remain in its report.
+Round four reduced BLS allocation: IC single verification **19,672 → 64 B**, Ethereum single **39,280 → 64 B**, eight-key proof-of-possession preparation **315,416 → 1,688 B**, and that aggregate's direct verification **494,840 → 181,112 B**. The new BLS optimization preserves those allocation and payload sizes while shrinking its runtime by **37,662 B** and every measured primitive canister by **36,519 B**. Ethereum aggregate preparation includes proof-of-possession verification for each key; plain single-key preparation does not.
+
+Round-four runtime changes were **+26,909 B for Secp256k1**, **+14,570 B for P256**, **+948 B for RSA**, **+585 B for ML-DSA**, **+47,054 B for BLS**, and **−1,041 B for Ed25519**. The correctness followup adds 875 runtime bytes and 872 bytes to each measured Secp256k1 canister; direct/prepared Schnorr signing adds 218/236 instructions with unchanged allocation. Full round-four linked-canister size changes remain in its report.
 
 The `ecdsa@8.0.1` library controls below are **reused from the preceding prepared-key run**, not rerun this round. They use the same compiler ELF and exact verification inputs; ratios use the current plugin costs.
 

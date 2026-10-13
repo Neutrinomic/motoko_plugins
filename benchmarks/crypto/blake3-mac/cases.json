@@ -1,0 +1,52 @@
+{
+  "cases": [
+    {
+      "name": "blake3-mac-generate-1024",
+      "family": "blake3-mac",
+      "implementation": "plugin",
+      "comparison": "shared-secret-mac",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "blake3-mac/cases/blake3-mac-generate-1024/plugin/main.mo",
+      "expected_hex": "75c46f6f3d9eb4f55ecaaee480db732e6c2105546f1e675003687c31719c7ba4",
+      "notes": "Same workload and timed operation as cases/blake3-keyed-1024/native/main.mo. Expected tag is the first 32 bytes of the official 1024-byte keyed vector."
+    },
+    {
+      "name": "blake3-mac-verify-1024-valid",
+      "family": "blake3-mac",
+      "implementation": "plugin",
+      "comparison": "shared-secret-mac",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-valid/plugin/main.mo",
+      "expected_hex": "01",
+      "notes": "Recompute keyedHash and compare all 32 tag bytes with XOR/OR; no mismatch-dependent early exit. Input/tag setup and correctness assertions run outside measurement."
+    },
+    {
+      "name": "blake3-mac-verify-1024-mismatch-first",
+      "family": "blake3-mac",
+      "implementation": "plugin",
+      "comparison": "shared-secret-mac",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-mismatch-first/plugin/main.mo",
+      "expected_hex": "00",
+      "notes": "Recompute keyedHash and compare all 32 tag bytes with XOR/OR; no mismatch-dependent early exit. Input/tag setup and correctness assertions run outside measurement."
+    },
+    {
+      "name": "blake3-mac-verify-1024-mismatch-last",
+      "family": "blake3-mac",
+      "implementation": "plugin",
+      "comparison": "shared-secret-mac",
+      "plugins": [
+        "blake3"
+      ],
+      "source": "blake3-mac/cases/blake3-mac-verify-1024-mismatch-last/plugin/main.mo",
+      "expected_hex": "00",
+      "notes": "Recompute keyedHash and compare all 32 tag bytes with XOR/OR; no mismatch-dependent early exit. Input/tag setup and correctness assertions run outside measurement."
+    }
+  ]
+}

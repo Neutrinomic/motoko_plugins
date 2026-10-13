@@ -1,5 +1,19 @@
 # Crypto public API benchmarks
 
+## BLAKE3 keyed MAC
+
+| Plugin | Input | Sign instructions | Verify instructions | Allocated B, sign / verify |
+| --- | --- | ---: | ---: | ---: |
+| BLAKE3 keyed (shared-secret MAC) | 1,024-byte message; 32-byte secret key | 35,935 | 40,819 | 88 / 88 |
+
+Measured on 2026-10-13 with PocketIC 10.0.0 and compiler `9f6ebeedc`.
+Generation and verification were both measured fresh, with three identical
+trials each. Verification composes the plugin's `keyedHash` with a Motoko loop
+that compares all 32 tag bytes using XOR/OR, without an early exit on mismatch.
+First- and last-byte mismatches also cost 40,819 instructions and 88 B.
+This is shared-secret authentication, not public-key signing.
+[Measurements and reproduction](benchmarks/crypto/blake3-mac/summary.json).
+
 ## Current signatures — round three
 
 The current signature plugins were measured on 2026-10-13 with PocketIC 10.0.0,
@@ -355,3 +369,48 @@ Pure Motoko secret-key arithmetic can be variable-time; ratios compare mathemati
 See [optimization results](benchmarks/crypto/round2/RESULTS.md) for before/after changes, regressions and Wasm-size tradeoffs; the [original Mops comparison report](benchmarks/crypto/RESULTS.md) remains unchanged.
 
 </details>
+
+## BLS verification optimization — round six
+
+The BLS plugin now uses fixed-width partial products for widening multiplication,
+simpler modular subtraction and a shorter final-exponentiation schedule. The
+compiler, SDK, validation rules, public API and prepared-key layouts are unchanged.
+
+| Verification | Before: instructions | Current: instructions | Reduction | Allocated B, before / current |
+| --- | ---: | ---: | ---: | ---: |
+| IC, direct | 210,673,356 | 127,630,963 | 39.42% | 64 / 64 |
+| IC, prepared key | 167,427,790 | 101,276,827 | 39.51% | 64 / 64 |
+| Ethereum, direct | 274,974,367 | 167,544,868 | 39.07% | 64 / 64 |
+| Ethereum, prepared key | 263,831,154 | 161,204,207 | 38.90% | 64 / 64 |
+| IC aggregate, 2 distinct keys, prepared | 204,848,489 | 124,128,212 | 39.40% | 544 / 544 |
+| Ethereum aggregate, 8 distinct keys, prepared | 976,180,848 | 600,858,961 | 38.45% | 181,552 / 181,552 |
+
+Prepared verification excludes key setup, measured separately in the report.
+Three identical fresh-canister trials per workload and revision on PocketIC
+10.0.0, compiler `9f6ebeedc`. Runtime Wasm shrank from 655,629 to 617,967 B.
+[Full 15-workload comparison and reproduction](benchmarks/crypto/bls-verify-round6/README.md) ·
+[Independent arithmetic review and validation](tests/crypto-audit/round6/bls12-381/README.md).
+
+## IC certified-data relay verification
+
+An untrusted client can carry A's certificate and Merkle witness to B. Caching
+A's authenticated certified root lets every client proving a record against
+that root skip repeated BLS verification.
+
+| Verification path | Instructions, 1,000 entries | Instructions, 100,000 entries | Allocated B, 1,000 / 100,000 entries |
+| --- | ---: | ---: | ---: |
+| Cold: root delegation and subnet signatures | 257,292,031 | 257,631,383 | 102,320 / 117,552 |
+| Cached verified delegation and prepared subnet key | 102,586,047 | 102,925,399 | 65,408 / 80,640 |
+| Cached authenticated A root; application proof only | **565,546** | **904,898** | **26,176 / 41,408** |
+
+Remeasured after the BLS optimization on 2026-10-13 with PocketIC 10.0.0,
+compiler `9f6ebeedc`, our BLS/SHA plugins and the unchanged bounded Motoko
+certificate decoder. Authentic NNS-delegated
+certificates; 32-byte values and 8-byte labels; three identical trials per case.
+Cache setup, incoming Candid decoding, replay tracking and business logic are
+excluded. Allocation is cumulative, not retained heap. Snapshots retain their
+signed-time expiry; previously unseen roots still require signature checks.
+This is a research prototype, not a production certificate verifier.
+[Cache design and initial measurements](benchmarks/crypto/ic-certified-relay/README.md) ·
+[Current comparison and reproduction](benchmarks/crypto/bls-verify-round6/README.md) ·
+[45 current observations and 12 rejection controls](benchmarks/crypto/bls-verify-round6/relay-results.json).
