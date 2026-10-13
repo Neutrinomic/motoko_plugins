@@ -1,0 +1,639 @@
+{
+  "purpose": "Correctness-fix followup; 11 matched existing workloads, 33 new observations. Baseline observations reused from round4.",
+  "status": "passed",
+  "validator": "benchmarks/crypto/round4/compare.py (unchanged)",
+  "comparison_sha256": "4800b1a4a3259c9a871ec7513229df31cb252e7f01d242b4c4f914bd297514fc",
+  "baseline": {
+    "stage": "prepared-round4-secp256k1-c3-candidate",
+    "build_sha256": "b3f66856e17a9f75ea677aae44de20e337360e2fc351acffc1657710d35a9748",
+    "results_sha256": "a59baeef2516904605c3b087161def38e11a91ed1703983f5db21948739b6799"
+  },
+  "candidate": {
+    "stage": "prepared-round5-secp256k1-matched",
+    "build_sha256": "d046a425d1c90ed84d2de971d26beb18c73c1189cedbb931369684e35f18c226",
+    "results_sha256": "ff51705dfcb58dc8cfe174116ea2d75c116b2cc4420418dac31650be551e9aca"
+  },
+  "environment": {
+    "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+    "runner_sha256": "aaa373e29976b89eee12e7d178f9358ec3bbdecf0b1b91ff78064c058b763f31",
+    "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990",
+    "runner_dependencies_sha256": "1515439779b1f9ac3432fe294bdd14d116631277acf771d387b5afbc454a685e",
+    "motoko_dependencies_sha256": "4672da3bc3b1663eaa254b87f3a2740431d9c5a389a270705c51daf33b375590",
+    "fast_package_sha256": "af0d3dd7e8396b93346acfea752d2275720402f3381026198d739050aa096eeb",
+    "dependency_aliases": {
+      "blake3": "blake3@0.1.2",
+      "ecdsa": "ecdsa@8.0.1",
+      "sha2@0": "sha2@0.1.14",
+      "core": "core@2.6.0",
+      "asn1@3": "asn1@3.1.0",
+      "xtended-numbers@2": "xtended-numbers@2.3.0",
+      "core@1": "core@1.0.0",
+      "buffer@0": "buffer@0.1.0",
+      "base@0": "base@0.16.0",
+      "xtended-iter@1": "xtended-iter@1.1.0",
+      "base-x-encoder@2": "base-x-encoder@2.1.0",
+      "core@2": "core@2.5.0",
+      "bitcoin": "bitcoin@0.2.1",
+      "sha2": "sha2@0.1.14",
+      "bls12-381": "bls12-381@0.2.0",
+      "base": "base@0.16.0"
+    },
+    "rts_sha256": {
+      "MOC_RELEASE_RTS": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+      "MOC_DEBUG_RTS": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+    }
+  },
+  "baseline_runtime_sha256": "1b34c5dc19da1421e64d1fa2e55e94401616efd06b3e4cba161ea1a29ab62ce7",
+  "candidate_runtime_sha256": "730329b0a01941777375b0b60f7d4454ae7f609cb3d7cab3c127896ebd074d02",
+  "runtime_bytes_before": 180910,
+  "runtime_bytes_after": 181785,
+  "all_correct": true,
+  "all_triples_identical": true,
+  "cases": [
+    {
+      "name": "secp256k1-ecdsa-sign-direct-n1",
+      "source_sha256": "7e7837807e23609cc0053f48aef3b455fbf721d31f8e041afb24df396717cf7b",
+      "expected_hex": "58db657bcd631038bea07b4941172f0167aca98f12b55e3176bd1c35435d65013a78e73d8ff8ab554e13c10f6390d81a882f91945d6275493882676170b53a57",
+      "mode": "control",
+      "reuse": 1,
+      "payload_bytes": 0,
+      "baseline_wasm_sha256": "6577ba64260c32d7f29e3e0002847fe0929dea3df9a2fc6867dd21add314b9f6",
+      "candidate_wasm_sha256": "41b4a2cda7133d0a3fbfef6c372aede482b4fcfdb9307a5f2a7c28362dfeb297",
+      "baseline_wasm_bytes": 425471,
+      "candidate_wasm_bytes": 426343,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2295959,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-ecdsa-verify-direct-n1",
+      "source_sha256": "520e7d765bc065b33edab6661d14d82739cd1f43909b042bbd8437832aa1ce78",
+      "expected_hex": "01",
+      "mode": "direct",
+      "reuse": 1,
+      "payload_bytes": 0,
+      "baseline_wasm_sha256": "5b8f09c13eb6f06f1e0a6116f05d7ae09147b511c1237ec7a02031203c2c8b74",
+      "candidate_wasm_sha256": "a59021fd662127963b166fc9dafbaf6db266aaca5b97f2f6fe5694d724c90e42",
+      "baseline_wasm_bytes": 425967,
+      "candidate_wasm_bytes": 426839,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2454026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-ecdsa-verify-prepare-n1",
+      "source_sha256": "3308adafbc283a02c3757dd9b04a0fe129663f6dd894dc963b6a5b40c2030fad",
+      "expected_hex": "01",
+      "mode": "prepare",
+      "reuse": 1,
+      "payload_bytes": 512,
+      "baseline_wasm_sha256": "c1927cf3ae795bc3614a682768fdf0873d5067f84f12ba7826c3399d3961fb1a",
+      "candidate_wasm_sha256": "5c5fb4e89af60e688c325d572c5ed63b3e8ef39945a0cef6e0d34f922ab07aee",
+      "baseline_wasm_bytes": 427546,
+      "candidate_wasm_bytes": 428418,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 484693,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-ecdsa-verify-prepared-n1",
+      "source_sha256": "4e4f1c9b9666cca5e437aee66427e480dad02011eeed480de3bfb5a783dab58e",
+      "expected_hex": "01",
+      "mode": "prepared",
+      "reuse": 1,
+      "payload_bytes": 512,
+      "baseline_wasm_sha256": "8854f2dd196d609d43c008df8566a81d64c493f86cd59cadc34bf45423100982",
+      "candidate_wasm_sha256": "0340a16d0d86dc830f3f002f3bbaa23255e3dac37003c6162bf3c193afd4c7f4",
+      "baseline_wasm_bytes": 427690,
+      "candidate_wasm_bytes": 428562,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2202476,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-keyderive-direct-n1",
+      "source_sha256": "397fe619f4730a7a97d8ec095065dafd68f39959b3a43daec5762283a49255e0",
+      "expected_hex": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "mode": "control",
+      "reuse": 1,
+      "payload_bytes": 0,
+      "baseline_wasm_sha256": "29b42b516c35edab09f844fb8ccada8abdbb6c67ab4b05e0473da514142719b7",
+      "candidate_wasm_sha256": "0a0834b0d9f0f82b215f5971939873690a7fdba007e6e893e354b8aec53f80c0",
+      "baseline_wasm_bytes": 426745,
+      "candidate_wasm_bytes": 427617,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1308861,
+          "allocated_bytes": 128,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-schnorr-sign-direct-n1",
+      "source_sha256": "8cf8bc5e3c69f91497f4dc38887074eb5cbb8f374cfc635521012b3fc9dad398",
+      "expected_hex": "e907831f80848d1069a5371b402410364bdf1c5f8307b0084c55f1ce2dca821525f66a4a85ea8b71e482a74f382d2ce5ebeee8fdb2172f477df4900d310536c0",
+      "mode": "direct",
+      "reuse": 1,
+      "payload_bytes": 0,
+      "baseline_wasm_sha256": "c14e76279a36384a1b9363f67e8ff115261cd5d26a92141ad3a3fd851402271b",
+      "candidate_wasm_sha256": "ee8c98be628ca421141fa5f3ea9573cb6b14fb5154dbf69f0fd7993cbce413f5",
+      "baseline_wasm_bytes": 425654,
+      "candidate_wasm_bytes": 426526,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2681364,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2681364,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2681364,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2681582,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2681582,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2681582,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 218
+    },
+    {
+      "name": "secp256k1-schnorr-sign-prepare-n1",
+      "source_sha256": "fffe4a0b2f6592e6bff22c2b80e53a0b99a0c84f506d519328b2fe402585100b",
+      "expected_hex": "e907831f80848d1069a5371b402410364bdf1c5f8307b0084c55f1ce2dca821525f66a4a85ea8b71e482a74f382d2ce5ebeee8fdb2172f477df4900d310536c0",
+      "mode": "prepare",
+      "reuse": 1,
+      "payload_bytes": 64,
+      "baseline_wasm_sha256": "1860533d4a054834cd6e73baab8f6f8c48d590c5a094d00e02ccbd9c44728d15",
+      "candidate_wasm_sha256": "44ea4dfb067d49d5a2a8e972bf0b014c7e3f79d43c2a6dea4b77807ac4aff939",
+      "baseline_wasm_bytes": 427223,
+      "candidate_wasm_bytes": 428095,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 1308308,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1308308,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1308308,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 1308292,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1308292,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1308292,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": -16
+    },
+    {
+      "name": "secp256k1-schnorr-sign-prepared-n1",
+      "source_sha256": "a1def35619785f7a089d4c9b2f8fd1787211f02170bb2617a2ea7b4e8095177a",
+      "expected_hex": "e907831f80848d1069a5371b402410364bdf1c5f8307b0084c55f1ce2dca821525f66a4a85ea8b71e482a74f382d2ce5ebeee8fdb2172f477df4900d310536c0",
+      "mode": "prepared",
+      "reuse": 1,
+      "payload_bytes": 64,
+      "baseline_wasm_sha256": "f0047214eed3ea24279c3296f77cc6dca220edc348c28e35becbe50e9807f7f0",
+      "candidate_wasm_sha256": "39bb0e266b915cc5aab2983f17c3c80d12c8d5c844d6ef58b457f4a94dabe8b9",
+      "baseline_wasm_bytes": 427377,
+      "candidate_wasm_bytes": 428249,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 1375272,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1375272,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1375272,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 1375508,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 1375508,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 1375508,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 236
+    },
+    {
+      "name": "secp256k1-schnorr-verify-direct-n1",
+      "source_sha256": "b14ab7a2789552c95f9a2cddce653dc3fd126f5814f7df8f34e623814fcb034f",
+      "expected_hex": "01",
+      "mode": "direct",
+      "reuse": 1,
+      "payload_bytes": 0,
+      "baseline_wasm_sha256": "3be25d3d749dabb7314852fbeda57e1e405236be191f48c6eb6a1048110404fa",
+      "candidate_wasm_sha256": "6997f08e5a92d8ea16f337c180f44d95c7edb90daf4c79cf761916723098cc7e",
+      "baseline_wasm_bytes": 425966,
+      "candidate_wasm_bytes": 426838,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2413617,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-schnorr-verify-prepare-n1",
+      "source_sha256": "f20a5a25f319fdd0f0873bf64b0461633ecca86a3cde8d63502974160bc8838e",
+      "expected_hex": "01",
+      "mode": "prepare",
+      "reuse": 1,
+      "payload_bytes": 512,
+      "baseline_wasm_sha256": "cab32c5300fc45b13c05327012ec48066d5f478d7aa19d8b26f8f1af64ada0c1",
+      "candidate_wasm_sha256": "83a8d931740c0f3520969a609c4d99fae7141fd679d364d3301be264b43ead32",
+      "baseline_wasm_bytes": 427545,
+      "candidate_wasm_bytes": 428417,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 485205,
+          "allocated_bytes": 568,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    },
+    {
+      "name": "secp256k1-schnorr-verify-prepared-n1",
+      "source_sha256": "df77f15db7f7025d99d34ccffa1afa7db27dc2b198cec47fcf916f7912fbd33e",
+      "expected_hex": "01",
+      "mode": "prepared",
+      "reuse": 1,
+      "payload_bytes": 512,
+      "baseline_wasm_sha256": "c0c1dd9a0cf51dd75d350a8279bb77f18797da757322aea9cb38b97c81c12780",
+      "candidate_wasm_sha256": "b5549f4f9641142f04259a0b4caea07ac87452af7630d083d88180d5b90eda37",
+      "baseline_wasm_bytes": 427689,
+      "candidate_wasm_bytes": 428561,
+      "before": [
+        {
+          "trial": 0,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "after": [
+        {
+          "trial": 0,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 1,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        },
+        {
+          "trial": 2,
+          "instructions": 2161731,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0
+        }
+      ],
+      "instruction_delta": 0
+    }
+  ],
+  "limits": "These correctness-fix measurements use original fixtures and expected outputs, fixed SDK/RTS and identical dependency/source identities. Heap snapshots are not peak or retained memory. Full raw logs/builds remain ignored; no new source archive is committed.",
+  "initial_attempt": "An earlier successful 33-observation run froze six unrelated ten-call actors added after the historical baseline. Strict comparator rejected the differing full actor inventory; the final run reused the original frozen actor directory and passed the unchanged comparator. Initial metrics equal final metrics; no failed cryptographic measurement."
+}

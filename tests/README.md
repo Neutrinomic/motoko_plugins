@@ -62,6 +62,12 @@ as described in the [benchmark guide](../benchmarks/README.md#candidx-repository
 
 ## Independent crypto audits
 
+[Round-five regressions](crypto-audit/round5/README.md) run through the normal
+native/public runners above. The native runner also invokes the round-five
+`run-native.sh` adapters, preserving independent oracle and rare-case injection
+setup; RSA's CLI oracle needs `openssl` on `PATH` or an `OPENSSL` override.
+New public Ash configurations are discovered by `scripts/test-ash.sh`.
+
 Run the audit drivers against explicit plugin directories built for the
 selected compiler. Hash/codec, curve, BLS and Bitcoin audits use separate entry points:
 

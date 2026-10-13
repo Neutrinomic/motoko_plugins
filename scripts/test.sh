@@ -67,6 +67,12 @@ python3 "$plugins_root/tests/build-config.py"
 cargo test --manifest-path "$plugins_root/Cargo.toml" --locked \
   --target-dir "$plugins_root/_build/native-tests"
 
+# Independent regressions retain their oracle/backend setup in small lane
+# runners instead of adding audit-only dependencies to production crates.
+for driver in "$plugins_root"/tests/crypto-audit/round5/*/run-native.sh; do
+  bash "$driver"
+done
+
 # The runner uses the compiler's build wrappers and changes into each test's
 # directory. Passing absolute paths preserves fail/run-drun flag inference and
 # keeps all expectations and generated _out files in this repository.

@@ -1,6 +1,6 @@
 # Public module tests with Ash
 
-These 32 configurations define **308 test-method executions** (302 distinct
+These 46 configurations define **392 test-method executions** (386 distinct
 Motoko method declarations) on PocketIC through Ash. They exercise the public
 `mo:fast` modules, independent wire and cryptographic vectors, comparisons with
 Core containers, Bitcoin composition, error recovery, persistence, and GC.
@@ -52,43 +52,58 @@ does not require unrelated plugins.
 | --- | ---: | --- | --- |
 | [BLAKE3](BLAKE3.mo) | 3 | Official hash/keyed/context/XOF vectors, streaming partitions, canonical states, seek and output bounds | [Config](BLAKE3.ash.json) · [Inventory](coverage/BLAKE3.md) |
 | [BLS12381](BLS12381.mo) | 2 | G1/G2, MSM, pairings, RFC9380 hash-to-curve, IC/Ethereum signatures, aggregation and proof-of-possession validation | [Config](BLS12381.ash.json) · [Inventory](coverage/BLS12381.md) |
+| [BLS12381Protocol](BLS12381Protocol.mo) | 4 | IC/Ethereum signature and proof domains, independent prepared handles, DST normalization boundaries | [Config](BLS12381Protocol.ash.json) · [Assertions](../bls/ProtocolSuite.mo) |
 | [Base58](Base58.mo) | 6 | Bitcoin Core vectors, strict alphabet, quotas, Base58Check checksums, error precedence and retained outputs | [Config](Base58.ash.json) · [Inventory](coverage/Base58.md) |
 | [Bech32](Bech32.mo) | 8 | BIP173/BIP350 encoding, checksums, bit conversion, SegWit versions/program lengths and malformed addresses | [Config](Bech32.ash.json) · [Inventory](coverage/Bech32.md) |
 | [BitcoinCryptoAddress](BitcoinCryptoAddress.mo) | 8 | HASH160/tagged hashes, legacy/SegWit/Taproot addresses, BIP86/BIP341 outputs, signed SegWit/Taproot spends and composed public wallets | [Config](BitcoinCryptoAddress.ash.json) · [Inventory](coverage/BitcoinCryptoAddress.md) |
 | [BitcoinCryptoBip32](BitcoinCryptoBip32.mo) | 5 | Official extended-key vectors, non-hardened public derivation, fingerprints, paths, networks and metadata rejection | [Config](BitcoinCryptoBip32.ash.json) · [Inventory](coverage/BitcoinCryptoBip32.md) |
 | [BitcoinCryptoTransaction](BitcoinCryptoTransaction.mo) | 2 | Bitcoin Core/BIP143/BIP341 sighashes, transaction parsing/serialization, txid/wtxid, scripts and prepared hash caches | [Config](BitcoinCryptoTransaction.ash.json) · [Inventory](#bitcoin-transaction-inventory) |
+| [BitcoinProperties](BitcoinProperties.mo) | 3 | BIP32 private/public derivation relations, sighash commitments and exclusions, CompactSize count boundaries | [Config](BitcoinProperties.ash.json) · [Assertions](../lib/BitcoinPropertiesCases.mo) |
 | [CBOR](CBOR.mo) | 34 | Exact wire vectors, typed decoding, all binary16 patterns, malformed inputs, quotas, retained results | [Config](CBOR.ash.json) · [Inventory](coverage/CBOR.md) |
 | [CandidX](CandidX.mo) | 16 | Canonical bytes, variadic arguments, type joins, recursion, references, quotas | [Config](CandidX.ash.json) · [Inventory](coverage/CandidX.md) |
 | [CandidSize](CandidSize.mo) | 5 | Conservative native-Candid bounds, large integers, zero allocation, recursive limits, references | [Config](CandidSize.ash.json) · [Inventory](coverage/CandidSize.md) |
+| [CodecProperties](CodecProperties.mo) | 3 | Bit conversion widths and padding, Bech32 character substitutions, Base58 alphabet and checksum corruption | [Config](CodecProperties.ash.json) · [Assertions](../lib/CodecPropertiesCases.mo) |
 | [Comparators](Comparators.mo) | 16 | Automatic scalar ordering, aliases and implicit calls, callback effects, multi-value results, allocation | [Config](Comparators.ash.json) · [Inventory](coverage/Comparators.md) |
 | [Composition](Composition.mo) | 3 | Eight original codec/hash/container plugins together, recovery after failures, retained managed values across messages | [Config](Composition.ash.json) · [Inventory](#composition-inventory) |
 | [CoreAPI](CoreAPI.mo) | 12 | Six identical consumer methods run against Core and Fast; implicit comparators/formatters, Core signatures and types | [Config](CoreAPI.ash.json) · [Inventory](coverage/CoreAPI.md) |
+| [Ed25519](Ed25519.mo) | 6 | RFC8032/OpenSSL answers, canonical points and scalars, pure-mode behavior, aliases and GC retention | [Config](Ed25519.ash.json) · [Inventory](coverage/Ed25519.md) |
+| [Ed25519Audit5](Ed25519Audit5.mo) | 2 | SHA512 prefix/padding boundaries, mixed-order keys, pure/ctx/ph domain separation and prepared parity | [Config](Ed25519Audit5.ash.json) · [Audit](../../../../tests/crypto-audit/round5/ed25519/README.md) |
+| [Ed25519Prepared](Ed25519Prepared.mo) | 5 | Prepared RFC8032/OpenSSL answers, factory errors, immutable inputs, aliases and retained handles | [Config](Ed25519Prepared.ash.json) · [Inventory](coverage/Ed25519Prepared.md) |
 | [MapConversions](MapConversions.mo) | 4 | Both Map conversions, independent bindings, shared payloads, comparator-equivalent keys | [Config](MapConversions.ash.json) · [Inventory](coverage/MapConversions.md) |
 | [JSON](JSON.mo) | 33 | Independent JSON output, typed decoding, Unicode, numeric limits, duplicates, structured errors | [Config](JSON.ash.json) · [Inventory](coverage/JSON.md) |
 | [HMAC](HMAC.mo) | 4 | RFC4231 SHA256/SHA512 vectors, key/padding boundaries, prepared keys, independent streams and reset | [Config](HMAC.ash.json) · [Inventory](coverage/HMAC.md) |
+| [HashLifecycle](HashLifecycle.mo) | 1 | Streaming hash states and prepared HMAC survive messages and confirmed collection, then replay exact answers | [Config](HashLifecycle.ash.json) · [Assertions](../../../../tests/crypto-audit/round5/hashes/Public.mo) |
 | [HistoryRing](HistoryRing.mo) | 8 | Sequence oracle, capacity/wrap boundaries, bulk drops, large Nats, reference release, incremental GC | [Config](HistoryRing.ash.json) · [Inventory](coverage/HistoryRing.md) |
 | [IndexedPriorityQueue](IndexedPriorityQueue.mo) | 11 | Independent model, cancellation/rescheduling, nullable keys, callback traces and reads, mixed scalar/callback dispatch, minimum-priority access | [Config](IndexedPriorityQueue.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
 | [IndexedPriorityQueueGC](IndexedPriorityQueueGC.mo) | 3 | Shared native helpers, cyclic queue/handle references, incremental GC and detached-handle reclamation | [Config](IndexedPriorityQueueGC.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
 | [Map](Map.mo) | 17 | 58 existing functions, mutable aliases, differential operations, B-tree boundaries, scalar keys | [Config](Map.ash.json) · [Inventory](coverage/Map.md) |
-| [P256](P256.mo) | 15 | RFC6979 signatures and digest reduction, SEC1/DER validation, scalar boundaries, normalization and selected Wycheproof cases | [Config](P256.ash.json) · [Inventory](coverage/P256.md) |
+| [MLDSA](MLDSA.mo) | 17 | NIST ML-DSA-44 key/signature answers, context and randomness binding, malformed encodings, aliases and GC | [Config](MLDSA.ash.json) · [Inventory](coverage/MLDSA.md) |
+| [MLDSAPrepared](MLDSAPrepared.mo) | 12 | Prepared NIST answers, interleaved handles, factory/hot-call errors, context binding and GC retention | [Config](MLDSAPrepared.ash.json) · [Inventory](coverage/MLDSAPrepared.md) |
+| [P256](P256.mo) | 22 | RFC6979 signatures, digest reduction, SEC1/DER boundaries, projective verification, prepared handles, GC and Wycheproof cases | [Config](P256.ash.json) · [Inventory](coverage/P256.md) |
+| [PreparedComposition](PreparedComposition.mo) | 1 | Six signature schemes' prepared handles in native maps, aliases and closures; confirmed collection and root release | [Config](PreparedComposition.ash.json) · [Inventory](coverage/PreparedComposition.md) |
 | [PureMap](PureMap.mo) | 22 | 100 existing functions, retained versions, ranges, algebra, builders, callback contracts | [Config](PureMap.ash.json) · [Inventory](coverage/PureMap.md) |
 | [PureSet](PureSet.mo) | 16 | All 70 functions, persistent AVL operations, rank/split/join, algebra, scalar keys | [Config](PureSet.ash.json) · [Inventory](coverage/PureSet.md) |
 | [QueueCollection](QueueCollection.mo) | 5 | Core API parity, differential sequences, chunk boundaries, shared generic payloads, native array exports | [Config](QueueCollection.ash.json) · [Inventory](coverage/QueueCollection.md) |
 | [QueueCollectionGC](QueueCollectionGC.mo) | 3 | Shared helpers, incremental GC, cleared slots and detached chunks | [Config](QueueCollectionGC.ash.json) · [Inventory](coverage/QueueCollection.md) |
 | [RIPEMD160](RIPEMD160.mo) | 4 | Independent binary answers, padding/block boundaries, immutable streaming, malformed states and million-byte input | [Config](RIPEMD160.ash.json) · [Inventory](coverage/RIPEMD160.md) |
+| [RSA](RSA.mo) | 9 | Exact OpenSSL RSA-PSS answers, CRT/key validation, malformed inputs, error precedence, aliases and GC retention | [Config](RSA.ash.json) · [Inventory](coverage/RSA.md) |
+| [RSAPrepared](RSAPrepared.mo) | 8 | Prepared verification/signing, exact OpenSSL answers, factory/hot-call errors, aliases, release and confirmed GC | [Config](RSAPrepared.ash.json) · [Inventory](coverage/RSAPrepared.md) |
 | [SHA256](SHA256.mo) | 5 | Independent known answers, padding/block boundaries, million-byte input, aliases | [Config](SHA256.ash.json) · [Inventory](coverage/SHA256.md) |
 | [SHA512](SHA512.mo) | 5 | SHA512/SHA384 known answers, padding boundaries, streaming partitions, reset and million-byte inputs | [Config](SHA512.ash.json) · [Inventory](coverage/SHA512.md) |
 | [Secp256k1](Secp256k1.mo) | 9 | SEC2 point/tweak operations, RFC6979 ECDSA, strict SEC1/DER, all BIP340 vectors, aliases and actor-frame GC retention | [Config](Secp256k1.ash.json) · [Inventory](coverage/Secp256k1.md) |
+| [Secp256k1Audit5](Secp256k1Audit5.mo) | 2 | Independent BIP340 hash-padding answers, direct/prepared parity, malformed lengths and error precedence | [Config](Secp256k1Audit5.ash.json) · [Audit](../../../../tests/crypto-audit/round5/secp256k1/README.md) |
 | [Set](Set.mo) | 15 | All 66 functions, Core semantics, B-tree removal, nested optional elements, scalar keys | [Config](Set.ash.json) · [Inventory](coverage/Set.md) |
 | [SetGC](SetGC.mo) | 2 | Shared native helpers, mixed element types, incremental GC and write barriers | [Config](SetGC.ash.json) · [Inventory](coverage/SetGC.md) |
+| [SignatureComposition](SignatureComposition.mo) | 4 | Seven plugins share signature/hash/HMAC pipelines, recover after errors and retain inputs/results across GC | [Config](SignatureComposition.ash.json) · [Inventory](coverage/SignatureComposition.md) |
 | [Smoke](Smoke.mo) | 7 | Package imports, codec results, hash pipeline, both map modules and Core conversion | [Config](Smoke.ash.json) · [Inventory](#smoke-inventory) |
-| **Total** | **308** | | |
+| **Total** | **392** | | |
 
 `CoreAPI` runs its six source methods twice, once with Core containers and once
-with Fast containers. Every other configuration names one canister. The 12 new
-crypto and Bitcoin configurations contribute 70 executions to the earlier
-20-configuration, 237-execution inventory. A method may contain many vectors;
-these totals count methods rather than individual assertions or vector rows.
+with Fast containers. Every other configuration names one canister, for 47
+configured canisters in total. Counts include the direct, prepared-key,
+composition and round-five regression suites listed above. A method may contain
+many vectors; these totals count methods rather than individual assertions or
+vector rows.
 
 `Map` now exposes 61 functions and `pure/Map` 101; `MapConversions` and
 `CoreAPI` cover their conversions and `toMap` additions. `CoreAPI` changes only

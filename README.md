@@ -28,11 +28,13 @@ Round four improves the already delivered plugins with the **same compiler and S
 |---|---:|---:|---:|
 | Ed25519 verify / 32 B | 2,308,542 | 2,169,138 | **6.04%** |
 | Secp256k1 ECDSA sign | 3,618,719 | 2,295,959 | **36.55%** |
-| Secp256k1 Schnorr sign | 5,099,447 | 2,681,364 | **47.42%** |
+| Secp256k1 Schnorr sign | 5,099,447 | 2,681,582 | **47.41%** |
 | P256 ECDSA sign | 7,252,878 | 4,791,659 | **33.93%** |
 | RSA-3072 PSS sign / digest | 447,476,438 | 400,505,033 | **10.50%** |
 | ML-DSA-44 verify / ACVP 4 | 3,810,844 | 3,656,399 | **4.05%** |
 | BLS IC single verify | 222,072,725 | 210,673,356 | **5.13%** |
+
+A [correctness followup](tests/crypto-audit/round5/README.md) fixes rare BIP340 signing boundaries and aligns portable ECDSA errors with the native contract. The Secp256k1 costs on this page include its **33 new observations across 11 unchanged workloads**; other scheme costs retain their round-four measurements.
 
 Current public-operation costs follow. Prepared keys are opaque, immutable GC-managed values; preparation is separate from the hot call. ECDSA signing rows use the existing direct APIs; dashes mean no prepared-signing API was measured.
 
@@ -42,7 +44,7 @@ Current public-operation costs follow. Prepared keys are opaque, immutable GC-ma
 | Ed25519 verify / same message | 2,169,138 | 266,515 | 1,933,663 | 1,056 | 32 / 1,112 / 32 |
 | Secp256k1 ECDSA sign / digest | 2,295,959 | — | — | — | 120 / — / — |
 | Secp256k1 ECDSA verify / digest | 2,454,026 | 484,693 | 2,202,476 | 512 | 32 / 568 / 32 |
-| Secp256k1 BIP340 sign / vector 0 | 2,681,364 | 1,308,308 | 1,375,272 | 64 | 120 / 120 / 120 |
+| Secp256k1 BIP340 sign / vector 0 | 2,681,582 | 1,308,292 | 1,375,508 | 64 | 120 / 120 / 120 |
 | Secp256k1 BIP340 verify / vector 0 | 2,413,617 | 485,205 | 2,161,731 | 512 | 32 / 568 / 32 |
 | P256 ECDSA sign / digest | 4,791,659 | — | — | — | 120 / — / — |
 | P256 ECDSA verify / digest | 11,961,908 | 19,688,627 | 3,223,424 | 16,320 | 32 / 16,376 / 32 |
@@ -58,7 +60,7 @@ Direct Ed25519 signing is unchanged. Secp256k1 Schnorr verification adds **534 i
 
 Setup matters: actual P256 preparation plus one check costs **22.91M** versus **11.96M** direct; preparation plus 100 checks costs **342.00M** versus **1,196.17M** direct. Actual Secp256k1 ECDSA preparation plus ten checks costs **22.51M** versus **24.54M** direct. These are measured batches, not setup-plus-hot estimates.
 
-Managed allocation is unchanged outside the measured BLS reductions: IC single verification **19,672 → 64 B**, Ethereum single **39,280 → 64 B**, eight-key proof-of-possession preparation **315,416 → 1,688 B**, and that aggregate's direct verification **494,840 → 181,112 B**. Prepared payload sizes are unchanged. Runtime Wasm grows **26,034 B for Secp256k1**, **14,570 B for P256**, **948 B for RSA**, **585 B for ML-DSA**, and **47,054 B for BLS**; Ed25519 shrinks **1,041 B**. Full linked-canister size changes are in the report.
+Managed allocation is unchanged outside the measured BLS reductions: IC single verification **19,672 → 64 B**, Ethereum single **39,280 → 64 B**, eight-key proof-of-possession preparation **315,416 → 1,688 B**, and that aggregate's direct verification **494,840 → 181,112 B**. Prepared payload sizes are unchanged. Runtime Wasm grows **26,909 B for Secp256k1**, **14,570 B for P256**, **948 B for RSA**, **585 B for ML-DSA**, and **47,054 B for BLS**; Ed25519 shrinks **1,041 B**. The correctness followup adds 875 runtime bytes and 872 bytes to each measured Secp256k1 canister; direct/prepared Schnorr signing adds 218/236 instructions with unchanged allocation. Full round-four linked-canister size changes remain in its report.
 
 The `ecdsa@8.0.1` library controls below are **reused from the preceding prepared-key run**, not rerun this round. They use the same compiler ELF and exact verification inputs; ratios use the current plugin costs.
 
@@ -69,7 +71,7 @@ The `ecdsa@8.0.1` library controls below are **reused from the preceding prepare
 
 Prepared ratios exclude setup. Library controls include byte parsing and validation, with reusable curve construction outside timing; P256 normalizes its high-S input internally. These valid-input comparisons do not establish identical error semantics. Allocation includes returned values and temporary garbage; payload excludes headers, and heap snapshots are not peaks or exact live-memory measurements. Ed25519 direct signing returns a Result while prepared signing returns a Blob. Digest rows exclude message hashing; schemes and security profiles differ.
 
-All **111 matched workloads / 666 fresh-canister observations** passed exact-output checks. All 23 plugin builds, packaging, combined composition, rejection and GC checks pass, alongside six independent internal scheme audits. Audits and regression tests are correctness evidence, not security guarantees.
+The round-four **111 matched workloads / 666 fresh-canister observations** passed exact-output checks. All 23 plugin builds, packaging, combined composition, rejection and GC checks pass, alongside six independent internal scheme audits. Audits and regression tests are correctness evidence, not security guarantees.
 [Full round-four results and evidence](benchmarks/crypto/round4/RESULTS.md) · [Reproduction](benchmarks/crypto/round4/README.md).
 
 <details>
