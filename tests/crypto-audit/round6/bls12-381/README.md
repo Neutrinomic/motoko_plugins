@@ -53,3 +53,30 @@ The new field operations are fixed straight-line arithmetic without
 input-dependent indexing. Exponentiation loops use only fixed public constants.
 This is a source-level constant-time review, not a formal timing proof for every
 compiler or execution engine. No validation check was removed for performance.
+
+## Validation on the combined candidate
+
+[Recorded results, commands and hashes](evidence/summary.json) identify clean
+candidate `429eed269a58481be04cac7ef07097bc03261c54`, the original matching
+compiler `9f6ebeedc` / ELF `24d8d0b9…`, and runtime `a2b0689d…`.
+All 404 build source pins and both plugin artifact hashes were checked after
+public tests completed.
+
+- 133 vendored arithmetic/group tests and 32 plugin runtime tests passed on
+  the runtime's Rust `1.99.0-nightly (da86f4d07 2026-07-24)` toolchain.
+- Six Motoko programs passed through the interpreter, IR interpreters and
+  compiled Wasm, with runtime sanity checks enabled.
+- Six public BLS methods passed on PocketIC using the Ash source checkout.
+  The installed Ash binary lacks `mocArgs` support and rejected configuration
+  before execution; the source checkout supports the existing test configs.
+- The independent algebra check passed.
+
+An isolated lowering probe extracts the exact candidate multiply-add and
+subtraction expressions and compiles them using the matching toolchain,
+custom wasm64 target and release optimization settings. The retained
+[Wasm text](evidence/lowering-probe.wat) contains no branches, loops, calls or
+selects in either arithmetic body. This checks those expressions' lowering;
+it is not a formal timing proof for the complete linked verifier.
+
+The retained native logs include existing upstream `cfg(std)` and deprecated
+`generic-array` warnings. This review did not update dependencies.
