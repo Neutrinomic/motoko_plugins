@@ -53,6 +53,9 @@ mod fp;
 #[cfg(feature = "groups")]
 mod fp2;
 #[cfg(feature = "groups")]
+#[path = "hash_to_curve/chain.rs"]
+mod fp_chain;
+#[cfg(feature = "groups")]
 mod g1;
 #[cfg(feature = "groups")]
 mod g2;
@@ -91,3 +94,6 @@ pub(crate) use digest::generic_array;
 
 #[cfg(feature = "experimental")]
 pub mod hash_to_curve;
+
+#[cfg(all(test, feature = "groups"))]
+mod plugin_round4_tests;

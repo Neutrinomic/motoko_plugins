@@ -5,7 +5,7 @@ use core::ops::Add;
 
 use subtle::Choice;
 
-pub(crate) mod chain;
+use crate::fp_chain as chain;
 
 mod expand_msg;
 pub use self::expand_msg::{

@@ -12,15 +12,30 @@ This directory vendors `bls12_381` **0.8.0** from the crates.io archive:
 
 The optional `plugin-prepared` feature adds the `plugin_prepared` module. It
 requires `pairings` and `alloc`, matching the plugin's existing dependency
-features. With the feature disabled, the existing upstream APIs and arithmetic
-are unchanged.
+features. The existing upstream public APIs are unchanged; the field optimizations
+below also apply when the prepared feature is disabled.
 
-The only edits to existing files are the feature and example declarations in
+The prepared-hook edits to existing files are the feature and example declarations in
 both Cargo manifests, the public module export in `src/lib.rs`, its child-module declaration
 in `src/pairings.rs`, and a feature-gated crate-private finite G1 constructor in
 `src/g1.rs`. `src/plugin_prepared.rs` contains the hooks and
-`src/plugin_prepared_tests.rs` contains their unit tests. No field, curve,
-Miller-loop, or final-exponentiation formulas were modified or copied.
+`src/plugin_prepared_tests.rs` contains their unit tests. The hooks reuse
+existing field, curve, Miller-loop and final-exponentiation formulas.
+
+## Fixed field exponentiation
+
+The existing upstream `chain_pm3div4` addition chain is also used by Fp square
+root/inversion and Fp2 square root. A private statically dispatched field trait
+shares the exact chain body between Fp and Fp2. For `e = (p - 3) / 4`, the
+required exponents are `e + 1`, `4e + 1` and `2e + 1`; these integer identities
+also preserve the result at zero. Existing zero, nonresidue, root-selection and
+final-square predicates are unchanged. The chain module is compiled with the
+groups feature; the unrelated hash-to-curve chain remains experimental.
+
+The binary exponent implementations are test-only differential oracles. Tests
+compare exact roots and inverses on edge cases and seeded random fields,
+including pure-real/imaginary Fp2 values and both valid and invalid roots.
+No prepared payload, external point format or group-validation rule changes.
 
 ## Payload contract
 

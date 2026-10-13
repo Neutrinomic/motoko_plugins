@@ -306,6 +306,7 @@ impl Fp {
     /// Although this is labeled "vartime", it is only
     /// variable time with respect to the exponent. It
     /// is also not exposed in the public API.
+    #[cfg(test)]
     pub fn pow_vartime(&self, by: &[u64; 6]) -> Self {
         let mut res = Self::one();
         for e in by.iter().rev() {
@@ -327,14 +328,8 @@ impl Fp {
         // works for elements that are actually quadratic residue,
         // so we check that we got the correct result at the end.
 
-        let sqrt = self.pow_vartime(&[
-            0xee7f_bfff_ffff_eaab,
-            0x07aa_ffff_ac54_ffff,
-            0xd9cc_34a8_3dac_3d89,
-            0xd91d_d2e1_3ce1_44af,
-            0x92c6_e9ed_90d2_eb35,
-            0x0680_447a_8e5f_f9a6,
-        ]);
+        // (p + 1) / 4 = (p - 3) / 4 + 1.
+        let sqrt = crate::fp_chain::chain_pm3div4(self) * self;
 
         CtOption::new(sqrt, sqrt.square().ct_eq(self))
     }
@@ -345,14 +340,9 @@ impl Fp {
     /// is zero.
     pub fn invert(&self) -> CtOption<Self> {
         // Exponentiate by p - 2
-        let t = self.pow_vartime(&[
-            0xb9fe_ffff_ffff_aaa9,
-            0x1eab_fffe_b153_ffff,
-            0x6730_d2a0_f6b0_f624,
-            0x6477_4b84_f385_12bf,
-            0x4b1b_a7b6_434b_acd7,
-            0x1a01_11ea_397f_e69a,
-        ]);
+        // p - 2 = 4 * ((p - 3) / 4) + 1. The fixed chain also maps
+        // zero to zero; the original nonzero result predicate is unchanged.
+        let t = crate::fp_chain::chain_pm3div4(self).square().square() * self;
 
         CtOption::new(t, !self.is_zero())
     }
