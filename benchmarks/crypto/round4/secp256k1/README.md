@@ -6,10 +6,12 @@ plugin. APIs, validation, deterministic signatures, caller-supplied auxiliary
 randomness and prepared-key formats are unchanged. The generator table is
 immutable; no lazy initialization or mutable global cache is added.
 
-All **168 PocketIC observations** passed: 132 across the same 11 cases and
-four incremental stages, plus 36 matched observations of actual ten-call
-batches including preparation. Every case uses three fresh-canister trials. Every
-instruction/allocation triple was identical. The [final comparison](final-comparison.json)
+The final comparison covers **17 unique matched case pairs and 102 PocketIC
+observations**: 11 individual-operation cases and six ten-call batches, each
+measured with the baseline and final plugin in three fresh canisters. Another
+66 observations cover the two intermediate optimization screens. All 168
+observations passed, and every instruction/allocation triple was identical.
+The [final comparison](final-comparison.json)
 pins both complete result/build manifests and runtime hashes. These are retained
 independent RFC6979 and official BIP340 fixtures; costs are input-specific.
 
