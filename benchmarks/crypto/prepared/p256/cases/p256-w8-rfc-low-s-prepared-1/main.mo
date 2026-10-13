@@ -1,0 +1,31 @@
+import Prim "mo:⛔";
+import P256 "mo:fast/P256";
+persistent actor {
+  transient let publicKey : Blob = "\03\60\fe\d4\ba\25\5a\9d\31\c9\61\eb\74\c6\35\6d\68\c0\49\b8\92\3b\61\fa\6c\e6\69\62\2e\60\f2\9f\b6";
+  transient let digest : Blob = "\af\2b\db\e1\aa\9b\6e\c1\e2\ad\e1\d6\94\f4\1f\c7\1a\83\1d\02\68\e9\89\15\62\11\3d\8a\62\ad\d1\bf";
+  transient let signature : Blob = "\ef\d4\8b\2a\ac\b6\a8\fd\11\40\dd\9c\d4\5e\81\d6\9d\2c\87\7b\56\aa\f9\91\c3\4d\0e\a8\4e\af\37\16\08\34\e3\6a\d2\9a\83\bf\2b\c9\38\5e\49\1d\60\99\c8\fd\f9\d1\ed\67\aa\7e\a5\f5\1f\93\78\28\57\a9";
+  transient var result : P256.Result<Bool> = #ok false;
+  transient var prepared : ?P256.PreparedPublicKey = null;
+  public func configure() : async () { let #ok(key) = P256.preparePublicKey(publicKey) else Prim.trap("prepare error"); prepared := ?key; };
+  public func run() : async {instructions : Nat64; allocated : Nat; reclaimed : Nat; outputSize : Nat} {
+    let allocatedBefore = Prim.rts_total_allocation();
+    let reclaimedBefore = Prim.rts_reclaimed();
+    let start = Prim.performanceCounter(0);
+    let ?key = prepared else Prim.trap("missing prepared key"); var i = 0; while (i < 1) { result := P256.verifyPrehashPrepared(key, digest, signature); i += 1 };
+    let stop = Prim.performanceCounter(0);
+    let allocatedAfter = Prim.rts_total_allocation();
+    let reclaimedAfter = Prim.rts_reclaimed();
+    {instructions = stop - start; allocated = allocatedAfter - allocatedBefore;
+      reclaimed = reclaimedAfter - reclaimedBefore; outputSize = 1}
+  };
+  public query func memory() : async {heapSize : Nat; memorySize : Nat; totalAllocation : Nat; reclaimed : Nat} {
+    {heapSize = Prim.rts_heap_size(); memorySize = Prim.rts_memory_size();
+      totalAllocation = Prim.rts_total_allocation(); reclaimed = Prim.rts_reclaimed()}
+  };
+  public query func bytesResult() : async Blob {
+    let answer = result;
+    let #ok(value) = answer else Prim.trap("verification error");
+    assert value == true;
+    if (value) "\01" else "\00"
+  };
+}

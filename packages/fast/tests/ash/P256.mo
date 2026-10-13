@@ -8,6 +8,14 @@ import Prim "mo:⛔";
 // SHA-256 digests are fixed independent answers, so this suite loads only P256.
 persistent actor {
   func concat(a : Blob, b : Blob) : Blob { Blob.fromArray(a.toArray().concat(b.toArray())) };
+  type RetainedPrepared = { key : P256.PreparedPublicKey; aliases : [P256.PreparedPublicKey] };
+  transient var retainedPrepared : ?RetainedPrepared = null;
+  func prepared(key : Blob) : P256.PreparedPublicKey {
+    switch (P256.preparePublicKey(key)) {
+      case (#ok value) value;
+      case (#err _) Prim.trap("unexpected prepared public key error");
+    }
+  };
   let secret : Blob = "\c9\af\a9\d8\45\ba\75\16\6b\5c\21\57\67\b1\d6\93\4e\50\c3\db\36\e8\9b\12\7b\8a\62\2b\12\0f\67\21";
   let publicCompressed : Blob = "\03\60\fe\d4\ba\25\5a\9d\31\c9\61\eb\74\c6\35\6d\68\c0\49\b8\92\3b\61\fa\6c\e6\69\62\2e\60\f2\9f\b6";
   let publicUncompressed : Blob = "\04\60\fe\d4\ba\25\5a\9d\31\c9\61\eb\74\c6\35\6d\68\c0\49\b8\92\3b\61\fa\6c\e6\69\62\2e\60\f2\9f\b6\79\03\fe\10\08\b8\bc\99\a4\1a\e9\e9\56\28\bc\64\f2\f1\b2\0c\2d\7e\9f\51\77\a3\c2\94\d4\46\22\99";
@@ -68,6 +76,57 @@ persistent actor {
     })
   };
 
+  public func test_prepared_rfc6979_aliases_and_evaluation_order() : async Test.Metrics {
+    Test.test(func() {
+      func identity<T>(value : T) : T { value };
+      let prepare = P256.preparePublicKey;
+      let verify = P256.verifyPrehashPrepared;
+      let key = prepared(publicCompressed);
+      let uncompressed = switch (prepare(publicUncompressed)) {
+        case (#ok value) value;
+        case (#err _) Prim.trap("unexpected uncompressed prepared key error");
+      };
+      let record = { key = identity(key); aliases = [key, uncompressed] };
+      func verifyWrapped(key : P256.PreparedPublicKey, digest : Blob, signature : Blob) : P256.Result<Bool> {
+        P256.verifyPrehashPrepared(key, digest, signature)
+      };
+      let callbacks : [(P256.PreparedPublicKey, Blob, Blob) -> P256.Result<Bool>] = [verifyWrapped];
+      assert callbacks[0](record.key, sampleHash, sampleSignature) == #ok true;
+      assert verify(record.aliases[0], sampleHash, sampleLowSignature) == #ok true;
+      assert verify(record.aliases[1], testHash, testSignature) == #ok true;
+      assert verify(record.key, testHash, sampleSignature) == #ok false;
+      assert verify(prepared(generatorCompressed), sampleHash, sampleSignature) == #ok false;
+      var order = 0;
+      func keyArgument() : P256.PreparedPublicKey { assert order == 0; order += 1; record.key };
+      func digestArgument() : Blob { assert order == 1; order += 1; sampleHash };
+      func signatureArgument() : Blob { assert order == 2; order += 1; sampleSignature };
+      assert verify(keyArgument(), digestArgument(), signatureArgument()) == #ok true;
+      assert order == 3;
+      // Later preparations and invalid operations cannot overwrite an earlier key.
+      ignore prepared(negativeGeneratorCompressed);
+      assert verify(record.key, "", "") == #err(#invalidDigest);
+      assert verify(record.aliases[1], sampleHash, sampleSignature) == #ok true;
+    })
+  };
+
+  public func test_prepared_digest_signature_errors_and_precedence() : async Test.Metrics {
+    Test.test(func() {
+      let key = prepared(publicCompressed);
+      let shortHash = Blob.fromArray(Array.repeat<Nat8>(0, 31));
+      for (hash in (["", shortHash, concat(sampleHash, "\00")] : [Blob]).values()) {
+        // Both malformed arguments still report the digest first.
+        assert P256.verifyPrehashPrepared(key, hash, "") == #err(#invalidDigest);
+        assert P256.verifyPrehashPrepared(key, hash, sampleSignature) == #err(#invalidDigest);
+      };
+      let bad : [Blob] = ["", "\01", concat(sampleSignature, "\00"), concat(zero, one), concat(one, zero), concat(order, one), concat(one, order), concat(allOnes, one), concat(one, allOnes)];
+      for (signature in bad.values()) {
+        assert P256.verifyPrehashPrepared(key, sampleHash, signature) == #err(#invalidSignature);
+      };
+      assert P256.verifyPrehashPrepared(key, sampleHash, concat(one, one)) == #ok false;
+      assert P256.verifyPrehashPrepared(key, sampleHash, sampleSignature) == #ok true;
+    })
+  };
+
   public func test_secret_key_ranges_and_digest_lengths() : async Test.Metrics {
     Test.test(func() {
       let invalidKeys : [Blob] = ["", zero, order, allOnes, concat(one, "\00"), "\01"];
@@ -105,10 +164,18 @@ persistent actor {
         assert P256.convertPublicKey(key, true) == #err(#invalidPublicKey);
         assert P256.convertPublicKey(key, false) == #err(#invalidPublicKey);
         assert P256.verifyPrehash(key, sampleHash, sampleSignature) == #err(#invalidPublicKey);
+        switch (P256.preparePublicKey(key)) {
+          case (#err(#invalidPublicKey)) {};
+          case _ Prim.trap("malformed SEC1 accepted by preparePublicKey");
+        };
       };
       // A correctly sized hybrid encoding of an otherwise valid point is rejected.
       let hybrid = "\07\60\fe\d4\ba\25\5a\9d\31\c9\61\eb\74\c6\35\6d\68\c0\49\b8\92\3b\61\fa\6c\e6\69\62\2e\60\f2\9f\b6\79\03\fe\10\08\b8\bc\99\a4\1a\e9\e9\56\28\bc\64\f2\f1\b2\0c\2d\7e\9f\51\77\a3\c2\94\d4\46\22\99" : Blob;
       assert P256.convertPublicKey(hybrid, true) == #err(#invalidPublicKey);
+      switch (P256.preparePublicKey(hybrid)) {
+        case (#err(#invalidPublicKey)) {};
+        case _ Prim.trap("hybrid SEC1 accepted by preparePublicKey");
+      };
     })
   };
 
@@ -197,9 +264,11 @@ persistent actor {
         // all_ff
         ("\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff", "\1f\2a\db\c5\4b\88\76\4c\27\9f\68\9f\c9\50\59\59\fc\9e\73\e8\0d\c2\08\89\a4\e0\be\91\86\5d\e7\5b\9d\10\9b\65\e2\fb\fc\0a\e4\2b\a0\b2\e5\f0\36\70\cd\45\8c\ff\48\82\df\67\83\f3\d9\3d\60\7d\17\55"),
       ];
+      let key = prepared(publicCompressed);
       for ((digest, expected) in boundaryVectors.values()) {
         assert P256.signPrehash(secret, digest) == #ok expected;
         assert P256.verifyPrehash(publicCompressed, digest, expected) == #ok true;
+        assert P256.verifyPrehashPrepared(key, digest, expected) == #ok true;
       };
       assert P256.signPrehash(secret, order) == P256.signPrehash(secret, zero);
     })
@@ -255,6 +324,73 @@ persistent actor {
     Test.test(verifySaved)
   };
 
+  public func test_prepared_keys_survive_gc_drop_and_reprepare() : async Test.Metrics {
+    func retainAcrossCollection() : async () {
+      // Allocate the key between discarded data so it belongs to a sparse,
+      // movable heap region. Its payload must be borrowed afresh after each GC.
+      ignore Prim.Array_init<Nat>(131_072, 0);
+      let source = Prim.arrayToBlob(Prim.Array_tabulate<Nat8>(publicCompressed.size(), func(i) { publicCompressed[i] }));
+      let key = prepared(source);
+      let saved : RetainedPrepared = { key; aliases = [key, key] };
+      retainedPrepared := ?saved;
+      func checkSaved() {
+        assert P256.verifyPrehashPrepared(saved.aliases[0], sampleHash, sampleSignature) == #ok true;
+        switch retainedPrepared {
+          case (?root) {
+            assert P256.verifyPrehashPrepared(root.key, sampleHash, sampleLowSignature) == #ok true;
+            assert P256.verifyPrehashPrepared(root.aliases[1], testHash, testSignature) == #ok true;
+          };
+          case null Prim.trap("prepared actor root lost across await");
+        };
+      };
+      checkSaved();
+      let reclaimedBefore = Prim.rts_reclaimed();
+      var round = 0;
+      while (round < 9) {
+        // Temporary prepared keys exercise fresh outputs and later discard;
+        // they must not overwrite any alias of the retained public key.
+        let other = prepared(generatorCompressed);
+        assert P256.verifyPrehashPrepared(other, sampleHash, sampleSignature) == #ok false;
+        assert P256.verifyPrehashPrepared(key, "", "") == #err(#invalidDigest);
+        var pressure = 0;
+        while (pressure < 8) {
+          ignore Prim.Array_init<Nat>(131_072, round + pressure);
+          pressure += 1;
+        };
+        await async {};
+        checkSaved();
+        round += 1;
+      };
+      var settle = 0;
+      while (settle < 4) { await async {}; checkSaved(); settle += 1 };
+      assert Prim.rts_reclaimed() > reclaimedBefore + 4 * 1024 * 1024;
+      retainedPrepared := null;
+      // Returning also drops the continuation-local key and record/array roots.
+    };
+    await retainAcrossCollection();
+    switch retainedPrepared { case null {}; case (?_) Prim.trap("prepared root not dropped") };
+    let reclaimedAfterDrop = Prim.rts_reclaimed();
+    var round = 0;
+    while (round < 9) {
+      var pressure = 0;
+      while (pressure < 8) {
+        ignore Prim.Array_init<Nat>(131_072, round + pressure);
+        pressure += 1;
+      };
+      await async {};
+      round += 1;
+    };
+    var settle = 0;
+    while (settle < 4) { await async {}; settle += 1 };
+    assert Prim.rts_reclaimed() > reclaimedAfterDrop + 4 * 1024 * 1024;
+    Test.test(func() {
+      let key = prepared(publicUncompressed);
+      assert P256.verifyPrehashPrepared(key, sampleHash, sampleSignature) == #ok true;
+      assert P256.verifyPrehashPrepared(key, sampleHash, sampleLowSignature) == #ok true;
+      assert P256.verifyPrehashPrepared(key, testHash, sampleSignature) == #ok false;
+    })
+  };
+
   type Vector = { id : Nat; publicKey : Blob; digest : Blob; der : Blob; compact : ?Blob; valid : Bool };
   func checkVector(v : Vector) {
     switch (v.compact) {
@@ -263,6 +399,7 @@ persistent actor {
         assert P256.signatureFromDer(v.der) == #ok expected;
         assert P256.signatureToDer(expected) == #ok(v.der);
         assert P256.verifyPrehash(v.publicKey, v.digest, expected) == #ok(v.valid);
+        assert P256.verifyPrehashPrepared(prepared(v.publicKey), v.digest, expected) == #ok(v.valid);
       };
     };
   };

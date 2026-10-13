@@ -1,4 +1,5 @@
 module V = Mo_values.Value
+module C = Mo_values.Compute_plugin
 module Curve = P256_curve
 module Z = Curve.Z
 
@@ -21,6 +22,15 @@ let valid_secret bytes =
   Z.sign value > 0 && Z.compare value curve.Curve.n < 0
 
 let evaluate name _type_arguments _types arguments = match name, arguments with
+  | "prepare_public_key", [V.Blob key] ->
+      (match Curve.ec_public_key_convert curve key true with
+      | None -> err "invalidPublicKey"
+      | Some key -> ok (C.Prepared.wrap Key_type.public_key key))
+  | "verify_prehash_prepared", [key; V.Blob digest; V.Blob signature] ->
+      let key = C.Prepared.unwrap Key_type.public_key key in
+      if String.length digest <> 32 then err "invalidDigest"
+      else if Curve.ec_compact_to_der curve signature = None then err "invalidSignature"
+      else ok (V.Bool (Curve.ec_ecdsa_verify curve key digest signature))
   | "public_key", [V.Blob secret; V.Bool compressed] ->
       blob "invalidSecretKey" (Curve.ec_public_key curve secret compressed)
   | "convert_public_key", [V.Blob key; V.Bool compressed] ->

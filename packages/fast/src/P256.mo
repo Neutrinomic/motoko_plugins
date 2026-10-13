@@ -12,6 +12,17 @@ module {
   };
   public type Result<T> = { #ok : T; #err : Error };
 
+  /// Validated public-key comb for repeated verification. Caller-owned,
+  /// immutable and garbage-collected; cannot be shared or stored as stable data.
+  public type PreparedPublicKey = Prim.P256PreparedPublicKey;
+
+  /// Validate an SEC1 public key and precompute its verification table once.
+  public let preparePublicKey = Prim.p256_prepare_public_key;
+
+  /// Verify using a prepared public key; validates digest then signature.
+  /// Accepts the same high-S and low-S signatures as verifyPrehash.
+  public let verifyPrehashPrepared = Prim.p256_verify_prehash_prepared;
+
   /// Derive a public key from an exactly 32-byte secret scalar in [1, n).
   public let publicKey = Prim.p256_public_key;
 

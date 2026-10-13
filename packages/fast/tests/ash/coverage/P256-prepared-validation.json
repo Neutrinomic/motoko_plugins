@@ -1,0 +1,744 @@
+{
+  "date_utc": "2026-10-13",
+  "status": "passed",
+  "selected_public_comb_width": 8,
+  "tests": {
+    "runner": {
+      "passed": 1,
+      "failed": 0,
+      "phases": [
+        "typecheck",
+        "interpreter",
+        "IR interpreter",
+        "lowered IR interpreter",
+        "compile",
+        "Wasm validation",
+        "Wasm execution"
+      ]
+    },
+    "nominal_type_failures": {
+      "passed": 6,
+      "failed": 0,
+      "diagnostics_reviewed": true
+    },
+    "ash": {
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "flags": [
+        "--sanity-checks",
+        "--force-gc"
+      ]
+    }
+  },
+  "gc_assertions": {
+    "retained_phase_reclaimed_bytes_greater_than": 4194304,
+    "after_drop_phase_reclaimed_bytes_greater_than": 4194304,
+    "scope": "Observed aggregate reclamation with surviving actor/continuation aliases, then collection after all saved roots are dropped and successful re-preparation. This is not exact per-handle reclamation or size measurement."
+  },
+  "inputs": {
+    "packages/fast/src/P256.mo": "ddefb9aa24746f5646afec78cac16d2bbf612bb489d0427cb5086886410cb368",
+    "packages/fast/tests/run/crypto-p256.mo": "56cb981ef9142f146b8b6f9657ec859882d043f64304889d162d28c07d0b0be9",
+    "packages/fast/tests/ash/P256.mo": "9851483f73d04a4bc019aa806d1c731c460abe1d2c5ec0beefad800d84e9f0d8",
+    "packages/fast/tests/ash/P256.ash.json": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64",
+    "packages/fast/tests/fail/crypto-p256-prepared-blob-forge.mo": "69cf3e2ba8133681a3428f5e9f389b9f04c40aa3560f1f9dd26b1802762eba9c",
+    "packages/fast/tests/fail/crypto-p256-prepared-blob-project.mo": "2666f95e8e260f38fdc1f012e84da30912668056fe07ee32e4cf255262d8c6df",
+    "packages/fast/tests/fail/crypto-p256-prepared-candid.mo": "79d32fab0b492b06ffb5de34d5187f1e643bf7c0844bbf6cfd9f68d008f939b3",
+    "packages/fast/tests/fail/crypto-p256-prepared-debug-show.mo": "3aa2144a8efb8b581239f8649e9e1441b6bf6a2ca9883eba69e8bef42e275519",
+    "packages/fast/tests/fail/crypto-p256-prepared-shared.mo": "36cc1d77112d6e386724d1026509332206aad617b380f5daa07754cb04c73297",
+    "packages/fast/tests/fail/crypto-p256-prepared-stable.mo": "fce07d31435da8310f6a16eb0f9ac494454deeff0c340a3f64346169bccd37ae",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ok": "6c5fafaf9ee418d1b7030beb4d439886f8218d1881336c42cd558b868ce50938",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ok": "c6129e40860c86f8b16867c24edef45396c28f01347a990d7a2f48b848fe4f97",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ok": "97436b55638a945c99b71838534b64f64feed59cdc2db28f075bfa51cad8814f",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ok": "1d374bcf7d940bd9a3e1d53e13ca0c8717a16b78091581b79c60df2380ba8315",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ok": "0ef001759b29a14986cb0c89ff1e91f0ad9f81c76a0d4645d88979fbbe28838b",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ok": "87e29b297dec50036e0707b42fb5cc16d009e4b30561aefb3f8c427cadd3bdab",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ok": "0f0b8715d3b4db2ec8f0b9bec0f9a306d292f2a702e8f1be5c7afd2910870fc0",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ok": "ae231cb58033fa8ac160856eb9cdd3736ec71d879d751a6f10f3c4c361962660",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ok": "13f8ca6527ab85bd7cc3fd53af60527adacb7951cf176e83b7e9802c13e86b3d",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ok": "96597ae67d1869eb70f4fbab2d2ee183bc856b1c066457977633665c7a0b75a9",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ok": "93c924e18f98cf8f592a6faff0a95952214abd90ce59564abc23914a6ca0b657",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ok": "496a21c26e7a5e7cc665986fab8b66414769de66d351d1fdd2dfc0abc7b3fbf4",
+    "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135"
+  },
+  "ash_canister_sha256": "238d5db2a6b00a22d309ec8898377fffe0a24b4d8bf8be9676511778f8e12425",
+  "runner_outputs": {
+    "packages/fast/tests/run/_out/crypto-p256.comp": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.diff-ir": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.diff-low": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.run": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.run-ir": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.run-low": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.tc": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.valid": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "packages/fast/tests/run/_out/crypto-p256.wasm-run": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "runs": {
+    "smoke": {
+      "log_path": "_build/prepared-public-validation/logs/smoke-20261013T045945.log",
+      "log_sha256": "fd95dff261925855cdeb1dc9114dd1cdbf2b96c2614c463ae7bf0bfd0759f86e",
+      "log": "P256 plugin, SDK, build-input closure and private Ash source hashes verified.\n/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/run/crypto-p256.mo.\nYou ran 1 tests in 5.117673104s\n\t --> 1 tests ran successfully.\n",
+      "provenance": {
+        "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+        "moc_version": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+        "plugin_build_manifest_sha256": "79f11f6c2f828cdcafe89437c4281710022fe2ce90a8d5ac2a805a6019c52812",
+        "plugin_artifacts": {
+          "plugin.cmxs": "966ed674806198030a1c3572b6a1eeb80934c606d6d77f90cf7946a172789b23",
+          "runtime.wasm": "0d2fa29baa9ab136ba5bd8a0cb55da5478ff6459fe1e8c02fecdc3e25dde3972"
+        },
+        "test_inputs": {
+          "packages/fast/tests/ash/P256.ash.json": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64",
+          "packages/fast/tests/ash/P256.mo": "9851483f73d04a4bc019aa806d1c731c460abe1d2c5ec0beefad800d84e9f0d8",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-forge.mo": "6608d88ae03e7faad9efc147973246fc141e57ec2889faba330cabd49d6afb30",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-project.mo": "2666f95e8e260f38fdc1f012e84da30912668056fe07ee32e4cf255262d8c6df",
+          "packages/fast/tests/fail/crypto-p256-prepared-candid.mo": "79d32fab0b492b06ffb5de34d5187f1e643bf7c0844bbf6cfd9f68d008f939b3",
+          "packages/fast/tests/fail/crypto-p256-prepared-debug-show.mo": "3aa2144a8efb8b581239f8649e9e1441b6bf6a2ca9883eba69e8bef42e275519",
+          "packages/fast/tests/fail/crypto-p256-prepared-shared.mo": "36cc1d77112d6e386724d1026509332206aad617b380f5daa07754cb04c73297",
+          "packages/fast/tests/fail/crypto-p256-prepared-stable.mo": "fce07d31435da8310f6a16eb0f9ac494454deeff0c340a3f64346169bccd37ae",
+          "packages/fast/tests/run/crypto-p256.mo": "56cb981ef9142f146b8b6f9657ec859882d043f64304889d162d28c07d0b0be9"
+        },
+        "public_module_sha256": "ddefb9aa24746f5646afec78cac16d2bbf612bb489d0427cb5086886410cb368",
+        "core_inputs": {
+          "Array.mo": "7400fd0e6d2550ddb6d01833f67a69109c617032ac445275aabc7c7d188caf8d",
+          "Base64.mo": "34bedbad18db06770823e86668a5968893124bfa6d60d8df6b8d9a9a8e15e441",
+          "Blob.mo": "25d7c07e9786f11ceb8611a32a83b8491769580024054086e4548607a67afbe4",
+          "Bool.mo": "3b606a6631f28c774e3055bc860201e56260fd32fdc5e8dc00d901506be95db5",
+          "CallerAttributes.mo": "7ac5ea306f7e4393a7830a1dd522583d3388b8dd4667db132ee77ba9ae131f66",
+          "CertifiedData.mo": "5af3182d77ab7aab2384d1f663a8cd992bbd6652aacff29c443314cf2186328f",
+          "Char.mo": "ecc2550a6c70ccbb204d216bd18a422d2fcfbb4668a89ac49aab059972902041",
+          "Cycles.mo": "9f5c1fceea47f05c43f22a1c25e8753fb7e552e36106d27bceef24b1310f4cbc",
+          "Debug.mo": "526c3f9d94e4a682917febb7b0021831a7cc345a2aa63e2499ddeda33cf63b3e",
+          "Error.mo": "2112280ea5300ae94ff9188c3bbd75a7db87f0c6eb65c2ac5bf04bc27c851d98",
+          "Float.mo": "d8b0afa56911ce8da99e26c8b0f2f149cfdea04da864805ee1af44b67ce047b7",
+          "Float32.mo": "8716c0504acb010c2f358a22896f917835377ebf16e4977e1776a26dae1d615c",
+          "Func.mo": "535991ccca8d551d48129a0b7df03ea7bd6ebf3d74b1b572259d10ce709d7d46",
+          "Int.mo": "03886964690ff75ecd4170decd67653c517dadc65d9957fc644d03e9c1cf9abb",
+          "Int16.mo": "78c72aafbc039e2c0becc824caa4181158206759d6859e83077db360bc8568c3",
+          "Int32.mo": "41d42155e753ef9fc1301c8823f255134bf2202d4a74ef33e7b7b54a8fc53af4",
+          "Int64.mo": "f1fda85af9f20b47bcbfda6eaef08c6eee11cab6e5fe3eadb2d9b1c2bcef2e65",
+          "Int8.mo": "361af007cfc333937c6bb8e238304db1a7f07a310ec3321a85b89d627f16990f",
+          "InternetComputer.mo": "969951411beb5caf7d60ba6d5e906a5c70a3b466cee42e1135d1cd3d791cb3a1",
+          "Iter.mo": "3627fbf52a392bfa76c6d6803c584b1556add077d0ad214d55802e17acf4d773",
+          "List.mo": "263c61ad591bc94f5adfc27517122ce060b9f50425b52e4e01c2d0ed1ced029d",
+          "Map.mo": "71c1dd738868479cc9770470706f6f222ac9d7b4a2743f59b33b16b31fd98ac7",
+          "Nat.mo": "78dab3e33310b766ee9066095a3e6acb1884a8dac32ae9a7cd560637d1e4ea4a",
+          "Nat16.mo": "2b04622ab82be11147130dce8968195c0d4a09b37de8f57d16580673ca780f78",
+          "Nat32.mo": "e3630af6551ae2a80f3809870f55d137c07f68092940c8d9255395504e4e81c8",
+          "Nat64.mo": "b7ea9f45a35f82c81771c1c36d99d73fdbd9e21f5b0c10e832685f7327246c5e",
+          "Nat8.mo": "e45a6ae2a55ee6ff890d556dc289816b1bdf352d52d4b3ce54e57ae795deffc2",
+          "Option.mo": "aeec94cd6954e7b8b5463a5b15abddfb56c5322cb9b9e7ac782092d5c33a8b38",
+          "Order.mo": "6c21e905e1e8c2b40cd50438218230c207d0bbec0d2514779edd76f9f84a812c",
+          "Principal.mo": "2246c14f55c5bc6968d97b551d9083522bb7a35bfac6f10f4dbcaa7ba53fbb3f",
+          "PriorityQueue.mo": "37b9906d1d5a61e520027fd2e48a77facb28ddc760d8129447d6902e037ef7ce",
+          "Queue.mo": "807ae8b4bdcaef6e37c57b65a93a04c0c5ed72f77e315e9916f5a25f62ce424f",
+          "Random.mo": "f5d48c30297b579a068af8cd8c6f4f986605e492b1b65424329a5171d1480e97",
+          "Region.mo": "741a6fae4f61e42fa0a938b00646515edfc96527341a3a2c3936d436c973798b",
+          "Result.mo": "0932722ab0187524c3c11539ccf2a1b9453438a9f3a042dde94e45d9c56a32c5",
+          "Runtime.mo": "d221bd16b45cb717cb4ef4fd698fa8632a415aecbbb5a6fdc8b5cd4bc50a9e56",
+          "Set.mo": "d64fed0989da152d0a4baa81719bef548ad3f461367d5d434d14e98cb18281f0",
+          "Stack.mo": "ed3c98fae4164ab4f934752f9adc2a92098af8f6d9fc71b16a54867cdb8787f8",
+          "Text.mo": "c23d3f2970234a9553d33aaed7907684d16b220e2cea95ebce02b25c3215e787",
+          "Time.mo": "fcffd56cbeb21c3d8613973f3f1ea382babcf122ea93c9689149f0101c5f3e96",
+          "Timer.mo": "389c247eed600fc8195ad1d9872f98fcc92faad96335c9734cf5265d573612e2",
+          "Tuples.mo": "0156c1fc21fffedd71d173e0d1b1e7a9a19726cbc49ec1cf49029d6d93bc7955",
+          "Types.mo": "00dc0132996b3bb3eaf5cc4413be78ca860137ef26f5b472b0e7b3ef68f6652f",
+          "VarArray.mo": "289e68fe216caa39d7d4829b73ccc03ed6e5e2e1d07079e3baa83b55651d1dd8",
+          "WeakReference.mo": "06e58a6d67bf67c4b31ff871416d0cf6d6e34bfb409ce73d83372ef6b74de3cf",
+          "internal/BTreeHelper.mo": "20a475baf18f924ee0297fc234469fa0985cdaa31c85ce002b5a921383b0534d",
+          "internal/PRNG.mo": "8a93e87baa2b12f613c82394a4a05b425e44a695bbace4ca36f9a1f78be26442",
+          "internal/SortHelper.mo": "fff4f2eec5c59a3db13e46eeb69152bb1b98931f45cb58ac481439a0cd0d10bb",
+          "pure/List.mo": "b4fb45cf75410461fb1501a316d2384d1be63fee1fccf11ed1d29677e5e2393c",
+          "pure/Map.mo": "e9868fc4dd5e8e6272382e33241c59f8664e3de2e618cbf62fa8b20beabecfab",
+          "pure/Queue.mo": "ed0bd0968457ea3bb24c5367f0dbdb159cfe950d0e2666224985e57a784fae3b",
+          "pure/RealTimeQueue.mo": "af133ae61c69ce4e00db5e9db53ddeccad84373fef82a156c85360c2426349dd",
+          "pure/Set.mo": "f0155b1d548cbc8889fcff75ef52f0cab7998b034621e4faac8d3b79d7bbac07"
+        },
+        "tools": {
+          "sdk_moc": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/src/_build/default/exes/moc.exe",
+            "sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2"
+          },
+          "sdk_moc_wrapper": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/wrapper.sh",
+            "sha256": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88"
+          },
+          "sdk_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts.wasm",
+            "sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f"
+          },
+          "sdk_debug_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts-debug.wasm",
+            "sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+          },
+          "didc": {
+            "path": "/home/devbox/.local/bin/didc",
+            "sha256": "40a7dc485b48d75b584c3a13dc4786bcf4d8504ee7d00e634858a9f7b245bd78"
+          },
+          "pocketic": {
+            "path": "/home/devbox/.local/bin/pocket-ic",
+            "sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+          },
+          "bun": {
+            "path": "/nix/store/4rb7w9md6573yhsyabyhvp8mbrgm7nb0-bun-1.2.13/bin/bun",
+            "sha256": "e193be242824fc6322f0a3871a6c20215b4cc7713f4e38e16760bfc41c268ab9"
+          },
+          "test_runner": {
+            "path": "/nix/store/r4hh6xx0cskpp1g2gaan3yspfcyqjhd7-test-runner-0.1.0/bin/test-runner",
+            "sha256": "8493a647613c502a04cd488cd3f598298cf7bcb84eff01194ea7405ba98af4cf"
+          }
+        }
+      },
+      "exit_code": 0
+    },
+    "verify-fail": {
+      "log_path": "_build/prepared-public-validation/logs/verify-fail-20261013T050042.log",
+      "log_sha256": "1784f813a816ad2044a90f882c29f82a6a969e77abbff490c02053745e0ec6ad",
+      "log": "P256 plugin, SDK, build-input closure and private Ash source hashes verified.\n/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-blob-forge.mo, /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-blob-project.mo, /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-candid.mo, /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-debug-show.mo, /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-shared.mo, /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/packages/fast/tests/fail/crypto-p256-prepared-stable.mo.\nYou ran 6 tests in 1.022061866s\n\t --> 6 tests ran successfully.\n",
+      "provenance": {
+        "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+        "moc_version": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+        "plugin_build_manifest_sha256": "79f11f6c2f828cdcafe89437c4281710022fe2ce90a8d5ac2a805a6019c52812",
+        "plugin_artifacts": {
+          "plugin.cmxs": "966ed674806198030a1c3572b6a1eeb80934c606d6d77f90cf7946a172789b23",
+          "runtime.wasm": "0d2fa29baa9ab136ba5bd8a0cb55da5478ff6459fe1e8c02fecdc3e25dde3972"
+        },
+        "test_inputs": {
+          "packages/fast/tests/ash/P256.ash.json": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64",
+          "packages/fast/tests/ash/P256.mo": "9851483f73d04a4bc019aa806d1c731c460abe1d2c5ec0beefad800d84e9f0d8",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc": "c6129e40860c86f8b16867c24edef45396c28f01347a990d7a2f48b848fe4f97",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc-human": "6c5fafaf9ee418d1b7030beb4d439886f8218d1881336c42cd558b868ce50938",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc": "1d374bcf7d940bd9a3e1d53e13ca0c8717a16b78091581b79c60df2380ba8315",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc-human": "97436b55638a945c99b71838534b64f64feed59cdc2db28f075bfa51cad8814f",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc": "87e29b297dec50036e0707b42fb5cc16d009e4b30561aefb3f8c427cadd3bdab",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc-human": "0ef001759b29a14986cb0c89ff1e91f0ad9f81c76a0d4645d88979fbbe28838b",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc": "ae231cb58033fa8ac160856eb9cdd3736ec71d879d751a6f10f3c4c361962660",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc-human": "0f0b8715d3b4db2ec8f0b9bec0f9a306d292f2a702e8f1be5c7afd2910870fc0",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc": "96597ae67d1869eb70f4fbab2d2ee183bc856b1c066457977633665c7a0b75a9",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc-human": "13f8ca6527ab85bd7cc3fd53af60527adacb7951cf176e83b7e9802c13e86b3d",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc": "496a21c26e7a5e7cc665986fab8b66414769de66d351d1fdd2dfc0abc7b3fbf4",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc-human": "93c924e18f98cf8f592a6faff0a95952214abd90ce59564abc23914a6ca0b657",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-forge.mo": "69cf3e2ba8133681a3428f5e9f389b9f04c40aa3560f1f9dd26b1802762eba9c",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-project.mo": "2666f95e8e260f38fdc1f012e84da30912668056fe07ee32e4cf255262d8c6df",
+          "packages/fast/tests/fail/crypto-p256-prepared-candid.mo": "79d32fab0b492b06ffb5de34d5187f1e643bf7c0844bbf6cfd9f68d008f939b3",
+          "packages/fast/tests/fail/crypto-p256-prepared-debug-show.mo": "3aa2144a8efb8b581239f8649e9e1441b6bf6a2ca9883eba69e8bef42e275519",
+          "packages/fast/tests/fail/crypto-p256-prepared-shared.mo": "36cc1d77112d6e386724d1026509332206aad617b380f5daa07754cb04c73297",
+          "packages/fast/tests/fail/crypto-p256-prepared-stable.mo": "fce07d31435da8310f6a16eb0f9ac494454deeff0c340a3f64346169bccd37ae",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ok": "6c5fafaf9ee418d1b7030beb4d439886f8218d1881336c42cd558b868ce50938",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ok": "c6129e40860c86f8b16867c24edef45396c28f01347a990d7a2f48b848fe4f97",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ok": "97436b55638a945c99b71838534b64f64feed59cdc2db28f075bfa51cad8814f",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ok": "1d374bcf7d940bd9a3e1d53e13ca0c8717a16b78091581b79c60df2380ba8315",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ok": "0ef001759b29a14986cb0c89ff1e91f0ad9f81c76a0d4645d88979fbbe28838b",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ok": "87e29b297dec50036e0707b42fb5cc16d009e4b30561aefb3f8c427cadd3bdab",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ok": "0f0b8715d3b4db2ec8f0b9bec0f9a306d292f2a702e8f1be5c7afd2910870fc0",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ok": "ae231cb58033fa8ac160856eb9cdd3736ec71d879d751a6f10f3c4c361962660",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ok": "13f8ca6527ab85bd7cc3fd53af60527adacb7951cf176e83b7e9802c13e86b3d",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ok": "96597ae67d1869eb70f4fbab2d2ee183bc856b1c066457977633665c7a0b75a9",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ok": "93c924e18f98cf8f592a6faff0a95952214abd90ce59564abc23914a6ca0b657",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ok": "496a21c26e7a5e7cc665986fab8b66414769de66d351d1fdd2dfc0abc7b3fbf4",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/run/crypto-p256.mo": "56cb981ef9142f146b8b6f9657ec859882d043f64304889d162d28c07d0b0be9"
+        },
+        "public_module_sha256": "ddefb9aa24746f5646afec78cac16d2bbf612bb489d0427cb5086886410cb368",
+        "core_inputs": {
+          "Array.mo": "7400fd0e6d2550ddb6d01833f67a69109c617032ac445275aabc7c7d188caf8d",
+          "Base64.mo": "34bedbad18db06770823e86668a5968893124bfa6d60d8df6b8d9a9a8e15e441",
+          "Blob.mo": "25d7c07e9786f11ceb8611a32a83b8491769580024054086e4548607a67afbe4",
+          "Bool.mo": "3b606a6631f28c774e3055bc860201e56260fd32fdc5e8dc00d901506be95db5",
+          "CallerAttributes.mo": "7ac5ea306f7e4393a7830a1dd522583d3388b8dd4667db132ee77ba9ae131f66",
+          "CertifiedData.mo": "5af3182d77ab7aab2384d1f663a8cd992bbd6652aacff29c443314cf2186328f",
+          "Char.mo": "ecc2550a6c70ccbb204d216bd18a422d2fcfbb4668a89ac49aab059972902041",
+          "Cycles.mo": "9f5c1fceea47f05c43f22a1c25e8753fb7e552e36106d27bceef24b1310f4cbc",
+          "Debug.mo": "526c3f9d94e4a682917febb7b0021831a7cc345a2aa63e2499ddeda33cf63b3e",
+          "Error.mo": "2112280ea5300ae94ff9188c3bbd75a7db87f0c6eb65c2ac5bf04bc27c851d98",
+          "Float.mo": "d8b0afa56911ce8da99e26c8b0f2f149cfdea04da864805ee1af44b67ce047b7",
+          "Float32.mo": "8716c0504acb010c2f358a22896f917835377ebf16e4977e1776a26dae1d615c",
+          "Func.mo": "535991ccca8d551d48129a0b7df03ea7bd6ebf3d74b1b572259d10ce709d7d46",
+          "Int.mo": "03886964690ff75ecd4170decd67653c517dadc65d9957fc644d03e9c1cf9abb",
+          "Int16.mo": "78c72aafbc039e2c0becc824caa4181158206759d6859e83077db360bc8568c3",
+          "Int32.mo": "41d42155e753ef9fc1301c8823f255134bf2202d4a74ef33e7b7b54a8fc53af4",
+          "Int64.mo": "f1fda85af9f20b47bcbfda6eaef08c6eee11cab6e5fe3eadb2d9b1c2bcef2e65",
+          "Int8.mo": "361af007cfc333937c6bb8e238304db1a7f07a310ec3321a85b89d627f16990f",
+          "InternetComputer.mo": "969951411beb5caf7d60ba6d5e906a5c70a3b466cee42e1135d1cd3d791cb3a1",
+          "Iter.mo": "3627fbf52a392bfa76c6d6803c584b1556add077d0ad214d55802e17acf4d773",
+          "List.mo": "263c61ad591bc94f5adfc27517122ce060b9f50425b52e4e01c2d0ed1ced029d",
+          "Map.mo": "71c1dd738868479cc9770470706f6f222ac9d7b4a2743f59b33b16b31fd98ac7",
+          "Nat.mo": "78dab3e33310b766ee9066095a3e6acb1884a8dac32ae9a7cd560637d1e4ea4a",
+          "Nat16.mo": "2b04622ab82be11147130dce8968195c0d4a09b37de8f57d16580673ca780f78",
+          "Nat32.mo": "e3630af6551ae2a80f3809870f55d137c07f68092940c8d9255395504e4e81c8",
+          "Nat64.mo": "b7ea9f45a35f82c81771c1c36d99d73fdbd9e21f5b0c10e832685f7327246c5e",
+          "Nat8.mo": "e45a6ae2a55ee6ff890d556dc289816b1bdf352d52d4b3ce54e57ae795deffc2",
+          "Option.mo": "aeec94cd6954e7b8b5463a5b15abddfb56c5322cb9b9e7ac782092d5c33a8b38",
+          "Order.mo": "6c21e905e1e8c2b40cd50438218230c207d0bbec0d2514779edd76f9f84a812c",
+          "Principal.mo": "2246c14f55c5bc6968d97b551d9083522bb7a35bfac6f10f4dbcaa7ba53fbb3f",
+          "PriorityQueue.mo": "37b9906d1d5a61e520027fd2e48a77facb28ddc760d8129447d6902e037ef7ce",
+          "Queue.mo": "807ae8b4bdcaef6e37c57b65a93a04c0c5ed72f77e315e9916f5a25f62ce424f",
+          "Random.mo": "f5d48c30297b579a068af8cd8c6f4f986605e492b1b65424329a5171d1480e97",
+          "Region.mo": "741a6fae4f61e42fa0a938b00646515edfc96527341a3a2c3936d436c973798b",
+          "Result.mo": "0932722ab0187524c3c11539ccf2a1b9453438a9f3a042dde94e45d9c56a32c5",
+          "Runtime.mo": "d221bd16b45cb717cb4ef4fd698fa8632a415aecbbb5a6fdc8b5cd4bc50a9e56",
+          "Set.mo": "d64fed0989da152d0a4baa81719bef548ad3f461367d5d434d14e98cb18281f0",
+          "Stack.mo": "ed3c98fae4164ab4f934752f9adc2a92098af8f6d9fc71b16a54867cdb8787f8",
+          "Text.mo": "c23d3f2970234a9553d33aaed7907684d16b220e2cea95ebce02b25c3215e787",
+          "Time.mo": "fcffd56cbeb21c3d8613973f3f1ea382babcf122ea93c9689149f0101c5f3e96",
+          "Timer.mo": "389c247eed600fc8195ad1d9872f98fcc92faad96335c9734cf5265d573612e2",
+          "Tuples.mo": "0156c1fc21fffedd71d173e0d1b1e7a9a19726cbc49ec1cf49029d6d93bc7955",
+          "Types.mo": "00dc0132996b3bb3eaf5cc4413be78ca860137ef26f5b472b0e7b3ef68f6652f",
+          "VarArray.mo": "289e68fe216caa39d7d4829b73ccc03ed6e5e2e1d07079e3baa83b55651d1dd8",
+          "WeakReference.mo": "06e58a6d67bf67c4b31ff871416d0cf6d6e34bfb409ce73d83372ef6b74de3cf",
+          "internal/BTreeHelper.mo": "20a475baf18f924ee0297fc234469fa0985cdaa31c85ce002b5a921383b0534d",
+          "internal/PRNG.mo": "8a93e87baa2b12f613c82394a4a05b425e44a695bbace4ca36f9a1f78be26442",
+          "internal/SortHelper.mo": "fff4f2eec5c59a3db13e46eeb69152bb1b98931f45cb58ac481439a0cd0d10bb",
+          "pure/List.mo": "b4fb45cf75410461fb1501a316d2384d1be63fee1fccf11ed1d29677e5e2393c",
+          "pure/Map.mo": "e9868fc4dd5e8e6272382e33241c59f8664e3de2e618cbf62fa8b20beabecfab",
+          "pure/Queue.mo": "ed0bd0968457ea3bb24c5367f0dbdb159cfe950d0e2666224985e57a784fae3b",
+          "pure/RealTimeQueue.mo": "af133ae61c69ce4e00db5e9db53ddeccad84373fef82a156c85360c2426349dd",
+          "pure/Set.mo": "f0155b1d548cbc8889fcff75ef52f0cab7998b034621e4faac8d3b79d7bbac07"
+        },
+        "tools": {
+          "sdk_moc": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/src/_build/default/exes/moc.exe",
+            "sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2"
+          },
+          "sdk_moc_wrapper": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/wrapper.sh",
+            "sha256": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88"
+          },
+          "sdk_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts.wasm",
+            "sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f"
+          },
+          "sdk_debug_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts-debug.wasm",
+            "sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+          },
+          "didc": {
+            "path": "/home/devbox/.local/bin/didc",
+            "sha256": "40a7dc485b48d75b584c3a13dc4786bcf4d8504ee7d00e634858a9f7b245bd78"
+          },
+          "pocketic": {
+            "path": "/home/devbox/.local/bin/pocket-ic",
+            "sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+          },
+          "bun": {
+            "path": "/nix/store/4rb7w9md6573yhsyabyhvp8mbrgm7nb0-bun-1.2.13/bin/bun",
+            "sha256": "e193be242824fc6322f0a3871a6c20215b4cc7713f4e38e16760bfc41c268ab9"
+          },
+          "test_runner": {
+            "path": "/nix/store/r4hh6xx0cskpp1g2gaan3yspfcyqjhd7-test-runner-0.1.0/bin/test-runner",
+            "sha256": "8493a647613c502a04cd488cd3f598298cf7bcb84eff01194ea7405ba98af4cf"
+          }
+        }
+      },
+      "exit_code": 0
+    },
+    "ash": {
+      "log_path": "_build/prepared-public-validation/logs/ash-20261013T050057.log",
+      "log_sha256": "f95248719dcb580183014d4510ad3b5b55347b760ecd93f3b6c9b62dd69a4635",
+      "log": "P256 plugin, SDK, build-input closure and private Ash source hashes verified.\n\u2139 No baseline found. Run with --set to capture the current instruction/heap metrics for future comparisons.\n    File > Test > Instructions\n\u2714 p256 > test_aliases_evaluation_order_and_retained_outputs > 47M instructions | 28 KB heap\n\u2714 p256 > test_der72_retained_across_await_and_forced_gc > 18K instructions | 192 B heap\n\u2714 p256 > test_der_conversion_and_explicit_normalization > 207K instructions | 8.97 KB heap\n\u2714 p256 > test_prepared_digest_signature_errors_and_precedence > 26M instructions | 29 KB heap\n\u2714 p256 > test_prepared_keys_survive_gc_drop_and_reprepare > 31M instructions | 16 KB heap\n\u2714 p256 > test_prepared_rfc6979_aliases_and_evaluation_order > 105M instructions | 65 KB heap\n\u2714 p256 > test_rfc6979_digest_reduction_boundaries > 124M instructions | 18 KB heap\n\u2714 p256 > test_rfc6979_key_derivation_and_sec1_conversion > 26M instructions | 1.57 KB heap\n\u2714 p256 > test_rfc6979_sha256_signatures_and_high_s_verification > 76M instructions | 744 B heap\n\u2714 p256 > test_secret_key_ranges_and_digest_lengths > 58M instructions | 7.22 KB heap\n\u2714 p256 > test_signature_scalar_ranges_and_error_precedence > 25M instructions | 16 KB heap\n\u2714 p256 > test_strict_der_rejects_nonminimal_and_malformed_values > 69K instructions | 3.81 KB heap\n\u2714 p256 > test_strict_sec1_rejects_invalid_points > 5.15M instructions | 208 KB heap\n\u2714 p256 > test_wycheproof_1 > 139M instructions | 69 KB heap\n\u2714 p256 > test_wycheproof_2 > 203M instructions | 101 KB heap\n\u2714 p256 > test_wycheproof_3 > 338M instructions | 167 KB heap\n\u2714 p256 > test_wycheproof_4 > 417M instructions | 200 KB heap\n\u2714 p256 > test_wycheproof_5 > 311M instructions | 151 KB heap\n\u2139 Summary: 18 succeeded, 0 failed, 0 skipped, 18 total\n",
+      "provenance": {
+        "sdk_revision": "9f6ebeedc547e389a0529b4c91442e46b88fcbe0",
+        "moc_version": "Motoko compiler (source 2.0.0-16-g9f6ebeedc)",
+        "plugin_build_manifest_sha256": "79f11f6c2f828cdcafe89437c4281710022fe2ce90a8d5ac2a805a6019c52812",
+        "plugin_artifacts": {
+          "plugin.cmxs": "966ed674806198030a1c3572b6a1eeb80934c606d6d77f90cf7946a172789b23",
+          "runtime.wasm": "0d2fa29baa9ab136ba5bd8a0cb55da5478ff6459fe1e8c02fecdc3e25dde3972"
+        },
+        "test_inputs": {
+          "packages/fast/tests/ash/P256.ash.json": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64",
+          "packages/fast/tests/ash/P256.mo": "9851483f73d04a4bc019aa806d1c731c460abe1d2c5ec0beefad800d84e9f0d8",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc": "c6129e40860c86f8b16867c24edef45396c28f01347a990d7a2f48b848fe4f97",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc-human": "6c5fafaf9ee418d1b7030beb4d439886f8218d1881336c42cd558b868ce50938",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-forge.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc": "1d374bcf7d940bd9a3e1d53e13ca0c8717a16b78091581b79c60df2380ba8315",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc-human": "97436b55638a945c99b71838534b64f64feed59cdc2db28f075bfa51cad8814f",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-blob-project.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc": "87e29b297dec50036e0707b42fb5cc16d009e4b30561aefb3f8c427cadd3bdab",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc-human": "0ef001759b29a14986cb0c89ff1e91f0ad9f81c76a0d4645d88979fbbe28838b",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-candid.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc": "ae231cb58033fa8ac160856eb9cdd3736ec71d879d751a6f10f3c4c361962660",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc-human": "0f0b8715d3b4db2ec8f0b9bec0f9a306d292f2a702e8f1be5c7afd2910870fc0",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-debug-show.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc": "96597ae67d1869eb70f4fbab2d2ee183bc856b1c066457977633665c7a0b75a9",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc-human": "13f8ca6527ab85bd7cc3fd53af60527adacb7951cf176e83b7e9802c13e86b3d",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-shared.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc": "496a21c26e7a5e7cc665986fab8b66414769de66d351d1fdd2dfc0abc7b3fbf4",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc-human": "93c924e18f98cf8f592a6faff0a95952214abd90ce59564abc23914a6ca0b657",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc-human.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/_out/crypto-p256-prepared-stable.tc.ret": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-forge.mo": "69cf3e2ba8133681a3428f5e9f389b9f04c40aa3560f1f9dd26b1802762eba9c",
+          "packages/fast/tests/fail/crypto-p256-prepared-blob-project.mo": "2666f95e8e260f38fdc1f012e84da30912668056fe07ee32e4cf255262d8c6df",
+          "packages/fast/tests/fail/crypto-p256-prepared-candid.mo": "79d32fab0b492b06ffb5de34d5187f1e643bf7c0844bbf6cfd9f68d008f939b3",
+          "packages/fast/tests/fail/crypto-p256-prepared-debug-show.mo": "3aa2144a8efb8b581239f8649e9e1441b6bf6a2ca9883eba69e8bef42e275519",
+          "packages/fast/tests/fail/crypto-p256-prepared-shared.mo": "36cc1d77112d6e386724d1026509332206aad617b380f5daa07754cb04c73297",
+          "packages/fast/tests/fail/crypto-p256-prepared-stable.mo": "fce07d31435da8310f6a16eb0f9ac494454deeff0c340a3f64346169bccd37ae",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ok": "6c5fafaf9ee418d1b7030beb4d439886f8218d1881336c42cd558b868ce50938",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ok": "c6129e40860c86f8b16867c24edef45396c28f01347a990d7a2f48b848fe4f97",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-forge.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ok": "97436b55638a945c99b71838534b64f64feed59cdc2db28f075bfa51cad8814f",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ok": "1d374bcf7d940bd9a3e1d53e13ca0c8717a16b78091581b79c60df2380ba8315",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-blob-project.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ok": "0ef001759b29a14986cb0c89ff1e91f0ad9f81c76a0d4645d88979fbbe28838b",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ok": "87e29b297dec50036e0707b42fb5cc16d009e4b30561aefb3f8c427cadd3bdab",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-candid.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ok": "0f0b8715d3b4db2ec8f0b9bec0f9a306d292f2a702e8f1be5c7afd2910870fc0",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ok": "ae231cb58033fa8ac160856eb9cdd3736ec71d879d751a6f10f3c4c361962660",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-debug-show.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ok": "13f8ca6527ab85bd7cc3fd53af60527adacb7951cf176e83b7e9802c13e86b3d",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ok": "96597ae67d1869eb70f4fbab2d2ee183bc856b1c066457977633665c7a0b75a9",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-shared.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ok": "93c924e18f98cf8f592a6faff0a95952214abd90ce59564abc23914a6ca0b657",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ok": "496a21c26e7a5e7cc665986fab8b66414769de66d351d1fdd2dfc0abc7b3fbf4",
+          "packages/fast/tests/fail/ok/crypto-p256-prepared-stable.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+          "packages/fast/tests/run/crypto-p256.mo": "56cb981ef9142f146b8b6f9657ec859882d043f64304889d162d28c07d0b0be9"
+        },
+        "public_module_sha256": "ddefb9aa24746f5646afec78cac16d2bbf612bb489d0427cb5086886410cb368",
+        "core_inputs": {
+          "Array.mo": "7400fd0e6d2550ddb6d01833f67a69109c617032ac445275aabc7c7d188caf8d",
+          "Base64.mo": "34bedbad18db06770823e86668a5968893124bfa6d60d8df6b8d9a9a8e15e441",
+          "Blob.mo": "25d7c07e9786f11ceb8611a32a83b8491769580024054086e4548607a67afbe4",
+          "Bool.mo": "3b606a6631f28c774e3055bc860201e56260fd32fdc5e8dc00d901506be95db5",
+          "CallerAttributes.mo": "7ac5ea306f7e4393a7830a1dd522583d3388b8dd4667db132ee77ba9ae131f66",
+          "CertifiedData.mo": "5af3182d77ab7aab2384d1f663a8cd992bbd6652aacff29c443314cf2186328f",
+          "Char.mo": "ecc2550a6c70ccbb204d216bd18a422d2fcfbb4668a89ac49aab059972902041",
+          "Cycles.mo": "9f5c1fceea47f05c43f22a1c25e8753fb7e552e36106d27bceef24b1310f4cbc",
+          "Debug.mo": "526c3f9d94e4a682917febb7b0021831a7cc345a2aa63e2499ddeda33cf63b3e",
+          "Error.mo": "2112280ea5300ae94ff9188c3bbd75a7db87f0c6eb65c2ac5bf04bc27c851d98",
+          "Float.mo": "d8b0afa56911ce8da99e26c8b0f2f149cfdea04da864805ee1af44b67ce047b7",
+          "Float32.mo": "8716c0504acb010c2f358a22896f917835377ebf16e4977e1776a26dae1d615c",
+          "Func.mo": "535991ccca8d551d48129a0b7df03ea7bd6ebf3d74b1b572259d10ce709d7d46",
+          "Int.mo": "03886964690ff75ecd4170decd67653c517dadc65d9957fc644d03e9c1cf9abb",
+          "Int16.mo": "78c72aafbc039e2c0becc824caa4181158206759d6859e83077db360bc8568c3",
+          "Int32.mo": "41d42155e753ef9fc1301c8823f255134bf2202d4a74ef33e7b7b54a8fc53af4",
+          "Int64.mo": "f1fda85af9f20b47bcbfda6eaef08c6eee11cab6e5fe3eadb2d9b1c2bcef2e65",
+          "Int8.mo": "361af007cfc333937c6bb8e238304db1a7f07a310ec3321a85b89d627f16990f",
+          "InternetComputer.mo": "969951411beb5caf7d60ba6d5e906a5c70a3b466cee42e1135d1cd3d791cb3a1",
+          "Iter.mo": "3627fbf52a392bfa76c6d6803c584b1556add077d0ad214d55802e17acf4d773",
+          "List.mo": "263c61ad591bc94f5adfc27517122ce060b9f50425b52e4e01c2d0ed1ced029d",
+          "Map.mo": "71c1dd738868479cc9770470706f6f222ac9d7b4a2743f59b33b16b31fd98ac7",
+          "Nat.mo": "78dab3e33310b766ee9066095a3e6acb1884a8dac32ae9a7cd560637d1e4ea4a",
+          "Nat16.mo": "2b04622ab82be11147130dce8968195c0d4a09b37de8f57d16580673ca780f78",
+          "Nat32.mo": "e3630af6551ae2a80f3809870f55d137c07f68092940c8d9255395504e4e81c8",
+          "Nat64.mo": "b7ea9f45a35f82c81771c1c36d99d73fdbd9e21f5b0c10e832685f7327246c5e",
+          "Nat8.mo": "e45a6ae2a55ee6ff890d556dc289816b1bdf352d52d4b3ce54e57ae795deffc2",
+          "Option.mo": "aeec94cd6954e7b8b5463a5b15abddfb56c5322cb9b9e7ac782092d5c33a8b38",
+          "Order.mo": "6c21e905e1e8c2b40cd50438218230c207d0bbec0d2514779edd76f9f84a812c",
+          "Principal.mo": "2246c14f55c5bc6968d97b551d9083522bb7a35bfac6f10f4dbcaa7ba53fbb3f",
+          "PriorityQueue.mo": "37b9906d1d5a61e520027fd2e48a77facb28ddc760d8129447d6902e037ef7ce",
+          "Queue.mo": "807ae8b4bdcaef6e37c57b65a93a04c0c5ed72f77e315e9916f5a25f62ce424f",
+          "Random.mo": "f5d48c30297b579a068af8cd8c6f4f986605e492b1b65424329a5171d1480e97",
+          "Region.mo": "741a6fae4f61e42fa0a938b00646515edfc96527341a3a2c3936d436c973798b",
+          "Result.mo": "0932722ab0187524c3c11539ccf2a1b9453438a9f3a042dde94e45d9c56a32c5",
+          "Runtime.mo": "d221bd16b45cb717cb4ef4fd698fa8632a415aecbbb5a6fdc8b5cd4bc50a9e56",
+          "Set.mo": "d64fed0989da152d0a4baa81719bef548ad3f461367d5d434d14e98cb18281f0",
+          "Stack.mo": "ed3c98fae4164ab4f934752f9adc2a92098af8f6d9fc71b16a54867cdb8787f8",
+          "Text.mo": "c23d3f2970234a9553d33aaed7907684d16b220e2cea95ebce02b25c3215e787",
+          "Time.mo": "fcffd56cbeb21c3d8613973f3f1ea382babcf122ea93c9689149f0101c5f3e96",
+          "Timer.mo": "389c247eed600fc8195ad1d9872f98fcc92faad96335c9734cf5265d573612e2",
+          "Tuples.mo": "0156c1fc21fffedd71d173e0d1b1e7a9a19726cbc49ec1cf49029d6d93bc7955",
+          "Types.mo": "00dc0132996b3bb3eaf5cc4413be78ca860137ef26f5b472b0e7b3ef68f6652f",
+          "VarArray.mo": "289e68fe216caa39d7d4829b73ccc03ed6e5e2e1d07079e3baa83b55651d1dd8",
+          "WeakReference.mo": "06e58a6d67bf67c4b31ff871416d0cf6d6e34bfb409ce73d83372ef6b74de3cf",
+          "internal/BTreeHelper.mo": "20a475baf18f924ee0297fc234469fa0985cdaa31c85ce002b5a921383b0534d",
+          "internal/PRNG.mo": "8a93e87baa2b12f613c82394a4a05b425e44a695bbace4ca36f9a1f78be26442",
+          "internal/SortHelper.mo": "fff4f2eec5c59a3db13e46eeb69152bb1b98931f45cb58ac481439a0cd0d10bb",
+          "pure/List.mo": "b4fb45cf75410461fb1501a316d2384d1be63fee1fccf11ed1d29677e5e2393c",
+          "pure/Map.mo": "e9868fc4dd5e8e6272382e33241c59f8664e3de2e618cbf62fa8b20beabecfab",
+          "pure/Queue.mo": "ed0bd0968457ea3bb24c5367f0dbdb159cfe950d0e2666224985e57a784fae3b",
+          "pure/RealTimeQueue.mo": "af133ae61c69ce4e00db5e9db53ddeccad84373fef82a156c85360c2426349dd",
+          "pure/Set.mo": "f0155b1d548cbc8889fcff75ef52f0cab7998b034621e4faac8d3b79d7bbac07"
+        },
+        "tools": {
+          "sdk_moc": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/src/_build/default/exes/moc.exe",
+            "sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2"
+          },
+          "sdk_moc_wrapper": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/wrapper.sh",
+            "sha256": "49ccd224b4c5566ed2fa8dcbcd6c6766dfcb9a2199111a010d6ef6eb672cca88"
+          },
+          "sdk_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts.wasm",
+            "sha256": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f"
+          },
+          "sdk_debug_rts": {
+            "path": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/rts/mo-rts-debug.wasm",
+            "sha256": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+          },
+          "didc": {
+            "path": "/home/devbox/.local/bin/didc",
+            "sha256": "40a7dc485b48d75b584c3a13dc4786bcf4d8504ee7d00e634858a9f7b245bd78"
+          },
+          "pocketic": {
+            "path": "/home/devbox/.local/bin/pocket-ic",
+            "sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+          },
+          "bun": {
+            "path": "/nix/store/4rb7w9md6573yhsyabyhvp8mbrgm7nb0-bun-1.2.13/bin/bun",
+            "sha256": "e193be242824fc6322f0a3871a6c20215b4cc7713f4e38e16760bfc41c268ab9"
+          },
+          "test_runner": {
+            "path": "/nix/store/r4hh6xx0cskpp1g2gaan3yspfcyqjhd7-test-runner-0.1.0/bin/test-runner",
+            "sha256": "8493a647613c502a04cd488cd3f598298cf7bcb84eff01194ea7405ba98af4cf"
+          }
+        }
+      },
+      "exit_code": 0
+    }
+  },
+  "ash_source_provenance": {
+    "ash_source": "/srv/shared/code/ash",
+    "ash_revision": "43af862e510e526b9bb82a56c8be137052e7dbe6",
+    "ash_status_at_copy": " M README.md\n M ash.schema.json\n M bun.lock\n M package.json\nA  problems/1_document_genius_workflow.jsonl\nA  problems/2_context_vectors_cli.jsonl\nMD src/commands/genius.ts\n M src/config.ts\n D src/genius/config.ts\n M src/index.ts\n M src/moc.ts\n M src/pocketic.ts\n M src/types.ts\n?? test/\n",
+    "sdk_moc_override": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/moc",
+    "node_modules": "/srv/shared/code/ash/node_modules",
+    "change": "Only the copied binaries.ts resolver selects private SDK moc. didc, PocketIC and global toolchain files are unchanged.",
+    "files": {
+      "ash.schema.json": {
+        "original_sha256": "176056882f679d458bd612e2160355d6dc9938b3364900a5b3069835e30cc4d1",
+        "copied_sha256": "176056882f679d458bd612e2160355d6dc9938b3364900a5b3069835e30cc4d1"
+      },
+      "bun.lock": {
+        "original_sha256": "4dc090b00d3bf3907a6be698fde7309888324d6bcce8dd4e817a7bf6131916a7",
+        "copied_sha256": "4dc090b00d3bf3907a6be698fde7309888324d6bcce8dd4e817a7bf6131916a7"
+      },
+      "package.json": {
+        "original_sha256": "e9e17b48fa101c983f42eb8d3d0838dafcdeb48884e3856b0a584a7c6765b5ef",
+        "copied_sha256": "e9e17b48fa101c983f42eb8d3d0838dafcdeb48884e3856b0a584a7c6765b5ef"
+      },
+      "src/binaries.ts": {
+        "original_sha256": "2fc3e97d9b710ffcf4b6650aeab75fc75a6ac0a79701a0d184571f72c6cf3e40",
+        "copied_sha256": "76acc38d41995d15abc410b6745b862c3b86b7cd2f309aab32c0cd8a0b9b83ee"
+      },
+      "src/canisters.ts": {
+        "original_sha256": "c9985fb7fe49db46bc11ee9aea63a2fa5500d4dc28405b564641bbf1c966810d",
+        "copied_sha256": "c9985fb7fe49db46bc11ee9aea63a2fa5500d4dc28405b564641bbf1c966810d"
+      },
+      "src/commands/build.ts": {
+        "original_sha256": "af94027a7126603925abb8bd14a774a12136da0512e661830179f27ad2d915b5",
+        "copied_sha256": "af94027a7126603925abb8bd14a774a12136da0512e661830179f27ad2d915b5"
+      },
+      "src/commands/doc.ts": {
+        "original_sha256": "954c3c54c931c2d4997066a24de7286a395ba6729c95dd1011643ba972377052",
+        "copied_sha256": "954c3c54c931c2d4997066a24de7286a395ba6729c95dd1011643ba972377052"
+      },
+      "src/commands/pkg.ts": {
+        "original_sha256": "7426f304249bb74134079a4bfb0c09a1c97c11ea8318bf2607b628a21e857d0b",
+        "copied_sha256": "7426f304249bb74134079a4bfb0c09a1c97c11ea8318bf2607b628a21e857d0b"
+      },
+      "src/commands/test.ts": {
+        "original_sha256": "113a6b78acedcf484138eb1b5288560033265d7dc0d162692da960c4032e053c",
+        "copied_sha256": "113a6b78acedcf484138eb1b5288560033265d7dc0d162692da960c4032e053c"
+      },
+      "src/commands/toolchain.ts": {
+        "original_sha256": "aaf24bf808bb6e8cfd101e0bc06031a2c90922d303af52cc112c8f056dde0ed9",
+        "copied_sha256": "aaf24bf808bb6e8cfd101e0bc06031a2c90922d303af52cc112c8f056dde0ed9"
+      },
+      "src/commands/typecheck.ts": {
+        "original_sha256": "49db4e91a8197e93c43fa7f79e18f613c34aff3fad005daf1fd92ba902a6ade8",
+        "copied_sha256": "49db4e91a8197e93c43fa7f79e18f613c34aff3fad005daf1fd92ba902a6ade8"
+      },
+      "src/config.ts": {
+        "original_sha256": "e1027404e185614884176cffbea977fedb9a14d325f5ecdecc8d1d88a80c4069",
+        "copied_sha256": "e1027404e185614884176cffbea977fedb9a14d325f5ecdecc8d1d88a80c4069"
+      },
+      "src/declarations/ashpack/service.did": {
+        "original_sha256": "6318359ffbfa69984041cee196b6e93eb9c3c343dcb9f55a8016bec3a185e198",
+        "copied_sha256": "6318359ffbfa69984041cee196b6e93eb9c3c343dcb9f55a8016bec3a185e198"
+      },
+      "src/declarations/ashpack/service.did.d.ts": {
+        "original_sha256": "6d31494548bca9ae355519415df401289f46b1e21f333ec06401254275560e1b",
+        "copied_sha256": "6d31494548bca9ae355519415df401289f46b1e21f333ec06401254275560e1b"
+      },
+      "src/declarations/ashpack/service.did.js": {
+        "original_sha256": "828ecf484662a0b9662ab510b80d160a232918843c0da618c4c023758c19ebde",
+        "copied_sha256": "828ecf484662a0b9662ab510b80d160a232918843c0da618c4c023758c19ebde"
+      },
+      "src/deploy.ts": {
+        "original_sha256": "3a14569b5812f3529f35ff2b9d24249d38601c04686f2cfce052ec22e4863fce",
+        "copied_sha256": "3a14569b5812f3529f35ff2b9d24249d38601c04686f2cfce052ec22e4863fce"
+      },
+      "src/didc.ts": {
+        "original_sha256": "0c2360bca48a7b7c71a97f420b9f5a1a36fd4e8deea1603473ae6e1b7ff21c5c",
+        "copied_sha256": "0c2360bca48a7b7c71a97f420b9f5a1a36fd4e8deea1603473ae6e1b7ff21c5c"
+      },
+      "src/identity.ts": {
+        "original_sha256": "2e5c45348ab17e18426b107a6384135356f86cc6451e490ed1b7bfe7126c9088",
+        "copied_sha256": "2e5c45348ab17e18426b107a6384135356f86cc6451e490ed1b7bfe7126c9088"
+      },
+      "src/index.ts": {
+        "original_sha256": "0d38f643922c8dad8300cb7f3ebc8bce7d6f443a9f6b1594760b4bd2d18b8048",
+        "copied_sha256": "0d38f643922c8dad8300cb7f3ebc8bce7d6f443a9f6b1594760b4bd2d18b8048"
+      },
+      "src/moc.ts": {
+        "original_sha256": "45f070c2e3e04591db2a143777d7b4c236d64e9c0716454729759b805782e3b6",
+        "copied_sha256": "45f070c2e3e04591db2a143777d7b4c236d64e9c0716454729759b805782e3b6"
+      },
+      "src/paths.ts": {
+        "original_sha256": "1a84439f24f238fba62d20ae81432d6f8a69830a25cf4b36487427c62b68bdc8",
+        "copied_sha256": "1a84439f24f238fba62d20ae81432d6f8a69830a25cf4b36487427c62b68bdc8"
+      },
+      "src/pkg/ashpack-client.ts": {
+        "original_sha256": "d4cba89bfc33710ff97dc48ad351d935cd308c9210cdd755a9605bd7f6e1ef77",
+        "copied_sha256": "d4cba89bfc33710ff97dc48ad351d935cd308c9210cdd755a9605bd7f6e1ef77"
+      },
+      "src/pkg/cache.ts": {
+        "original_sha256": "b9092906a8c51072ee0a7325d0465c8a765fb142d3d9ae9062479bb9bb748997",
+        "copied_sha256": "b9092906a8c51072ee0a7325d0465c8a765fb142d3d9ae9062479bb9bb748997"
+      },
+      "src/pkg/embedding.ts": {
+        "original_sha256": "1253fb5c6375c8aa31ea0ba962297d0a1d7fedc331cd70e0a577a7d29c733cfc",
+        "copied_sha256": "1253fb5c6375c8aa31ea0ba962297d0a1d7fedc331cd70e0a577a7d29c733cfc"
+      },
+      "src/pkg/lockfile.ts": {
+        "original_sha256": "be9bdaa1fe1ab242fd4267dd1d36c31ba3d1824ba62a2d6f6c29a201cf7e1e88",
+        "copied_sha256": "be9bdaa1fe1ab242fd4267dd1d36c31ba3d1824ba62a2d6f6c29a201cf7e1e88"
+      },
+      "src/pkg/modules.ts": {
+        "original_sha256": "1f5f6eac05bc90bf56faeb357fa74ccc486fc121dbb99454ef471763dfe9871d",
+        "copied_sha256": "1f5f6eac05bc90bf56faeb357fa74ccc486fc121dbb99454ef471763dfe9871d"
+      },
+      "src/pkg/resolver.ts": {
+        "original_sha256": "385b827047bc1f1a91ce890379a82eaf30c22c48442c206f34c56acb9052f022",
+        "copied_sha256": "385b827047bc1f1a91ce890379a82eaf30c22c48442c206f34c56acb9052f022"
+      },
+      "src/pkg/service.ts": {
+        "original_sha256": "0f0ea508acc58f74fba60aabe5f32a6f25a51057d80618aa94881a78908e30aa",
+        "copied_sha256": "0f0ea508acc58f74fba60aabe5f32a6f25a51057d80618aa94881a78908e30aa"
+      },
+      "src/pkg/types.ts": {
+        "original_sha256": "3dd3de090d7ce40635d8457d64b06b86c1bbdd3098b7b374d283851382ed7015",
+        "copied_sha256": "3dd3de090d7ce40635d8457d64b06b86c1bbdd3098b7b374d283851382ed7015"
+      },
+      "src/pkg/workspace.ts": {
+        "original_sha256": "f5a074228685ca77f78e580650d457682c029c218fae81884a93de697a30e0a0",
+        "copied_sha256": "f5a074228685ca77f78e580650d457682c029c218fae81884a93de697a30e0a0"
+      },
+      "src/pkg.ts": {
+        "original_sha256": "e2d2014c63f3bf08a34c178e2c2709d122c92f8b874daf05b8e293a4aabb7c88",
+        "copied_sha256": "e2d2014c63f3bf08a34c178e2c2709d122c92f8b874daf05b8e293a4aabb7c88"
+      },
+      "src/pocketic.ts": {
+        "original_sha256": "8bf509e1d94267549e557191d4c4c2e3839211420fd7a2799f8a9546e93badad",
+        "copied_sha256": "8bf509e1d94267549e557191d4c4c2e3839211420fd7a2799f8a9546e93badad"
+      },
+      "src/runtime.ts": {
+        "original_sha256": "3328719962a85bdf7fadf76865c6a2d0ceedb2c4cc6523ddd5ae9b375cdc3975",
+        "copied_sha256": "3328719962a85bdf7fadf76865c6a2d0ceedb2c4cc6523ddd5ae9b375cdc3975"
+      },
+      "src/schema.ts": {
+        "original_sha256": "c42ed4e90e75f8c025462587603c823fc3800977dbec80e903986d6d6495cb4f",
+        "copied_sha256": "c42ed4e90e75f8c025462587603c823fc3800977dbec80e903986d6d6495cb4f"
+      },
+      "src/test-harness.ts": {
+        "original_sha256": "f034e8ab2b4cabadb187b6dda2355267a910ae0fc10fb7a87ef57a6ae518d693",
+        "copied_sha256": "f034e8ab2b4cabadb187b6dda2355267a910ae0fc10fb7a87ef57a6ae518d693"
+      },
+      "src/types.ts": {
+        "original_sha256": "c6d77c4999abb607cb4e9f96cd872b65c5aeeb44f49ca3f203b73aea7b765aa1",
+        "copied_sha256": "c6d77c4999abb607cb4e9f96cd872b65c5aeeb44f49ca3f203b73aea7b765aa1"
+      },
+      "src/utils/colors.ts": {
+        "original_sha256": "4ec0d2ef0a6ec341efefe582278c8dfcb6149ca96f3abf47551e3cf3d3a6ef09",
+        "copied_sha256": "4ec0d2ef0a6ec341efefe582278c8dfcb6149ca96f3abf47551e3cf3d3a6ef09"
+      },
+      "src/utils/exec.ts": {
+        "original_sha256": "396c1f3f8a8c3856572bae8964ba00aad976602bd8964d7901680a0b91b6d7f3",
+        "copied_sha256": "396c1f3f8a8c3856572bae8964ba00aad976602bd8964d7901680a0b91b6d7f3"
+      },
+      "src/utils/fs.ts": {
+        "original_sha256": "1bb3e5c2d058c6247cf069c5edd7c2fa33fd2ca66b6105a3cadc714631904e76",
+        "copied_sha256": "1bb3e5c2d058c6247cf069c5edd7c2fa33fd2ca66b6105a3cadc714631904e76"
+      },
+      "src/utils/hash.ts": {
+        "original_sha256": "297eed34edcb1e29cd74b16c4fa80dfa58cbf92002baf58ffdb8efd695859f88",
+        "copied_sha256": "297eed34edcb1e29cd74b16c4fa80dfa58cbf92002baf58ffdb8efd695859f88"
+      },
+      "src/utils/platform.ts": {
+        "original_sha256": "3c2017f31b3106cdf74fb8957fbddcfba6eea8e40a7ec4a1789bbadc6a577792",
+        "copied_sha256": "3c2017f31b3106cdf74fb8957fbddcfba6eea8e40a7ec4a1789bbadc6a577792"
+      },
+      "src/utils/time.ts": {
+        "original_sha256": "f55ec570a08298c192fa856b09d70b14c15756c6dfc2e1f34e597241967fa735",
+        "copied_sha256": "f55ec570a08298c192fa856b09d70b14c15756c6dfc2e1f34e597241967fa735"
+      }
+    }
+  },
+  "harness": {
+    "COMMANDS.md": "# Prepared P256 public validation\n\nRun only after the integration owner grants a slot. Every phase checks the\nfrozen width-8 runtime SHA-256, matching SDK compiler, plugin build inputs and\nprivate Ash sources, and writes tool/artifact/input hashes alongside the log.\n\nFrom `/srv/shared/code/motoko_experiments/prepared-crypto/sdk`, sequentially:\n\n```sh\nnix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/_build/prepared-public-validation/run.sh smoke\nnix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/_build/prepared-public-validation/run.sh accept-fail\n```\n\nReview the six generated diagnostics, then:\n\n```sh\nnix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/_build/prepared-public-validation/run.sh verify-fail\nnix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256/_build/prepared-public-validation/run.sh ash\n```\n\nThe runner uses one worker and the exact SDK/bin/moc wrapper, which resolves\nSDK/src/moc and SDK/rts/mo-rts{,-debug}.wasm. Ash is copied locally, with only its\nbinary resolver changed to select that same wrapper. didc and PocketIC retain\nthe existing source Ash resolution and are hashed in each provenance record.\nNo global binary or home variable changes. The local ignored .mops symlink\nselects the existing core@2.5.0 checkout without installing dependencies.\n\nAsh runs the committed 18-method P256 suite with --force-gc and --sanity-checks.\nThe retained prepared-key test requires observed reclamation, including a\nsecond collection after dropping every saved actor/continuation root.\n",
+    "run.sh": "#!/usr/bin/env bash\nset -euo pipefail\np256_root=/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256\np256_sdk=/srv/shared/code/motoko_experiments/prepared-crypto/sdk\nphase=${1:-}\ncase \"$phase\" in smoke|accept-fail|verify-fail|ash) ;; *) echo 'usage: run.sh {smoke|accept-fail|verify-fail|ash}' >&2; exit 2;; esac\nmkdir -p \"$p256_root/_build/prepared-public-validation/logs\"\np256_timestamp=$(date -u +%Y%m%dT%H%M%S)\np256_log=\"$p256_root/_build/prepared-public-validation/logs/$phase-$p256_timestamp.log\"\nexport MOTOKO_ROOT=\"$p256_sdk\"\nexport PATH=\"$p256_sdk/bin:$PATH\"\ncd \"$p256_sdk\"\nrun_phase() {\n  python3 \"$p256_root/_build/prepared-public-validation/preflight.py\" \"$p256_log.provenance.json\" || return $?\n  case \"$phase\" in\n    smoke)\n      test-runner -b -j 1 \"$p256_root/packages/fast/tests/run/crypto-p256.mo\"\n      ;;\n    accept-fail|verify-fail)\n      p256_flags=()\n      if [[ \"$phase\" == accept-fail ]]; then p256_flags=(-a); fi\n      test-runner -b -j 1 \"${p256_flags[@]}\" \"$p256_root\"/packages/fast/tests/fail/crypto-p256-prepared-*.mo\n      ;;\n    ash)\n      bun \"$p256_root/_build/prepared-public-validation/ash-local/src/index.ts\" test \"$p256_root/packages/fast/tests/ash/P256.ash.json\" --verbose\n      ;;\n  esac\n}\nrun_phase 2>&1 | tee \"$p256_log\"\necho \"Log: $p256_log\"\n",
+    "preflight.py": "from pathlib import Path\nimport hashlib, json, shutil, subprocess, sys\nroot = Path('/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256')\nsdk = Path('/srv/shared/code/motoko_experiments/prepared-crypto/sdk')\nhashfile = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()\nmanifest = json.loads((root/'dist/p256/build.json').read_text())\nassert manifest['sha256']['runtime.wasm'] == '0d2fa29baa9ab136ba5bd8a0cb55da5478ff6459fe1e8c02fecdc3e25dde3972', 'not frozen width-8 runtime'\nmoc = sdk/'src/_build/default/exes/moc.exe'\nassert hashfile(moc) == manifest['moc_sha256'], 'plugin compiler does not match selected SDK'\nfor name, expected in manifest['sha256'].items():\n    assert hashfile(root/'dist/p256'/name) == expected, f'artifact changed: {name}'\nfor name, expected in manifest['source_sha256'].items():\n    assert hashfile(root/name) == expected, f'build input changed; rebuild first: {name}'\nprovenance = json.loads((root/'_build/prepared-public-validation/ash-source-provenance.json').read_text())\nfor name, hashes in provenance['files'].items():\n    assert hashfile(root/'_build/prepared-public-validation/ash-local'/name) == hashes['copied_sha256'], f'copied Ash input changed: {name}'\npaths = {\n 'sdk_moc': moc,\n 'sdk_moc_wrapper': sdk/'bin/wrapper.sh',\n 'sdk_rts': sdk/'rts/mo-rts.wasm',\n 'sdk_debug_rts': sdk/'rts/mo-rts-debug.wasm',\n 'didc': Path('/home/devbox/.local/bin/didc'),\n 'pocketic': Path('/home/devbox/.local/bin/pocket-ic'),\n 'bun': Path(shutil.which('bun')),\n}\nrunner = shutil.which('test-runner')\nif runner: paths['test_runner'] = Path(runner)\nrecord = {\n 'sdk_revision': subprocess.check_output(['git','-C',str(sdk),'rev-parse','HEAD'],text=True).strip(),\n 'moc_version': subprocess.check_output([str(sdk/'bin/moc'),'--version'],text=True).strip(),\n 'plugin_build_manifest_sha256': hashfile(root/'dist/p256/build.json'),\n 'plugin_artifacts': manifest['sha256'],\n 'test_inputs': {str(p.relative_to(root)):hashfile(p) for p in sorted((root/'packages/fast/tests').rglob('*')) if p.is_file() and ((p.name in ('P256.mo','P256.ash.json','crypto-p256.mo')) or p.name.startswith('crypto-p256-prepared-'))},\n 'public_module_sha256': hashfile(root/'packages/fast/src/P256.mo'),\n 'core_inputs': {str(p.relative_to(root/'packages/fast/.mops/core@2.5.0/src')):hashfile(p) for p in sorted((root/'packages/fast/.mops/core@2.5.0/src').rglob('*.mo'))},\n 'tools': {name:{'path':str(path.resolve()),'sha256':hashfile(path.resolve())} for name,path in paths.items()},\n}\nPath(sys.argv[1]).write_text(json.dumps(record,indent=2)+'\\n')\nprint('P256 plugin, SDK, build-input closure and private Ash source hashes verified.')\n",
+    "prepare-harness.py": "from pathlib import Path\nimport hashlib, json, shutil, subprocess\nroot = Path('/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/p256')\nash = Path('/srv/shared/code/ash')\nout = root / '_build/prepared-public-validation/ash-local'\nif out.exists():\n    raise SystemExit(f'refusing to overwrite existing harness: {out}')\nout.mkdir(parents=True)\nshutil.copytree(ash / 'src', out / 'src')\nfor name in ('package.json', 'ash.schema.json', 'bun.lock', 'LICENSE'):\n    if (ash / name).is_file(): shutil.copy2(ash / name, out / name)\n(out / 'node_modules').symlink_to(ash / 'node_modules', target_is_directory=True)\nresolver = out / 'src/binaries.ts'\nsource = resolver.read_text()\nneedle = '  const { binDir } = getGlobalCachePaths();'\nassert source.count(needle) == 1\nprivate = '/srv/shared/code/motoko_experiments/prepared-crypto/sdk/bin/moc'\nsource = source.replace(needle, '  // Isolated prepared-P256 test harness: all other binaries retain Ash resolution.\\n  if (binaryName === \\'moc\\') return ' + json.dumps(private) + ';\\n' + needle)\nresolver.write_text(source)\nsha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()\nfiles = {}\nfor p in sorted(out.rglob('*')):\n    if p.is_file() and not p.is_symlink():\n        rel = str(p.relative_to(out))\n        files[rel] = {'original_sha256': sha(ash / rel), 'copied_sha256': sha(p)}\nassert [p for p,v in files.items() if v['original_sha256'] != v['copied_sha256']] == ['src/binaries.ts']\nprovenance = {\n 'ash_source': str(ash),\n 'ash_revision': subprocess.check_output(['git','-C',str(ash),'rev-parse','HEAD'],text=True).strip(),\n 'ash_status_at_copy': subprocess.check_output(['git','-C',str(ash),'status','--short'],text=True),\n 'sdk_moc_override': private,\n 'node_modules': str((out/'node_modules').resolve()),\n 'change': 'Only the copied binaries.ts resolver selects private SDK moc. didc, PocketIC and global toolchain files are unchanged.',\n 'files': files,\n}\n(root/'_build/prepared-public-validation/ash-source-provenance.json').write_text(json.dumps(provenance,indent=2)+'\\n')\nprint(f'Prepared isolated Ash source with {len(files)} hashed files; exactly one resolver change. No tests executed.')\n"
+  }
+}

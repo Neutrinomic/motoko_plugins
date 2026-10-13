@@ -52,3 +52,15 @@ version. This checks table values; it does not establish constant-time behavior.
 The native runtime also compares the comb against upstream multiplication for
 1,284 zero/boundary, single-bit and deterministic SHA-256-derived scalars, and
 checks compressed and uncompressed SEC1 outputs.
+
+`generate-prepared-comb.py` emits the private public-key comb table and matching
+compiler output capacity together. It checks every generated point against
+independent Python arithmetic and OpenSSL scalar multiplication, then encodes
+canonical Montgomery coordinates with explicit little-endian u64 limbs.
+The same proof includes the eight fixed odd multiples of G used by direct
+verification. The generator now emits only the selected width-eight format. Frozen benchmark
+inputs preserve the bounded comparison of widths 4, 6 and 8.
+`prepared-comb-proof.json` records the chosen table, exact coefficients, words,
+tool version and generated-source hashes. Runtime tests compare every point
+and prepared linear combinations against upstream arithmetic, and run all
+484 pinned Wycheproof cases through both direct and prepared verification.

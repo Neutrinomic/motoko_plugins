@@ -94,6 +94,56 @@ Primary references: [RFC6979](https://www.rfc-editor.org/rfc/rfc6979),
 and [Wycheproof](https://github.com/C2SP/wycheproof).
 
 
+## Repeated verification
+
+`preparePublicKey` validates a compressed or uncompressed SEC1 public key and
+returns `Result<PreparedPublicKey>`. Pass the resulting handle to
+`verifyPrehashPrepared(key, digest, signature)` for repeated checks. The digest
+and compact signature keep the same rules as `verifyPrehash`: malformed
+arguments return typed errors, valid but incorrect signatures return
+`#ok(false)`, and both high-S and low-S signatures are accepted. Prepared
+verification checks the digest before the signature because preparation has
+already validated the key.
+
+A prepared key is immutable, caller-owned and garbage-collected. It can live
+in transient records, arrays or maps and survive asynchronous calls. It cannot
+be serialized, shared in an actor interface, used as stable data, inspected as
+a Blob, or reconstructed from arbitrary bytes. Drop all references to release
+it normally; there is no native cache or manual cleanup operation. Upgrades
+must prepare fresh handles from the application's stored SEC1 public keys.
+
+The native representation stores an affine public-key comb as explicit
+little-endian canonical Montgomery coordinates. Preparation uses upstream
+batch normalization with one field inversion. The runtime borrows the managed
+payload synchronously and retains no pointers. Fixed generator tables are
+shared immutable Wasm data, not duplicated in each handle. Direct verification
+also uses a fixed odd-multiple generator table; comparisons include that
+optimization in both paths. Signing and derivation retain their existing
+constant-time implementation. The interpreter independently stores validated
+SEC1 and evaluates the same public operation with portable curve arithmetic.
+See the [narrow vendor hooks](runtime/vendor/README.md) for provenance and the
+supported 64-bit targets. The pinned upstream crates emit generic-array deprecation
+and trait-implementation attribute warnings when built as path dependencies;
+the archived build logs preserve them. The selected width-eight format uses 16,320 payload bytes per key; it is not
+a portable prepared-key encoding.
+
+## Prepared verification performance
+
+The selected width-eight table reduces repeated RFC6979 sample verification
+from 12,541,922 to 3,802,871 IC instructions (69.68%), against direct verification
+in the same plugin/compiler build. Both calls allocate 32 bytes. Preparation
+costs 19,688,675 instructions and allocates 16,376 bytes, including the 16,320-byte
+key payload. Its modeled total cost becomes cheaper than direct calls from
+three verifications. Use direct verification for one-off keys.
+
+The bounded width-four/six/eight comparison passed all 81 PocketIC trials;
+width eight is 20.95% cheaper per repeated call than width six, using about four times
+the payload. The public API has one chosen format. See the
+[prepared-key report](../../benchmarks/crypto/prepared/p256/README.md) for
+preparation, reuse, code-size and memory details. Payload size and cumulative
+allocation are distinct from the separately sampled occupied heap and Wasm
+capacity.
+
 ## Performance
 
 The third pass reuses the fixed-base comb for signing and switches its table to

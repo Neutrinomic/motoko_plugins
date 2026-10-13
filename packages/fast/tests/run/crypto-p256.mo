@@ -2,6 +2,7 @@
 import P256 "mo:fast/P256";
 import Array "mo:core/Array";
 import Blob "mo:core/Blob";
+import Prim "mo:⛔";
 
 // RFC 6979 A.2.5 SHA-256, loading only the P256 plugin.
   func concat(a : Blob, b : Blob) : Blob { Blob.fromArray(a.toArray().concat(b.toArray())) };
@@ -52,6 +53,43 @@ assert wrappers[0](one, true) == #ok generatorCompressed;
 assert wrappers[0](maxScalar, true) == #ok negativeGeneratorCompressed;
 assert saved == #ok sampleSignature;
 
+// Prepared public keys remain opaque through ordinary local Motoko storage.
+func prepared(key : Blob) : P256.PreparedPublicKey {
+  switch (P256.preparePublicKey(key)) {
+    case (#ok value) value;
+    case (#err _) Prim.trap("unexpected prepared public key error");
+  }
+};
+func identity<T>(value : T) : T { value };
+let prepare = P256.preparePublicKey;
+let preparedCompressed = prepared(publicCompressed);
+let preparedUncompressed = switch (prepare(publicUncompressed)) {
+  case (#ok value) value;
+  case (#err _) Prim.trap("unexpected uncompressed prepared public key error");
+};
+let verifyPrepared = P256.verifyPrehashPrepared;
+let retainedPrepared = { key = identity(preparedCompressed); aliases = [preparedCompressed, preparedUncompressed] };
+func verifyPreparedWrapped(key : P256.PreparedPublicKey, digest : Blob, signature : Blob) : P256.Result<Bool> {
+  P256.verifyPrehashPrepared(key, digest, signature)
+};
+let preparedVerifiers : [(P256.PreparedPublicKey, Blob, Blob) -> P256.Result<Bool>] = [verifyPreparedWrapped];
+assert preparedVerifiers[0](retainedPrepared.key, sampleHash, sampleSignature) == #ok true;
+assert verifyPrepared(retainedPrepared.aliases[0], sampleHash, sampleLowSignature) == #ok true;
+assert verifyPrepared(retainedPrepared.aliases[1], testHash, testSignature) == #ok true;
+assert verifyPrepared(retainedPrepared.key, testHash, sampleSignature) == #ok false;
+assert verifyPrepared(prepared(generatorCompressed), sampleHash, sampleSignature) == #ok false;
+assert verifyPrepared(retainedPrepared.key, "", "") == #err(#invalidDigest);
+assert verifyPrepared(retainedPrepared.key, sampleHash, "") == #err(#invalidSignature);
+assert verifyPrepared(retainedPrepared.key, sampleHash, concat(zero, one)) == #err(#invalidSignature);
+for (key in (["", "\00", concat(publicCompressed, "\00"), concat(concat("\04", zero), zero)] : [Blob]).values()) {
+  switch (prepare(key)) {
+    case (#err(#invalidPublicKey)) {};
+    case _ Prim.trap("malformed SEC1 accepted by preparePublicKey");
+  };
+};
+// A failed preparation or verification cannot mutate a previously returned key.
+assert verifyPrepared(retainedPrepared.aliases[1], sampleHash, sampleSignature) == #ok true;
+
 // Independent RFC6979 + OpenSSL vectors. RFC6979 bits2octets reduces the
 // prehash modulo n before nonce generation; digest n must sign identically to 0.
 let boundaryVectors : [(Blob, Blob)] = [
@@ -67,5 +105,6 @@ let boundaryVectors : [(Blob, Blob)] = [
 for ((digest, expected) in boundaryVectors.values()) {
   assert P256.signPrehash(secret, digest) == #ok expected;
   assert P256.verifyPrehash(publicCompressed, digest, expected) == #ok true;
+  assert verifyPrepared(preparedCompressed, digest, expected) == #ok true;
 };
 assert P256.signPrehash(secret, order) == P256.signPrehash(secret, zero);

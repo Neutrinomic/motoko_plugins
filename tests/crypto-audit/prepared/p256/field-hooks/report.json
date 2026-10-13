@@ -1,0 +1,81 @@
+{
+  "scope": "Read-only static sub-review of final selected width-eight P256 Montgomery field and affine coordinate hooks, thin Invert adapter, managed payload codec, and direct ODD_GENERATOR consumer. This is not full plugin/SDK approval.",
+  "reviewed_at_utc": "2026-10-13T05:02:36.176317+00:00",
+  "base_commit": "c0012493aca787d825e04547c0ae296b0f87127f",
+  "production_files_modified_by_reviewer": false,
+  "execution_tests_run": false,
+  "blocking_findings": [],
+  "conclusion": "No current-source blocker found within this field-hook sub-review. The frozen width-eight table and direct odd-generator consumers preserve the unchecked field/affine restoration preconditions under the protected prepared-value contract. Final independent native tests, all-engine tests, GC tests, and SDK protection remain the parent audit responsibility.",
+  "vendor_differences_from_pinned_registry": {
+    "p256": [
+      "Cargo.toml",
+      "src/arithmetic/field.rs"
+    ],
+    "primeorder": [
+      "src/affine.rs"
+    ]
+  },
+  "excluded_upstream_metadata": [
+    ".cargo-ok",
+    ".cargo_vcs_info.json"
+  ],
+  "invariants": [
+    "FieldElement stores canonical residues a*2^256 mod p. Valid upstream input paths and add/sub/multiply/square/negate preserve the integer range [0,p). Existing field32.rs and field64.rs are unchanged.",
+    "On target_pointer_width=64, U256::to_words/from_words copy four integer limbs; no transmute, layout reinterpretation, unaligned access, or padding serialization is introduced.",
+    "The two Montgomery accessors are absent on 32-bit targets. Repository runtime builds explicitly target Wasm64 and owner scopes native tests to 64-bit. This is a supported-target limitation, not a silent 32-bit representation mismatch. The thin Invert adapter is width-independent.",
+    "Affine restore forces infinity=0 and is correct only for validated on-curve nonidentity points. It must never round-trip AffinePoint::IDENTITY using coordinates alone.",
+    "Preparation validates canonical compressed/uncompressed SEC1 through PublicKey::from_sec1_bytes. For the selected WIDTH=8 and ROWS=32, every table coefficient is c=sum(b_j*2^(32*j)), j=0..7, with at least one bit set. Thus 0<c<2^225<n. P256 has prime group order and cofactor one, so no nonidentity input key yields an identity table entry.",
+    "POINTS=255 and 64 bytes per point give a 16320-byte payload, matching compiler/prepared_layout.ml. compiler/key_type.ml registers owner p256 and P256PreparedPublicKey; register.ml wraps preparation and unwraps verification with this same token.",
+    "Payload encoding is eight explicit little-endian u64 integers per point, x then y. Decoding uses from_le_bytes on copied eight-byte slices, independent of payload alignment and host byte order.",
+    "ODD_GENERATOR is generated from G by repeated addition of 2G, yielding G,3G,...,15G. Its coordinate conversion uses coordinate*2^256 mod p, followed by four numeric low-to-high u64 limbs per coordinate, exactly as the prepared generator table. These constant points are nonidentity because 1<=2*i+1<=15<n.",
+    "Direct verification decodes immutable ODD_GENERATOR constants with point_from_words. The width-five NAF path emits signed odd digits of magnitude 1..15; magnitude/2 selects indices 0..7. Negative digits subtract the same restored point. All lookup choices depend only on public verification scalars.",
+    "Unchecked restore consumers are private point_from_words called from immutable GENERATOR/ODD_GENERATOR constants or the prepared payload path. Wasm export safety contract requires the exact current-build payload size and valid protected provenance.",
+    "Prepared payload trust depends on nominal SDK protection and immutability. The raw unsafe native export is not an arbitrary untrusted byte decoding API.",
+    "The elliptic_curve::ops::Invert implementation calls FieldElement::invert(self), which resolves to the inherent method rather than recursive trait dispatch. Inherent inversion returns CtOption::None for zero and unchanged exponentiation/arithmetic preserves canonical output residues.",
+    "Upstream BatchNormalize initializes every z workspace slot to ONE, copies a projective z only when nonzero, then batch-inverts the nonzero product. Original zero-z points are conditionally mapped back to affine identity. Direct BatchInvert on a zero-containing batch returns None.",
+    "Upstream batch inversion reports failure for empty input and normalization unwraps its result. The selected prepared table has a positive compile-time POINTS=255, so this inherited empty-input edge is unreachable through plugin preparation."
+  ],
+  "pending_separate_review": [
+    "Independent native differential/corpus/codec execution tests for the final frozen source.",
+    "All-engine and GC integration runs for the final frozen source.",
+    "Compiler Prepared type ownership, non-forgeability, persistence and GC behavior."
+  ],
+  "source_sha256": {
+    "plugins/p256/runtime/vendor/p256/Cargo.toml": "a7021479e8494ab67fb3aea9e8d2f48d0a02e3a2495c0634c5fc8a6be4a26582",
+    "plugins/p256/runtime/vendor/p256/src/arithmetic/field.rs": "33d4be37fde30f045cbad1d77e67f655b6663d9822f4efc260b875e13d3b74f6",
+    "plugins/p256/runtime/vendor/p256/src/arithmetic/field/field32.rs": "eea276076f53bb6a79d634838c6d1587c72d8f43cd7ad21d58ce9bc249d3b477",
+    "plugins/p256/runtime/vendor/p256/src/arithmetic/field/field64.rs": "611bc1c282a22913784ca1fd6364c0aae67b04f800fc6bd00a3268b6d50f5e60",
+    "plugins/p256/runtime/vendor/primeorder/src/affine.rs": "c9e223d860c9e5ee1e68ebab61f2e2f98a36ec6f7eef6d76d6a3853523fa0861",
+    "plugins/p256/runtime/vendor/primeorder/src/field.rs": "5a3c9bb09c21cafb56032374d99be8494d7bf482253e701cf745c0d6b4df61a5",
+    "plugins/p256/runtime/vendor/primeorder/src/projective.rs": "4250a404894f3f18f788bdac07c91573ff57070e5a7bea54b8422c49f53b3f15",
+    "plugins/p256/runtime/src/lib.rs": "c909260fd492a06d58188d233efd79ce3bc6cc986690c8a3ce0b9aa2f6b19fa6",
+    "plugins/p256/runtime/src/prepared_table.rs": "1b5aac2f6e9a28476b78675dea09e5b81650869d47356a6c9ed546a9941daffa",
+    "plugins/p256/compiler/key_type.ml": "2fb9d12f793e40173ab8643385c89356a79b3abb810669380f199619b647bc07",
+    "plugins/p256/compiler/prepared_layout.ml": "0fe2dcb946a103fda78870e0d7d6325f990ac18c7123871aaea1279993268dbb",
+    "plugins/p256/compiler/register.ml": "b538d8e604886205b9a78d497d732b5e5e09e41e0e9b855e99d2a50a3b04e821",
+    "plugins/p256/tests/vectors/generate-prepared-comb.py": "84628129de9d228eae8f2806c3cc47b8b82119d62a5fc2aa31c9dd34d5d8dcd1",
+    "plugins/p256/tests/vectors/prepared-comb-proof.json": "73b3803edffc8cc9b235d608a74e0e257e94a87f2f169eb3c8593edcce81a30b"
+  },
+  "upstream_source_sha256": {
+    "p256-0.13.2/Cargo.toml": "7f2c98e9af91a495cf341425f77b782d6c253dba9cf4f63a16d63489ecb9ddfc",
+    "p256-0.13.2/src/arithmetic/field.rs": "b7ac34f7f82072e45b86d33bb0c82d87058d65e50b1a4e2037753d1d414dfcac",
+    "p256-0.13.2/src/arithmetic/field/field32.rs": "eea276076f53bb6a79d634838c6d1587c72d8f43cd7ad21d58ce9bc249d3b477",
+    "p256-0.13.2/src/arithmetic/field/field64.rs": "611bc1c282a22913784ca1fd6364c0aae67b04f800fc6bd00a3268b6d50f5e60",
+    "primeorder-0.13.6/src/affine.rs": "f9071d6eb656a1a98522d3a0bf9f7b8b7954e58bf4e86e90d71843d057a2a576",
+    "primeorder-0.13.6/src/field.rs": "5a3c9bb09c21cafb56032374d99be8494d7bf482253e701cf745c0d6b4df61a5",
+    "primeorder-0.13.6/src/projective.rs": "4250a404894f3f18f788bdac07c91573ff57070e5a7bea54b8422c49f53b3f15",
+    "crypto-bigint-0.5.5/src/uint.rs": "ff1d174e7c236abb78ccc0aea1f637b86f30f2bb20df929396f9d2eac0fdd1c5",
+    "elliptic-curve-0.13.8/src/public_key.rs": "392da0745b3fb931c9072de88d6278729e223e27e2700b93bf50d941bc285ed1",
+    "elliptic-curve-0.13.8/src/ops.rs": "23460c86fe3a07e07a446b7bceb164b99551943e4668ae7e04256f5177f3470f"
+  },
+  "invert_adapter_reviewed_at_utc": "2026-10-13T04:42:33.242274+00:00",
+  "hash_scope_note": "All listed current source hashes were refreshed together for the selected width-eight source snapshot. Earlier width-six evidence has been superseded.",
+  "selected_layout": {
+    "width": 8,
+    "rows": 32,
+    "points": 255,
+    "payload_bytes": 16320,
+    "odd_generator_points": 8,
+    "compiler_type_source": "plugins/p256/compiler/key_type.ml"
+  }
+}

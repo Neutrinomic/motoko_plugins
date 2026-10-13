@@ -16,27 +16,32 @@ module type Operation = sig
   val boolean : bool
   val compressed : bool
   val variable : bool
+  val prepared_result : bool
 end
 
 module Generate (O : Operation) = struct
   module Make (B : P.Backend) = struct
     let num n = B.compile_unboxed_const (Int64.of_int n)
-    let compile env _specialization arguments =
+    let compile env specialization arguments =
       let locals = List.mapi (fun index _ -> B.new_local env ("p256_arg" ^ string_of_int index)) arguments in
       let set_result, result = B.new_local env "p256_result" in
       let set_status, status = B.new_local env "p256_status" in
       let size = if O.compressed then
         snd (List.nth locals 1) ^^ B.E.if1 I64Type (num 33) (num 65)
         else num O.capacity in
-      let operands = List.map2 (fun typ (_, get) ->
-        if typ = Type.blob then get ^^ B.Blob.payload_ptr_unskewed env ^^ get ^^ B.Blob.len env
-        else get) O.inputs locals in
+      let operands = List.mapi (fun index (typ, (_, get)) ->
+        if typ = Key_type.public_key_type then
+          B.Prepared.unwrap Key_type.public_key (List.nth specialization.C.argument_types index) get ^^
+          B.Blob.payload_ptr_unskewed env
+        else if typ = Type.blob then get ^^ B.Blob.payload_ptr_unskewed env ^^ get ^^ B.Blob.len env
+        else get) (List.combine O.inputs locals) in
       let errors = List.fold_right (fun (number,label) rest ->
         status ^^ B.compile_eq_const (Int64.of_int number) ^^
         B.E.if1 I64Type (B.Variant.inject env label (B.Tuple.compile_unit env)) rest)
         [-1,"invalidSecretKey"; -2,"invalidPublicKey"; -3,"invalidDigest"]
         (B.Variant.inject env "invalidSignature" (B.Tuple.compile_unit env)) in
-      let payload = if O.boolean then status
+      let payload = if O.prepared_result then B.Prepared.wrap Key_type.public_key result
+        else if O.boolean then status
         else if O.variable then status ^^ B.compile_eq_const (Int64.of_int O.capacity) ^^
           B.E.if1 I64Type result
             (result ^^ B.Blob.payload_ptr_unskewed env ^^ status ^^ B.Blob.of_ptr_size env)
@@ -53,16 +58,17 @@ module Generate (O : Operation) = struct
   end
 end
 
-let operation name inputs capacity boolean compressed variable =
+let operation ?(prepared_result = false) name inputs capacity boolean compressed variable =
   let module O = struct
     let name = name let inputs = inputs let capacity = capacity
     let boolean = boolean let compressed = compressed let variable = variable
+    let prepared_result = prepared_result
   end in
   let module Generator = Generate(O) in
   let binding = C.{
     id = "p256_" ^ name; name = "p256_" ^ name;
     arguments = Fixed (fun _ -> Ok inputs); type_parameters = [];
-    result_type = (fun _ _ -> Ok (result_type (if boolean then Type.bool else Type.blob)));
+    result_type = (fun _ _ -> Ok (result_type (if prepared_result then Key_type.public_key_type else if boolean then Type.bool else Type.blob)));
     evaluate = C.pure (Reference.evaluate name);
   } in
   let count = List.fold_left (fun n typ -> n + if typ = Type.blob then 2 else 1) 0 inputs
@@ -72,6 +78,8 @@ let operation name inputs capacity boolean compressed variable =
 
 let () =
   let operations = [
+    operation ~prepared_result:true "prepare_public_key" [Type.blob] Key_type.payload_size false false false;
+    operation "verify_prehash_prepared" [Key_type.public_key_type; Type.blob; Type.blob] 0 true false false;
     operation "public_key" [Type.blob; Type.bool] 65 false true false;
     operation "convert_public_key" [Type.blob; Type.bool] 65 false true false;
     operation "sign_prehash" [Type.blob; Type.blob] 64 false false false;
@@ -81,4 +89,5 @@ let () =
     operation "normalize_signature" [Type.blob] 64 false false false;
   ] in
   P.register P.{ abi = 1; name = "p256"; runtime = Some "runtime.wasm";
+    types = [Key_type.public_key];
     imports = List.map snd operations; bindings = List.map fst operations }

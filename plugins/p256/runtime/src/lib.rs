@@ -8,7 +8,7 @@ use ecdsa::hazmat::DigestPrimitive;
 use p256::ecdsa::Signature;
 use p256::elliptic_curve::subtle::{ConditionallySelectable, ConstantTimeEq};
 use p256::elliptic_curve::{
-    Curve, FieldBytesEncoding,
+    BatchNormalize, Curve, FieldBytesEncoding,
     bigint::U256,
     ff::PrimeField,
     group::Group,
@@ -17,7 +17,9 @@ use p256::elliptic_curve::{
     sec1::ToEncodedPoint,
     zeroize::{Zeroize, Zeroizing},
 };
-use p256::{AffinePoint, NistP256, ProjectivePoint, PublicKey, Scalar, SecretKey};
+use p256::{AffinePoint, FieldElement, NistP256, ProjectivePoint, PublicKey, Scalar, SecretKey};
+
+mod prepared_table;
 
 const INVALID_SECRET_KEY: i64 = -1;
 const INVALID_PUBLIC_KEY: i64 = -2;
@@ -285,7 +287,6 @@ fn verification_lincomb(u1: &Scalar, q: &ProjectivePoint, u2: &Scalar) -> Projec
         }
         digits
     }
-    let generator = table(&ProjectivePoint::GENERATOR);
     let public_key = table(q);
     let left = nonadjacent(u1);
     let right = nonadjacent(u2);
@@ -295,9 +296,9 @@ fn verification_lincomb(u1: &Scalar, q: &ProjectivePoint, u2: &Scalar) -> Projec
         let a = left[bit];
         let b = right[bit];
         if a > 0 {
-            result += generator[a as usize / 2];
+            result += point_from_words(&prepared_table::ODD_GENERATOR[a as usize / 2]);
         } else if a < 0 {
-            result -= generator[(-a) as usize / 2];
+            result -= point_from_words(&prepared_table::ODD_GENERATOR[(-a) as usize / 2]);
         }
         if b > 0 {
             result += public_key[b as usize / 2];
@@ -321,6 +322,105 @@ fn verify_prehash(key: &[u8], hash: &[u8], sig: &[u8]) -> Result<bool, i64> {
     let u2 = *r * s_inv;
     let point =
         verification_lincomb(&u1, &ProjectivePoint::from(*key.as_affine()), &u2).to_affine();
+    if bool::from(point.is_identity()) {
+        return Ok(false);
+    }
+    Ok(*r == <Scalar as Reduce<U256>>::reduce_bytes(&point.x()))
+}
+
+// The point encoding is private to the nominal PreparedPublicKey type: eight
+// initialized little-endian u64 limbs, x then y, in canonical Montgomery form.
+// It contains no Rust layout, padding, pointers, identity marker or global state.
+fn point_words(point: &AffinePoint) -> [u64; 8] {
+    let (x, y) = point.to_field_coordinates();
+    let mut words = [0u64; 8];
+    words[..4].copy_from_slice(&x.to_montgomery_words());
+    words[4..].copy_from_slice(&y.to_montgomery_words());
+    words
+}
+
+fn point_from_words(words: &[u64; 8]) -> AffinePoint {
+    let x = FieldElement::from_montgomery_words_unchecked(words[..4].try_into().unwrap());
+    let y = FieldElement::from_montgomery_words_unchecked(words[4..].try_into().unwrap());
+    AffinePoint::from_field_coordinates_unchecked(x, y)
+}
+
+fn prepared_point(bytes: &[u8], index: usize) -> AffinePoint {
+    let mut words = [0u64; 8];
+    let encoded = &bytes[index * 64..(index + 1) * 64];
+    for (word, chunk) in words.iter_mut().zip(encoded.chunks_exact(8)) {
+        *word = u64::from_le_bytes(chunk.try_into().unwrap());
+    }
+    point_from_words(&words)
+}
+
+fn prepare_public_key(key: &[u8], output: &mut [u8]) -> Result<usize, i64> {
+    let key = public(key)?;
+    let mut basis = [ProjectivePoint::IDENTITY; prepared_table::WIDTH];
+    basis[0] = ProjectivePoint::from(*key.as_affine());
+    for column in 1..prepared_table::WIDTH {
+        let mut point = basis[column - 1];
+        for _ in 0..prepared_table::ROWS {
+            point = point.double();
+        }
+        basis[column] = point;
+    }
+    let mut table = [ProjectivePoint::IDENTITY; prepared_table::POINTS];
+    for digit in 1usize..=prepared_table::POINTS {
+        let column = digit.trailing_zeros() as usize;
+        let remainder = digit & (digit - 1);
+        table[digit - 1] = if remainder == 0 {
+            basis[column]
+        } else {
+            table[remainder - 1] + basis[column]
+        };
+    }
+    // A nonzero Q of prime order multiplied by these nonzero coefficients
+    // (all below n) cannot be the identity. Normalize together with one inverse.
+    let affine = ProjectivePoint::batch_normalize(&table);
+    for (encoded, point) in output.chunks_exact_mut(64).zip(affine.iter()) {
+        for (chunk, word) in encoded.chunks_exact_mut(8).zip(point_words(point)) {
+            chunk.copy_from_slice(&word.to_le_bytes());
+        }
+    }
+    Ok(prepared_table::BYTES)
+}
+
+// Only public verification scalars determine table indices and zero branches.
+fn verification_prepared(u1: &Scalar, key: &[u8], u2: &Scalar) -> ProjectivePoint {
+    let left = u1.to_bytes();
+    let right = u2.to_bytes();
+    let mut result = ProjectivePoint::IDENTITY;
+    for bit in (0..prepared_table::ROWS).rev() {
+        result = result.double();
+        let mut a = 0usize;
+        let mut b = 0usize;
+        for column in 0..prepared_table::WIDTH {
+            let position = bit + prepared_table::ROWS * column;
+            if position < 256 {
+                a |= (((left[31 - position / 8] >> (position & 7)) & 1) as usize) << column;
+                b |= (((right[31 - position / 8] >> (position & 7)) & 1) as usize) << column;
+            }
+        }
+        if a != 0 {
+            result += point_from_words(&prepared_table::GENERATOR[a - 1]);
+        }
+        if b != 0 {
+            result += prepared_point(key, b - 1);
+        }
+    }
+    result
+}
+
+fn verify_prehash_prepared(key: &[u8], hash: &[u8], sig: &[u8]) -> Result<bool, i64> {
+    // The SDK type and matching preparation function establish key validity.
+    // Neither arbitrary Blob bytes nor another plugin's prepared type can enter.
+    digest(hash)?;
+    let sig = signature(sig)?;
+    let z = <Scalar as Reduce<U256>>::reduce_bytes(hash.into());
+    let (r, s) = sig.split_scalars();
+    let inverse = *s.invert_vartime();
+    let point = verification_prepared(&(z * inverse), key, &(*r * inverse)).to_affine();
     if bool::from(point.is_identity()) {
         return Ok(false);
     }
@@ -432,6 +532,42 @@ pub unsafe extern "C" fn p256_verify_prehash(
 ) -> i64 {
     match verify_prehash(
         unsafe { input(key, key_len) },
+        unsafe { input(hash, hash_len) },
+        unsafe { input(sig, sig_len) },
+    ) {
+        Ok(valid) => i64::from(valid),
+        Err(error) => error,
+    }
+}
+
+/// # Safety
+/// key points to key_len readable bytes. out points to prepared_table::BYTES
+/// writable bytes disjoint from key; all buffers remain live for this call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn p256_prepare_public_key(
+    key: *const u8,
+    key_len: usize,
+    out: *mut u8,
+) -> i64 {
+    status(prepare_public_key(unsafe { input(key, key_len) }, unsafe {
+        output(out, prepared_table::BYTES)
+    }))
+}
+
+/// # Safety
+/// key must point to the immutable prepared_table::BYTES-byte output of this
+/// exact build's successful preparation, protected by the SDK nominal type.
+/// Other inputs point to readable buffers; all remain live for this call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn p256_verify_prehash_prepared(
+    key: *const u8,
+    hash: *const u8,
+    hash_len: usize,
+    sig: *const u8,
+    sig_len: usize,
+) -> i64 {
+    match verify_prehash_prepared(
+        unsafe { input(key, prepared_table::BYTES) },
         unsafe { input(hash, hash_len) },
         unsafe { input(sig, sig_len) },
     ) {
@@ -599,6 +735,8 @@ mod tests {
         let mut count = 0;
         for group in corpus["testGroups"].as_array().unwrap() {
             let key = hex(group["publicKey"]["uncompressed"].as_str().unwrap());
+            let mut prepared = [0u8; prepared_table::BYTES];
+            let prepared_valid = prepare_public_key(&key, &mut prepared).is_ok();
             for vector in group["tests"].as_array().unwrap() {
                 let message = hex(vector["msg"].as_str().unwrap());
                 let hash = Sha256::digest(&message);
@@ -613,6 +751,10 @@ mod tests {
                     vector["tcId"],
                     vector["comment"]
                 );
+                let valid_prepared = prepared_valid
+                    && signature_from_der(&der, &mut compact).is_ok()
+                    && verify_prehash_prepared(&prepared, &hash, &compact) == Ok(true);
+                assert_eq!(valid_prepared, valid, "prepared tcId {}", vector["tcId"]);
                 count += 1;
             }
         }
@@ -732,6 +874,138 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn prepared_table_codec_and_lincomb_match_upstream() {
+        let keys = [
+            ProjectivePoint::GENERATOR,
+            -ProjectivePoint::GENERATOR,
+            ProjectivePoint::from(*public(&hex(PUBLIC)).unwrap().as_affine()),
+        ];
+        let scalars = [
+            Scalar::ZERO,
+            Scalar::ONE,
+            Scalar::from(2u64),
+            -Scalar::ONE,
+            Scalar::from_repr({
+                let mut bytes = [0u8; 32];
+                bytes[0] = 0x80;
+                bytes.into()
+            })
+            .unwrap(),
+            <Scalar as Reduce<U256>>::reduce_bytes(
+                hex("fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210")
+                    .as_slice()
+                    .into(),
+            ),
+        ];
+        for (index, words) in prepared_table::ODD_GENERATOR.iter().enumerate() {
+            assert_eq!(
+                point_from_words(words),
+                (ProjectivePoint::GENERATOR * Scalar::from((2 * index + 1) as u64)).to_affine()
+            );
+        }
+        for key in keys {
+            let mut prepared = [0u8; prepared_table::BYTES];
+            let encoded = key.to_affine().to_encoded_point(true);
+            assert_eq!(
+                prepare_public_key(encoded.as_bytes(), &mut prepared),
+                Ok(prepared.len())
+            );
+            for digit in 1..=prepared_table::POINTS {
+                let mut bytes = [0u8; 32];
+                for column in 0..prepared_table::WIDTH {
+                    if digit >> column & 1 != 0 {
+                        let bit = prepared_table::ROWS * column;
+                        bytes[31 - bit / 8] |= 1 << (bit & 7);
+                    }
+                }
+                let coefficient = Scalar::from_repr(bytes.into()).unwrap();
+                assert_eq!(
+                    prepared_point(&prepared, digit - 1),
+                    (key * coefficient).to_affine()
+                );
+                assert_eq!(
+                    point_from_words(&prepared_table::GENERATOR[digit - 1]),
+                    (ProjectivePoint::GENERATOR * coefficient).to_affine()
+                );
+            }
+            for a in scalars {
+                for b in scalars {
+                    assert_eq!(
+                        verification_prepared(&a, &prepared, &b),
+                        ProjectivePoint::GENERATOR * a + key * b
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn prepared_pointer_contract_errors_and_immutability() {
+        let key = hex(PUBLIC);
+        let hash = hex(HASH);
+        let sig = hex(SIGNATURE);
+        let mut output = vec![0xa5; prepared_table::BYTES + 2];
+        assert_eq!(
+            unsafe { p256_prepare_public_key(key.as_ptr(), key.len(), output.as_mut_ptr().add(1)) },
+            prepared_table::BYTES as i64
+        );
+        assert_eq!(output[0], 0xa5);
+        assert_eq!(output[prepared_table::BYTES + 1], 0xa5);
+        let saved = output.clone();
+        for _ in 0..8 {
+            assert_eq!(
+                unsafe {
+                    p256_verify_prehash_prepared(
+                        output.as_ptr().add(1),
+                        hash.as_ptr(),
+                        hash.len(),
+                        sig.as_ptr(),
+                        sig.len(),
+                    )
+                },
+                1
+            );
+        }
+        assert_eq!(
+            unsafe {
+                p256_verify_prehash_prepared(
+                    output.as_ptr().add(1),
+                    core::ptr::null(),
+                    0,
+                    core::ptr::null(),
+                    0,
+                )
+            },
+            INVALID_DIGEST
+        );
+        assert_eq!(
+            unsafe {
+                p256_verify_prehash_prepared(
+                    output.as_ptr().add(1),
+                    hash.as_ptr(),
+                    hash.len(),
+                    core::ptr::null(),
+                    0,
+                )
+            },
+            INVALID_SIGNATURE
+        );
+        assert_eq!(output, saved);
+        for key in [vec![], vec![0], vec![4; 65], vec![255; 33], vec![6; 65]] {
+            output.fill(0xa5);
+            assert_eq!(
+                unsafe {
+                    p256_prepare_public_key(key.as_ptr(), key.len(), output.as_mut_ptr().add(1))
+                },
+                INVALID_PUBLIC_KEY
+            );
+            assert!(output[1..=prepared_table::BYTES].iter().all(|b| *b == 0));
+            assert_eq!(output[0], 0xa5);
+            assert_eq!(output[prepared_table::BYTES + 1], 0xa5);
+        }
+    }
+
     #[test]
     fn comb_matches_upstream() {
         use sha2::{Digest, Sha256};
