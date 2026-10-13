@@ -1,8 +1,9 @@
 # Independent prepared P256 audit
 
-Status: independent source and correctness audit approved for the selected
-width-8 artifact below. No production correctness blocker was found. The final
-full benchmark cohort remains a separate integration acceptance check.
+Status: independent source, correctness and final benchmark audit approved for
+the selected width-8 artifact below. No blocking defect was found. The final
+benchmark uses the same audited source and binaries, unchanged from source
+checkpoint `6b174d7becd596a80665f7e42a032f54c65070c6`.
 
 Tested SDK compiler: `9f6ebeedc547e389a0529b4c91442e46b88fcbe0`, SHA-256
 `24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2`.
@@ -70,6 +71,24 @@ Passing evidence:
   red-zone forms; the audit-only adapter recognizes these explicit forms,
   forbids nested calls/global mutation, and counts their full reservations.
   The original rejection log is retained rather than concealed.
+- `benchmark.py`/`benchmark-acceptance.json`: independently verifies all 688
+  frozen inputs, all 37 actor source/Wasm hashes, exact audited compiler/plugin
+  parity, and all 111 output hashes. It recomputes every instruction,
+  allocation and memory summary from the raw three-trial results and checks
+  the seven groups' break-even arithmetic. Every metric is identical across
+  each case's three trials. Only the corrected final stage contributes
+  counters; the preceding cold-fixture compile failure has no results file.
+
+For the RFC6979 sample, direct verification costs 12,541,922 instructions and
+prepared verification 3,802,871, a 69.68% reduction. Preparation costs
+19,688,675 instructions and allocates 16,376 bytes, including the 16,320-byte
+payload and managed overhead. Direct and hot prepared calls both allocate
+32 bytes per check. Actual cold batches include preparation: ten checks cost
+57,714,287 versus direct 125,416,988 (53.98% lower), and 100 cost 399,943,697
+versus 1,254,167,648 (68.11% lower). Cold one- and two-check batches are slower
+than direct; the reported three-check break-even is explicitly a model from
+single-operation counters, not a measured three-check batch. Occupied heap
+samples are not peak memory or proof of completed collection.
 
 One fixture-only issue found during review was fixed by the public-test owner:
 raw intrinsic aliases cannot populate ordinary function arrays. The tests now
