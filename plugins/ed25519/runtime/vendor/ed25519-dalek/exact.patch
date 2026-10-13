@@ -1,0 +1,88 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -135,6 +135,7 @@
+ required-features = ["rand_core"]
+ 
+ [dependencies.curve25519-dalek]
++path = "../curve25519-dalek"
+ version = "4"
+ features = ["digest"]
+ default-features = false
+@@ -187,6 +188,7 @@
+ features = ["html_reports"]
+ 
+ [dev-dependencies.curve25519-dalek]
++path = "../curve25519-dalek"
+ version = "4"
+ features = [
+     "digest",
+@@ -224,3 +226,5 @@
+ version = "2"
+ features = ["static_secrets"]
+ default-features = false
++
++[workspace]
+--- a/src/signing.rs
++++ b/src/signing.rs
+@@ -862,6 +862,52 @@
+         CtxDigest: Digest<OutputSize = U64>,
+         F: Fn(&mut CtxDigest) -> Result<(), SignatureError>,
+     {
++        self.raw_sign_byupdate_bytes(msg_update, verifying_key.as_bytes())
++    }
++
++    /// Sign using an expanded secret and its already bound compressed public key.
++    ///
++    /// The caller MUST derive both this expanded secret and `public_key_bytes`
++    /// from the same seed, and keep that association immutable. Letting an
++    /// attacker choose the public key for a fixed expanded secret can reveal
++    /// the secret scalar. This is a low-level operation for protected prepared
++    /// keys, not a constructor from independently supplied public/secret bytes.
++    /// `CtxDigest` must be SHA-512 for ordinary Ed25519 signatures.
++    #[allow(clippy::unwrap_used)]
++    #[inline(always)]
++    pub fn sign_prepared<CtxDigest>(
++        &self,
++        message: &[u8],
++        public_key_bytes: &[u8; 32],
++    ) -> Signature
++    where
++        CtxDigest: Digest<OutputSize = U64>,
++    {
++        // As in raw_sign, hashing a contiguous message cannot fail.
++        self.raw_sign_byupdate_bytes(
++            |h: &mut CtxDigest| {
++                h.update(message);
++                Ok(())
++            },
++            public_key_bytes,
++        )
++        .unwrap()
++    }
++
++    // The original signing algorithm needs only the public key's compressed
++    // bytes. Keeping this shared implementation avoids a point decompression
++    // for an already validated and bound prepared secret key.
++    #[allow(non_snake_case)]
++    #[inline(always)]
++    fn raw_sign_byupdate_bytes<CtxDigest, F>(
++        &self,
++        msg_update: F,
++        public_key_bytes: &[u8; 32],
++    ) -> Result<Signature, SignatureError>
++    where
++        CtxDigest: Digest<OutputSize = U64>,
++        F: Fn(&mut CtxDigest) -> Result<(), SignatureError>,
++    {
+         let mut h = CtxDigest::new();
+ 
+         h.update(self.hash_prefix);
+@@ -872,7 +918,7 @@
+ 
+         h = CtxDigest::new();
+         h.update(R.as_bytes());
+-        h.update(verifying_key.as_bytes());
++        h.update(public_key_bytes);
+         msg_update(&mut h)?;
+ 
+         let k = Scalar::from_hash(h);

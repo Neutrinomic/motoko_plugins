@@ -1,0 +1,113 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -153,3 +153,5 @@
+ 
+ [target."cfg(target_arch = \"x86_64\")".dependencies.cpufeatures]
+ version = "0.2.6"
++
++[workspace]
+--- a/src/backend/serial/scalar_mul/vartime_double_base.rs
++++ b/src/backend/serial/scalar_mul/vartime_double_base.rs
+@@ -21,6 +21,16 @@
+ 
+ /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
+ pub fn mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
++    let table_A = NafLookupTable5::<ProjectiveNielsPoint>::from(A);
++    mul_with_table(a, &table_A, b)
++}
++
++/// The same multiplication with the odd multiples of A already prepared.
++pub(crate) fn mul_with_table(
++    a: &Scalar,
++    table_A: &NafLookupTable5<ProjectiveNielsPoint>,
++    b: &Scalar,
++) -> EdwardsPoint {
+     let a_naf = a.non_adjacent_form(5);
+ 
+     #[cfg(feature = "precomputed-tables")]
+@@ -37,7 +47,6 @@
+         }
+     }
+ 
+-    let table_A = NafLookupTable5::<ProjectiveNielsPoint>::from(A);
+     #[cfg(feature = "precomputed-tables")]
+     let table_B = &constants::AFFINE_ODD_MULTIPLES_OF_BASEPOINT;
+     #[cfg(not(feature = "precomputed-tables"))]
+--- a/src/edwards.rs
++++ b/src/edwards.rs
+@@ -897,6 +897,75 @@
+     }
+ }
+ 
++/// A fixed-size, allocation-free table for variable-time verification.
++///
++/// This retains the upstream width-five odd multiples of one public point A.
++/// Its portable encoding is 1024 bytes: eight Projective Niels entries, each
++/// containing Y+X, Y-X, Z, and 2dT as canonical 32-byte little-endian field
++/// elements. It contains no native pointers or Rust object representations.
++///
++/// This type and its scalar multiplication are for public inputs only.
++pub struct PreparedVartimeEdwardsTable(crate::window::NafLookupTable5<ProjectiveNielsPoint>);
++
++impl PreparedVartimeEdwardsTable {
++    /// Prepare the odd multiples A, 3A, ..., 15A using the existing lookup table.
++    pub fn from_point(point: &EdwardsPoint) -> Self {
++        Self(crate::window::NafLookupTable5::from(point))
++    }
++
++    /// Encode every field canonically into fully initialized portable bytes.
++    pub fn to_bytes(&self) -> [u8; 1024] {
++        let mut bytes = [0u8; 1024];
++        for (point, entry) in self.0.0.iter().zip(bytes.chunks_exact_mut(128)) {
++            entry[0..32].copy_from_slice(&point.Y_plus_X.as_bytes());
++            entry[32..64].copy_from_slice(&point.Y_minus_X.as_bytes());
++            entry[64..96].copy_from_slice(&point.Z.as_bytes());
++            entry[96..128].copy_from_slice(&point.T2d.as_bytes());
++        }
++        bytes
++    }
++
++    /// Restore bytes previously emitted by `to_bytes` and kept intact.
++    ///
++    /// This is a trusted internal-storage codec, NOT a public-key parser. It
++    /// does not validate canonicality, point validity, or the relationships
++    /// between entries. Callers must ensure the bytes came from `to_bytes`
++    /// and cannot be modified or forged. The Motoko plugin uses a protected
++    /// nominal handle whose payload can only be created by its factory.
++    pub fn from_trusted_bytes(bytes: &[u8; 1024]) -> Self {
++        let mut points = [ProjectiveNielsPoint::identity(); 8];
++        for (point, entry) in points.iter_mut().zip(bytes.chunks_exact(128)) {
++            // Fixed-size slices come from a 128-byte entry, so each copy is exact.
++            let mut field = [0u8; 32];
++            field.copy_from_slice(&entry[0..32]);
++            point.Y_plus_X = FieldElement::from_bytes(&field);
++            field.copy_from_slice(&entry[32..64]);
++            point.Y_minus_X = FieldElement::from_bytes(&field);
++            field.copy_from_slice(&entry[64..96]);
++            point.Z = FieldElement::from_bytes(&field);
++            field.copy_from_slice(&entry[96..128]);
++            point.T2d = FieldElement::from_bytes(&field);
++        }
++        Self(crate::window::NafLookupTable5(points))
++    }
++
++    /// Compute aA + bB in variable time using the prepared public point A.
++    ///
++    /// This calls the existing serial double-scalar loop without rebuilding
++    /// its A table. B is the Ed25519 basepoint. For verification, prepare -A
++    /// and pass the positive reduced challenge: reducing a negated challenge
++    /// modulo the prime order instead is not equivalent for mixed-order A.
++    pub fn vartime_double_scalar_mul_basepoint(
++        &self,
++        a: &Scalar,
++        b: &Scalar,
++    ) -> EdwardsPoint {
++        crate::backend::serial::scalar_mul::vartime_double_base::mul_with_table(
++            a, &self.0, b,
++        )
++    }
++}
++
+ impl EdwardsPoint {
+     /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
+     pub fn vartime_double_scalar_mul_basepoint(

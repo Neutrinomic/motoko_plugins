@@ -1,0 +1,14 @@
+[package]
+name = "ed25519-prepared-vendor-comparator"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+curve-candidate = { package = "curve25519-dalek", path = "../../../curve25519-dalek", default-features = false, features = ["precomputed-tables", "zeroize"] }
+curve-original = { package = "curve25519-dalek", version = "=4.1.3", default-features = false, features = ["precomputed-tables", "zeroize"] }
+ed-candidate = { package = "ed25519-dalek", path = "../..", default-features = false, features = ["fast", "zeroize", "hazmat"] }
+ed-original = { package = "ed25519-dalek", version = "=2.2.0", default-features = false, features = ["fast", "zeroize"] }
+sha2 = { version = "=0.10.9", default-features = false }
