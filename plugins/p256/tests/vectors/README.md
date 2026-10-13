@@ -40,18 +40,44 @@ in [section 3.2](https://www.rfc-editor.org/rfc/rfc6979.html#section-3.2).
 For these equal-width P-256/SHA256 values, this is reduction modulo `n`.
 Consequently digest `n` and digest zero must produce identical signatures.
 
-`generate-p256-comb.py` independently constructs the 15 nonzero combinations
-of `G`, `2^64 G`, `2^128 G` and `2^192 G` with Python integer arithmetic. It
-parses the runtime's encoded table and requires every point to equal both this
-construction and OpenSSL's public-key derivation for the exact table scalar.
+`generate-p256-comb.py` independently verifies the selected secret comb in
+`runtime/src/secret_table.rs`. It reads that file's `TABLES` and `ROWS`
+constants; the chosen format has four tables of 15 points and 16 rounds.
+Table `t` contains the nonzero combinations of
+`2^(16*t) G`, `2^(16*t+64) G`, `2^(16*t+128) G` and `2^(16*t+192) G`.
+The generator checks the complete array dimensions and canonical Montgomery
+coordinates, then requires every point to equal both independent Python
+integer arithmetic and OpenSSL's public-key derivation for its exact scalar.
 Regenerate the proof from this directory with
 `python3 generate-p256-comb.py --output p256-comb-proof.json`; supply
 `--openssl /path/to/openssl` when needed. `p256-comb-proof.json` records the
-runtime and generator hashes, exact coefficients, encoded points and OpenSSL
-version. This checks table values; it does not establish constant-time behavior.
+runtime table and generator hashes, dimensions, exact coefficients, encoded
+points, Montgomery words and OpenSSL version. Each point stores `xR` and `yR`
+modulo the field prime, with `R = 2^256` and four little-endian u64 limbs per
+coordinate. All 60 public constants occupy 3,840 bytes of immutable data.
+This checks table values; it does not establish constant-time behavior.
+The runtime executes 16 doublings and 64 complete mixed additions, scanning
+all 15 entries for every selection, including zero digits.
 The native runtime also compares the comb against upstream multiplication for
 1,284 zero/boundary, single-bit and deterministic SHA-256-derived scalars, and
 checks compressed and uncompressed SEC1 outputs.
+
+The scalar inversion uses a fixed addition chain for `n - 2` with 254
+squarings and 38 multiplications, adapted from Go's implementation of Brian
+Smith's chain. The [source proof](../../../../benchmarks/crypto/round4/p256/scalar-chain/verify-chain.py)
+interprets the checked-in exponent schedule with Python integers. Scalar
+squaring uses the pinned `crypto-bigint` symmetric wide square and the existing
+Barrett reduction. Runtime tests compare inversion with generic binary
+exponentiation, compare square with multiplication, and check inverse products
+for nonzero scalars and the rejected-zero result separately.
+
+Direct and prepared verification compare the resulting homogeneous point's
+X coordinate without affine inversion. They reject infinity, compare
+`X = r*Z`, and also compare `X = (r+n)*Z` only when `r+n < p`.
+The second representative matters because `n < p < 2n`.
+The [projective-check fixtures](../../../../benchmarks/crypto/round4/p256/projective-check/)
+cover the rare second representative and the range boundary using independent
+Python arithmetic. This verification path handles public inputs only.
 
 `generate-prepared-comb.py` emits the private public-key comb table and matching
 compiler output capacity together. It checks every generated point against

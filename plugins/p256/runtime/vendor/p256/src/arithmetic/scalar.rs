@@ -118,8 +118,11 @@ impl Scalar {
 
     /// Returns self * self mod p
     pub const fn square(&self) -> Self {
-        // Schoolbook multiplication.
-        self.multiply(self)
+        // Reuse crypto-bigint's constant-time symmetric wide square; the
+        // existing Barrett reduction and canonical scalar representation stay
+        // unchanged. square_wide returns the same (lo, hi) order as mul_wide.
+        let (lo, hi) = self.0.square_wide();
+        Self(barrett_reduce(lo, hi))
     }
 
     /// Right shifts the scalar.
@@ -138,22 +141,71 @@ impl Scalar {
     ///
     /// Does not check that self is non-zero.
     const fn invert_unchecked(&self) -> Self {
-        // We need to find b such that b * a ≡ 1 mod p. As we are in a prime
-        // field, we can apply Fermat's Little Theorem:
-        //
-        //    a^p         ≡ a mod p
-        //    a^(p-1)     ≡ 1 mod p
-        //    a^(p-2) * a ≡ 1 mod p
-        //
-        // Thus inversion can be implemented with a single exponentiation.
-        //
-        // This is `n - 2`, so the top right two digits are `4f` instead of `51`.
-        self.pow_vartime(&[
-            0xf3b9_cac2_fc63_254f,
-            0xbce6_faad_a717_9e84,
-            0xffff_ffff_ffff_ffff,
-            0xffff_ffff_0000_0000,
-        ])
+        // Fermat inversion: self^(n - 2), with 254 squares and 38 multiplies.
+        // The exponent schedule and loop bounds are independent of self.
+        // The addition-chain schedule is adapted from Go's P256OrdInverse:
+        // https://go.googlesource.com/go/+/2c659bb4db1ff06c819f8b4cd6decc71e4d5b36e/src/crypto/internal/fips140/nistec/p256_ordinv.go
+        // Copyright 2022 The Go Authors. All rights reserved. BSD-3-Clause;
+        // see LICENSE-Go in this vendored crate. The underlying chain is due
+        // to Brian Smith:
+        // https://briansmith.org/ecc-inversion-addition-chains-01#p256_scalar_inversion
+        // benchmarks/crypto/round4/p256/scalar-chain/verify-chain.py in the
+        // repository checks this exact source chain independently.
+        let x1 = *self;
+        let x2 = x1.square();
+        let x3 = x2.multiply(&x1);
+        let x5 = x2.multiply(&x3);
+        let x7 = x2.multiply(&x5);
+        let x10 = x5.square();
+        let x15 = x5.multiply(&x10);
+        let x21 = x10.square().multiply(&x1);
+        let x42 = x21.square();
+        let x47 = x5.multiply(&x42);
+        let x63 = x21.multiply(&x42);
+        let x255 = x63.sqn(2).multiply(&x3);
+        let x65535 = x255.sqn(8).multiply(&x255);
+        let x4294967295 = x65535.sqn(16).multiply(&x65535);
+
+        let mut acc = x4294967295.sqn(64).multiply(&x4294967295);
+        acc = acc.sqn(32).multiply(&x4294967295);
+        acc = acc.sqn(6).multiply(&x47);
+        acc = acc.sqn(5).multiply(&x7);
+        acc = acc.sqn(4).multiply(&x3);
+        acc = acc.sqn(5).multiply(&x15);
+        acc = acc.sqn(5).multiply(&x21);
+        acc = acc.sqn(4).multiply(&x5);
+        acc = acc.sqn(3).multiply(&x5);
+        acc = acc.sqn(3).multiply(&x5);
+        acc = acc.sqn(5).multiply(&x7);
+        acc = acc.sqn(9).multiply(&x47);
+        acc = acc.sqn(6).multiply(&x15);
+        acc = acc.sqn(2).multiply(&x1);
+        acc = acc.sqn(5).multiply(&x1);
+        acc = acc.sqn(6).multiply(&x15);
+        acc = acc.sqn(5).multiply(&x7);
+        acc = acc.sqn(4).multiply(&x7);
+        acc = acc.sqn(5).multiply(&x7);
+        acc = acc.sqn(5).multiply(&x5);
+        acc = acc.sqn(3).multiply(&x3);
+        acc = acc.sqn(10).multiply(&x47);
+        acc = acc.sqn(2).multiply(&x3);
+        acc = acc.sqn(5).multiply(&x3);
+        acc = acc.sqn(5).multiply(&x3);
+        acc = acc.sqn(3).multiply(&x1);
+        acc = acc.sqn(7).multiply(&x21);
+        acc = acc.sqn(6).multiply(&x15);
+        acc
+    }
+
+    /// Returns self^(2^count) mod the group order, with a fixed squaring count.
+    const fn sqn(&self, count: usize) -> Self {
+        let mut result = *self;
+        let mut i = 0;
+        while i < count {
+            result = result.square();
+            i += 1;
+        }
+        result
     }
 
     /// Exponentiates `self` by `exp`, where `exp` is a little-endian order integer
@@ -795,6 +847,40 @@ mod tests {
 
         assert_eq!(minus_three * &minus_two, minus_two * &minus_three);
         assert_eq!(six, minus_two * &minus_three);
+    }
+
+    #[test]
+    fn inversion_chain_matches_binary_exponentiation() {
+        const ORDER_MINUS_TWO: [u64; 4] = [
+            0xf3b9_cac2_fc63_254f,
+            0xbce6_faad_a717_9e84,
+            0xffff_ffff_ffff_ffff,
+            0xffff_ffff_0000_0000,
+        ];
+
+        fn check(value: Scalar) {
+            let expected = value.pow_vartime(&ORDER_MINUS_TWO);
+            assert_eq!(value.invert_unchecked(), expected);
+            let inverse = value.invert();
+            if value == Scalar::ZERO {
+                assert!(bool::from(inverse.is_none()));
+                assert_eq!(expected, Scalar::ZERO);
+            } else {
+                let inverse = inverse.unwrap();
+                assert_eq!(inverse, expected);
+                assert_eq!(value * inverse, Scalar::ONE);
+            }
+        }
+
+        check(Scalar::ZERO);
+        let mut power = Scalar::ONE;
+        for _ in 0..256 {
+            check(power);
+            check(power - Scalar::ONE);
+            check(power + Scalar::ONE);
+            check(-power);
+            power = power.double();
+        }
     }
 
     /// Tests that a Scalar can be safely converted to a SecretKey and back

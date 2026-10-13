@@ -59,20 +59,34 @@ variable-time arbitrary-precision arithmetic for interpreter correctness; the
 canister runtime uses the separate RustCrypto implementation.
 
 Public-key derivation and signing nonce multiplication share a fixed-base comb
-with 64 iterations and a full, constant-time scan of all 15 table entries on
-each iteration. The table uses affine points with upstream complete mixed
-addition, including its constant-time identity handling for zero digits. Its public table
-is independently checked against Python arithmetic and exact OpenSSL scalar
-multiplication. Secret bytes and the copied scalar are explicitly zeroized.
-Verification combines the two public scalar multiplications with width-5
-nonadjacent forms and performs one affine normalization. Its variable-time
-branches depend only on the supplied public key, digest and signature. Signing
-keeps upstream RFC6979 nonce generation and constant-time scalar inversion,
-with the same ECDSA equation and nonzero signature validation. As before, the
-vanishingly rare zero-r or zero-s result returns `#invalidSignature`; it does
-not silently change deterministic signing by retrying with another nonce. Targeted source and
-emitted-Wasm inspection found no secret-dependent branch or address in the
-added comb loop; this review is not a formal constant-time proof.
+with four immutable tables of 15 affine points each. Its 16 rounds perform
+16 doublings and 64 complete mixed additions. Every selection scans all 15
+entries in a fixed order, including zero digits, using upstream constant-time
+selection and complete mixed addition's identity handling. The 3,840 bytes of
+public Montgomery coordinates are independently checked against Python
+arithmetic and exact OpenSSL scalar multiplication. Restoring these constants
+does not require SEC1 decoding on each call. Secret bytes and the copied
+scalar are explicitly zeroized.
+
+Signing keeps upstream RFC6979 nonce generation and uses a fixed scalar
+inversion chain with 254 squarings and 38 multiplications. Its exponent is
+independently verified as `n - 2`; loop counts and the multiplication schedule
+do not depend on the secret. Scalar squares use the pinned `crypto-bigint`
+symmetric wide-square operation followed by the existing Barrett reduction.
+The ECDSA equation, exact signature bytes and nonzero validation are preserved.
+The vanishingly rare zero-r or zero-s result returns `#invalidSignature`; it does
+not silently change deterministic signing by retrying with another nonce.
+
+Direct verification combines the two public scalar multiplications with
+width-5 nonadjacent forms. Direct and prepared verification then compare the
+homogeneous result `(X,Y,Z)` with `r` without affine normalization: infinity
+is rejected, and `X = r*Z` or `X = (r+n)*Z` must hold in the field. The second
+comparison is permitted only when the integer `r+n` is below the field prime
+`p`; since `n < p < 2n`, these are the only possible representatives.
+Verification's variable-time branches depend only on the supplied public
+key, digest and signature. The table and exponent proofs establish arithmetic
+values; constant-time behavior additionally requires source and emitted-code
+review.
 
 Validation includes exact RFC6979 A.2.5 SHA-256 signatures, all 484 cases in a
 pinned Wycheproof P-256/SHA-256 corpus, SEC1/scalar/DER edge cases, and unaligned
@@ -85,7 +99,10 @@ retained across asynchronous continuations and observed garbage collection.
 Native differential tests additionally compare 1,284 comb inputs and 147
 verification linear combinations with upstream arithmetic. Another 530
 exact-byte signing comparisons cover boundary secrets and digests, all
-256 single-bit secrets, and deterministic SHA-256-derived inputs. See
+256 single-bit secrets, and deterministic SHA-256-derived inputs. Scalar
+inversion is separately compared with generic binary exponentiation, and
+squaring with multiplication. Verification fixtures cover both possible
+X-coordinate representatives, the `r+n = p` boundary and infinity. See
 [vector provenance](tests/vectors/README.md) and
 [public API coverage](../../packages/fast/tests/ash/coverage/P256.md).
 
@@ -118,8 +135,8 @@ batch normalization with one field inversion. The runtime borrows the managed
 payload synchronously and retains no pointers. Fixed generator tables are
 shared immutable Wasm data, not duplicated in each handle. Direct verification
 also uses a fixed odd-multiple generator table; comparisons include that
-optimization in both paths. Signing and derivation retain their existing
-constant-time implementation. The interpreter independently stores validated
+optimization in both paths. Signing and derivation use the separate constant-time
+comb described above. The interpreter independently stores validated
 SEC1 and evaluates the same public operation with portable curve arithmetic.
 See the [narrow vendor hooks](runtime/vendor/README.md) for provenance and the
 supported 64-bit targets. The pinned upstream crates emit generic-array deprecation
@@ -127,16 +144,17 @@ and trait-implementation attribute warnings when built as path dependencies;
 the archived build logs preserve them. The selected width-eight format uses 16,320 payload bytes per key; it is not
 a portable prepared-key encoding.
 
-## Prepared verification performance
+## Prepared verification performance before the fourth pass
 
-The selected width-eight table reduces repeated RFC6979 sample verification
+The prepared-key pass selected a width-eight table, reducing repeated RFC6979
+sample verification
 from 12,541,922 to 3,802,871 IC instructions (69.68%), against direct verification
 in the same plugin/compiler build. Both calls allocate 32 bytes. Preparation
 costs 19,688,675 instructions and allocates 16,376 bytes, including the 16,320-byte
 key payload. Its modeled total cost becomes cheaper than direct calls from
 three verifications. Use direct verification for one-off keys.
 
-The final build passed all 111 PocketIC trials across seven independent
+That build passed all 111 PocketIC trials across seven independent
 fixtures. Including preparation, ten RFC sample verifications cost 57,714,287
 instructions versus 125,416,988 for direct calls (53.98% fewer); 100 cost
 399,943,697 versus 1,254,167,648 (68.11% fewer). The bounded
@@ -150,17 +168,24 @@ capacity.
 
 ## Performance
 
+The fourth pass adds the scalar inversion chain and symmetric scalar square,
+splits the secret generator comb into four static tables, and removes the
+final field inversion from direct and prepared verification. These changes
+preserve the public API, deterministic signature outputs and prepared-key
+payload format. The measurements below record earlier passes.
+
 The third pass reuses the fixed-base comb for signing and switches its table to
 complete affine mixed addition. All 30 workloads passed exact-output checks in
 three fresh PocketIC canisters for each version.
 
-| Operation | Previous instructions | Current instructions | Reduction | Allocation change |
+| Operation | Previous instructions | Round-three instructions | Reduction | Allocation change |
 | --- | ---: | ---: | ---: | ---: |
 | RFC6979 signing | 13,458,880 | 7,225,034 | 46.32% | None |
 | Compressed public key | 5,207,139 | 4,968,732 | 4.58% | None |
 | Compressed-key verification | 12,873,756 | 12,873,756 | 0% | None |
 
-All verification, key-conversion, DER and normalization cases have exactly
+In that comparison, all verification, key-conversion, DER and normalization
+cases have exactly
 unchanged instruction counts. Allocation and sampled memory are unchanged for
 all cases. Whole-canister Wasm grows by 8,416 bytes and the runtime by 8,535 bytes.
 See the [round-three report](../../benchmarks/crypto/round3/p256/README.md) for

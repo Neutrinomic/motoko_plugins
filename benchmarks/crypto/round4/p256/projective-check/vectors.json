@@ -1,0 +1,90 @@
+{
+  "curve": "NIST P-256 / secp256r1",
+  "provenance": {
+    "generator": "generate.py",
+    "generator_sha256": "5bc83bbb4688c3a2734a7f5bdb434d2f8ee49c135453aba20385afa268c85dcf",
+    "construction": "Q = r^-1 R; digest = 0; s = 1; therefore u1*G + u2*Q = R.",
+    "oracle": "Independent Python integer affine arithmetic; no plugin or RustCrypto imports.",
+    "checks": [
+      "p and n bounds",
+      "generator and constructed points on curve",
+      "n*G and n*R are infinity",
+      "r*Q equals the selected target R",
+      "ordinary affine ECDSA verification has the expected result"
+    ]
+  },
+  "parameters": {
+    "p": "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff",
+    "n": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+    "a": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+    "b": "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b",
+    "p_minus_n": "000000000000000000000000000000004319055358e8617b0c46353d039cdaae",
+    "u256_modulus_minus_n": "00000000ffffffff00000000000000004319055258e8617b0c46353d039cdaaf"
+  },
+  "vectors": [
+    {
+      "label": "rare_n_plus_3",
+      "purpose": "Valid second candidate: affine x = n + 3, signature r = 3.",
+      "public_key": "0202bc847e19ebbe40a367ced648068511bbc24dba56322fd52885604eddc09eaf",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": true,
+      "computed_point": "03ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "computed_affine_x": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "computed_affine_y": "484f0c0fda434ef0a808458914f328715d7a545e198ac7eee31dffe861b5d23f",
+      "signature_r": "0000000000000000000000000000000000000000000000000000000000000003",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "r_plus_order_below_p": true,
+      "r_plus_order_overflows_u256": false
+    },
+    {
+      "label": "near_p_minus_3",
+      "purpose": "Valid second candidate close to p: affine x = p - 3.",
+      "public_key": "02f7e989e38002374231cd080ce66566f5efabd1e5133f3f7cefd29836a0389aea",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "000000000000000000000000000000004319055358e8617b0c46353d039cdaab0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": true,
+      "computed_point": "03ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "computed_affine_x": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "computed_affine_y": "19719bebf6aea13f25c96dfd7c71f5225d4c8fc09eb5a0ab9f39e9178e55c121",
+      "signature_r": "000000000000000000000000000000004319055358e8617b0c46353d039cdaab",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "r_plus_order_below_p": true,
+      "r_plus_order_overflows_u256": false
+    },
+    {
+      "label": "reject_field_wrap",
+      "purpose": "Invalid: r+n=p must not reduce to affine x=0 modulo p.",
+      "public_key": "024b31d62fd9e3334146b7e206f7f4ba3520dd8494bee06d5c946ae5f7475f9d8a",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "000000000000000000000000000000004319055358e8617b0c46353d039cdaae0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": false,
+      "computed_point": "020000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_x": "0000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_y": "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4",
+      "signature_r": "000000000000000000000000000000004319055358e8617b0c46353d039cdaae",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff",
+      "r_plus_order_below_p": false,
+      "r_plus_order_overflows_u256": false
+    },
+    {
+      "label": "reject_limb_wrap",
+      "purpose": "Invalid: r+n=2^256 must not truncate to affine x=0.",
+      "public_key": "02b26c576d4e7d552d0602b3edf284be43a286d85a47644c69466deffb79748e46",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "00000000ffffffff00000000000000004319055258e8617b0c46353d039cdaaf0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": false,
+      "computed_point": "020000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_x": "0000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_y": "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4",
+      "signature_r": "00000000ffffffff00000000000000004319055258e8617b0c46353d039cdaaf",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "10000000000000000000000000000000000000000000000000000000000000000",
+      "r_plus_order_below_p": false,
+      "r_plus_order_overflows_u256": true
+    }
+  ]
+}

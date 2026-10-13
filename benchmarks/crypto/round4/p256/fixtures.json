@@ -1,0 +1,276 @@
+{
+  "protocol": "crypto-prepared-v1",
+  "purpose": "same-input baseline/candidate P256 arithmetic comparison",
+  "public_comb_width": 8,
+  "prepared_payload_bytes": 16320,
+  "oracle": "Python hashlib/HMAC RFC6979, Python modular scalar arithmetic, OpenSSL P-256 public-point derivation",
+  "upstream": {
+    "round3/p256/audit/independent-vectors.json": "9891c77ca8844f544113d4fa6c9820bb5ce7e51eaa0ffc49933a3a4e2844dc6c",
+    "prepared/p256/fixtures.json": "3647d5a7587ae2e084468897ec6236b6563ebc0358aa7e768aec2c9a41a64e06",
+    "round3/p256/cases.json": "ebd04fda58b2d7ad668cc768250ffcbc7ba310ad41e09beff09d9995d9afbb63",
+    "round4/p256/projective-check/vectors.json": "d1e2824284d92f29cb86346b9059d1eabae67bffeb1349b2be775504befa1a62"
+  },
+  "verification_vectors": [
+    {
+      "label": "rfc-sample",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf",
+      "public": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8",
+      "valid": true
+    },
+    {
+      "label": "one/zero",
+      "secret": "0000000000000000000000000000000000000000000000000000000000000001",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "0e6b3bb68d65aa645104de3abb94cbc6f568e2d55ea511d0e6d300e177002159167afc0b518bd63853ccc1b5292e27024c557c8924ca3dec81d59651b9021794",
+      "valid": true
+    },
+    {
+      "label": "one/order",
+      "secret": "0000000000000000000000000000000000000000000000000000000000000001",
+      "digest": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "0e6b3bb68d65aa645104de3abb94cbc6f568e2d55ea511d0e6d300e177002159167afc0b518bd63853ccc1b5292e27024c557c8924ca3dec81d59651b9021794",
+      "valid": true
+    },
+    {
+      "label": "order-minus-one/max",
+      "secret": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550",
+      "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "public": "026b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "77b47b05c7efc7af6da228f99727ae7cf6fc3aa80c36663ec4a56b2f7aa32f89bc70ca0c1e8f4530ed6ecf3088a1f47dad8bcf10fd61e1ff727dd77b147810b5",
+      "valid": true
+    },
+    {
+      "label": "rfc-wrong-digest",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "public": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8",
+      "valid": false
+    },
+    {
+      "label": "rfc-wrong-key",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8",
+      "valid": false
+    },
+    {
+      "label": "rfc-low-s",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf",
+      "public": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf37160834e36ad29a83bf2bc9385e491d6099c8fdf9d1ed67aa7ea5f51f93782857a9",
+      "valid": true
+    }
+  ],
+  "signing_vectors": [
+    {
+      "label": "RFC6979/sample",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf",
+      "public": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+    },
+    {
+      "label": "one/zero",
+      "secret": "0000000000000000000000000000000000000000000000000000000000000001",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "0e6b3bb68d65aa645104de3abb94cbc6f568e2d55ea511d0e6d300e177002159167afc0b518bd63853ccc1b5292e27024c557c8924ca3dec81d59651b9021794"
+    },
+    {
+      "label": "one/order",
+      "secret": "0000000000000000000000000000000000000000000000000000000000000001",
+      "digest": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "0e6b3bb68d65aa645104de3abb94cbc6f568e2d55ea511d0e6d300e177002159167afc0b518bd63853ccc1b5292e27024c557c8924ca3dec81d59651b9021794"
+    },
+    {
+      "label": "order-minus-one/max",
+      "secret": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550",
+      "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "public": "026b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "77b47b05c7efc7af6da228f99727ae7cf6fc3aa80c36663ec4a56b2f7aa32f89bc70ca0c1e8f4530ed6ecf3088a1f47dad8bcf10fd61e1ff727dd77b147810b5"
+    },
+    {
+      "label": "high-bit/order-plus-one",
+      "secret": "8000000000000000000000000000000000000000000000000000000000000000",
+      "digest": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632552",
+      "public": "0377b20a912e6b23135066e911891524bc4efe3560e3e92350b52dec8f375f2b54",
+      "signature": "180d33ab1959910f61a23fecc96b7ee1e9100d91895b25ebaecc13eb4128f732d26ef4352b3ab39f9c0ddc7a673dead7ef12a0e63e7611ebb62d0baa4a031c1b"
+    },
+    {
+      "label": "sha256-pair-0",
+      "secret": "c23789678a2fb3c8101187486437c1e383f742579585b92dee2d0e2e1862d962",
+      "digest": "39a007f9bc25e4c5cc1fac0f64c1701c316336239145744b32829491280d776c",
+      "public": "037f6c7de0585fc32fd1b5cc3ea4cbfe899e99927064488cfcce542f74f7d99d25",
+      "signature": "32ae265622524ee7af8cb995bff3f9013c1c068043190f50066860581839a763e291f81075286ed6af809d4a4c08cf96af0aaac472f4a70d042d40d4e0357753"
+    }
+  ],
+  "derivation_vectors": [
+    {
+      "label": "RFC6979/sample",
+      "secret": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721",
+      "digest": "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf",
+      "public": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+      "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+    },
+    {
+      "label": "one/zero",
+      "secret": "0000000000000000000000000000000000000000000000000000000000000001",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "public": "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "signature": "0e6b3bb68d65aa645104de3abb94cbc6f568e2d55ea511d0e6d300e177002159167afc0b518bd63853ccc1b5292e27024c557c8924ca3dec81d59651b9021794"
+    },
+    {
+      "label": "high-bit/order-plus-one",
+      "secret": "8000000000000000000000000000000000000000000000000000000000000000",
+      "digest": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632552",
+      "public": "0377b20a912e6b23135066e911891524bc4efe3560e3e92350b52dec8f375f2b54",
+      "signature": "180d33ab1959910f61a23fecc96b7ee1e9100d91895b25ebaecc13eb4128f732d26ef4352b3ab39f9c0ddc7a673dead7ef12a0e63e7611ebb62d0baa4a031c1b"
+    }
+  ],
+  "copied_controls": [
+    {
+      "label": "public-key-uncompressed",
+      "source": "round3/p256/cases/r2-p256-public-key-uncompressed/main.mo",
+      "source_sha256": "7aae4cd631777fe3de7a7a719d5457dc6dae3e9d03d08ae4fcc6efb3d246c55a",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "convert-compressed-to-uncompressed",
+      "source": "round3/p256/cases/r2-p256-convert-compressed-to-uncompressed/main.mo",
+      "source_sha256": "888374a736a741071892fa1b1cfe55aecacde77490e094453f210ce81d385d94",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "convert-uncompressed-to-compressed",
+      "source": "round3/p256/cases/r2-p256-convert-uncompressed-to-compressed/main.mo",
+      "source_sha256": "db499391c4262b043006da476b4b09a0b95198c61ce4233d79f48db699996d7c",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "der-encode-both-integers-padded",
+      "source": "round3/p256/cases/r2-p256-der-encode-both-integers-padded/main.mo",
+      "source_sha256": "0226cab6f9e757d4eaef8c43f428907b7d31c135f96254c138ca68ea4f787f14",
+      "expected_hex": "3046022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550022100ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "der-decode-both-integers-padded",
+      "source": "round3/p256/cases/r2-p256-der-decode-both-integers-padded/main.mo",
+      "source_sha256": "282ef7cb79cd9c9aaf365d2e7e8652313910717414ce3a374f89501649613762",
+      "expected_hex": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "normalize-high-s",
+      "source": "round3/p256/cases/r2-p256-normalize-high-s/main.mo",
+      "source_sha256": "6deb6a02b8508a7773a55db2f34adeb31b150f45c29c27b128a01c7a5fe9df4c",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    },
+    {
+      "label": "normalize-low-s",
+      "source": "round3/p256/cases/r2-p256-normalize-low-s/main.mo",
+      "source_sha256": "9d1560846ccd79ebaa655e99323f556557d06a2e65f0bbde2fdbd9d07634d649",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values."
+    }
+  ],
+  "projective_vectors": [
+    {
+      "label": "rare_n_plus_3",
+      "purpose": "Valid second candidate: affine x = n + 3, signature r = 3.",
+      "public_key": "0202bc847e19ebbe40a367ced648068511bbc24dba56322fd52885604eddc09eaf",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": true,
+      "computed_point": "03ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "computed_affine_x": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "computed_affine_y": "484f0c0fda434ef0a808458914f328715d7a545e198ac7eee31dffe861b5d23f",
+      "signature_r": "0000000000000000000000000000000000000000000000000000000000000003",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632554",
+      "r_plus_order_below_p": true,
+      "r_plus_order_overflows_u256": false,
+      "public": "0202bc847e19ebbe40a367ced648068511bbc24dba56322fd52885604eddc09eaf",
+      "valid": true
+    },
+    {
+      "label": "near_p_minus_3",
+      "purpose": "Valid second candidate close to p: affine x = p - 3.",
+      "public_key": "02f7e989e38002374231cd080ce66566f5efabd1e5133f3f7cefd29836a0389aea",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "000000000000000000000000000000004319055358e8617b0c46353d039cdaab0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": true,
+      "computed_point": "03ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "computed_affine_x": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "computed_affine_y": "19719bebf6aea13f25c96dfd7c71f5225d4c8fc09eb5a0ab9f39e9178e55c121",
+      "signature_r": "000000000000000000000000000000004319055358e8617b0c46353d039cdaab",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc",
+      "r_plus_order_below_p": true,
+      "r_plus_order_overflows_u256": false,
+      "public": "02f7e989e38002374231cd080ce66566f5efabd1e5133f3f7cefd29836a0389aea",
+      "valid": true
+    },
+    {
+      "label": "reject_field_wrap",
+      "purpose": "Invalid: r+n=p must not reduce to affine x=0 modulo p.",
+      "public_key": "024b31d62fd9e3334146b7e206f7f4ba3520dd8494bee06d5c946ae5f7475f9d8a",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "000000000000000000000000000000004319055358e8617b0c46353d039cdaae0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": false,
+      "computed_point": "020000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_x": "0000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_y": "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4",
+      "signature_r": "000000000000000000000000000000004319055358e8617b0c46353d039cdaae",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff",
+      "r_plus_order_below_p": false,
+      "r_plus_order_overflows_u256": false,
+      "public": "024b31d62fd9e3334146b7e206f7f4ba3520dd8494bee06d5c946ae5f7475f9d8a",
+      "valid": false
+    },
+    {
+      "label": "reject_limb_wrap",
+      "purpose": "Invalid: r+n=2^256 must not truncate to affine x=0.",
+      "public_key": "02b26c576d4e7d552d0602b3edf284be43a286d85a47644c69466deffb79748e46",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "signature": "00000000ffffffff00000000000000004319055258e8617b0c46353d039cdaaf0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_valid": false,
+      "computed_point": "020000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_x": "0000000000000000000000000000000000000000000000000000000000000000",
+      "computed_affine_y": "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4",
+      "signature_r": "00000000ffffffff00000000000000004319055258e8617b0c46353d039cdaaf",
+      "signature_s": "0000000000000000000000000000000000000000000000000000000000000001",
+      "r_plus_order": "10000000000000000000000000000000000000000000000000000000000000000",
+      "r_plus_order_below_p": false,
+      "r_plus_order_overflows_u256": true,
+      "public": "02b26c576d4e7d552d0602b3edf284be43a286d85a47644c69466deffb79748e46",
+      "valid": false
+    }
+  ],
+  "projective_provenance": {
+    "generator": "generate.py",
+    "generator_sha256": "5bc83bbb4688c3a2734a7f5bdb434d2f8ee49c135453aba20385afa268c85dcf",
+    "construction": "Q = r^-1 R; digest = 0; s = 1; therefore u1*G + u2*Q = R.",
+    "oracle": "Independent Python integer affine arithmetic; no plugin or RustCrypto imports.",
+    "checks": [
+      "p and n bounds",
+      "generator and constructed points on curve",
+      "n*G and n*R are infinity",
+      "r*Q equals the selected target R",
+      "ordinary affine ECDSA verification has the expected result"
+    ]
+  }
+}

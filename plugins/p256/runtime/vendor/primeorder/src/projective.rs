@@ -58,6 +58,13 @@ where
         z: C::FieldElement::ONE,
     };
 
+    /// Read-only homogeneous coordinates `(X, Y, Z)` with affine `(X/Z, Y/Z)`.
+    /// The identity has `Z = 0`. No normalization or inversion is performed.
+    #[doc(hidden)]
+    pub fn to_field_coordinates(&self) -> (C::FieldElement, C::FieldElement, C::FieldElement) {
+        (self.x, self.y, self.z)
+    }
+
     /// Returns the affine representation of this point, or `None` if it is the identity.
     pub fn to_affine(&self) -> AffinePoint<C> {
         <C::FieldElement as Field>::invert(&self.z)

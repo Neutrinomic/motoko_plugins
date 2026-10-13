@@ -1,4 +1,4 @@
-# Narrow prepared-point accessors
+# Narrow P256 arithmetic and point accessors
 
 These are source copies of RustCrypto `p256` 0.13.2 and `primeorder` 0.13.6
 from crates.io. Their Apache-2.0 and MIT licenses are preserved in each directory.
@@ -7,11 +7,26 @@ The crate archive SHA-256 checksums are:
 - p256: `c9863ad85fa8f4460f9c48cb909d38a0d689dba1f6f6988a5e3e0d31071bcd4b`
 - primeorder: `353e1ca18966c16d9deb1c69278edbc5f194139612772bd9537af60ac231e1e6`
 
-No field, scalar or point arithmetic is changed. Source additions are
+Field multiplication/reduction and point arithmetic are unchanged. Source additions are
 `FieldElement::{to_montgomery_words,from_montgomery_words_unchecked}` and
-`AffinePoint::{to_field_coordinates,from_field_coordinates_unchecked}`.
+`AffinePoint::{to_field_coordinates,from_field_coordinates_unchecked}` and the
+read-only `ProjectivePoint::to_field_coordinates`. The latter exposes the
+existing homogeneous `(X,Y,Z)` representation for public ECDSA verification
+without affine normalization; it performs no arithmetic or mutation.
 An `Invert` trait implementation delegates to the existing field inversion to
 enable primeorder's upstream batch normalization. The p256 dependency metadata selects the adjacent primeorder source.
+
+`Scalar::invert_unchecked` uses the fixed P256 order-inversion addition chain
+from Go's `P256OrdInverse` at commit
+`2c659bb4db1ff06c819f8b4cd6decc71e4d5b36e`, derived from Brian Smith's chain.
+Its 254 squarings and 38 multiplications use the existing scalar operations;
+the exponent remains exactly `n - 2`. Zero handling and public variable-time
+inversion are unchanged. The upstream Go license is retained as
+`p256/LICENSE-Go`; the independent source-parsing proof and provenance are in
+`benchmarks/crypto/round4/p256/scalar-chain/` at the repository root.
+`Scalar::square` calls the already-pinned crypto-bigint 0.5.5 `square_wide`
+primitive instead of general multiplication, followed by the same Barrett
+reduction. No custom limb arithmetic is introduced.
 
 The field accessors support the repository's **64-bit native and Wasm64**
 targets. They intentionally do not introduce a new 32-bit serialization path.

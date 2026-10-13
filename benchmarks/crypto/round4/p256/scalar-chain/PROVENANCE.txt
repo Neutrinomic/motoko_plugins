@@ -1,0 +1,62 @@
+Candidate: P-256 scalar inversion addition chain, chain-only source stage.
+
+The production source changes only Scalar::invert_unchecked and adds its
+fixed-count sqn helper. Scalar::square, multiplication, Barrett reduction,
+Scalar::invert's CtOption zero check, and public invert_vartime are unchanged.
+
+Primary sources:
+- Go commit 2c659bb4db1ff06c819f8b4cd6decc71e4d5b36e, P256OrdInverse:
+  https://go.googlesource.com/go/+/2c659bb4db1ff06c819f8b4cd6decc71e4d5b36e/src/crypto/internal/fips140/nistec/p256_ordinv.go
+- Brian Smith, P-256 scalar inversion addition chain:
+  https://briansmith.org/ecc-inversion-addition-chains-01#p256_scalar_inversion
+
+Only the addition-chain schedule is adapted; none of Go's Montgomery
+arithmetic is copied. Small powers have decimal exponent names, followed by
+an explicit sequence of fixed square/multiply operations. Go's 26-element
+schedule is written directly to avoid runtime schedule storage and indexing.
+LICENSE-Go preserves the upstream source and Go license notices.
+
+The old exponentiation performs 256 squares and 169 multiplies. The new
+schedule performs 254 squares and 38 multiplies. Because the current scalar
+square delegates to multiply, this saves 133 of 425 scalar multiply calls
+(31.294% of inversion arithmetic), before compiler and ABI effects. No
+instruction-count performance result is claimed by this source-only proof.
+
+Run the independent source proof from the repository root:
+  python3 benchmarks/crypto/round4/p256/scalar-chain/verify-chain.py
+
+The script parses the actual Rust inversion source as integer exponent
+arithmetic, asserts the small-power exponents, checks the exact fixed-count
+squaring helper, and proves the resulting integer is exactly n - 2. It also
+checks representative residues against Python's independent modular inverse.
+proof.json captures its output for the frozen chain-only source.
+
+Secret-flow properties: the source schedule contains no input-dependent
+branch, loop bound, or table index. The only loops added are sqn calls with
+literal public counts. Zero propagates to zero through the positive-exponent
+chain; Scalar::invert continues to return CtOption::None for zero. This source
+review does not replace downstream inspection of generated Wasm arithmetic.
+
+Rust regression test added in scalar.rs:
+  inversion_chain_matches_binary_exponentiation
+It checks zero, all 256 one-bit scalars, their immediate neighbors, and their
+negations against the unchanged generic pow_vartime(n - 2), and checks the
+nonzero multiplication identity. This vendored dependency test is not run by
+the runtime package's ordinary test suite. No Rust build was run in this lane.
+
+Reusable runtime test plan (public p256::Scalar methods suffice):
+  const E: [u64; 4] = [0xf3b9_cac2_fc63_254f,
+      0xbce6_faad_a717_9e84, 0xffff_ffff_ffff_ffff, 0xffff_ffff_0000_0000];
+  For each scalar v, let expected = v.pow_vartime(&E), actual = v.invert().
+  If v == Scalar::ZERO, assert actual.is_none() and expected == Scalar::ZERO.
+  Otherwise unwrap actual, assert actual == expected and v * actual == ONE.
+  Use the same power/boundary values and 256 deterministic SHA-256 residues.
+The unchanged generic exponentiation is an independent schedule oracle;
+existing signing-vs-upstream tests alone share the modified inversion code.
+
+Optional follow-up, intentionally not applied in the chain-only source:
+  Scalar::square can call self.0.square_wide(), then the same barrett_reduce.
+  crypto-bigint 0.5.5 already implements that const operation with half-grid
+  multiplication: 10 instead of 16 limb products on four-limb U256.
+  https://github.com/RustCrypto/crypto-bigint/blob/v0.5.5/src/uint/mul.rs
+  Benchmark this separately after the chain-only stage to preserve attribution.
