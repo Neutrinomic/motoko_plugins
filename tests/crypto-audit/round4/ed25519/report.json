@@ -1,0 +1,60 @@
+{
+  "approved": true,
+  "findings": [],
+  "baseline_revision": "0e1e96a4c325bdfebc627f0c16d546cb39c16a70",
+  "scope": "Selected serial32 projective-equality verification candidate; rejected Fiat32 and pending extra benchmark cases are excluded.",
+  "source_review": [
+    "Canonical y, decompression and small-order rejection preserve compress(decompress(R)) = original R, including negative-zero exclusion.",
+    "Upstream EdwardsPoint equality compares both projective coordinates and preserves the full uncofactored equation, including mixed-order points.",
+    "Direct public-key-first validation and signature error ordering are unchanged; canonical S is retained after successful validation.",
+    "Challenge hashes original R/A bytes; both verification paths retain positive reduced k multiplied by -A.",
+    "Signing, prepared serialization, native imports, allocation and borrowed-pointer lifetime are unchanged; no new variable-time secret path."
+  ],
+  "validation": {
+    "native_tests": 9,
+    "public_fixtures": 4,
+    "engines": [
+      "source",
+      "IR",
+      "lowered IR",
+      "compiled Wasm"
+    ],
+    "independent_verification_cases": 290,
+    "independent_signing_vectors": 18,
+    "native_old_new_predicate_comparisons": 118,
+    "native_R_sign_bit_mutations": 96,
+    "public_R_sign_bit_mutations": 13,
+    "prepared_tests": "initialized canonical pointer-free payloads, unaligned guarded output, immutable overlapping read inputs, interleaved keys, malformed-input recovery",
+    "nominal_and_GC": "Previous approved audits retained; bridge/layout/compiler/module unchanged, so not repeated."
+  },
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "rts_sha256": {
+    "mo-rts.wasm": "8456e47e527bbd584ee2d5d867b0c93f5596d2bcdaa87bba53c04281562c820f",
+    "mo-rts-debug.wasm": "f87c1f4a8b15e6e5949f618195cd303bd0d07fc85f1f73e9f0a244eacecb24c9"
+  },
+  "artifact_sha256": {
+    "build.json": "3383b1c7420b08e3ee0848b9e32251d2ee943c86ef00df66982a2a4356ff6ddd",
+    "plugin.cmxs": "d35ca880547f71ce8f502e30e497cfe88f1c96f91584796606ee772ded1d0a3c",
+    "runtime.wasm": "32d76fa35196fcce7933a7e3c21ea171366e3d2acfac156f8f857dead42c97ac"
+  },
+  "runtime_source_sha256": "f4cd810a2765967f9ebf9de4db86b5890288634f8b977aca2fb5c49b43c95829",
+  "native_rustflags": [
+    "--cfg",
+    "curve25519_dalek_bits=\"32\"",
+    "--cfg",
+    "curve25519_dalek_backend=\"serial\""
+  ],
+  "unchanged_boundary_sources_sha256": {
+    "plugins/ed25519/compiler/reference.ml": "f089bb54bfbf25b6cd7ca6495ad794be89d38b77ff053bd4eba14f4ddfb22799",
+    "plugins/ed25519/compiler/register.ml": "656479d09b67944f0b62344ed73d58be338fe1a34e2300dbc26cca3f374ec952",
+    "plugins/ed25519/plugin.json": "7ec2eeade5b56dc9e29dfc6ad110e57a3e1f4f1be9b8e0cdc9e382ab8b80ac91",
+    "plugins/ed25519/runtime/Cargo.toml": "4e845deb646e4bd2dcd62ec6dee3002eedd9e21deac1547ece8e74fc37ddafae",
+    "packages/fast/src/Ed25519.mo": "21bf8d94133590517bcad958b03837cb257054864482fcacc8cf218c90df7b6b"
+  },
+  "evidence_sha256": {
+    "evidence.json": "a2f261205d4ac4048277776398130c74cb45380f0b6d6fed9f9dccce1e81d58f",
+    "benchmark-review.json": "a6a7b8a01aaca0cbf36f8f556cd928230401cc7225e884a2ad84b1c52e9143c5",
+    "README.md": "107bd21f71b95eb9906317a80e19069b2079991f75f8cb03e02a9aa4056427dd"
+  },
+  "benchmark_review": "36 matched observations: direct verification 2,308,542 to 2,169,138 (-6.0386%); prepared verification 2,071,444 to 1,933,663 (-6.6514%); all timed allocations and sampled memory identical. Runtime shrinks 1,041 bytes. Matching actor source/oracle and artifact/environment pins verified."
+}
