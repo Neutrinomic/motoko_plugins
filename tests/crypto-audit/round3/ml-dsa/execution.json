@@ -1,0 +1,172 @@
+{
+  "approved": true,
+  "productionCommit": "3aea298d5ec7f027c2f76c55024ad47566c755f1",
+  "reviewedAtCommit": "eb35696115734878cf66bc5e03e29395fae4a1fa",
+  "findings": {
+    "blocking": [],
+    "residualLimits": [
+      "Upstream does not comprehensively erase all secret scratch; caller input Blobs unchanged.",
+      "Signing rejection runtime varies; upstream16-bit nonce can theoretically wrap after16384 rejected attempts.",
+      "Native additional shadow-stack bound does not include caller frames; no separate Wasm32 artifact audited."
+    ]
+  },
+  "executions": [
+    {
+      "name": "Motoko/IR/lowered/Wasm public-API tests",
+      "exitCode": 0,
+      "cases": 2,
+      "cwd": "/srv/shared/code/motoko_experiments/motoko_sha",
+      "command": "nix develop --command bash -c 'export PATH=/srv/shared/code/motoko_experiments/motoko_sha/bin:$PATH; test-runner -b -f \"crypto-mldsa|independent\" /srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ml-dsa/packages/fast/tests/run /srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ml-dsa/tests/crypto-audit/round3/ml-dsa/run'",
+      "log": "logs/test-runner.log"
+    },
+    {
+      "name": "Retained GC actor initial fixture",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 1,
+      "skippedHelperMethods": 1,
+      "log": "logs/ash-retained-initial.log",
+      "note": "All cryptographic/retained-root assertions passed; reclaim threshold did not. Fixed test pressure only; initial source hash/diagnosis retained."
+    },
+    {
+      "name": "Retained GC actor final fixture",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skippedHelperMethods": 1,
+      "cwd": "/srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ml-dsa",
+      "command": "bun /srv/shared/code/ash/src/index.ts test tests/crypto-audit/round3/ml-dsa/Retained.ash.json --verbose",
+      "log": "logs/ash-retained-final.log",
+      "assertedMessageBoundaries": 13,
+      "minimumReclaimedBytesExclusive": 4194304,
+      "note": "Printed529 instructions/0B measures empty final Test.test return, not async crypto or GC workload."
+    }
+  ],
+  "executionCoordination": "Author agent ran the independently authored fixtures in the assigned integration test slot. Audit agent inspected logs, zero-output files, source/artifact identity, and all final assertions.",
+  "compilerExecutable": {
+    "path": "/home/devbox/.local/lib/motoko-compute/moc",
+    "sha256": "4eb5e547d8772ccc25fcea56f1b97b100415b6e2b0edb891e2d06832a55dd2bc"
+  },
+  "files": [
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/Cases.mo",
+      "sha256": "3d4490f31672eed3b797161726a20fa6706306cfcc1a7b08295a350d2e37f914",
+      "bytes": 6571
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/Retained.mo",
+      "sha256": "976a4c0e8bf56c20ac6864229f8b5b3fe0fdaa11c136b3fd713045c702f05b3c",
+      "bytes": 2453
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/Retained.ash.json",
+      "sha256": "7254f658bf7d3f28c52277f0b8c2fa7267e8cc5c46a7a4d5859ea8c8560b3890",
+      "bytes": 203
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/independent.mo",
+      "sha256": "9f76dec5a15d337038453b4a2b096474743d439008813af104213868596ec58f",
+      "bytes": 230
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/logs/test-runner.log",
+      "sha256": "8044a7879cbb6563e6959bf910fb448b1a714a86e9c8a38bbc95e92c67387280",
+      "bytes": 308
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/logs/ash-retained-initial.log",
+      "sha256": "3ea0c67fdb5b474063e8ae20b2c88c89be8e86080e11dab99dcf5e1b1477c1a4",
+      "bytes": 362
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/logs/ash-retained-final.log",
+      "sha256": "d77094cceb3ae50a2c8229a3969b780d1289669ff73b1ad422fc5d13840b34a1",
+      "bytes": 345
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/logs/retained-initial-source.json",
+      "sha256": "769cd22b65ad802f42827f1baf5f1edd4810c68dae967ba7bbf994f8cf4dfc1b",
+      "bytes": 488
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/acvp-provenance.json",
+      "sha256": "f9b510e91d20ab613b0be5594e9c62177016a2f333b3f485c08ebd0cdbbdb36d",
+      "bytes": 1363
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/source-pin.json",
+      "sha256": "a655b168098fcc615eaad06173cfcea7b7de9c39f8ba5c9b83154d6eb796980b",
+      "bytes": 5223
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/stack/report.json",
+      "sha256": "44531b76c09b3385c3d9e74492738087515b5bb9dabdb4ce80dcbbfc96967614",
+      "bytes": 14121
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/stack/errata-review.json",
+      "sha256": "c97e4cbbfd5fc8d9d7c58462ba436cda081bd1726b1e4a56dbdd409d26d24da3",
+      "bytes": 1408
+    }
+  ],
+  "silentTestOutputs": [
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.tc",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.run",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.run-ir",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.run-low",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.comp",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.valid",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.wasm-run",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.diff-ir",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.diff-low",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "compiledTestArtifacts": [
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/run/_out/independent.wasm",
+      "sha256": "957cc775bbd4e2571172cdeabd7ddbb0b13e695fd67fd9d12b250fa64089fb72",
+      "bytes": 2078418
+    },
+    {
+      "path": "tests/crypto-audit/round3/ml-dsa/.ash/Retained/artifacts/mldsa_audit.wasm",
+      "sha256": "159229342380ba061c194c0a9a622be7628c34c7f3ac0dde7397fa40bcfd189d",
+      "bytes": 665079
+    }
+  ],
+  "binaryRetention": "Generated Wasm remains in ignored build output; hashes retained here. Runtime/plugin artifact hashes and compiler identity are in source-pin.json."
+}
