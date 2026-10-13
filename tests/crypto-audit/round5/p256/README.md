@@ -61,8 +61,11 @@ requirements or fabricate prepared handles.
   passes 18/18, native passes 2/2. OCaml compilation treats enabled warnings as
   errors. Existing vendored Rust deprecation/attribute warnings remain.
 - OpenSSL fixture regeneration check and `git diff --check` pass.
-- Integration owns rebuilding both affected reference plugins, their ordinary
-  signature/public gates, and the combined 22-method P256 Ash run with forced GC.
+- Integration rebuilt both affected reference plugins: the combined P256,
+  secp256k1 and signature/prepared-composition public gate passes 13/13. P256 Ash
+  passes 22/22 with sanity checks and forced GC; the prepared-composition test
+  passes 1/1 with observed collection. The P256 runtime remains byte-identical
+  to the baseline. Artifact and integration-log hashes are in `execution.json`.
 
 `execution.json` records commands and hashes. Large logs remain under `_build`.
 An initial new-fixture run caught a tuple-projection parsing error in the test;

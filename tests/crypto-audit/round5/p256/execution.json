@@ -59,5 +59,53 @@
     "plugins/p256/tests/vectors/generate-encoding.py": "73b01171645921607968210c29e27e636c9912f7f535153ab0e816703bbdb59b"
   },
   "oracle": "OpenSSL 3.6.3 9 Jun 2026",
-  "integration_gates": "Rebuilt reference plugin public tests and Ash are integration-owned; see combined report."
+  "integration_gates": {
+    "passed": true,
+    "reference_plugins_rebuilt": [
+      "p256",
+      "secp256k1"
+    ],
+    "source_sha256": {
+      "plugins/secp256k1/compiler/secp256k1_reference.ml": "e4e89863b6f58e1637b0ab024c4310203ec663771e7cd79efd22e7e196b75c36"
+    },
+    "artifact_sha256": {
+      "p256": {
+        "runtime.wasm": "b4b1f17afd54c3928bf037da4f1ddea0f3bc44d7e5bcde19f61c22e32ad0f378",
+        "plugin.cmxs": "344b63969e38f62e090d38a3608614934a5776556e3e909c3e66e601d5ab899d",
+        "build.json": "98ceb3b98b04ab2c361354ef37f5f079d63f61429a19a92ce6a8e75be808a5f7"
+      },
+      "secp256k1": {
+        "runtime.wasm": "730329b0a01941777375b0b60f7d4454ae7f609cb3d7cab3c127896ebd074d02",
+        "plugin.cmxs": "82541faf86cf3c9c883ab3d2679a176eedc9f819658ef5602f47c8c34a415ba2",
+        "build.json": "51c043c986a8aa084e7baefa3f49b378d6fe3d406aa4cb8bc3dff1dcfb5c5d56"
+      }
+    },
+    "p256_runtime_byte_identical_to_baseline": true,
+    "checks": {
+      "public_fixed_combined": {
+        "passed": 13,
+        "failed": 0,
+        "log": "_build/round5/logs/public-fixed-combined.log",
+        "log_sha256": "7c629f15b37cea279b97d77d2570ce77b1a7ece057ae49a7c5f8963041d358b2"
+      },
+      "ash_p256": {
+        "passed": 22,
+        "failed": 0,
+        "log": "_build/round5/logs/ash-P256.log",
+        "log_sha256": "10c22ea3a9ba92b91c1e5905e4f3013dd4d97999b3b6b637ecc4395db99c3536"
+      },
+      "ash_prepared_composition": {
+        "passed": 1,
+        "failed": 0,
+        "log": "_build/round5/logs/ash-PreparedComposition.log",
+        "log_sha256": "0984650e879e142d4800715dba8a0610939c7a04d45c997fb89c06dd74f41fdc"
+      }
+    },
+    "ash_flags": [
+      "--sanity-checks",
+      "--force-gc"
+    ],
+    "p256_ash_source_sha256": "eb5785042665d2b9f23ae14e08e71f286a6accb41b0f06bedfda769549973ee3",
+    "p256_ash_config_sha256": "c08b56a1c9fc548dccd42d82b213735fc2155eb27c6685c7b6359f2c00925d64"
+  }
 }
