@@ -590,7 +590,7 @@ fn baseline_pairing_check(bytes: &[u8]) -> Result<bool, u32> {
     }
     let prepared: Vec<_> = points.iter().map(|(_, q)| G2Prepared::from(*q)).collect();
     let terms: Vec<_> = points.iter().zip(&prepared).map(|((p, _), q)| (p, q)).collect();
-    Ok(multi_miller_loop(&terms).final_exponentiation() == Gt::identity())
+    Ok(bls12_381::multi_miller_loop(&terms).final_exponentiation() == Gt::identity())
 }
 
 #[test]

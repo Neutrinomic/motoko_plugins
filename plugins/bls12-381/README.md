@@ -18,7 +18,7 @@ with exact byte comparisons and a bounded index sort for larger batches.
 
 `verifyEthereum` uses G2 signatures/G1 keys and
 `BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_`. Proofs use
-`BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_`. Both aggregate entry points verify
+`BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_`. Both direct aggregate entry points verify
 every distinct byte-identical key/proof pair in each call before using its key.
 A previously verified pair may be reused within that call; a different proof is
 always checked. No result or native state is retained between calls. Repeated
@@ -31,6 +31,27 @@ external points still receive canonical, curve, subgroup and identity checks. Th
 no unchecked assertion flag.
 Callers construct Ethereum signing roots themselves. Raw group aggregation does
 not prove key possession and should not be substituted for signature verification.
+
+For repeated verification, `prepareICPublicKey` validates a key and creates
+`PreparedICPublicKey`; `verifyICPrepared` and `aggregateVerifyICPrepared` reuse its
+pairing coefficients. `prepareEthereumPublicKey` creates a validated
+`PreparedEthereumPublicKey` for `verifyEthereumPrepared`. Ethereum aggregates use
+a separate `PreparedEthereumPoPKey`, created only by `prepareEthereumPoPKey(key,
+proof)` after successful proof verification. Pass those keys to
+`aggregateVerifyEthereumPrepared` or `fastAggregateVerifyEthereumPrepared`.
+A false proof returns `#err(#invalidProof)`; malformed inputs retain the ordinary
+decoding errors. Prepared calls still validate every signature and preserve the
+profile's message rules, identity checks, and batch limits.
+
+Prepared keys are immutable Motoko heap values owned by the caller. Keep them in
+transient fields, records or collections; they cannot be created from arbitrary
+Blobs, sent between actors, or stored across upgrades. The collector manages them
+normally, and dropping all references permits collection. There is no native
+handle registry or hidden cache. Retain the original key/proof bytes separately
+if preparation must be repeated after an upgrade. The private payload occupies
+19,680 bytes per IC key and 144 bytes per Ethereum key, plus ordinary managed
+object overhead. Preparation cost is paid once per value; measure it separately
+from repeated verification.
 
 Group batches and pairing products contain at most 128 items. General aggregate
 verification accepts 1..127 entries, reserving one pairing term for the signature;
@@ -46,6 +67,12 @@ signature batches are errors. Public hashing requires a nonempty explicit DST;
 RFC9380 oversized DST normalization is supported. Errors are typed Motoko variants.
 
 The runtime pins portable `bls12_381` 0.8.0, `sha2` 0.9.9 and `generic-array` 0.14.9.
+Its small vendored prepared-table interface reuses the upstream Miller-loop and
+field algorithms. Private tables contain explicit initialized little-endian
+limbs, without pointers or native-structure padding. An immutable generator
+table benefits both direct and prepared verification; comparisons use that same
+direct implementation. See `runtime/vendor/bls12_381/MOTOKO-PREPARED.md` for the
+upstream provenance and exact extension.
 These dependencies must not be described as independently audited. A shared
 exceptional-zero G2 mapping helper corrects a defect in upstream 0.8.0 (also present
 in 0.9.0); both direct mapping and full hashing take the corrected path. The helper

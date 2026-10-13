@@ -1,16 +1,24 @@
 module P = Codegen.Plugin_codegen
 module G = Codegen.InstrList
+module C = Mo_values.Compute_plugin
+module T = Mo_types.Type
 open Wasm_exts.Types
 open Wasm_exts.Ast
 open Schema
 
 module Operation (O : sig val operation : Schema.operation end) = struct
   module Make (B : P.Backend) = struct
-    let compile_aggregate env op arguments =
+    let compile_aggregate env specialization op arguments =
       let keys = List.nth arguments 0 in
-      let proofs = if op.opcode = 19 then None else Some (List.nth arguments 1) in
-      let messages = List.nth arguments (if op.opcode = 19 then 1 else 2) in
+      let proofs = if op.opcode = 20 || op.opcode = 21
+        then Some (List.nth arguments 1) else None in
+      let messages = List.nth arguments (match proofs with None -> 1 | Some _ -> 2) in
       let signature = List.nth arguments (op.arity - 1) in
+      let key_payload key = match Schema.prepared_input op.opcode with
+        | None -> key
+        | Some descriptor ->
+          let actual = T.as_array_sub (List.hd specialization.C.argument_types) in
+          B.Prepared.unwrap descriptor actual key in
       let set_count, get_count = B.new_local env "bls_count" in
       let set_index, get_index = B.new_local env "bls_index" in
       let set_rows, get_rows = B.new_local env "bls_rows" in
@@ -39,11 +47,11 @@ module Operation (O : sig val operation : Schema.operation end) = struct
         set_rows; get_rows; B.Blob.payload_ptr_unskewed env; set_row;
         B.compile_unboxed_zero; set_index;
         B.Arr.for_each env keys get_count (fun key -> G.concat [
-          blob 0L key;
+          blob 0L (key_payload key);
           (match proofs with
           | None -> G.concat [store 16L B.compile_unboxed_zero; store 24L B.compile_unboxed_zero]
           | Some proofs -> blob 16L (indexed proofs));
-          blob 32L (if op.opcode = 21 then messages else indexed messages);
+          blob 32L (if Schema.fast_aggregate op.opcode then messages else indexed messages);
           get_index; B.compile_add_const 1L; set_index;
           get_row; B.compile_add_const 48L; set_row]);
         B.alloc_blob env (B.compile_unboxed_const 1L); set_output;
@@ -61,10 +69,10 @@ module Operation (O : sig val operation : Schema.operation end) = struct
             B.Bool.from_rts_int32]))
           (status_error 1 Schema.errors)] in
       let arrays = (match proofs with None -> [] | Some proofs -> [proofs]) @
-        (if op.opcode = 21 then [] else [messages]) in
+        (if Schema.fast_aggregate op.opcode then [] else [messages]) in
       let checked = G.concat [get_count; B.compile_eq_const 0L;
         B.E.if1 I64Type (error "emptyBatch") (G.concat [
-          get_count; B.compile_unboxed_const (if op.opcode = 21 then 128L else 127L);
+          get_count; B.compile_unboxed_const (if Schema.fast_aggregate op.opcode then 128L else 127L);
           B.compile_comparison I64Op.GtU;
           B.E.if1 I64Type (error "tooManyItems") run])] in
       let checked = List.fold_right (fun array rest -> G.concat [
@@ -74,9 +82,9 @@ module Operation (O : sig val operation : Schema.operation end) = struct
       P.{representation = Managed;
         code = G.concat [keys; B.Arr.len env; set_count; checked]}
 
-    let compile env _specialization arguments =
+    let compile env specialization arguments =
       let op = O.operation in
-      if op.opcode >= 19 && op.opcode <= 21 then compile_aggregate env op arguments else
+      if Schema.aggregate op.opcode then compile_aggregate env specialization op arguments else
       let set_output,get_output = B.new_local env "bls_output" in
       let set_status,get_status = B.new_local env "bls_status" in
       let rec error_code index = function
@@ -85,6 +93,11 @@ module Operation (O : sig val operation : Schema.operation end) = struct
             B.E.if1 I64Type
               (B.Variant.inject env label (B.Tuple.compile_unit env))
               (error_code (index+1) rest)] in
+      let arguments = match Schema.prepared_input op.opcode with
+        | None -> arguments
+        | Some descriptor -> List.mapi (fun index argument ->
+          if index = 0 then B.Prepared.unwrap descriptor
+            (List.hd specialization.C.argument_types) argument else argument) arguments in
       let args = List.map (fun argument -> G.concat [argument;
         B.Blob.payload_ptr_unskewed env; argument; B.Blob.len env]) arguments in
       let unused = List.init (3 - op.arity) (fun _ -> G.concat [
@@ -93,7 +106,9 @@ module Operation (O : sig val operation : Schema.operation end) = struct
         B.Blob.payload_ptr_unskewed env;
         G.i (Wasm_exts.Ast.Load {ty=I32Type; align=0; offset=0L; sz=Some (Pack8,ZX)});
         B.Bool.from_rts_int32]
-        else get_output in
+        else match Schema.prepared_output op.opcode with
+          | Some descriptor -> B.Prepared.wrap descriptor get_output
+          | None -> get_output in
       P.{representation=Managed; code=G.concat [
         B.alloc_blob env (B.compile_unboxed_const (Int64.of_int op.output_size));
         set_output;

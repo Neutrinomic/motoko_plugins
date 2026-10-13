@@ -1,5 +1,6 @@
 (* Portable executable specification. No native code, subprocess, or retained state. *)
 module V = Mo_values.Value
+module C = Mo_values.Compute_plugin
 module G1 = Bls_group.G1
 module G2 = Bls_group.G2
 exception Invalid of string
@@ -25,6 +26,9 @@ let dst_pop = "BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_"
 let as_blob = function V.Blob b -> b | _ -> fail "invalidArgument"
 let as_blobs = function
   | V.Array a -> Array.to_list (Array.map as_blob a)
+  | _ -> fail "invalidArgument"
+let prepared_blobs descriptor = function
+  | V.Array a -> Array.to_list (Array.map (C.Prepared.unwrap descriptor) a)
   | _ -> fail "invalidArgument"
 
 (* A portable mathematical specification of the fused profiles. Successful
@@ -57,15 +61,21 @@ let aggregate opcode arguments =
       as_blobs keys, as_blobs proofs, as_blobs messages, as_blob signature
     | 21, [keys; proofs; message; signature] ->
       as_blobs keys, as_blobs proofs, [as_blob message], as_blob signature
+    | 27, [keys; messages; signature] ->
+      prepared_blobs Schema.prepared_ic keys, [], as_blobs messages, as_blob signature
+    | 28, [keys; messages; signature] ->
+      prepared_blobs Schema.prepared_pop keys, [], as_blobs messages, as_blob signature
+    | 29, [keys; message; signature] ->
+      prepared_blobs Schema.prepared_pop keys, [], [as_blob message], as_blob signature
     | _ -> fail "invalidArgument" in
   let n = List.length keys in
-  if (opcode <> 21 && n <> List.length messages) ||
-     (opcode <> 19 && n <> List.length proofs) then fail "invalidLength";
+  if (not (Schema.fast_aggregate opcode) && n <> List.length messages) ||
+     ((opcode = 20 || opcode = 21) && n <> List.length proofs) then fail "invalidLength";
   if n = 0 then fail "emptyBatch";
-  if n > (if opcode = 21 then 128 else 127) then fail "tooManyItems";
+  if n > (if Schema.fast_aggregate opcode then 128 else 127) then fail "tooManyItems";
   let check terms = V.Bool (Bls_pairing.pairing_check terms) in
   match opcode with
-  | 19 ->
+  | 19 | 27 ->
     let rec distinct seen = function
       | [] -> ()
       | message :: rest ->
@@ -77,14 +87,16 @@ let aggregate opcode arguments =
       let key = nonzero2 (g2 key) in
       Bls_hash.hash_g1 ~dst:dst_ic message, key) keys messages in
     check ((G1.neg signature, G2.generator) :: terms)
-  | 20 ->
+  | 20 | 28 ->
     let signature = nonzero2 (g2 signature) in
-    let keys = checked_keys keys proofs in
+    let keys = if opcode = 20 then checked_keys keys proofs
+      else List.map (fun key -> nonzero1 (g1 key)) keys in
     let terms = List.map2 (fun key message ->
       key, Bls_hash.hash_g2 ~dst:dst_eth message) keys messages in
     check ((G1.neg G1.generator, signature) :: terms)
-  | 21 ->
-    let keys = checked_keys keys proofs in
+  | 21 | 29 ->
+    let keys = if opcode = 21 then checked_keys keys proofs
+      else List.map (fun key -> nonzero1 (g1 key)) keys in
     let key = List.fold_left G1.add G1.infinity keys in
     (* Preserve verifyEthereum's order: signature decoding precedes the
        aggregate-key identity check; that check precedes signature identity. *)
@@ -147,9 +159,30 @@ let blob_operation opcode arguments =
     | 18,[points] -> V.Blob (G2.to_compressed (List.fold_left G2.add G2.infinity (chunks 96 g2 points)))
     | _ -> fail "invalidArgument"
 
+let prepared_operation opcode arguments = match opcode, arguments with
+  | 22, [key] ->
+    let key = nonzero2 (g2 (as_blob key)) in
+    C.Prepared.wrap Schema.prepared_ic (G2.to_compressed key)
+  | 23, [key] ->
+    let key = nonzero1 (g1 (as_blob key)) in
+    C.Prepared.wrap Schema.prepared_eth (G1.to_compressed key)
+  | 24, [key; proof] ->
+    (match blob_operation 16 [key; proof] with
+    | V.Bool true -> C.Prepared.wrap Schema.prepared_pop (as_blob key)
+    | V.Bool false -> fail "invalidProof"
+    | _ -> fail "invalidArgument")
+  | 25, [key; message; signature] ->
+    let key = C.Prepared.unwrap Schema.prepared_ic key in
+    blob_operation 14 [V.Blob key; message; signature]
+  | 26, [key; message; signature] ->
+    let key = C.Prepared.unwrap Schema.prepared_eth key in
+    blob_operation 15 [V.Blob key; message; signature]
+  | _ -> fail "invalidArgument"
+
 let evaluate opcode _type_arguments _types arguments =
   try
-    let value = if opcode >= 19 && opcode <= 21 then aggregate opcode arguments
+    let value = if Schema.aggregate opcode then aggregate opcode arguments
+      else if opcode >= 22 && opcode <= 26 then prepared_operation opcode arguments
       else blob_operation opcode arguments in
     Ok (V.Variant ("ok",value))
   with Invalid label -> Ok (V.Variant ("err",V.Variant (label,V.Tup [])))

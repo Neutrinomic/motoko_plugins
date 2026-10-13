@@ -1,7 +1,9 @@
 //! BLS12-381 kernels using canonical IETF compressed point encodings.
 //!
-//! No borrowed input pointer survives the call. Pairing precomputation uses
-//! bounded ephemeral managed scratch (at most 128 terms), as does MSM. MSM is
+//! No borrowed input pointer survives the call. Direct pairing precomputation
+//! uses bounded ephemeral managed scratch (at most 128 terms), as does MSM.
+//! Explicit prepared keys use immutable caller-owned managed Blobs containing
+//! only initialized limbs; an immutable generator table is shared by both paths. MSM is
 //! variable time and intended for public scalars. Other kernels use fixed
 //! stack storage. Every point decoder checks the prime-order
 //! subgroup. Scalars and map-to-curve field elements are canonical big endian.
@@ -14,7 +16,11 @@ use alloc::vec::Vec;
 use bls12_381::{
     G1Affine, G1Projective, G2Affine, G2Prepared, G2Projective, Gt, Scalar,
     hash_to_curve::{ExpandMsgXmd, HashToCurve, HashToField, MapToCurve},
-    multi_miller_loop,
+};
+use bls12_381::plugin_prepared::{
+    G1_AFFINE_BYTES, G2_PREPARED_BYTES, G2PreparedSource,
+    multi_miller_loop as prepared_miller_loop,
+    read_g1_affine_trusted, write_g1_affine, write_g2_prepared,
 };
 // bls12_381 0.8 exposes generic-array 0.14 in its hash-to-field interface.
 #[allow(deprecated)]
@@ -73,6 +79,82 @@ const INVALID_ARGUMENT: u32 = 10;
 const IC_DST: &[u8] = b"BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_";
 const ETH_DST: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
 const ETH_POP_DST: &[u8] = b"BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+
+// These private, nonstable representations are created only by the plugin's
+// protected factories. Every byte is initialized; neither format contains
+// native pointers, allocator metadata, padding, or retained scratch storage.
+const PREPARED_IC_BYTES: usize = 96 + G2_PREPARED_BYTES;
+const PREPARED_ETH_BYTES: usize = 48 + G1_AFFINE_BYTES;
+
+#[repr(align(8))]
+struct AlignedGeneratorTable([u8; G2_PREPARED_BYTES]);
+// Generated through the same explicit-limb writer and checked byte-for-byte
+// against fresh upstream preparation in native tests. Direct and prepared
+// APIs share this immutable constant; it is not a mutable cross-call cache.
+static G2_GENERATOR_TABLE: AlignedGeneratorTable = AlignedGeneratorTable(
+    *include_bytes!("../vectors/g2-generator-prepared.bin"));
+
+fn dynamic_g2_preparation(point: G2Affine) -> Option<G2Prepared> {
+    if point == G2Affine::generator() { None } else { Some(G2Prepared::from(point)) }
+}
+
+fn pairing_source(prepared: &Option<G2Prepared>) -> G2PreparedSource<'_> {
+    match prepared {
+        Some(prepared) => G2PreparedSource::Owned(prepared),
+        None => G2PreparedSource::TrustedBytes(&G2_GENERATOR_TABLE.0),
+    }
+}
+
+#[derive(Clone, Copy)]
+struct PreparedIC<'a> {
+    canonical: &'a [u8; 96],
+    table: &'a [u8; G2_PREPARED_BYTES],
+}
+
+fn prepared_ic(bytes: &[u8]) -> Result<PreparedIC<'_>, u32> {
+    if bytes.len() != PREPARED_IC_BYTES { return Err(INVALID_LENGTH); }
+    Ok(PreparedIC {
+        canonical: bytes[..96].try_into().map_err(|_| INVALID_LENGTH)?,
+        table: bytes[96..].try_into().map_err(|_| INVALID_LENGTH)?,
+    })
+}
+
+fn prepared_eth(bytes: &[u8]) -> Result<G1Affine, u32> {
+    if bytes.len() != PREPARED_ETH_BYTES { return Err(INVALID_LENGTH); }
+    // The SDK nominal type prevents importing arbitrary bytes into this path.
+    // Factories have already checked canonical encoding, subgroup and identity;
+    // the separate PoP nominal type additionally certifies its proof equation.
+    Ok(read_g1_affine_trusted(bytes[48..].try_into().map_err(|_| INVALID_LENGTH)?))
+}
+
+fn prepare_key(op: u32, key: &[u8], proof: &[u8], output: &mut [u8]) -> Result<(), u32> {
+    if op == 22 {
+        if output.len() != PREPARED_IC_BYTES { return Err(INVALID_LENGTH); }
+        let point = g2(key)?;
+        if bool::from(point.is_identity()) { return Err(IDENTITY); }
+        let table = (&mut output[96..]).try_into().map_err(|_| INVALID_LENGTH)?;
+        if !write_g2_prepared(&point, table) { return Err(IDENTITY); }
+        output[..96].copy_from_slice(key);
+    } else {
+        if output.len() != PREPARED_ETH_BYTES { return Err(INVALID_LENGTH); }
+        let point = g1(key)?;
+        if op == 24 {
+            // Decode both operands before identity rejection, as verifyPoP does.
+            let proof = g2(proof)?;
+            if bool::from(point.is_identity()) || bool::from(proof.is_identity()) {
+                return Err(IDENTITY);
+            }
+            if !pair_equal(point, G2Affine::from(hash_g2(key, ETH_POP_DST)),
+                G1Affine::generator(), proof) {
+                return Err(INVALID_PROOF);
+            }
+        } else if bool::from(point.is_identity()) { return Err(IDENTITY); }
+        let affine = (&mut output[48..]).try_into().map_err(|_| INVALID_LENGTH)?;
+        if !write_g1_affine(&point, affine) { return Err(IDENTITY); }
+        output[..48].copy_from_slice(key);
+    }
+    Ok(())
+}
 
 // BLS12-381's base field modulus in canonical big-endian order.
 const FP_MODULUS: [u8; 48] = [
@@ -192,9 +274,10 @@ fn map_g2(bytes: &[u8]) -> Result<G2Projective, u32> {
 }
 
 fn pair_equal(a: G1Affine, b: G2Affine, c: G1Affine, d: G2Affine) -> bool {
-    let b = G2Prepared::from(b);
-    let d = G2Prepared::from(d);
-    multi_miller_loop(&[(&a, &b), (&-c, &d)]).final_exponentiation() == Gt::identity()
+    let b = dynamic_g2_preparation(b);
+    let d = dynamic_g2_preparation(d);
+    prepared_miller_loop(&[(&a, pairing_source(&b)), (&-c, pairing_source(&d))])
+        .final_exponentiation() == Gt::identity()
 }
 
 fn verify_ic(pk: &[u8], message: &[u8], signature: &[u8]) -> Result<bool, u32> {
@@ -223,6 +306,25 @@ fn verify_eth(pk: &[u8], message: &[u8], signature: &[u8], dst: &[u8]) -> Result
         G1Affine::generator(),
         signature,
     ))
+}
+
+fn verify_ic_prepared(key: &[u8], message: &[u8], signature: &[u8]) -> Result<bool, u32> {
+    let key = prepared_ic(key)?;
+    let signature = g1(signature)?;
+    if bool::from(signature.is_identity()) { return Err(IDENTITY); }
+    let hash = -G1Affine::from(hash_g1(message, IC_DST));
+    Ok(prepared_miller_loop(&[
+        (&signature, G2PreparedSource::TrustedBytes(&G2_GENERATOR_TABLE.0)),
+        (&hash, G2PreparedSource::TrustedBytes(key.table)),
+    ]).final_exponentiation() == Gt::identity())
+}
+
+fn verify_eth_prepared(key: &[u8], message: &[u8], signature: &[u8]) -> Result<bool, u32> {
+    let key = prepared_eth(key)?;
+    let signature = g2(signature)?;
+    if bool::from(signature.is_identity()) { return Err(IDENTITY); }
+    Ok(pair_equal(key, G2Affine::from(hash_g2(message, ETH_DST)),
+        G1Affine::generator(), signature))
 }
 
 fn pairing_check(bytes: &[u8]) -> Result<bool, u32> {
@@ -267,13 +369,13 @@ fn pairing_product(mut points: Vec<(G1Affine, G2Affine)>) -> bool {
     if points.is_empty() {
         return true;
     }
-    let prepared: Vec<_> = points.iter().map(|(_, q)| G2Prepared::from(*q)).collect();
+    let prepared: Vec<_> = points.iter().map(|(_, q)| dynamic_g2_preparation(*q)).collect();
     let terms: Vec<_> = points
         .iter()
         .zip(&prepared)
-        .map(|((p, _), q)| (p, q))
+        .map(|((p, _), q)| (p, pairing_source(q)))
         .collect();
-    multi_miller_loop(&terms).final_exponentiation() == Gt::identity()
+    prepared_miller_loop(&terms).final_exponentiation() == Gt::identity()
 }
 
 // Width-four non-adjacent form for a canonical public scalar. A carry may
@@ -466,6 +568,8 @@ fn execute(op: u32, a: &[u8], b: &[u8], c: &[u8]) -> Result<Output, u32> {
             }
             Ok(Output::G2(G2Affine::from(sum).to_compressed()))
         }
+        25 => Ok(Output::Bool(verify_ic_prepared(a, b, c)?)),
+        26 => Ok(Output::Bool(verify_eth_prepared(a, b, c)?)),
         _ => Err(INVALID_ARGUMENT),
     }
 }
@@ -480,6 +584,9 @@ fn execute(op: u32, a: &[u8], b: &[u8], c: &[u8]) -> Result<Output, u32> {
 /// the complete writable result size and does not overlap any input. No GC
 /// safepoint occurs during the call. Allocated scratch is reclaimed by the
 /// host after the synchronous frame, not by this kernel.
+/// For prepared consumers, the first input must be the immutable payload
+/// created by this plugin's matching protected factory. It is not a raw-byte
+/// import API. Factory outputs contain only explicit initialized limbs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn bls_call(
     op: u32,
@@ -498,12 +605,19 @@ pub unsafe extern "C" fn bls_call(
             unsafe { core::slice::from_raw_parts(ptr, len) }
         }
     }
-    let result = execute(
-        op,
-        unsafe { input(p1, n1) },
-        unsafe { input(p2, n2) },
-        unsafe { input(p3, n3) },
-    );
+    let first = unsafe { input(p1, n1) };
+    let second = unsafe { input(p2, n2) };
+    if (22..=24).contains(&op) {
+        // Write directly into the compiler-owned output Blob. A 19.6KB table
+        // must not enlarge the common output enum or be copied through stack.
+        let size = if op == 22 { PREPARED_IC_BYTES } else { PREPARED_ETH_BYTES };
+        let output = unsafe { core::slice::from_raw_parts_mut(out, size) };
+        return match prepare_key(op, first, second, output) {
+            Ok(()) => 0,
+            Err(code) => code,
+        };
+    }
+    let result = execute(op, first, second, unsafe { input(p3, n3) });
     match result {
         Ok(Output::G1(bytes)) => unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), out, 48) },
         Ok(Output::G2(bytes)) => unsafe { core::ptr::copy_nonoverlapping(bytes.as_ptr(), out, 96) },
@@ -569,6 +683,40 @@ fn aggregate_ic(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool,
     Ok(pairing_product(terms))
 }
 
+fn aggregate_ic_prepared(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    if !distinct_messages(inputs) { return Err(DUPLICATE_MESSAGE); }
+    let signature = -g1(signature)?;
+    if bool::from(signature.is_identity()) { return Err(IDENTITY); }
+    let mut points = Vec::with_capacity(inputs.len());
+    for input in inputs {
+        let key = prepared_ic(input.key)?;
+        points.push((G1Affine::from(hash_g1(input.message, IC_DST)), key));
+    }
+    // A canonical prefix identifies the key without comparing its 19.6KB
+    // table. Preserve bilinear consolidation, including cancelling sums.
+    for i in 0..points.len() {
+        let (before, after) = points.split_at_mut(i + 1);
+        let (point, key) = &mut before[i];
+        if bool::from(point.is_identity()) { continue; }
+        let mut combined = None;
+        for (other, other_key) in after {
+            if !bool::from(other.is_identity()) && key.canonical == other_key.canonical {
+                combined = Some(combined.unwrap_or_else(|| G1Projective::from(*point)) + *other);
+                *other = G1Affine::identity();
+            }
+        }
+        if let Some(sum) = combined { *point = G1Affine::from(sum); }
+    }
+    let mut terms = Vec::with_capacity(points.len() + 1);
+    terms.push((&signature, G2PreparedSource::TrustedBytes(&G2_GENERATOR_TABLE.0)));
+    for (point, key) in &points {
+        if !bool::from(point.is_identity()) {
+            terms.push((point, G2PreparedSource::TrustedBytes(key.table)));
+        }
+    }
+    Ok(prepared_miller_loop(&terms).final_exponentiation() == Gt::identity())
+}
+
 fn proof_checked_keys(inputs: &[AggregateInput<'_>]) -> Result<Vec<G1Affine>, u32> {
     let mut keys = Vec::with_capacity(inputs.len());
     for (i, input) in inputs.iter().enumerate() {
@@ -602,6 +750,21 @@ fn aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool
         return Err(IDENTITY);
     }
     let keys = proof_checked_keys(inputs)?;
+    Ok(aggregate_eth_with_keys(inputs, &keys, signature))
+}
+
+fn prepared_eth_keys(inputs: &[AggregateInput<'_>]) -> Result<Vec<G1Affine>, u32> {
+    inputs.iter().map(|input| prepared_eth(input.key)).collect()
+}
+
+fn aggregate_eth_prepared(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    let signature = g2(signature)?;
+    if bool::from(signature.is_identity()) { return Err(IDENTITY); }
+    let keys = prepared_eth_keys(inputs)?;
+    Ok(aggregate_eth_with_keys(inputs, &keys, signature))
+}
+
+fn aggregate_eth_with_keys(inputs: &[AggregateInput<'_>], keys: &[G1Affine], signature: G2Affine) -> bool {
     let mut terms = Vec::with_capacity(inputs.len() + 1);
     terms.push((-G1Affine::generator(), signature));
     for (i, input) in inputs.iter().enumerate() {
@@ -614,11 +777,20 @@ fn aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool
         };
         terms.push((keys[i], hash));
     }
-    Ok(pairing_product(terms))
+    pairing_product(terms)
 }
 
 fn fast_aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
     let keys = proof_checked_keys(inputs)?;
+    fast_aggregate_eth_with_keys(inputs, &keys, signature)
+}
+
+fn fast_aggregate_eth_prepared(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result<bool, u32> {
+    let keys = prepared_eth_keys(inputs)?;
+    fast_aggregate_eth_with_keys(inputs, &keys, signature)
+}
+
+fn fast_aggregate_eth_with_keys(inputs: &[AggregateInput<'_>], keys: &[G1Affine], signature: &[u8]) -> Result<bool, u32> {
     let mut key = G1Projective::identity();
     for part in keys {
         key += part;
@@ -643,14 +815,16 @@ fn fast_aggregate_eth(inputs: &[AggregateInput<'_>], signature: &[u8]) -> Result
 /// `signature` denotes `signature_len` readable bytes; `out` is one writable
 /// byte disjoint from the descriptors and all payloads. Fast aggregate rows
 /// must all describe the same message. Invalid statuses leave `out` unchanged.
+/// Prepared operations 27–29 require matching protected-factory payloads;
+/// operations 28–29 specifically require proof-validated Ethereum payloads.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn bls_aggregate(
     op: u32, rows: *const usize, count: usize,
     signature: *const u8, signature_len: usize, out: *mut u8,
 ) -> u32 {
     let maximum = match op {
-        19 | 20 => MAX_BATCH - 1,
-        21 => MAX_BATCH,
+        19 | 20 | 27 | 28 => MAX_BATCH - 1,
+        21 | 29 => MAX_BATCH,
         _ => return INVALID_ARGUMENT,
     };
     if count == 0 { return EMPTY_BATCH; }
@@ -672,6 +846,9 @@ pub unsafe extern "C" fn bls_aggregate(
         19 => aggregate_ic(&inputs[..count], signature),
         20 => aggregate_eth(&inputs[..count], signature),
         21 => fast_aggregate_eth(&inputs[..count], signature),
+        27 => aggregate_ic_prepared(&inputs[..count], signature),
+        28 => aggregate_eth_prepared(&inputs[..count], signature),
+        29 => fast_aggregate_eth_prepared(&inputs[..count], signature),
         _ => unreachable!(),
     };
     match result {
@@ -682,3 +859,6 @@ pub unsafe extern "C" fn bls_aggregate(
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod prepared_tests;
