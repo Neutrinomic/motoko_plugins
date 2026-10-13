@@ -1,8 +1,9 @@
 # Independent Ed25519 audit
 
 **Passed:** seven native tests and three public fixtures in all four execution
-engines. The reviewed baseline has no findings; exact source/artifact hashes and
-scope are recorded in `report.json` and `evidence.json`.
+engines, with the selected upstream serial32 backend. No findings; exact
+source/artifact hashes and scope are recorded in `report.json` and
+`evidence.json`. The original serial64 audit is preserved in `history/default64`.
 
 The corpus exercises the public `mo:fast/Ed25519` API in the source interpreter,
 IR interpreter, lowered interpreter and compiled Wasm. The native audit calls
@@ -30,11 +31,14 @@ come from the published corpus; they are not inferred from plugin output.
 Build `dist/ed25519`, then run inside the matching compiler's Nix environment:
 
 ```sh
+CARGO_ENCODED_RUSTFLAGS=$'--cfg\x1fcurve25519_dalek_bits="32"\x1f--cfg\x1fcurve25519_dalek_backend="serial"' \
 python3 tests/crypto-audit/round3/ed25519/run.py --motoko /path/to/motoko
 ```
 
 The runner checks source/artifact consistency before and after execution and
-records per-engine outputs and content hashes in `evidence.json`.
+records per-engine outputs and content hashes in `evidence.json`. It requires
+native flags to match the plugin's configured backend, and records both native
+and Wasm flags. `native.log` includes the exact curve25519-dalek rustc invocation.
 
 The source review covers the runtime, compiler binding and portable reference.
 Dalek's ordinary `raw_verify` and `verify_strict` use the same internal scalar

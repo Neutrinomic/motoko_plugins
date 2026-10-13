@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import time
 
@@ -55,7 +56,16 @@ def main():
     report = dict(schema=1, source_sha256=sources, artifact_sha256=artifacts,
                   corpus_cases=290, wycheproof_cases=151,
                   mixed_order={'uncofactored_valid': 8, 'cofactor_only_invalid': 8})
-    report['native'] = run(['cargo', 'test', '--offline', '--manifest-path', HERE/'Cargo.toml',
+    native_flags = (env['CARGO_ENCODED_RUSTFLAGS'].split('\x1f')
+                    if env.get('CARGO_ENCODED_RUSTFLAGS') else shlex.split(env.get('RUSTFLAGS', '')))
+    runtime_flags = build.get('runtime_rustflags', [])
+    for cfg in json.loads((ROOT/'plugins/ed25519/plugin.json').read_text()).get('runtime_cfg', []):
+        for label, flags in [('native', native_flags), ('runtime', runtime_flags)]:
+            assert any(flags[index:index+2] == ['--cfg', cfg] for index in range(len(flags))), \
+                f'{label} audit would omit configured backend: {cfg}'
+    report['native_rustflags'] = native_flags
+    report['runtime_rustflags'] = runtime_flags
+    report['native'] = run(['cargo', 'test', '--offline', '--verbose', '--manifest-path', HERE/'Cargo.toml',
                             '--lib', '--target-dir', ROOT/'_build/ed25519-audit-native'],
                            HERE/'native.log', ROOT, env)
     report['motoko'] = run(['test-runner', '-b', '-j', '1', HERE/'run'],

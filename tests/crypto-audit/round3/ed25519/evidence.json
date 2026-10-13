@@ -5,14 +5,14 @@
     "plugins/ed25519/runtime/Cargo.toml": "8eca2858ff15c87d19c4951f0c20821bbab26c1cc04bffeaa8961701410422e3",
     "plugins/ed25519/compiler/register.ml": "029fa29623268ed4f2fcfec790669138aaf8d4f4a0e67802b697650923544f45",
     "plugins/ed25519/compiler/reference.ml": "4aa75ad3570b21d373a88bfd952e1da8eb5149135f5354385560ce2eccbcfb4e",
-    "plugins/ed25519/plugin.json": "c47d57685a11f1ddcbbe792475013a79408807692b4508ab371c864e176e0c62",
+    "plugins/ed25519/plugin.json": "7ec2eeade5b56dc9e29dfc6ad110e57a3e1f4f1be9b8e0cdc9e382ab8b80ac91",
     "packages/fast/src/Ed25519.mo": "4675bdcadac0ffcc862c3402ec3b53c1b04cca801098b158f44e0c7c45219741",
     "Cargo.lock": "39fcd79df7c177261dacc8168f72f215cb04d1161a5990467caed55105aac449"
   },
   "artifact_sha256": {
-    "build.json": "72ef905c779ddc6cf5d2ab673bb764812dc8d4db36126289a0dfcbff442131ad",
+    "build.json": "3d8a3c2a62f1d07214b5e84a83c515fd0987042deaea06ac3ebba972943001d5",
     "plugin.cmxs": "f8204c223fcc16e7202055f0d9b571043c4b1dd77f9ea8a9d8a1dbe99723b1aa",
-    "runtime.wasm": "f13d99896bce70f91b7ebb9bb808e3b4015aac79a55152962ea4a29bedb16e29"
+    "runtime.wasm": "0c1ff6f573ca09fdb67a7dd7f10ff57fb019901fe14a2e4820f3ba80088a04d0"
   },
   "corpus_cases": 290,
   "wycheproof_cases": 151,
@@ -20,15 +20,31 @@
     "uncofactored_valid": 8,
     "cofactor_only_invalid": 8
   },
+  "native_rustflags": [
+    "--cfg",
+    "curve25519_dalek_bits=\"32\"",
+    "--cfg",
+    "curve25519_dalek_backend=\"serial\""
+  ],
+  "runtime_rustflags": [
+    "--remap-path-prefix=/srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ed25519=.",
+    "-C",
+    "link-arg=--import-memory",
+    "--cfg",
+    "curve25519_dalek_bits=\"32\"",
+    "--cfg",
+    "curve25519_dalek_backend=\"serial\""
+  ],
   "native": {
     "exit": 0,
-    "seconds": 8.839918152079917,
+    "seconds": 3.232175905024633,
     "log": "native.log",
-    "sha256": "fc8e74ddd69e8886b338aef910d2955648bf1398ff7ac5092374019ab150d6a7",
+    "sha256": "073539a4764f07dd87eadbb6eafd1ee4d11c9891682290722c23c8989870f650",
     "command": [
       "cargo",
       "test",
       "--offline",
+      "--verbose",
       "--manifest-path",
       "/srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ed25519/tests/crypto-audit/round3/ed25519/Cargo.toml",
       "--lib",
@@ -38,9 +54,9 @@
   },
   "motoko": {
     "exit": 0,
-    "seconds": 7.565914503997192,
+    "seconds": 7.519512585015036,
     "log": "motoko.log",
-    "sha256": "1aaf702d761d67f7aa6c72017104f7986a90b288ffce4a26cf6d72737bd80b5a",
+    "sha256": "aa379281ffab10966601eb7b60021afa60536deee69264fd6caa57940f651152",
     "command": [
       "test-runner",
       "-b",
@@ -79,7 +95,7 @@
     "run/adversarial.mo": "9d1737f25989580eac1073625087c82ceaa281f6ff95c372311f0f0549f08b51",
     "run/large-aliasing.mo": "943136cc8f1c2a1c547a6c0f04c77829eaf96cea5fb51ee435c271c5cc48553b",
     "run/wycheproof.mo": "19c2bd3126053d36ad4725a683df48133faaf0550a877f2f78eeb2de763e3cde",
-    "run.py": "5f6ba66175a1eb97913252fe79d835894e2c134e4ee56dec320e0237c414a7f2",
+    "run.py": "6277169c58705ac473efb24e6a86bed9b395cb8f9e9c39642021e5e1d51251b0",
     "vectors/cases.json": "05313892385a861ae2f54b00c091a193492fc690a93693628d7360799e30ec10",
     "vectors/ed25519_test.json": "752d2ea7d7c6cf4736381b6cbacb61f8182b126ab7cd9b058f00c50084975536",
     "vectors/openssl-extra.json": "6e44d3f3d7cc796c49f270e62b35bf22432face651534103f6c21307376fffe6",

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "approved": true,
-  "scope": "New Ed25519 baseline using pinned Dalek 2.2.0/curve25519-dalek 4.1.3 serial64 backend; source, portable reference and managed binding",
+  "scope": "New Ed25519 plugin using pinned Dalek 2.2.0/curve25519-dalek 4.1.3 upstream serial32 backend; source, portable reference and managed binding",
   "blocking_findings": [],
   "other_findings": [],
   "validation": {
@@ -23,22 +23,39 @@
     "Canonical A/R, on-curve/non-small-order checks and S<L precede the same uncofactored equation used by Dalek verify_strict. No cofactor-only acceptance introduced by using ordinary verify after explicit guards.",
     "Mixed-order keys remain supported as documented: validation is not prime-subgroup membership. Eight valid mixed-order signatures and eight cofactor-only signatures distinguish these contracts.",
     "Compiler allocates managed outputs before borrowing input pointers; synchronous stack-only runtime has no host callback, input mutation, retained state or allocator.",
-    "SigningKey and ExpandedSecretKey use upstream zeroize-on-drop. Public API does not promise erasing caller-owned immutable seed or all hash temporaries."
+    "SigningKey and ExpandedSecretKey use upstream zeroize-on-drop. Public API does not promise erasing caller-owned immutable seed or all hash temporaries.",
+    "The upstream serial32 backend is selected for both native audit and actual linked Wasm. Verbose Cargo evidence contains the exact curve25519-dalek rustc invocation with both cfg overrides; no field arithmetic implementation was changed."
   ],
   "source_sha256": {
     "plugins/ed25519/runtime/src/lib.rs": "cee615e8ef8bb26a3a350e0461cf1b7a8e1a1582769bd876c697ba5c7afa7f6f",
     "plugins/ed25519/runtime/Cargo.toml": "8eca2858ff15c87d19c4951f0c20821bbab26c1cc04bffeaa8961701410422e3",
     "plugins/ed25519/compiler/register.ml": "029fa29623268ed4f2fcfec790669138aaf8d4f4a0e67802b697650923544f45",
     "plugins/ed25519/compiler/reference.ml": "4aa75ad3570b21d373a88bfd952e1da8eb5149135f5354385560ce2eccbcfb4e",
-    "plugins/ed25519/plugin.json": "c47d57685a11f1ddcbbe792475013a79408807692b4508ab371c864e176e0c62",
+    "plugins/ed25519/plugin.json": "7ec2eeade5b56dc9e29dfc6ad110e57a3e1f4f1be9b8e0cdc9e382ab8b80ac91",
     "packages/fast/src/Ed25519.mo": "4675bdcadac0ffcc862c3402ec3b53c1b04cca801098b158f44e0c7c45219741",
     "Cargo.lock": "39fcd79df7c177261dacc8168f72f215cb04d1161a5990467caed55105aac449"
   },
   "artifact_sha256": {
-    "build.json": "72ef905c779ddc6cf5d2ab673bb764812dc8d4db36126289a0dfcbff442131ad",
+    "build.json": "3d8a3c2a62f1d07214b5e84a83c515fd0987042deaea06ac3ebba972943001d5",
     "plugin.cmxs": "f8204c223fcc16e7202055f0d9b571043c4b1dd77f9ea8a9d8a1dbe99723b1aa",
-    "runtime.wasm": "f13d99896bce70f91b7ebb9bb808e3b4015aac79a55152962ea4a29bedb16e29"
+    "runtime.wasm": "0c1ff6f573ca09fdb67a7dd7f10ff57fb019901fe14a2e4820f3ba80088a04d0"
   },
-  "evidence_sha256": "da7c92f6fe4cdbf1d021e58147f5a2a37a8eac2b5341addd7bf11bee312d562b",
-  "performance_changes_require_revalidation": true
+  "evidence_sha256": "73d3b1a30c4db37ec629fc9a434250c73d7c1760ba30327eacdcbd128a070621",
+  "performance_changes_require_revalidation": true,
+  "native_rustflags": [
+    "--cfg",
+    "curve25519_dalek_bits=\"32\"",
+    "--cfg",
+    "curve25519_dalek_backend=\"serial\""
+  ],
+  "runtime_rustflags": [
+    "--remap-path-prefix=/srv/shared/code/motoko_experiments/plugins/_build/signature-round3/ed25519=.",
+    "-C",
+    "link-arg=--import-memory",
+    "--cfg",
+    "curve25519_dalek_bits=\"32\"",
+    "--cfg",
+    "curve25519_dalek_backend=\"serial\""
+  ],
+  "prior_baseline": "history/default64/report.json"
 }
