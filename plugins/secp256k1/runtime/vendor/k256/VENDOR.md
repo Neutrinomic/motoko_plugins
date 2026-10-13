@@ -1,14 +1,14 @@
-# Pinned k256 source and constructor patch
+# Pinned k256 source and local performance patches
 
 This is the complete published source of RustCrypto `k256` 0.13.4, including its
 original Apache-2.0 and MIT licenses. The `.cargo-ok` local extraction marker is
 omitted. The crate archive SHA-256 is
 `f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b`;
 the archive records upstream commit `5ac8f5d77f11399ff48d87b0554935f6eddda342`.
-`upstream-source.json` records every original file's hash, both changed files'
+`upstream-source.json` records every original file's hash, changed files'
 before/after hashes, and the hash of `exact.patch`.
 
-Only two upstream files differ:
+Four upstream files differ:
 
 - `Cargo.toml` adds an empty workspace to keep upstream development targets
   outside the enclosing plugin workspace. Dependencies, features and package
@@ -18,6 +18,12 @@ Only two upstream files differ:
   Previously, the constructor calculated `dG` to obtain parity, normalized the
   scalar, and calculated the normalized scalar's public point a second time.
   It now conditionally negates the existing point using the same parity bit.
+
+- `src/arithmetic/field.rs` and `src/arithmetic/field/field_impl.rs` select
+  upstream's unchanged 10x26 coordinate field backend on Wasm64 in release
+  and debug builds. Its products fit in native Wasm `u64` multiplication;
+  5x52 uses `u128` products that need software expansion on this target.
+  Other targets and scalar arithmetic retain their upstream selection.
 
 The original secret multiplication, scalar conditional assignment, nonce/signing
 implementation, hashing, and `SigningKey` zeroization remain unchanged. Point

@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "name": "secp256k1_public_key_ecdsa_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_public_key_ecdsa",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_verify_ecdsa_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_verify_ecdsa",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement.",
+      "source": "curve-cases/secp256k1_verify_ecdsa_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_public_key_bitcoin_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_public_key_bitcoin",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "notes": "Full-width 254-bit scalar. Native API validates input and returns compressed SEC1; baseline key/curve setup and SEC1 output encoding are outside measurement.",
+      "source": "curve-cases/secp256k1_public_key_bitcoin_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_verify_bitcoin_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_verify_bitcoin",
+      "plugins": [
+        "secp256k1",
+        "sha256"
+      ],
+      "expected_hex": "01",
+      "notes": "Valid low-S compact signature, fixed digest and key. Native key/signature decoding is measured; baseline key/signature decoding is outside measurement. Both sides include SHA-256 prehashing of the same message.",
+      "source": "curve-cases/secp256k1_verify_bitcoin_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_sign_rfc6979_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_sign_rfc6979",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "385cd1a83f1e9b94a03b6a704abaed20879541ff0af652704b55d1bd0473d8536938f2a4e0b4167e44c697f45390f12e2891edef3030ab6fcc32877ddf519ae8",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "curve-cases/secp256k1_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_schnorr_sign_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_schnorr_sign",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Official BIP340 test vector 1: https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv",
+      "notes": "Absolute-only BIP340 Schnorr; bitcoin 0.2.1 does not implement Schnorr. Full-width official secret key and message; explicit auxiliary randomness.",
+      "source": "curve-cases/secp256k1_schnorr_sign_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock"
+    },
+    {
+      "name": "secp256k1_schnorr_verify_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_schnorr_verify",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Official BIP340 test vector 1: https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv",
+      "notes": "Absolute-only BIP340 Schnorr; bitcoin 0.2.1 does not implement Schnorr. Full-width official secret key and message; explicit auxiliary randomness.",
+      "source": "curve-cases/secp256k1_schnorr_verify_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock"
+    }
+  ]
+}

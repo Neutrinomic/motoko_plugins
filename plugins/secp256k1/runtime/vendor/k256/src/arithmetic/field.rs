@@ -4,10 +4,14 @@
 
 use cfg_if::cfg_if;
 
+// Wasm64 has native 64-bit multiplication but no 128-bit multiplication.
+// Reuse the upstream 10x26 backend whose products fit in u64.
+// Scalar arithmetic and the constant-time curve formulas are unchanged.
+
 cfg_if! {
-    if #[cfg(target_pointer_width = "32")] {
+    if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
         mod field_10x26;
-    } else if #[cfg(target_pointer_width = "64")] {
+    } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
         mod field_5x52;
     } else {
         compile_error!("unsupported target word size (i.e. target_pointer_width)");
@@ -20,9 +24,9 @@ cfg_if! {
         use field_impl::FieldElementImpl;
     } else {
         cfg_if! {
-            if #[cfg(target_pointer_width = "32")] {
+            if #[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))] {
                 use field_10x26::FieldElement10x26 as FieldElementImpl;
-            } else if #[cfg(target_pointer_width = "64")] {
+            } else if #[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))] {
                 use field_5x52::FieldElement5x52 as FieldElementImpl;
             } else {
                 compile_error!("unsupported target word size (i.e. target_pointer_width)");

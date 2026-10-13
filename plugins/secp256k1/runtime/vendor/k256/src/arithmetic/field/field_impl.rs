@@ -8,10 +8,10 @@ use elliptic_curve::{
     zeroize::Zeroize,
 };
 
-#[cfg(target_pointer_width = "32")]
+#[cfg(any(target_pointer_width = "32", target_arch = "wasm64"))]
 use super::field_10x26::FieldElement10x26 as FieldElementUnsafeImpl;
 
-#[cfg(target_pointer_width = "64")]
+#[cfg(all(target_pointer_width = "64", not(target_arch = "wasm64")))]
 use super::field_5x52::FieldElement5x52 as FieldElementUnsafeImpl;
 
 #[derive(Clone, Copy, Debug)]
