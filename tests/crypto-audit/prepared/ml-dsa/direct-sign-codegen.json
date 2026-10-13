@@ -1,0 +1,93 @@
+{
+  "productionSourceCommit": "8d67a9fee0e59c482bb867ee8a7b2c2f758f2f69",
+  "runtimeSha256": "07ae75432d55ddcbb4741f0d0aa40bb0d086f365d1c68c0648bde3dd20850c3f",
+  "signingCoreFunction": "$_RINvNtCsl148ggKCHvF_7fips2046ml_dsa25sign_internal_with_matrixKb0_Kj4_KB13_Kj20_Kj974_Kja00_Kj300_EB4_",
+  "matrixExpansionFunction": "$_RINvNtCseJf3vUvalIj_4core5array11try_from_fnINtNtNtB4_3ops9try_trait17NeverShortCircuitANtNtCsl148ggKCHvF_7fips2045types1Tj4_EKB1W_NCINvMBJ_BG_10wrap_mut_1jNCINvNtB1s_7hashing8expand_aKb0_KB1W_KB1W_E0E0EB1s_",
+  "signingCoreReachableMatrixExpansion": false,
+  "keygenExpansionCallSites": 1,
+  "callSites": [
+    {
+      "function": "$mldsa_sign",
+      "keygenCall": [
+        "      i32.const 0",
+        "      i64.const 16384",
+        "      memory.fill",
+        "      local.get 7",
+        "      i64.const 32992",
+        "      i64.add",
+        "      local.get 0",
+        "      local.get 7",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "matrixOutputOperand": "local.get 7",
+      "signCall": [
+        "      local.get 5",
+        "      i64.eqz",
+        "      select",
+        "      local.get 5",
+        "      local.get 7",
+        "      i64.const 49600",
+        "      i64.add",
+        "      local.get 7",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa25sign_internal_with_matrixKb0_Kj4_KB13_Kj20_Kj974_Kja00_Kj300_EB4_"
+      ]
+    },
+    {
+      "function": "$mldsa_sign_randomized",
+      "keygenCall": [
+        "      i32.const 0",
+        "      i64.const 16384",
+        "      memory.fill",
+        "      local.get 9",
+        "      i64.const 32992",
+        "      i64.add",
+        "      local.get 0",
+        "      local.get 9",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "matrixOutputOperand": "local.get 9",
+      "signCall": [
+        "      local.get 5",
+        "      i64.eqz",
+        "      select",
+        "      local.get 5",
+        "      local.get 9",
+        "      i64.const 49600",
+        "      i64.add",
+        "      local.get 9",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa25sign_internal_with_matrixKb0_Kj4_KB13_Kj20_Kj974_Kja00_Kj300_EB4_"
+      ]
+    },
+    {
+      "function": "$mldsa_public_key",
+      "keygenCall": [
+        "        br_if 0 (;@2;)",
+        "        i64.const 0",
+        "        local.set 1",
+        "        local.get 3",
+        "        i64.const 16608",
+        "        i64.add",
+        "        local.get 0",
+        "        i64.const 0",
+        "        call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "matrixOutputOperand": "i64.const 0"
+    },
+    {
+      "function": "$mldsa_prepare_secret_key",
+      "keygenCall": [
+        "      i32.const 0",
+        "      i64.const 16384",
+        "      memory.fill",
+        "      local.get 3",
+        "      i64.const 32992",
+        "      i64.add",
+        "      local.get 0",
+        "      local.get 3",
+        "      call $_RINvNtCsl148ggKCHvF_7fips2046ml_dsa28key_gen_internal_with_matrixKb0_Kj4_KB16_Kj520_Kja00_EB4_"
+      ],
+      "matrixOutputOperand": "local.get 3"
+    }
+  ],
+  "conclusion": "Both direct signing exports initialize a matrix, pass its address to keygen, then pass that same address to the signing core. The signing core has no reachable matrix-expansion routine. Direct publicKey still passes a null matrix output; prepared factory requests one. These are intentional useful signing/factory copies, not an unused returned matrix."
+}

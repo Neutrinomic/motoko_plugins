@@ -5,6 +5,45 @@ Scope: `MLDSA.preparePublicKey`, `prepareSecretKey`, `verifyPrepared`,
 managed immutable caches; and the narrow vendored `fips204 = 0.4.6` hooks.
 The previous [direct ML-DSA audit](../../round3/ml-dsa/README.md) is unchanged.
 
+## Final seeded-signing checkpoint
+
+**Approved at production commit `8d67a9f`**, runtime
+`07ae75432d55ddcbb4741f0d0aa40bb0d086f365d1c68c0648bde3dd20850c3f`.
+The final delta reuses key generation's matrix during ordinary seeded signing.
+It adds no managed cache or serialization. Direct and prepared signing now
+share the same facade with unchanged FIPS parameters, framing, randomness,
+error order and exact signature bytes.
+
+The [independent source review](direct-sign-review.json) and
+[executed delta validation](direct-sign-validation.json) pin this change.
+Native debug/release each passed all 10 groups; the public fixture passed
+Motoko, IR, lowered IR and Wasm again. [Disassembly evidence](direct-sign-codegen.json)
+shows direct signing passes the same matrix address from keygen to signing,
+and the signing core has no reachable matrix expansion. Direct `publicKey`
+still passes a null matrix output.
+
+[Final stack analysis](direct-sign-stack.json) covers all 38 functions and
+171 direct call sites. All bounds remain within the 4 MiB reservation:
+
+| Operation | Final additional native shadow stack |
+|---|---:|
+| Prepare public key | 53,888 B |
+| Prepare secret key | 137,952 B |
+| Direct public key | 134,144 B |
+| Direct sign / randomized sign | 137,984 B |
+| Prepared sign / randomized sign | 121,312 B |
+| Direct verify | 103,232 B |
+| Prepared verify | 138,624 B |
+
+Direct signing intentionally retains the useful matrix until signing finishes;
+its bound increases from 129,776 B to 137,984 B. Instruction and heap benchmark
+comparisons remain a separate measurement scope. The existing 10 negative-type
+and actual-GC tests below were not repeated for this narrow change: the SDK,
+compiler plugin, RTS, public module, cache format and managed pointer/allocation
+boundaries are unchanged. Their original runtime pins and logs remain intact.
+
+## Initial prepared checkpoint
+
 **Approved for the frozen implementation after one performance regression was
 fixed.** No unresolved blocking correctness, type-boundary, memory-lifetime or
 native-stack finding remains. Production source is `4657a21`; runtime is

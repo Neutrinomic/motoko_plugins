@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-13T05:13:22.890112+00:00",
+  "checkoutHead": "b797f06a1dca79d483ab5ff4b557b475192ce38e",
+  "scope": "Source-only review of the uncommitted seeded-signing matrix reuse and shared sign_with_key facade; no production edit or executable job.",
+  "verdict": "No blocking defect found in this delta. Executable, final Wasm stack and performance approval are pending.",
+  "reviewedSourcesSha256": {
+    "plugins/ml-dsa/runtime/src/lib.rs": "6fe8599375db0109114182446a9cf1c3174eabe9bc207dadf9b280fbd99c0bb0",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/motoko_prepared.rs": "ea2d339d4e57e0e1f438b18111ba598b4ab282ef8fd84a1df17b3e264dd214e9",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/ml_dsa.rs": "03dc9260f2a19d072000a7d5a635296f1d1dc91869a7a6550a72950178155246",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/lib.rs": "4e301d742735c3c08c8d25c2fcb2ec98a61e38351a6c4df0d91606aa483f034b",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/traits.rs": "1d6fe99ffbc2128629b7965b106145b63cc1e013d976545f9a7f09f321a94f1d",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/types.rs": "d811518ef64dbac77e0aead6f33edde8ae1ec89ef641334b6232d2a35bd1cb18"
+  },
+  "preservedPriorCheckpoint": {
+    "path": "tests/crypto-audit/prepared/ml-dsa/static-review.json",
+    "sha256": "a63262b405114d07e30e986d46bda6169322a0b65924b02eac428138412a123b"
+  },
+  "upstreamEquivalence": {
+    "oldRoute": "Signer::try_sign_with_seed -> DummyRng containing the supplied rnd -> try_sign_with_rng -> sign_internal -> sign_internal_with_matrix(None).",
+    "newRoute": "Runtime validates seed/context/rnd -> sign_from_seed -> original key generation with initialized optional matrix output -> sign_with_key -> sign_internal_with_matrix(Some(matrix)).",
+    "typeParameters": {
+      "CTEST": false,
+      "K": 4,
+      "L": 4,
+      "LAMBDA_DIV4": 32,
+      "SIG_LEN": 2420,
+      "SK_LEN": 2560,
+      "W1_LEN": 768
+    },
+    "algorithmParameters": {
+      "beta": 78,
+      "gamma1": 131072,
+      "gamma2": 95232,
+      "omega": 80,
+      "tau": 39,
+      "nist": false,
+      "oidBytes": 0,
+      "prehashBytes": 0
+    },
+    "messageFraming": "Both routes hash tr || 0x00 || one-byte context length || context || message, then derive rho_prime from K || supplied rnd || mu. Key generation remains seed || k || l.",
+    "randomnessAndErrors": "DummyRng only copied the supplied 32 rnd bytes and could not return an RNG failure. Removing it adds no RNG or entropy transformation. Runtime still rejects invalid seed length, then context >255, then rnd length before the facade; prepared signing keeps context then rnd validation.",
+    "directPreparedParity": "Both routes call the same sign_with_key with equivalent key fields and A_hat. Deterministic mode supplies 32 zero bytes; randomized mode passes the validated caller bytes unchanged."
+  },
+  "initializationAndLifetime": [
+    "sign_from_seed initializes all 16 matrix polynomials to T([0;256]); key generation fully overwrites them via clone_from before any signing use.",
+    "The copied matrix is the exact A_hat used with the generated key, preserving upstream NTT-domain coefficients. It owns separate arrays from the local key-generation matrix, so that local drop cannot erase the copy.",
+    "The facade borrows key and matrix only during the synchronous signing call. Its local expanded key, public key and matrix retain upstream ZeroizeOnDrop behavior; no managed preparation, cache serialization, heap retention or pointer escape is added.",
+    "Shared sign_with_key preserves rejection sampling, signature encoding and all secret-dependent calculations. The matrix-selection branch depends only on the caller-selected Some/None option, not secret data.",
+    "This preserves typed key/polynomial zeroization; it does not claim erasure of all raw-byte/SHAKE/compiler-generated scratch copies. Original Motoko seed and randomness blobs remain caller-owned."
+  ],
+  "pending": [
+    "Run direct and prepared official-vector/parity tests against this exact source.",
+    "Rebuild and analyze final runtime stack/copy behavior; previous-runtime bounds do not cover this hash.",
+    "Measure final one-shot and prepared costs; source equivalence alone does not prove improvement."
+  ],
+  "sourceLocations": [
+    "plugins/ml-dsa/runtime/src/lib.rs:31-40",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/motoko_prepared.rs:87-110",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/ml_dsa.rs:64-148,177-242",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/lib.rs:133-136,272-296,643-651",
+    "plugins/ml-dsa/runtime/vendor/fips204/src/traits.rs:228-232,310-322"
+  ],
+  "subsequentExecutedEvidence": "direct-sign-validation.json"
+}
