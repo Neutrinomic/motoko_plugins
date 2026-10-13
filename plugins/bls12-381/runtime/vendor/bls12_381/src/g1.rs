@@ -773,19 +773,19 @@ impl G1Projective {
         acc
     }
 
-    /// Multiply `self` by `crate::BLS_X`, using double and add.
+    /// Multiply `self` by the signed BLS parameter using its fixed set-bit gaps.
     fn mul_by_x(&self) -> G1Projective {
-        let mut xself = G1Projective::identity();
-        // NOTE: in BLS12-381 we can just skip the first bit.
-        let mut x = crate::BLS_X >> 1;
-        let mut tmp = *self;
-        while x != 0 {
-            tmp = tmp.double();
-
-            if x % 2 == 1 {
-                xself += tmp;
+        // |x| = 0xd201000000010000. Starting at its top set bit avoids
+        // adding to the identity; all loop counts depend only on this constant.
+        let mut xself = *self;
+        for gap in [1, 2, 3, 9, 32] {
+            for _ in 0..gap {
+                xself = xself.double();
             }
-            x >>= 1;
+            xself += self;
+        }
+        for _ in 0..16 {
+            xself = xself.double();
         }
         // finally, flip the sign
         if crate::BLS_X_IS_NEGATIVE {
