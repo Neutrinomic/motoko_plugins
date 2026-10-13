@@ -1,0 +1,2612 @@
+{
+  "protocol": "crypto-prepared-v1",
+  "stage": "prepared-rsa-window5-final",
+  "expected_case_count": 22,
+  "complete": true,
+  "recorded_utc": "2026-10-13T05:23:23.806Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "runner_dependencies": {
+    "package_lock_sha256": "7aa2b27b47c3a1687b90f58d24c3019850abfb1c8c9a263448dffa1a9724d996",
+    "modules_sha256": {
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-core.js": "8afeff8f66ff4b17cde52404afde64dfa2b58081948b36624ab15bf2e1a9758e",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-ui.js": "deed5c788fec30dfe9a27275faa374ea3bc0882490efab56028c82293d2631f6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/idl.js": "24a5f38a5abce8ae51e5cf8fe9c14911d68308a000f23ea338e62d7cec76e7da",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/index.js": "2f06723a6cbdbb8d3d09f01ae471c1cd0170d35ca57d14e512d137d2716fdb27",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/types.js": "98fdc337ae0e090594e9f79d5654ec9b42aefe1f7397ed6f2706cda39fa860a0",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/bigint-math.js": "bff79122d3ad07d91342ab23539699f94cdf7b320079e92f33c3e1ed27515a62",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/buffer.js": "1daa2af18f451a226cdf420899e05c081bdaad76aa93e9160167eaad098fb434",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/hash.js": "c9ea528e50690f4cd231de88708071917ffb80f76c86b9ecdd39b7addbb5b6b6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/leb128.js": "35dc93a2549521ead1e111be4d0b1eacbed7f30bb37d7793fd65ac84afd91887",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/index.js": "96637e1ec315d5ff4288ebef2bbc606bb35b26e358824065f7a8488ef4fdf5e7",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/principal.js": "3360b13ec66c7692884a7805c9d3390861424d66d2dee1e2442554bded9c9d72",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/base32.js": "56c38f84c788a38b46e8302e22563c950c51d86fc69d90f2aed7f9164bdf25ac",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/getCrc.js": "8d5546512a158f0f02805b637694b467232118e908e784cb6f643e8d1004d904",
+      "node_modules/@noble/hashes/sha2.js": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b",
+      "node_modules/@noble/hashes/utils.js": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c"
+    }
+  },
+  "runner_dependencies_sha256": "1515439779b1f9ac3432fe294bdd14d116631277acf771d387b5afbc454a685e",
+  "build_sha256": "e8b0b5c90d0c04c4a252e70391dafb913fc1aac9aeeb9cf6a7f0201a9d2fcbc4",
+  "runner_sha256": "aaa373e29976b89eee12e7d178f9358ec3bbdecf0b1b91ff78064c058b763f31",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes. memory_metrics fixtures additionally query occupied heap, Wasm capacity and cumulative RTS counters after setup GC, after the run message, and after four further forced GC increments. These snapshots are outside measurement; after_run includes any message-end GC. Four increments are not guaranteed to complete collection. Snapshots are neither true peaks nor a measurement of retained live data; the result remains reachable until the oracle query.",
+  "cases": [
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-direct-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-direct-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "3e064e4f5d4df0905418b9171e7fd9008e408e20e69e30113546f188281e60c6",
+      "wasm": "rsa3072-sign-prehash-openssl3072-direct-1/native/main.wasm",
+      "wasm_sha256": "dc770141fe02161ed0b56c6dccadc5a698f633a5945a32675e0ade8ecc523aa5",
+      "wasm_bytes": 278818,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 447476438,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322464,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322464,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392480,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 447476438,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322464,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322464,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392480,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 447476438,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322464,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322464,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392480,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-prepare-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-prepare-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "5868c1da043ae8632aef2f37878abbcd416853b742c8564ac11407b148d5b560",
+      "wasm": "rsa3072-sign-prehash-openssl3072-prepare-1/native/main.wasm",
+      "wasm_sha256": "0560f9257670964804a9f2b961a056dcfcbb184c53e72db0efee21833a5f3510",
+      "wasm_bytes": 280074,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393960,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393960,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393960,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-prepared-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-prepared-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "3bd453c69af37a139317e04cd7f50381fd890c8b5af605f448b18aa3a2e985f0",
+      "wasm": "rsa3072-sign-prehash-openssl3072-prepared-1/native/main.wasm",
+      "wasm_sha256": "0aa00c374db9265d33398ac1e473606338e26e526243e8ce9a69fa954019814a",
+      "wasm_bytes": 280214,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 443550622,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324416,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394432,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 443550622,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324416,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394432,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 443550622,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324416,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324416,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394432,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-direct-2",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-direct-2/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 2,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "c344f22d44a2bc7167e193757af21d023939850ecc835a93f48eee92f7a246c2",
+      "wasm": "rsa3072-sign-prehash-openssl3072-direct-2/native/main.wasm",
+      "wasm_sha256": "ac0ac34f6dd249cc00e3d95728f5fd8cc2a17d6204cade6d632b9d2e080a2456",
+      "wasm_bytes": 278867,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 894952920,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322904,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322904,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392920,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392920,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 894952920,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322904,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322904,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392920,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392920,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 894952920,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322904,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322904,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392920,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392920,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-prepared-2",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-prepared-2/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 2,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "ca787007344fafd7714323ef8c81bd94d71ec0c2477aacb0e728a07698a70971",
+      "wasm": "rsa3072-sign-prehash-openssl3072-prepared-2/native/main.wasm",
+      "wasm_sha256": "569d128bc68d8c4614c12a0bb856a2308e5ef5f9ad77c522c1202ad9e2bcbceb",
+      "wasm_bytes": 280263,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 887101288,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324856,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324856,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394872,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394872,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 887101288,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324856,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324856,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394872,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394872,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 887101288,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324856,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324856,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394872,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394872,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-direct-10",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-direct-10/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 10,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "4e6d541c223ba6efd36a8100977af0bd08195bd5a7b99cfd3419f0f3343e4867",
+      "wasm": "rsa3072-sign-prehash-openssl3072-direct-10/native/main.wasm",
+      "wasm_sha256": "fd2c40c96d25166e1cbde6f067e52b25fdd8a5cce91518a1798a529c23e6e6bb",
+      "wasm_bytes": 278867,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4474763608,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326424,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396440,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396440,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 4474763608,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326424,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396440,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396440,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 4474763608,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321792,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321792,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326424,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326424,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396440,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396440,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-prehash-openssl3072-prepared-10",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-prehash-openssl3072-prepared-10/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 10,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "ea45fb2253e8098328afbb4a7c1d6ec222e130b27266408f1c6e13facc72e121",
+      "wasm": "rsa3072-sign-prehash-openssl3072-prepared-10/native/main.wasm",
+      "wasm_sha256": "0eb47dc3a47c4d58f7ae38c619dd1ef688853e13f4d86be8661b2bc52c377845",
+      "wasm_bytes": 280263,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 4435505448,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5328376,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5328376,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5398392,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5398392,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 4435505448,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5328376,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5328376,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5398392,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5398392,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 4435505448,
+          "allocated_bytes": 4400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5328376,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5328376,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5398392,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5398392,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-direct-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-direct-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "b5cdf11d73bbc9baae900f2034189c11a8b84c36aaa4226ed5e6944ed267f2ff",
+      "wasm": "rsa3072-verify-prehash-openssl3072-direct-1/native/main.wasm",
+      "wasm_sha256": "23cb2dbf413f25dda2dc84d02edc6158ec08885a63ece0c8c685f9f1e1341e97",
+      "wasm_bytes": 278775,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9822608,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321912,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391928,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 9822608,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321912,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391928,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 9822608,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321912,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391928,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-prepare-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-prepare-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "f7fa6f392aae13dd2fe1b05d63c5c465018c42bc1bcb4d739cbb2fbf02246cd3",
+      "wasm": "rsa3072-verify-prehash-openssl3072-prepare-1/native/main.wasm",
+      "wasm_sha256": "eca645c33f66af425c94858ccb876b5a530461c725ea38cd3a144ef831132c43",
+      "wasm_bytes": 280029,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322784,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322784,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392800,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322784,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322784,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392800,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322784,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322784,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392800,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-prepared-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-prepared-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "1575562d173637cca23295471879461436d883c2196af983ee751192a436bbc4",
+      "wasm": "rsa3072-verify-prehash-openssl3072-prepared-1/native/main.wasm",
+      "wasm_sha256": "3034b4cae4969d4f8d2773fe51309718c34e86f09f5914735e4ad7d0e0b1f2af",
+      "wasm_bytes": 280171,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8421716,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322848,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322848,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392864,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 8421716,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322848,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322848,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392864,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 8421716,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322848,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322848,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392864,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-direct-2",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-direct-2/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 2,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "6e47c6f5b230ac7db050cf84e96ec823df62e50486702bac4afdef369573c667",
+      "wasm": "rsa3072-verify-prehash-openssl3072-direct-2/native/main.wasm",
+      "wasm_sha256": "9745678aaad2fdec67ce3c55ebc437645a842e3bd8a83474566445314b45248f",
+      "wasm_bytes": 278824,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 19645310,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391960,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 19645310,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391960,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 19645310,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321944,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391960,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-prepared-2",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-prepared-2/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 2,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "1c79c1ea8e6769c8cb69efc46a16762c8f0a2ff83e337d7f313ccd686d569b45",
+      "wasm": "rsa3072-verify-prehash-openssl3072-prepared-2/native/main.wasm",
+      "wasm_sha256": "ad3b386c4f285bbf8afa32cd3b5461f3b894b3ab7d3d6a5bbd2099afa33eed03",
+      "wasm_bytes": 280220,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 16843526,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322880,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392896,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 16843526,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322880,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392896,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 16843526,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322880,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392896,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-direct-10",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-direct-10/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 10,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "16afa1ac8d9a35980ef66f71edd515b7b114518ce054067f71da48d51143a158",
+      "wasm": "rsa3072-verify-prehash-openssl3072-direct-10/native/main.wasm",
+      "wasm_sha256": "34945e0c24c5e345ba44e38f15af6bf2731643c333e55f57caa048aa9e9029d9",
+      "wasm_bytes": 278824,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 98225558,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322200,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322200,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392216,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 98225558,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322200,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322200,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392216,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 98225558,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322200,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322200,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392216,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-prepared-10",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-prepared-10/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 10,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "e07fdb5191048b9ee6a4e37c771b8261ff5b7e1604a9236c761a602e52fecaa4",
+      "wasm": "rsa3072-verify-prehash-openssl3072-prepared-10/native/main.wasm",
+      "wasm_sha256": "dd3706f7fe962182a3264b107a776af7c9b7e2838eb8aa68a20f7a611958935c",
+      "wasm_bytes": 280220,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 84216638,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323136,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323136,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393152,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393152,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 84216638,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323136,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323136,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393152,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393152,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 84216638,
+          "allocated_bytes": 320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323136,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323136,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393152,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393152,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-direct-100",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-direct-100/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "direct",
+        "reuse": 100,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "fa987506223b4636330345c83d0ed2a2344f1dd3c117fa17f72bf2a19756613f",
+      "wasm": "rsa3072-verify-prehash-openssl3072-direct-100/native/main.wasm",
+      "wasm_sha256": "f872f8fe019e579612fbdc6a5c60575fa4c809acee03e2b96ab5ea2b08734584",
+      "wasm_bytes": 278825,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 982253348,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5325080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5325080,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5395096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5395096,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 982253348,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5325080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5325080,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5395096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5395096,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 982253348,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321648,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5325080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5325080,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5395096,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5395096,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-prehash-openssl3072-prepared-100",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-prehash-openssl3072-prepared-100/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-prehash",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-prehash-openssl3072",
+        "mode": "prepared",
+        "reuse": 100,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "eb4bde67c78596921aa344ea09c51b24ba633c06170e5b0715c85012ba4fe608",
+      "wasm": "rsa3072-verify-prehash-openssl3072-prepared-100/native/main.wasm",
+      "wasm_sha256": "dea0f7db467e537109576118fd1c737f0b7edcb87a05ae2113ebfb07ff5c6169",
+      "wasm_bytes": 280221,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 842164148,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326016,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326016,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396032,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 842164148,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326016,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326016,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396032,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 842164148,
+          "allocated_bytes": 3200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322584,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322584,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5326016,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5326016,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5396032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5396032,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-message-openssl3072-direct-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-message-openssl3072-direct-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-message-openssl3072",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "19c1b7f31d99ac1cdf7ac7d9ac5d75c9653b38bbb35963290c9d9841a5f64165",
+      "wasm": "rsa3072-sign-message-openssl3072-direct-1/native/main.wasm",
+      "wasm_sha256": "3acbe09007dace3d1c9c396609b70326224c13e381f9ca8fc6c80eede36bb91c",
+      "wasm_bytes": 278833,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 447485855,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321808,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321808,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 447485855,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321808,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321808,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 447485855,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321808,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321808,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392496,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-message-openssl3072-prepare-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-message-openssl3072-prepare-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-message-openssl3072",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "429e9beb80472466aed17cba16cbd05aeb50c07c9a9a2c2d8890c37ab3db80a1",
+      "wasm": "rsa3072-sign-message-openssl3072-prepare-1/native/main.wasm",
+      "wasm_sha256": "e2e9fea91674ede335467b2555481dd11e8a4281a4eaa4cc2c97f1255e146ba5",
+      "wasm_bytes": 280089,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321832,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321832,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323960,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393976,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321832,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321832,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323960,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393976,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 6138602,
+          "allocated_bytes": 1896,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321832,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321832,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5323960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323960,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5393976,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5393976,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-sign-message-openssl3072-prepared-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-sign-message-openssl3072-prepared-1/main.mo",
+      "expected_hex": "1baa6874fbea3fa3c7611e0000dc28eb051f26bee4af5d31b111d5fbc41c66b18ad7ba751994d3a4c92290a68aed2de116cbc79ddb76e82b0f2b26be2e41d3ca33232d0c82251c05ecc4694bc275cfd9d2aabf27704ab8f28a02fface7404a4b5b6ace6daaeda9aa2e540fcd1600147b546dd42badca39237887d21328ac62b2eaaffaedce358cfc5bc165c26afa51e8e852fa794a49599451676eb47e10b3b28d3c2fa80834c2dd27d0ebf383cce4e2dab183a977fc0c99df271bb68bc23b1f69df73166c182610a999f40770c18a3bce3c38bea47c3cab9ac7bcf4a2b634739387eb31929baa7dd14b2f7555f59a25df7b6fea7d1cee1a7f9121518e92c1e7536fb2548b58cb88ad2f28cff2b49348725d99aae6923c3e7f4c56a461ac7f199e7fc92a67a20a1666b6672de9fc79ed450cbdce0681adbc609df39a5c03cd92bea6e27ae9a010b8821739cac6ea3505d89d102b2c1af46cfa2f13e40ac6c1b1e623e4da84e0cebd80ff6f0556e33f8133d9c0bf3b4efe2a601a928fe1ade2cb",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "sign-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-sign-message-openssl3072",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 1840,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "6cc13b5a3bfb39fcc73ee9d3f1b1e20a28c36f9291cbb5abae6f15b069027fee",
+      "wasm": "rsa3072-sign-message-openssl3072-prepared-1/native/main.wasm",
+      "wasm_sha256": "34aa5e999883ef9225277f30709dc91b364edeb737c8bb61f20a04cd4405aa32",
+      "wasm_bytes": 280229,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 443560039,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323760,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323760,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324432,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394448,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394448,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 443560039,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323760,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323760,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324432,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394448,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394448,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 443560039,
+          "allocated_bytes": 440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 384,
+          "output_sha256": "e73075d7433a4877bc65fcbb9057feaf8d378f6b00ca2e4da8209afcd0959ba3",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323760,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323760,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324432,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324432,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394448,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394448,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-message-openssl3072-direct-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-message-openssl3072-direct-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-message-openssl3072",
+        "mode": "direct",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "0848ee9edc0178a334f7de5d20b91f24c0da7e78354f427544abd32e3fc1c5c0",
+      "wasm": "rsa3072-verify-message-openssl3072-direct-1/native/main.wasm",
+      "wasm_sha256": "27c7f93432fa70a469622fab3bad6aa00c8959a89a9756b5e231f1ccfd256559",
+      "wasm_bytes": 278790,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 9832026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321928,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391944,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 9832026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321928,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391944,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 9832026,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5321928,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321928,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5391944,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5391944,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-message-openssl3072-prepare-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-message-openssl3072-prepare-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-message-openssl3072",
+        "mode": "prepare",
+        "reuse": 1,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "d5126db9db38e578db9a39f8b1127b98e9d848a962dde9f89921f5df25b121a6",
+      "wasm": "rsa3072-verify-message-openssl3072-prepare-1/native/main.wasm",
+      "wasm_sha256": "954d718f34e9c0b393ae8e43af7980455b59e4cb7c33a2853bad637a3857c5b6",
+      "wasm_bytes": 280044,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321688,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321688,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321688,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321688,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 3642309,
+          "allocated_bytes": 880,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321688,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321688,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsa3072-verify-message-openssl3072-prepared-1",
+      "implementation": "native",
+      "family": "rsa",
+      "plugins": [
+        "rsa"
+      ],
+      "source": "prepared/rsa/cases/rsa3072-verify-message-openssl3072-prepared-1/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "prepared": {
+        "scheme": "rsa",
+        "profile": "RSA3072/e65537/PSS-SHA256/MGF1SHA256/salt32",
+        "operation": "verify-message",
+        "fixture": "openssl3072",
+        "fixture_source": "prepared/rsa/fixture.json",
+        "comparison_group": "rsa3072-verify-message-openssl3072",
+        "mode": "prepared",
+        "reuse": 1,
+        "payload_bytes": 824,
+        "fixture_sha256": "52470b69dc690894e025a0cca337a6ade4b044399fc258e6848db9a38a0887fe"
+      },
+      "returncode": 0,
+      "source_sha256": "785fe75bca7da9221a7b4ee0bd14c3de22fd3366cfe8d6b3e2aa1b5114d0b596",
+      "wasm": "rsa3072-verify-message-openssl3072-prepared-1/native/main.wasm",
+      "wasm_sha256": "328ab528c17f045ecce5948014b3f43ab5dabed6fd64ba87b7c5e52a77a2ba60",
+      "wasm_bytes": 280186,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8431134,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322600,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322864,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392880,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 8431134,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322600,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322864,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392880,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 8431134,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322600,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322600,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322864,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322864,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392880,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

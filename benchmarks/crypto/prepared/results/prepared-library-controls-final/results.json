@@ -1,0 +1,288 @@
+{
+  "protocol": "crypto-prepared-v1",
+  "stage": "prepared-library-controls-final",
+  "expected_case_count": 2,
+  "complete": true,
+  "recorded_utc": "2026-10-13T05:17:01.387Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "runner_dependencies": {
+    "package_lock_sha256": "7aa2b27b47c3a1687b90f58d24c3019850abfb1c8c9a263448dffa1a9724d996",
+    "modules_sha256": {
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-core.js": "8afeff8f66ff4b17cde52404afde64dfa2b58081948b36624ab15bf2e1a9758e",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/candid-ui.js": "deed5c788fec30dfe9a27275faa374ea3bc0882490efab56028c82293d2631f6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/idl.js": "24a5f38a5abce8ae51e5cf8fe9c14911d68308a000f23ea338e62d7cec76e7da",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/index.js": "2f06723a6cbdbb8d3d09f01ae471c1cd0170d35ca57d14e512d137d2716fdb27",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/types.js": "98fdc337ae0e090594e9f79d5654ec9b42aefe1f7397ed6f2706cda39fa860a0",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/bigint-math.js": "bff79122d3ad07d91342ab23539699f94cdf7b320079e92f33c3e1ed27515a62",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/buffer.js": "1daa2af18f451a226cdf420899e05c081bdaad76aa93e9160167eaad098fb434",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/hash.js": "c9ea528e50690f4cd231de88708071917ffb80f76c86b9ecdd39b7addbb5b6b6",
+      "node_modules/@icp-sdk/core/lib/cjs/candid/utils/leb128.js": "35dc93a2549521ead1e111be4d0b1eacbed7f30bb37d7793fd65ac84afd91887",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/index.js": "96637e1ec315d5ff4288ebef2bbc606bb35b26e358824065f7a8488ef4fdf5e7",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/principal.js": "3360b13ec66c7692884a7805c9d3390861424d66d2dee1e2442554bded9c9d72",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/base32.js": "56c38f84c788a38b46e8302e22563c950c51d86fc69d90f2aed7f9164bdf25ac",
+      "node_modules/@icp-sdk/core/lib/cjs/principal/utils/getCrc.js": "8d5546512a158f0f02805b637694b467232118e908e784cb6f643e8d1004d904",
+      "node_modules/@noble/hashes/sha2.js": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b",
+      "node_modules/@noble/hashes/utils.js": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c"
+    }
+  },
+  "runner_dependencies_sha256": "1515439779b1f9ac3432fe294bdd14d116631277acf771d387b5afbc454a685e",
+  "build_sha256": "df21a2e71864f277684ab3309cf8855e705b30a7a24ec71402ac6fccf950fc79",
+  "runner_sha256": "aaa373e29976b89eee12e7d178f9358ec3bbdecf0b1b91ff78064c058b763f31",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes. memory_metrics fixtures additionally query occupied heap, Wasm capacity and cumulative RTS counters after setup GC, after the run message, and after four further forced GC increments. These snapshots are outside measurement; after_run includes any message-end GC. Four increments are not guaranteed to complete collection. Snapshots are neither true peaks nor a measurement of retained live data; the result remains reachable until the oracle query.",
+  "cases": [
+    {
+      "name": "pure-secp256k1-verify-ecdsa-rfc6979-key1-sample",
+      "implementation": "ecdsa-8.0.1",
+      "family": "secp256k1",
+      "plugins": [],
+      "source": "prepared/library-controls/cases/pure-secp256k1-verify-ecdsa-rfc6979-key1-sample/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "native_comparison_group": "secp256k1-ecdsa-verify-ecdsa-rfc6979-key1-sample-payload512",
+      "native_fixture_source": "prepared/secp256k1/fixtures.json",
+      "native_fixture_sha256": "77e88f30a324d3fcbe71fe9a04311e469849190ca27f05589cc2e1e73575e279",
+      "adapter_source": "round3/controls/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "adapter_source_sha256": "de397695f13a21ac586bcea70238ebe9d4d250857ffec8f9a92359c460d52367",
+      "notes": "Valid input only. Curve construction and immutable inputs are outside timing; compressed-key and compact-signature parsing, validation, verification and public result handling remain inside. Timed Result unwrap and static oracle Blob selection match the native Secp256k1 direct case. The Secp256k1 signature is low-S. General malformed-input semantics are not compared.",
+      "prepared": {
+        "scheme": "secp256k1",
+        "profile": "ECDSA-SHA256",
+        "operation": "verify",
+        "fixture": "ecdsa-rfc6979-key1-sample",
+        "fixture_source": "prepared/library-controls/secp256k1-fixtures.json",
+        "comparison_group": "pure-secp256k1-verify-ecdsa-rfc6979-key1-sample",
+        "mode": "control",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "77e88f30a324d3fcbe71fe9a04311e469849190ca27f05589cc2e1e73575e279"
+      },
+      "adapter_changes": [
+        "Key, digest and signature literals replaced with the independent prepared fixture.",
+        "Timed Result unwrap and static oracle Blob selection match the native Secp256k1 direct case."
+      ],
+      "returncode": 0,
+      "source_sha256": "cd5d8f70d44a9c0209a541098ee1a53d977bf5cdaa70f4c6ae5ba7acd5a90013",
+      "wasm": "pure-secp256k1-verify-ecdsa-rfc6979-key1-sample/ecdsa-8.0.1/main.wasm",
+      "wasm_sha256": "9e851a47469125fd9d35413d537fab5047f7fa8248fb42e264aeac80ad58d8a1",
+      "wasm_bytes": 661720,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 137009273,
+          "allocated_bytes": 10903256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16242232,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16242232,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16312248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16312248,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 137009273,
+          "allocated_bytes": 10903256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16242232,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16242232,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16312248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16312248,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 137009273,
+          "allocated_bytes": 10903256,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338744,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338744,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16242232,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16242232,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16312248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16312248,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pure-p256-verify-rfc-sample",
+      "implementation": "ecdsa-8.0.1",
+      "family": "p256",
+      "plugins": [],
+      "source": "prepared/library-controls/cases/pure-p256-verify-rfc-sample/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "native_comparison_group": "p256-w8-rfc-sample",
+      "native_fixture_source": "prepared/p256/fixtures.json",
+      "native_fixture_sha256": "3647d5a7587ae2e084468897ec6236b6563ebc0358aa7e768aec2c9a41a64e06",
+      "adapter_source": "round3/controls/api-p256-verifyPrehash-ecdsa/main.mo",
+      "adapter_source_sha256": "24d94fe3debae44bfd8092defb49dcab38a6f3b48350a036d51c346fadde6c8a",
+      "notes": "Valid input only. Curve construction and immutable inputs are outside timing; compressed-key and compact-signature parsing, validation, verification and public result handling remain inside. One-iteration measured loop and retained Result match the native P256 direct case. P256 high-S input is normalized internally by ecdsa Signature; this is not a general error/canonicality equivalence claim.",
+      "prepared": {
+        "scheme": "p256",
+        "profile": "RFC6979-SHA256-prehash",
+        "operation": "verifyPrehash",
+        "fixture": "rfc-sample",
+        "fixture_source": "prepared/library-controls/p256-fixtures.json",
+        "comparison_group": "pure-p256-verify-rfc-sample",
+        "mode": "control",
+        "reuse": 1,
+        "payload_bytes": 0,
+        "fixture_sha256": "3647d5a7587ae2e084468897ec6236b6563ebc0358aa7e768aec2c9a41a64e06"
+      },
+      "adapter_changes": [
+        "Key, digest and signature literals replaced with the independent prepared fixture.",
+        "One-iteration measured loop and retained Result match the native P256 direct case."
+      ],
+      "returncode": 0,
+      "source_sha256": "4e594ff2443e9d18eb6407ff28390dfb60a5b85d80149ece892e89ec2ec70e59",
+      "wasm": "pure-p256-verify-rfc-sample/ecdsa-8.0.1/main.wasm",
+      "wasm_sha256": "a9c31aa3baed6b5e9f9ffe3c484b37f3630b68ef2538795a43008f5f0979d145",
+      "wasm_bytes": 661914,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 323983718,
+          "allocated_bytes": 23927448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 29288896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29288896,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 29358912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29358912,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 323983718,
+          "allocated_bytes": 23927448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 29288896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29288896,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 29358912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29358912,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 323983718,
+          "allocated_bytes": 23927448,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 29288896,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29288896,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 29358912,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 29358912,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

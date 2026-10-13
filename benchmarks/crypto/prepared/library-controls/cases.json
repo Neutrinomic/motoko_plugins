@@ -1,0 +1,65 @@
+{
+  "methodology": "Two standalone pure Motoko controls on the prepared SDK; independent input bytes match the indicated native groups, public byte parsing and validation remain timed. No historical results are reused.",
+  "cases": [
+    {
+      "name": "pure-secp256k1-verify-ecdsa-rfc6979-key1-sample",
+      "implementation": "ecdsa-8.0.1",
+      "family": "secp256k1",
+      "plugins": [],
+      "source": "prepared/library-controls/cases/pure-secp256k1-verify-ecdsa-rfc6979-key1-sample/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "native_comparison_group": "secp256k1-ecdsa-verify-ecdsa-rfc6979-key1-sample-payload512",
+      "native_fixture_source": "prepared/secp256k1/fixtures.json",
+      "native_fixture_sha256": "77e88f30a324d3fcbe71fe9a04311e469849190ca27f05589cc2e1e73575e279",
+      "adapter_source": "round3/controls/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "adapter_source_sha256": "de397695f13a21ac586bcea70238ebe9d4d250857ffec8f9a92359c460d52367",
+      "notes": "Valid input only. Curve construction and immutable inputs are outside timing; compressed-key and compact-signature parsing, validation, verification and public result handling remain inside. Timed Result unwrap and static oracle Blob selection match the native Secp256k1 direct case. The Secp256k1 signature is low-S. General malformed-input semantics are not compared.",
+      "prepared": {
+        "scheme": "secp256k1",
+        "profile": "ECDSA-SHA256",
+        "operation": "verify",
+        "fixture": "ecdsa-rfc6979-key1-sample",
+        "fixture_source": "prepared/library-controls/secp256k1-fixtures.json",
+        "comparison_group": "pure-secp256k1-verify-ecdsa-rfc6979-key1-sample",
+        "mode": "control",
+        "reuse": 1,
+        "payload_bytes": 0
+      },
+      "adapter_changes": [
+        "Key, digest and signature literals replaced with the independent prepared fixture.",
+        "Timed Result unwrap and static oracle Blob selection match the native Secp256k1 direct case."
+      ]
+    },
+    {
+      "name": "pure-p256-verify-rfc-sample",
+      "implementation": "ecdsa-8.0.1",
+      "family": "p256",
+      "plugins": [],
+      "source": "prepared/library-controls/cases/pure-p256-verify-rfc-sample/main.mo",
+      "expected_hex": "01",
+      "memory_metrics": true,
+      "native_comparison_group": "p256-w8-rfc-sample",
+      "native_fixture_source": "prepared/p256/fixtures.json",
+      "native_fixture_sha256": "3647d5a7587ae2e084468897ec6236b6563ebc0358aa7e768aec2c9a41a64e06",
+      "adapter_source": "round3/controls/api-p256-verifyPrehash-ecdsa/main.mo",
+      "adapter_source_sha256": "24d94fe3debae44bfd8092defb49dcab38a6f3b48350a036d51c346fadde6c8a",
+      "notes": "Valid input only. Curve construction and immutable inputs are outside timing; compressed-key and compact-signature parsing, validation, verification and public result handling remain inside. One-iteration measured loop and retained Result match the native P256 direct case. P256 high-S input is normalized internally by ecdsa Signature; this is not a general error/canonicality equivalence claim.",
+      "prepared": {
+        "scheme": "p256",
+        "profile": "RFC6979-SHA256-prehash",
+        "operation": "verifyPrehash",
+        "fixture": "rfc-sample",
+        "fixture_source": "prepared/library-controls/p256-fixtures.json",
+        "comparison_group": "pure-p256-verify-rfc-sample",
+        "mode": "control",
+        "reuse": 1,
+        "payload_bytes": 0
+      },
+      "adapter_changes": [
+        "Key, digest and signature literals replaced with the independent prepared fixture.",
+        "One-iteration measured loop and retained Result match the native P256 direct case."
+      ]
+    }
+  ]
+}

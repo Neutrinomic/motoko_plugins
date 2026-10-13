@@ -36,13 +36,43 @@ Streaming state is held in managed Motoko values, and a digest can be finalized
 without consuming its saved state. Individual modules document malformed-input
 errors, output/batch limits, scalar byte order, and signature encoding.
 
-Signature plugins accept caller-owned key bytes and do not generate entropy or
-retain private keys. Ed25519 and ML-DSA derive keys from 32-byte secret seeds;
+Signature plugins accept caller-owned keys and do not generate entropy or
+keep hidden key caches. Ed25519 and ML-DSA derive keys from 32-byte secret seeds;
 RSA imports externally generated 3072-bit CRT keys. RSA-PSS signing takes a
 fresh 32-byte salt, and ML-DSA hedged signing takes an explicit 32-byte random
 value. Use a cryptographically secure source for those inputs. ML-DSA signing
-expands its seed on every call; the benchmark includes that cost. See each
-module's documentation for its exact key format and verification policy.
+expands its seed on every ordinary `sign` call; `prepareSecretKey` performs
+that work once for repeated `signPrepared` calls. Benchmarks distinguish
+these costs. See each module's documentation for key formats and verification
+policy.
+
+Prepare a reused key once and keep it with your application data:
+
+```motoko
+import Ed25519 "mo:fast/Ed25519";
+
+type Signer = {
+  accountId : Nat;
+  publicKey : Blob;
+  prepared : Ed25519.PreparedPublicKey;
+};
+
+func prepareSigner(accountId : Nat, publicKey : Blob) : Ed25519.Result<Signer> {
+  switch (Ed25519.preparePublicKey(publicKey)) {
+    case (#ok prepared) #ok { accountId; publicKey; prepared };
+    case (#err error) #err error;
+  }
+};
+
+func verifyMessage(signer : Signer, message : Blob, signature : Blob) : Ed25519.Result<Bool> {
+  Ed25519.verifyPrepared(signer.prepared, message, signature)
+};
+```
+
+Prepared values can live in transient application records and maps; persist
+canonical keys and rebuild prepared values after upgrade. Their managed
+payload stays alive while reachable, including expanded secrets for prepared
+signing, and collection provides no secure-erasure guarantee.
 
 `BLS12381` distinguishes the IC profile (G1 signatures, G2 keys) from the
 Ethereum proof-of-possession profile (G2 signatures, G1 keys). Its aggregate

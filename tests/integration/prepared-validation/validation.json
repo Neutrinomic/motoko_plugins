@@ -1,0 +1,136 @@
+{
+  "status": "PASS",
+  "time_utc": "2026-10-13T05:29:54.210144+00:00",
+  "sdk_revision": "9f6ebeedc",
+  "compiler_sha256": "24d8d0b951c4d2928c505ed6e91503750c83cf754d9518dcda9a265a8842beb2",
+  "invocation": {
+    "cwd": "/srv/shared/code/motoko_experiments/prepared-crypto/sdk",
+    "command": "nix develop --command bash /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/_build/prepared-validation/composition/run.sh PHASE",
+    "phases": [
+      "run",
+      "accept-fail",
+      "replay-fail",
+      "ash"
+    ]
+  },
+  "results": [
+    {
+      "gate": "all-engines",
+      "passed": 1,
+      "log": "logs/run-20261013T052750.log",
+      "log_sha256": "eb0110f8aa56da0ea237d08aed832dee1ccb181bd1e9f53fc4891b6c9a8c510d",
+      "provenance": "logs/run-20261013T052750.log.provenance.json",
+      "provenance_sha256": "0593d978c11b0227fd56db531146a1edc7a85966ca8258d2e0f4089295053434"
+    },
+    {
+      "gate": "reject-accept-reviewed",
+      "passed": 8,
+      "log": "logs/accept-fail-20261013T052809.log",
+      "log_sha256": "6a1c718c0ab65183c62cc39a111cc0e6b2ac663dbd84063bfad5137097716856",
+      "provenance": "logs/accept-fail-20261013T052809.log.provenance.json",
+      "provenance_sha256": "0593d978c11b0227fd56db531146a1edc7a85966ca8258d2e0f4089295053434"
+    },
+    {
+      "gate": "reject-replay",
+      "passed": 8,
+      "log": "logs/replay-fail-20261013T052824.log",
+      "log_sha256": "7f67ebbdeaad1babbf869fae454b566eb0404041d6e8cabe5c1462ed327147ef",
+      "provenance": "logs/replay-fail-20261013T052824.log.provenance.json",
+      "provenance_sha256": "0593d978c11b0227fd56db531146a1edc7a85966ca8258d2e0f4089295053434"
+    },
+    {
+      "gate": "ash-real-gc",
+      "passed": 1,
+      "log": "logs/ash-20261013T052853.log",
+      "log_sha256": "1f97e7ed79e9cb3173c78909abcc9024d4f8345bf53ff5157a50592f424bea2a",
+      "provenance": "logs/ash-20261013T052853.log.provenance.json",
+      "provenance_sha256": "b5421b254f9e43a3e719d3cb23e0c49ea70e5fa52a522299914e083c1f79098c"
+    }
+  ],
+  "reviewed_diagnostics": {
+    "prepared-candidx-encode": "M0279 shared argument types",
+    "prepared-candidx-estimate": "M0279 shared argument types",
+    "prepared-cbor-decode": "M0279 runtime handles unsupported",
+    "prepared-cbor-nested-decode": "M0279 runtime handles unsupported",
+    "prepared-json-decode": "M0279 runtime handles unsupported",
+    "prepared-json-nested-decode": "M0279 runtime handles unsupported",
+    "prepared-cross-plugin-ed25519": "M0096 P256PreparedPublicKey cannot produce Ed25519PreparedPublicKey",
+    "prepared-cross-plugin-p256": "M0096 Ed25519PreparedPublicKey cannot produce P256PreparedPublicKey"
+  },
+  "gc_assertions": {
+    "allocated_pressure_bytes_each_phase": 75497472,
+    "async_boundaries_each_phase": 13,
+    "reclaimed_delta_required_each_phase_gt": 4194304,
+    "phases": [
+      "all prepared values remain reachable and are then consumed",
+      "all tested roots cleared before further collection"
+    ],
+    "actual_reclaimed_byte_totals": "not emitted; threshold assertions passed",
+    "ash_metrics_scope": "final empty-root assertions only; not end-to-end performance"
+  },
+  "failed_attempts": [
+    {
+      "log": "logs/run-20261013T052656.log",
+      "reason": "test-only reserved field name label; renamed accountName"
+    },
+    {
+      "log": "logs/run-20261013T052719.log",
+      "reason": "all engines completed, but dot-notation warnings differed from silent expectation; converted container calls to dot notation"
+    },
+    {
+      "log": "logs/ash-20261013T052838.log",
+      "reason": "test config used package-level .mops instead of existing test-local .mops; relative path corrected"
+    },
+    {
+      "reason": "one shell invocation attempted nix develop from plugin cwd; shell hook rejected missing flake.nix before any tests; rerun from SDK cwd"
+    }
+  ],
+  "production_bugs_found": [],
+  "outputs_sha256": {
+    "tests/integration/run/_out/prepared-composition.wasm": "cc733946fdb6a5679deb89d3e7a31fa979bc051b8488021b2a58cb3251459869",
+    "packages/fast/tests/ash/.ash/PreparedComposition/artifacts/prepared_composition.wasm": "04de8ffceb37891ac871d588a95d4969348a1f241d721cd0cbfd4af56bba38f8",
+    "tests/integration/fail/ok/prepared-candidx-encode.tc-human.ok": "c8ffb8f9d1a650d8644a376e96289c078510f0466437c8ba8fafe29243582b0d",
+    "tests/integration/fail/ok/prepared-candidx-encode.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-candidx-encode.tc.ok": "aa628c516e787048f073f2501dfd1deb82855979b717258e9a122baf1f95fd99",
+    "tests/integration/fail/ok/prepared-candidx-encode.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-candidx-estimate.tc-human.ok": "100e35741be272e5921531e267a9bc2bc12537e7ec254d2805b7c18a5a9b5749",
+    "tests/integration/fail/ok/prepared-candidx-estimate.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-candidx-estimate.tc.ok": "5d3b0bb27c4fe46cd4028cdec8ed45aa082e16e2cbfaafe8e2edbd28228a3747",
+    "tests/integration/fail/ok/prepared-candidx-estimate.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cbor-decode.tc-human.ok": "401eb260a068f6457ce01aa1669326ef90917d53e0a5643901fbdb644c8d75d2",
+    "tests/integration/fail/ok/prepared-cbor-decode.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cbor-decode.tc.ok": "10f328cb708b815c5012442a743a6c713d057bac78a2ec4140fe2bf35b00fa63",
+    "tests/integration/fail/ok/prepared-cbor-decode.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cbor-nested-decode.tc-human.ok": "96a3e218070c33cc367ed6b9990ea75aa4ebeb65ca23081de1c9e23daaf8da1c",
+    "tests/integration/fail/ok/prepared-cbor-nested-decode.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cbor-nested-decode.tc.ok": "753128f5c6e8392b659e5e34adbb358ab2012f44a694145b785a76b83704b996",
+    "tests/integration/fail/ok/prepared-cbor-nested-decode.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cross-plugin-ed25519.tc-human.ok": "ffa33491cd4cc497e5d6fa12abfa66d211f8836e040318778583933db4e4f41a",
+    "tests/integration/fail/ok/prepared-cross-plugin-ed25519.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cross-plugin-ed25519.tc.ok": "ea48b46cd2ad211c7febf671cda7c17bfcdb32fd62cf03e0e1486858bfea2732",
+    "tests/integration/fail/ok/prepared-cross-plugin-ed25519.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cross-plugin-p256.tc-human.ok": "fa5a8da59551d52d1bef21e3645798c2b7346fd435d4472c8660c9e72ab6cd60",
+    "tests/integration/fail/ok/prepared-cross-plugin-p256.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-cross-plugin-p256.tc.ok": "50e9c614d19f401613bb17217eff81cb23b4d85058d2d5331bdaf00d1bd1fd6e",
+    "tests/integration/fail/ok/prepared-cross-plugin-p256.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-json-decode.tc-human.ok": "77cd2a19bca785a30910e9d61a5f91a08c65db506bcc0049617a4996e9af7032",
+    "tests/integration/fail/ok/prepared-json-decode.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-json-decode.tc.ok": "faba74c95b06654d7a09a1c86c19187fa7e79620db4d61f82822b5012627e4ee",
+    "tests/integration/fail/ok/prepared-json-decode.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-json-nested-decode.tc-human.ok": "63a4ec8ab96537b4570056a0526f8717866a1735b557e59f328d327dfc084e49",
+    "tests/integration/fail/ok/prepared-json-nested-decode.tc-human.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135",
+    "tests/integration/fail/ok/prepared-json-nested-decode.tc.ok": "2cce9d397d335994ca308805671f1c3be41956d0d6c74eb65821ebb1091d4908",
+    "tests/integration/fail/ok/prepared-json-nested-decode.tc.ret.ok": "f6b31808f474eae7705d11e0c49602b2a24d9e8388e647b5ff859b0bad1b2135"
+  },
+  "all_engine_silent_outputs": {
+    "tc": 0,
+    "run": 0,
+    "run-ir": 0,
+    "run-low": 0,
+    "diff-ir": 0,
+    "diff-low": 0,
+    "comp": 0,
+    "valid": 0,
+    "wasm-run": 0
+  }
+}

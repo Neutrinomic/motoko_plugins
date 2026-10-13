@@ -22,56 +22,49 @@ data.
 
 ## Current signature performance
 
-New `mo:fast/Ed25519`, `RSA` and `MLDSA` modules provide signing, verification
-and key operations. The existing Secp256k1, P256 and BLS plugins also improve.
-These are **PocketIC instructions per public call**, median of three fresh
-canisters, using unchanged compiler `92b1bde`, RTS and ABI 1.
+Prepared keys let Motoko reuse validated key data and precomputed tables through the plugin SDK. The values are opaque, immutable and managed by Motoko's GC. Direct calls remain available for one-off work.
 
-| Plugin | Input | Sign instructions | Verify instructions | Allocated B, sign / verify |
-| --- | --- | ---: | ---: | ---: |
-| Ed25519 | 32-byte message | 1,802,738 | 2,306,648 | 120 / 32 |
-| Secp256k1 ECDSA | 32-byte SHA-256 digest | 3,618,817 | 2,735,020 | 120 / 32 |
-| Secp256k1 BIP340 | 32-byte message | 5,099,055 | 2,519,140 | 120 / 32 |
-| P256 ECDSA | 32-byte SHA-256 digest | 7,225,034 | 12,873,707 | 120 / 32 |
-| RSA-3072 PSS | 32-byte SHA-256 digest; 32-byte signing salt | 550,857,988 | 9,822,506 | 440 / 32 |
-| ML-DSA-44 | 1-byte message; 59-byte context | 14,753,165 | 3,806,359 | 2,480 / 32 |
+These are **PocketIC instructions per public operation**, medians of three fresh canisters, with the same prepared-capable compiler and plugin build for each direct/prepared comparison. Preparation is measured separately. Compiler binary: `24d8d0b9…` (`9f6ebeedc`), ABI 1.
 
-ECDSA and RSA rows exclude message hashing. Ed25519 signs the original message;
-ML-DSA signing includes full expansion of its secret seed on every call. Its
-other tested inputs cost 10.296–27.592M signing instructions because rejection
-sampling varies. The algorithms, signature sizes and security profiles differ;
-these rows are not interchangeable-security comparisons. RSA keys are generated
-externally and imported with the tested OpenSSL helper.
+| Operation / input | Direct instructions | Preparation instructions | Prepared instructions | Payload B | Allocated B: direct / preparation / prepared |
+|---|---:|---:|---:|---:|---:|
+| Ed25519 sign / 32-byte message | 1,803,963 | 887,929 | 907,801 | 96 | 120 / 152 / 88 |
+| Ed25519 verify / same message | 2,308,542 | 266,520 | 2,071,444 | 1,056 | 32 / 1,112 / 32 |
+| Secp256k1 ECDSA verify / SHA-256 digest | 2,618,931 | 484,693 | 2,367,381 | 512 | 32 / 568 / 32 |
+| Secp256k1 BIP340 sign / vector 0 | 5,099,447 | 2,517,394 | 2,584,269 | 64 | 120 / 120 / 120 |
+| Secp256k1 BIP340 verify / vector 0 | 2,413,083 | 485,205 | 2,161,197 | 512 | 32 / 568 / 32 |
+| P256 ECDSA verify / SHA-256 digest | 12,541,922 | 19,688,675 | 3,802,871 | 16,320 | 32 / 16,376 / 32 |
+| RSA-3072 PSS sign / digest + salt32 | 447,476,438 | 6,138,602 | 443,550,622 | 1,840 | 440 / 1,896 / 440 |
+| RSA-3072 PSS verify / same digest | 9,822,608 | 3,642,309 | 8,421,716 | 824 | 32 / 880 / 32 |
+| ML-DSA-44 sign / 1-byte message, 59-byte context | 13,193,656 | 5,016,889 | 9,076,804 | 28,800 | 2,480 / 28,856 / 2,480 |
+| ML-DSA-44 verify / same fixture | 3,810,844 | 2,525,559 | 1,920,986 | 20,576 | 32 / 20,632 / 32 |
+| BLS IC single verify | 222,072,725 | 49,992,831 | 172,121,515 | 19,680 | 19,672 / 19,736 / 64 |
+| BLS Ethereum aggregate / 8 distinct keys | 3,285,303,573 | 2,291,247,278 | 994,060,838 | 1,152 | 494,840 / 315,416 / 181,552 |
 
-Separate public-key derivation costs 0.889M instructions for Ed25519, 2.518M
-for Secp256k1, 4.969M for P256, 1.947M for RSA's imported CRT key, and 5.109M
-for ML-DSA. None of these calls generates randomness.
+Prepared RSA signing saves only **0.88%**; its private exponentiation still dominates. The **14.26%** verification saving is more useful. Both use the improved direct implementation as their baseline.
 
-Fresh byte-oriented Motoko verification controls use the same valid inputs:
+Setup matters. In actual measurements, preparing a P256 key for one check costs **23.49M** instructions versus **12.54M** direct; preparing once for 100 checks costs **399.94M** versus **1,254.17M** direct. ML-DSA verification already wins at two calls: **6.37M including preparation** versus **7.62M** direct. The full report separates these measured cold batches from modeled reuse estimates.
 
-| Verification | Motoko `ecdsa@8.0.1` instructions | Current plugin instructions | Instruction ratio | Allocated B, Motoko / plugin |
-| --- | ---: | ---: | ---: | ---: |
-| Secp256k1 ECDSA | 135,628,126 | 2,735,020 | **49.59×** | 10,763,472 / 32 |
-| P256 ECDSA | 341,837,259 | 12,873,707 | **26.55×** | 25,290,680 / 32 |
+Fresh `ecdsa@8.0.1` controls use identical input bytes and the new compiler:
 
-Parsing and validation are included; reusable Motoko curve construction is
-outside timing. This valid-input comparison does not establish identical error
-semantics. Allocation includes temporary garbage and returned values; it does
-not measure native stack scratch or retained live memory.
+| Verification | Pure Motoko instructions | Direct / prepared plugin instructions | Motoko instruction ratio: direct / prepared | Allocated B: Motoko / direct / prepared |
+|---|---:|---:|---:|---:|
+| Secp256k1 ECDSA | 137,009,273 | 2,618,931 / 2,367,381 | **52.31× / 57.87×** | 10,903,256 / 32 / 32 |
+| P256 ECDSA | 323,983,718 | 12,541,922 / 3,802,871 | **25.83× / 85.19×** | 23,927,448 / 32 / 32 |
 
-Against the delivered plugins, Secp256k1 ECDSA verification uses **72.90% fewer
-instructions**, Schnorr verification **74.61% fewer**, and P256 signing
-**46.32% fewer**; P256 verification arithmetic is unchanged. BLS valid aggregate
-cases save **4.11–43.36%**, but two-message IC duplicate rejection rises from
-1,896 to 7,891 instructions and 0 to 216 allocated bytes. Whole-canister Wasm
-shrinks 68,691–68,732 B for Secp256k1; it grows 8,416 B for P256,
-10,499 B for Ed25519 versus its initial backend, and 11,042–23,669 B for BLS.
+The prepared ratios exclude preparation. Library controls include byte parsing and validation, with reusable curve construction outside timing. P256's library normalizes the high-S fixture internally; these valid-input comparisons do not establish identical error semantics.
 
-All **98 final cases × 3 trials** passed independent output checks. Integrated
-validation passed 54 native tests, 14 Motoko fixtures across all execution
-engines, 7 rejection fixtures, 62 Ash methods, and packaging for all 23 plugins.
-[Crypto API benchmarks](benchmark_crypto.md) ·
-[Full signature results, memory limits and reproduction](benchmarks/crypto/round3/RESULTS.md).
+Allocation includes temporary garbage and returned values; payload excludes object headers. Ed25519's direct signer returns a Result while its prepared signer returns a Blob. Heap snapshots are not peaks or exact live-memory measurements; separate pressure/drop experiments and their limitations are documented. Algorithms and security profiles differ; ECDSA/RSA digest rows exclude message hashing.
+
+All **199 final cases × 3 trials** passed independent output checks. Six independent crypto audits and integrated package, composition, rejection, GC and 20 codec/SHA regression checks pass.
+[Full prepared-key measurements, memory evidence and limits](benchmarks/crypto/prepared/RESULTS.md) · [Reproduction](benchmarks/crypto/prepared/README.md).
+
+<details>
+<summary>Earlier signature benchmark results</summary>
+
+The previous compiler/plugin measurements remain archived in [round three](benchmarks/crypto/round3/RESULTS.md) and the [crypto API benchmark history](benchmark_crypto.md). They are historical controls, not current prepared-SDK costs.
+
+</details>
 
 ## Current collection performance
 

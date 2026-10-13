@@ -1,0 +1,841 @@
+[base58] building Wasm runtime
+   Compiling compiler_builtins v0.1.160 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/compiler-builtins/compiler-builtins)
+   Compiling core v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/core)
+   Compiling alloc v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/alloc)
+   Compiling motoko-compute-base58 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/base58/runtime)
+    Finished `release` profile [optimized] target(s) in 9.99s
+[bech32] building Wasm runtime
+   Compiling motoko-compute-bech32 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/bech32/runtime)
+    Finished `release` profile [optimized] target(s) in 0.22s
+[blake3] building Wasm runtime
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling constant_time_eq v0.4.2
+   Compiling arrayvec v0.7.8
+   Compiling cfg-if v1.0.5
+   Compiling cc v1.8.0
+   Compiling blake3 v1.8.7
+   Compiling motoko-compute-blake3 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/blake3/runtime)
+    Finished `release` profile [optimized] target(s) in 1.61s
+[bls12-381] building Wasm runtime
+   Compiling version_check v0.9.5
+   Compiling typenum v1.20.1
+   Compiling rand_core v0.6.4
+   Compiling subtle v2.6.1
+   Compiling opaque-debug v0.3.1
+   Compiling ff v0.13.1
+   Compiling group v0.13.0
+   Compiling generic-array v0.14.9
+   Compiling pairing v0.23.0
+   Compiling digest v0.9.0
+   Compiling block-buffer v0.9.0
+   Compiling bls12_381 v0.8.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/bls12-381/runtime/vendor/bls12_381)
+   Compiling sha2 v0.9.9
+warning: unexpected `cfg` condition value: `std`
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/scalar.rs:833:7
+    |
+833 | #[cfg(feature = "std")]
+    |       ^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `alloc`, `bits`, `default`, `digest`, `experimental`, `group`, `groups`, `nightly`, `pairing`, `pairings`, `plugin-prepared`, and `zeroize`
+    = help: consider adding `std` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+    = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: use of deprecated crate `digest::generic_array`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/lib.rs:90:24
+   |
+90 | pub(crate) use digest::generic_array;
+   |                        ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/mod.rs:19:47
+   |
+19 | use crate::generic_array::{typenum::Unsigned, ArrayLength, GenericArray};
+   |                                               ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/mod.rs:19:60
+   |
+19 | use crate::generic_array::{typenum::Unsigned, ArrayLength, GenericArray};
+   |                                                            ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/mod.rs:32:23
+   |
+32 |     type InputLength: ArrayLength<u8>;
+   |                       ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/mod.rs:36:23
+   |
+36 |     fn from_okm(okm: &GenericArray<u8, Self::InputLength>) -> Self;
+   |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/mod.rs:49:23
+   |
+49 |         let mut buf = GenericArray::<u8, Self::InputLength>::default();
+   |                       ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:13:5
+   |
+13 |     ArrayLength, GenericArray,
+   |     ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:13:18
+   |
+13 |     ArrayLength, GenericArray,
+   |                  ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:27:26
+   |
+27 | enum ExpandMsgDst<'x, L: ArrayLength<u8>> {
+   |                          ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:29:12
+   |
+29 |     Hashed(GenericArray<u8, L>),
+   |            ^^^^^^^^^^^^
+
+warning: use of deprecated trait `digest::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:34:13
+   |
+34 | impl<'x, L: ArrayLength<u8>> ExpandMsgDst<'x, L> {
+   |             ^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:195:10
+    |
+195 |     b_0: GenericArray<u8, H::OutputSize>,
+    |          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:196:10
+    |
+196 |     b_i: GenericArray<u8, H::OutputSize>,
+    |          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:41:28
+   |
+41 |             let mut data = GenericArray::<u8, L>::default();
+   |                            ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/expand_msg.rs:224:20
+    |
+224 |             .chain(GenericArray::<u8, <H as BlockInput>::BlockSize>::default())
+    |                    ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g1.rs:9:42
+  |
+9 | use crate::generic_array::{typenum::U64, GenericArray};
+  |                                          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g1.rs:507:23
+    |
+507 |     fn from_okm(okm: &GenericArray<u8, U64>) -> Fp {
+    |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:9:5
+  |
+9 |     GenericArray,
+  |     ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:371:23
+    |
+371 |     fn from_okm(okm: &GenericArray<u8, U128>) -> Fp2 {
+    |                       ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:372:48
+    |
+372 |         let c0 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[..64]));
+    |                                                ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:373:48
+    |
+373 |         let c1 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[64..]));
+    |                                                ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+ --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_scalar.rs:4:42
+  |
+4 | use crate::generic_array::{typenum::U48, GenericArray};
+  |                                          ^^^^^^^^^^^^
+
+warning: use of deprecated struct `digest::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_scalar.rs:11:23
+   |
+11 |     fn from_okm(okm: &GenericArray<u8, U48>) -> Scalar {
+   |                       ^^^^^^^^^^^^
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/scalar.rs:652:7
+    |
+652 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/scalar.rs:657:7
+    |
+657 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/g1.rs:982:7
+    |
+982 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+    --> plugins/bls12-381/runtime/vendor/bls12_381/src/g2.rs:1127:7
+     |
+1127 |     #[must_use]
+     |       ^^^^^^^^
+     |
+     = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+     = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/pairings.rs:481:7
+    |
+481 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: use of deprecated associated function `digest::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:372:73
+    |
+372 |         let c0 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[..64]));
+    |                                                                         ^^^^^^^^^^
+
+warning: use of deprecated associated function `digest::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+   --> plugins/bls12-381/runtime/vendor/bls12_381/src/hash_to_curve/map_g2.rs:373:73
+    |
+373 |         let c1 = <Fp as HashToField>::from_okm(GenericArray::<u8, U64>::from_slice(&okm[64..]));
+    |                                                                         ^^^^^^^^^^
+
+warning: `bls12_381` (lib) generated 31 warnings (run `cargo fix --lib -p bls12_381` to apply 5 suggestions)
+   Compiling motoko-compute-bls12-381 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/bls12-381/runtime)
+    Finished `release` profile [optimized] target(s) in 6.63s
+[candidx] building Wasm runtime
+   Compiling motoko-compute-candidx v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/candidx/runtime)
+    Finished `release` profile [optimized] target(s) in 0.45s
+[cbor] building Wasm runtime
+   Compiling motoko-compute-cbor v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/cbor/runtime)
+    Finished `release` profile [optimized] target(s) in 0.47s
+[ed25519] building Wasm runtime
+   Compiling compiler_builtins v0.1.160 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/compiler-builtins/compiler-builtins)
+   Compiling core v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/core)
+   Compiling semver v1.0.28
+   Compiling generic-array v0.14.9
+   Compiling rustc_version v0.4.1
+   Compiling curve25519-dalek v4.1.3 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ed25519/runtime/vendor/curve25519-dalek)
+   Compiling alloc v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/alloc)
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+   Compiling zeroize v1.9.1
+   Compiling subtle v2.6.1
+   Compiling signature v2.2.0
+   Compiling ed25519 v2.2.3
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+warning: use of deprecated method `digest::generic_array::GenericArray::<T, N>::as_slice`: please upgrade to generic-array 1.x
+   --> plugins/ed25519/runtime/vendor/curve25519-dalek/src/scalar.rs:676:48
+    |
+676 |         output.copy_from_slice(hash.finalize().as_slice());
+    |                                                ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `digest::generic_array::GenericArray::<T, N>::as_slice`: please upgrade to generic-array 1.x
+   --> plugins/ed25519/runtime/vendor/curve25519-dalek/src/ristretto.rs:771:45
+    |
+771 |         output_bytes.copy_from_slice(output.as_slice());
+    |                                             ^^^^^^^^
+
+   Compiling ed25519-dalek v2.2.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ed25519/runtime/vendor/ed25519-dalek)
+warning: `curve25519-dalek` (lib) generated 2 warnings
+   Compiling motoko-compute-ed25519 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ed25519/runtime)
+    Finished `release` profile [optimized] target(s) in 12.08s
+[hmac-sha2] building Wasm runtime
+   Compiling compiler_builtins v0.1.160 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/compiler-builtins/compiler-builtins)
+   Compiling core v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/core)
+   Compiling generic-array v0.14.9
+   Compiling alloc v0.0.0 (/nix/store/1d1lqv056pr1670d6m7fkrwjk5xk5x71-rust-default-1.99.0-nightly-2026-07-25/lib/rustlib/src/rust/library/alloc)
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling motoko-compute-hmac-sha2 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/hmac-sha2/runtime)
+    Finished `release` profile [optimized] target(s) in 11.58s
+[json] building Wasm runtime
+   Compiling motoko-compute-json v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/json/runtime)
+    Finished `release` profile [optimized] target(s) in 1.07s
+[ml-dsa] building Wasm runtime
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling keccak v0.1.6
+   Compiling rand_core v0.6.4
+   Compiling sha2 v0.10.9
+   Compiling sha3 v0.10.9
+   Compiling syn v2.0.119
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.1
+   Compiling fips204 v0.4.6 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ml-dsa/runtime/vendor/fips204)
+   Compiling motoko-compute-ml-dsa v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ml-dsa/runtime)
+    Finished `release` profile [optimized] target(s) in 5.16s
+[p256] building Wasm runtime
+   Compiling generic-array v0.14.9
+   Compiling zeroize v1.9.1
+   Compiling subtle v2.6.1
+   Compiling const-oid v0.9.6
+   Compiling base16ct v0.2.0
+   Compiling ff v0.13.1
+   Compiling der v0.7.10
+   Compiling group v0.13.0
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling sec1 v0.7.3
+   Compiling crypto-bigint v0.5.5
+   Compiling digest v0.10.7
+   Compiling hmac v0.12.1
+   Compiling signature v2.2.0
+   Compiling sha2 v0.10.9
+   Compiling rfc6979 v0.4.0
+   Compiling elliptic-curve v0.13.8
+   Compiling ecdsa v0.16.9
+   Compiling primeorder v0.13.6 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/p256/runtime/vendor/primeorder)
+warning: use of deprecated crate `elliptic_curve::generic_array`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/primeorder/src/lib.rs:25:11
+   |
+25 |     self, generic_array, point::Double, Field, FieldBytes, PrimeCurve, PrimeField,
+   |           ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated trait `elliptic_curve::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:12:20
+   |
+12 |     generic_array::ArrayLength,
+   |                    ^^^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:252:52
+    |
+252 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:265:52
+    |
+265 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:311:52
+    |
+311 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:338:52
+    |
+338 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/affine.rs:359:52
+    |
+359 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated trait `elliptic_curve::generic_array::ArrayLength`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:13:20
+   |
+13 |     generic_array::ArrayLength,
+   |                    ^^^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:160:52
+    |
+160 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:307:52
+    |
+307 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:440:52
+    |
+440 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:451:52
+    |
+451 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: use of deprecated associated type `elliptic_curve::generic_array::ArrayLength::ArrayType`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:470:52
+    |
+470 |     <UncompressedPointSize<C> as ArrayLength<u8>>::ArrayType: Copy,
+    |                                                    ^^^^^^^^^
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/p256/runtime/vendor/primeorder/src/projective.rs:295:7
+    |
+295 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: `primeorder` (lib) generated 14 warnings (run `cargo fix --lib -p primeorder` to apply 1 suggestion)
+   Compiling p256 v0.13.2 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/p256/runtime/vendor/p256)
+warning: unnecessary qualification
+   --> plugins/p256/runtime/vendor/p256/src/arithmetic/scalar.rs:690:21
+    |
+690 |         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> plugins/p256/runtime/vendor/p256/src/lib.rs:15:5
+    |
+ 15 |     unused_qualifications
+    |     ^^^^^^^^^^^^^^^^^^^^^
+help: remove the unnecessary path segments
+    |
+690 -         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+690 +         iter.reduce(Add::add).unwrap_or(Self::ZERO)
+    |
+
+warning: unnecessary qualification
+   --> plugins/p256/runtime/vendor/p256/src/arithmetic/scalar.rs:702:21
+    |
+702 |         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+702 -         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+702 +         iter.reduce(Mul::mul).unwrap_or(Self::ONE)
+    |
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/p256/src/lib.rs:53:56
+   |
+53 |     bigint::ArrayEncoding, consts::U33, generic_array::GenericArray, FieldBytesEncoding,
+   |                                                        ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/p256/runtime/vendor/p256/src/lib.rs:138:28
+    |
+138 | pub type CompressedPoint = GenericArray<u8, U33>;
+    |                            ^^^^^^^^^^^^
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/p256/src/arithmetic/field.rs:40:1
+   |
+40 | / primeorder::impl_mont_field_element!(
+41 | |     NistP256,
+42 | |     FieldElement,
+43 | |     FieldBytes,
+...  |
+53 | |     fe_square
+54 | | );
+   | |_^
+   |
+   = note: this warning originates in the macro `primeorder::impl_mont_field_element` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/p256/runtime/vendor/p256/src/arithmetic/scalar.rs:223:7
+    |
+223 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/p256/runtime/vendor/p256/src/arithmetic/scalar.rs:228:7
+    |
+228 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: use of deprecated associated function `elliptic_curve::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+  --> plugins/p256/runtime/vendor/p256/src/arithmetic/field.rs:40:1
+   |
+40 | / primeorder::impl_mont_field_element!(
+41 | |     NistP256,
+42 | |     FieldElement,
+43 | |     FieldBytes,
+...  |
+53 | |     fe_square
+54 | | );
+   | |_^
+   |
+   = note: this warning originates in the macro `primeorder::impl_mont_field_element` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: `p256` (lib) generated 9 warnings (1 duplicate) (run `cargo fix --lib -p p256` to apply 4 suggestions)
+   Compiling motoko-compute-p256 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/p256/runtime)
+    Finished `release` profile [optimized] target(s) in 3.22s
+[ripemd160] building Wasm runtime
+   Compiling typenum v1.20.1
+   Compiling hybrid-array v0.4.15
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling digest v0.11.3
+   Compiling ripemd v0.2.0
+   Compiling motoko-compute-ripemd160 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/ripemd160/runtime)
+    Finished `release` profile [optimized] target(s) in 2.13s
+[rsa] building Wasm runtime
+   Compiling motoko-compute-rsa v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/rsa/runtime)
+    Finished `release` profile [optimized] target(s) in 2.15s
+[secp256k1] building Wasm runtime
+   Compiling k256 v0.13.4 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/secp256k1/runtime/vendor/k256)
+warning: unnecessary qualification
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/field.rs:492:21
+    |
+492 |         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> plugins/secp256k1/runtime/vendor/k256/src/lib.rs:16:5
+    |
+ 16 |     unused_qualifications
+    |     ^^^^^^^^^^^^^^^^^^^^^
+help: remove the unnecessary path segments
+    |
+492 -         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+492 +         iter.reduce(Add::add).unwrap_or(Self::ZERO)
+    |
+
+warning: unnecessary qualification
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/field.rs:505:21
+    |
+505 |         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+505 -         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+505 +         iter.reduce(Mul::mul).unwrap_or(Self::ONE)
+    |
+
+warning: unnecessary qualification
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/scalar.rs:716:21
+    |
+716 |         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+716 -         iter.reduce(core::ops::Add::add).unwrap_or(Self::ZERO)
+716 +         iter.reduce(Add::add).unwrap_or(Self::ZERO)
+    |
+
+warning: unnecessary qualification
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/scalar.rs:728:21
+    |
+728 |         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+    |                     ^^^^^^^^^^^^^^^^^^^
+    |
+help: remove the unnecessary path segments
+    |
+728 -         iter.reduce(core::ops::Mul::mul).unwrap_or(Self::ONE)
+728 +         iter.reduce(Mul::mul).unwrap_or(Self::ONE)
+    |
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+  --> plugins/secp256k1/runtime/vendor/k256/src/lib.rs:67:20
+   |
+67 |     generic_array::GenericArray,
+   |                    ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/secp256k1/runtime/vendor/k256/src/lib.rs:120:28
+    |
+120 | pub type CompressedPoint = GenericArray<u8, U33>;
+    |                            ^^^^^^^^^^^^
+
+warning: use of deprecated struct `elliptic_curve::generic_array::GenericArray`: please upgrade to generic-array 1.x
+   --> plugins/secp256k1/runtime/vendor/k256/src/lib.rs:141:22
+    |
+141 | pub type WideBytes = GenericArray<u8, U64>;
+    |                      ^^^^^^^^^^^^
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/field.rs:276:7
+    |
+276 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/field.rs:281:7
+    |
+281 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/projective.rs:421:7
+    |
+421 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/scalar.rs:240:7
+    |
+240 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: the `must_use` attribute cannot be used on trait methods in impl blocks
+   --> plugins/secp256k1/runtime/vendor/k256/src/arithmetic/scalar.rs:245:7
+    |
+245 |     #[must_use]
+    |       ^^^^^^^^
+    |
+    = help: the `must_use` attribute can be applied to data types, foreign functions, functions, inherent methods, provided trait methods, required trait methods, and traits
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+warning: use of deprecated method `elliptic_curve::generic_array::GenericArray::<T, N>::as_slice`: please upgrade to generic-array 1.x
+   --> plugins/secp256k1/runtime/vendor/k256/src/schnorr/signing.rs:130:46
+    |
+130 |         let k = NonZeroScalar::try_from(rand.as_slice())
+    |                                              ^^^^^^^^
+
+warning: use of deprecated associated function `elliptic_curve::generic_array::GenericArray::<T, N>::from_slice`: please upgrade to generic-array 1.x
+  --> plugins/secp256k1/runtime/vendor/k256/src/schnorr/verifying.rs:80:69
+   |
+80 |         let maybe_affine_point = AffinePoint::decompact(FieldBytes::from_slice(bytes));
+   |                                                                     ^^^^^^^^^^
+
+warning: use of deprecated method `elliptic_curve::generic_array::GenericArray::<T, N>::as_slice`: please upgrade to generic-array 1.x
+  --> plugins/secp256k1/runtime/vendor/k256/src/schnorr/verifying.rs:97:53
+   |
+97 |         self.verify_prehash(digest.finalize_fixed().as_slice(), signature)
+   |                                                     ^^^^^^^^
+
+warning: `k256` (lib) generated 15 warnings (run `cargo fix --lib -p k256` to apply 9 suggestions)
+   Compiling motoko-compute-secp256k1 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/secp256k1/runtime)
+    Finished `release` profile [optimized] target(s) in 1.78s
+[sha256] building Wasm runtime
+   Compiling motoko-compute-sha256 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/sha256/runtime)
+    Finished `release` profile [optimized] target(s) in 0.61s
+[sha512] building Wasm runtime
+   Compiling motoko-compute-sha512 v0.1.0 (/srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/plugins/sha512/runtime)
+    Finished `release` profile [optimized] target(s) in 0.33s
+[base58] compiling schema.ml
+[base58] compiling reference.ml
+[base58] compiling generator.ml
+[base58] compiling register.ml
+[base58] checking compatibility with the selected compiler
+[base58] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/base58
+[bech32] compiling reference.mli
+[bech32] compiling reference.ml
+[bech32] compiling schema.ml
+[bech32] compiling generator.ml
+[bech32] compiling register.ml
+[bech32] checking compatibility with the selected compiler
+[bech32] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/bech32
+[blake3] compiling reference.mli
+[blake3] compiling reference.ml
+[blake3] compiling register.ml
+[blake3] checking compatibility with the selected compiler
+[blake3] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/blake3
+[bls12-381] compiling bls_sha256.mli
+[bls12-381] compiling z.mli
+[bls12-381] compiling bls_sha256.ml
+[bls12-381] compiling schema.ml
+[bls12-381] compiling z.ml
+[bls12-381] compiling generator.ml
+[bls12-381] compiling bls_hash_constants.mli
+[bls12-381] compiling bls_field.mli
+[bls12-381] compiling bls_group.mli
+[bls12-381] compiling bls_hash.mli
+[bls12-381] compiling bls_pairing.mli
+[bls12-381] compiling bls_field.ml
+[bls12-381] compiling bls_group.ml
+[bls12-381] compiling bls_hash_constants.ml
+[bls12-381] compiling bls_pairing.ml
+[bls12-381] compiling bls_hash.ml
+[bls12-381] compiling reference.ml
+[bls12-381] compiling register.ml
+[bls12-381] checking compatibility with the selected compiler
+[bls12-381] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/bls12-381
+[candidx] compiling generator.mli
+[candidx] compiling reference.mli
+[candidx] compiling errors.ml
+[candidx] compiling estimate.ml
+[candidx] compiling generator.ml
+[candidx] compiling reference.ml
+[candidx] compiling compute_plugin_candidx.ml
+[candidx] checking compatibility with the selected compiler
+[candidx] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/candidx
+[cbor] compiling schema.ml
+[cbor] compiling reference.ml
+[cbor] compiling generator.ml
+[cbor] compiling register.ml
+[cbor] checking compatibility with the selected compiler
+[cbor] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/cbor
+[ed25519] compiling reference.ml
+[ed25519] compiling register.ml
+[ed25519] checking compatibility with the selected compiler
+[ed25519] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/ed25519
+[history-ring] compiling schema.ml
+[history-ring] compiling reference.ml
+[history-ring] compiling generator.ml
+[history-ring] compiling register.ml
+[history-ring] checking compatibility with the selected compiler
+[history-ring] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/history-ring
+[hmac-sha2] compiling hmac_reference.mli
+[hmac-sha2] compiling sha256_reference.mli
+[hmac-sha2] compiling sha512_reference.mli
+[hmac-sha2] compiling sha256_core.ml
+[hmac-sha2] compiling sha256_reference.ml
+[hmac-sha2] compiling sha512_reference.ml
+[hmac-sha2] compiling hmac_reference.ml
+[hmac-sha2] compiling register.ml
+[hmac-sha2] checking compatibility with the selected compiler
+[hmac-sha2] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/hmac-sha2
+[indexed-priority-queue] compiling schema.ml
+[indexed-priority-queue] compiling reference.ml
+[indexed-priority-queue] compiling generator.ml
+[indexed-priority-queue] compiling register.ml
+[indexed-priority-queue] checking compatibility with the selected compiler
+[indexed-priority-queue] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/indexed-priority-queue
+[json] compiling schema.ml
+[json] compiling reference.ml
+[json] compiling generator.ml
+[json] compiling register.ml
+[json] checking compatibility with the selected compiler
+[json] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/json
+[ml-dsa] compiling mldsa_shake.mli
+[ml-dsa] compiling mldsa_shake.ml
+[ml-dsa] compiling prepared_types.ml
+[ml-dsa] compiling mldsa.ml
+[ml-dsa] compiling reference.ml
+[ml-dsa] compiling register.ml
+[ml-dsa] checking compatibility with the selected compiler
+[ml-dsa] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/ml-dsa
+[mutable-map] compiling schema.ml
+[mutable-map] compiling reference.ml
+[mutable-map] compiling generator.ml
+[mutable-map] compiling register.ml
+[mutable-map] checking compatibility with the selected compiler
+[mutable-map] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/mutable-map
+[mutable-set] compiling schema.ml
+[mutable-set] compiling reference.ml
+[mutable-set] compiling generator.ml
+[mutable-set] compiling register.ml
+[mutable-set] checking compatibility with the selected compiler
+[mutable-set] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/mutable-set
+[p256] compiling p256_curve.mli
+[p256] compiling p256_curve.ml
+[p256] compiling prepared_layout.ml
+[p256] compiling key_type.ml
+[p256] compiling reference.ml
+[p256] compiling register.ml
+[p256] checking compatibility with the selected compiler
+[p256] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/p256
+[pure-map] compiling schema.ml
+[pure-map] compiling reference.ml
+[pure-map] compiling generator.ml
+[pure-map] compiling register.ml
+[pure-map] checking compatibility with the selected compiler
+[pure-map] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/pure-map
+[pure-set] compiling schema.ml
+[pure-set] compiling reference.ml
+[pure-set] compiling generator.ml
+[pure-set] compiling register.ml
+[pure-set] checking compatibility with the selected compiler
+[pure-set] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/pure-set
+[queue] compiling schema.ml
+[queue] compiling reference.ml
+[queue] compiling generator.ml
+[queue] compiling register.ml
+[queue] checking compatibility with the selected compiler
+[queue] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/queue
+[ripemd160] compiling ripemd160_reference.mli
+[ripemd160] compiling ripemd160_reference.ml
+[ripemd160] compiling register.ml
+[ripemd160] checking compatibility with the selected compiler
+[ripemd160] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/ripemd160
+[rsa] compiling rsa_sha256.mli
+[rsa] compiling rsa_sha256.ml
+[rsa] compiling reference.ml
+[rsa] compiling prepared.ml
+[rsa] compiling register.ml
+[rsa] checking compatibility with the selected compiler
+[rsa] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/rsa
+[secp256k1] compiling secp256k1_reference.mli
+[secp256k1] compiling secp256k1_reference.ml
+[secp256k1] compiling register.ml
+[secp256k1] checking compatibility with the selected compiler
+[secp256k1] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/secp256k1
+[sha256] compiling sha256_reference.mli
+[sha256] compiling sha256_reference.ml
+[sha256] compiling register.ml
+[sha256] checking compatibility with the selected compiler
+[sha256] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/sha256
+[sha512] compiling sha512_reference.mli
+[sha512] compiling sha512_reference.ml
+[sha512] compiling register.ml
+[sha512] checking compatibility with the selected compiler
+[sha512] /srv/shared/code/motoko_experiments/plugins/_build/prepared-crypto/integration/dist/sha512
