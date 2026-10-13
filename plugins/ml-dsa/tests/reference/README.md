@@ -24,11 +24,21 @@ The checks exercise:
 - A one-bit mutation in each of the 2,420 signature bytes. Every verification
   must return `#ok(false)`, including malformed hint encodings.
 - All 256 permitted context lengths with an empty message.
+- Prepared-key adapters against every signing and verification vector, the
+  signature mutations, factory errors and consumer error precedence. Interleaved
+  reuse of two key pairs verifies that no message state survives between calls.
 
-The adapter is compiled against a minimal `Mo_values.Value` constructor stub,
-so this script validates its behavior without requiring a Motoko compiler
-installation. Full plugin interpreter tests separately exercise real compiler
-loading and Motoko values.
+The adapter is compiled against minimal `Mo_values.Value` constructors and
+the SDK's prepared Blob representation/registration contract. This script
+validates reference behavior without requiring a Motoko compiler installation;
+the stubs do not implement nominal type checking. Full plugin tests separately
+exercise actual SDK loading, type rejection, and interpreter values.
+
+Prepared reference payloads privately retain the original canonical public key
+or secret seed. Operations recompute through the independent arithmetic above;
+they do not consume the Wasm kernel's optimized cache representation. These
+opaque values have no public serialization format. PocketIC performance and
+memory measurements apply to the Wasm implementation, not this reference.
 
 Optional older official internal-interface vectors, distributed with the
 pinned `fips204` 0.4.6 source, exercise the expanded secret encoding and the raw
@@ -45,6 +55,8 @@ surfaces: the public Motoko API exclusively accepts 32-byte seeds.
 
 On 2026-10-13, OCaml 5.4.1 passed **3,369 checks** from the default command;
 OCaml 4.14.2 passed **3,454 checks** with the optional internal corpus.
+The subsequent prepared-key adapter suite passes **6,193 checks** with
+OCaml 5.4.1 using the default command.
 Compilation enables all warnings as errors except missing interfaces
 and intentional catch-all value matches. The production plugin also built
 successfully against the selected compiler's OCaml 5.4.1 toolchain.
