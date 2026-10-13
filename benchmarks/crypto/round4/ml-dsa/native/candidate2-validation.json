@@ -1,0 +1,52 @@
+{
+  "production_source_commit": "f4da0c8",
+  "scope": "Final candidate: buffered ExpandA plus direct initialized prepared-vector decode. Independent audit and representative extra fixtures recorded separately.",
+  "runtime_sha256": "d2ad769ca27e92e62d74f9e3a185fc5d4459964b5f0525cc817ab64c102af869",
+  "runtime_bytes": 123611,
+  "source_pin_count": 383,
+  "environment": "nix develop in fixed SDK checkout 9f6ebeedc, CARGO_BUILD_JOBS=2",
+  "commands": [
+    "cargo test --offline --release -p motoko-compute-ml-dsa",
+    "cargo test --offline -p motoko-compute-ml-dsa",
+    "scripts/build.sh --motoko /srv/shared/code/motoko_experiments/prepared-crypto/sdk --skip-motoko-build ml-dsa"
+  ],
+  "results": {
+    "native_debug": {
+      "passed": 10,
+      "failed": 0
+    },
+    "native_release": {
+      "passed": 10,
+      "failed": 0
+    },
+    "plugin_build": {
+      "exit_code": 0
+    },
+    "matched_pocketic_cases": 13,
+    "fresh_trials_per_case": 3,
+    "all_39_oracles_pass": true
+  },
+  "independent_static_stack": {
+    "functions": 38,
+    "calls": 159,
+    "max_additional_native_stack_bytes": 137984,
+    "prepared_sign_bytes": 104960,
+    "prepared_verify_bytes": 114048
+  },
+  "comparisons": {
+    "baseline": "prepared-round4-mldsa-c1-baseline",
+    "sampler_only": "prepared-round4-mldsa-c1-candidate",
+    "final": "prepared-round4-mldsa-c2-candidate",
+    "incremental_prepared_sign_saving": 186671,
+    "incremental_prepared_verify_saving": 133350,
+    "direct_and_factory_incremental_change": 0,
+    "allocation_and_payload_unchanged": true
+  },
+  "logs": {
+    "candidate2-native-debug.log": "3e4e5a2eadd525aaad74acb9cdf28fca8f0088b738eeb769a366cd4780bd51dd",
+    "candidate2-native-release.log": "817b57286fa784e121df3e6d7601c14907989eb6d9e467b8e3e00d87b5c631e9",
+    "candidate2-build.log": "fb45c8d362686a53a3fa1fd9fe3469a6e3ffa89f171532c9fae23a811b13075d",
+    "candidate2-candidate-actors.log": "886a9f0d2cf88478b2dec40a477eef9032fc8643bb10c6517f667eae0a53beff",
+    "candidate2-candidate-run.log": "e3f545a66472aee7a4768afc84ac58a1e83fd4b97ab9a67e790c554e32a91ead"
+  }
+}
