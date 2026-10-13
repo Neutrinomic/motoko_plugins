@@ -37,6 +37,19 @@ compare exact roots and inverses on edge cases and seeded random fields,
 including pure-real/imaginary Fp2 values and both valid and invalid roots.
 No prepared payload, external point format or group-validation rule changes.
 
+## Fixed group multiplication
+
+G1 and G2 multiplication by the signed BLS parameter uses the same fixed
+set-bit gaps as final exponentiation: start at the point, double by gaps
+`1, 2, 3, 9, 32`, add the point after each gap, then double 16 more times
+and negate. This computes exactly `-0xd201000000010000` times the point,
+with one fewer complete addition than the original right-to-left loop.
+Subgroup predicates and cofactor formulas are unchanged. Independent tests
+compare with signed integer double-and-add on arbitrary full-curve points,
+including non-subgroup points, negatives, identities, rescaled homogeneous
+representatives and cofactor-cleared points. The oracle does not reduce the
+multiplier modulo the subgroup order.
+
 ## Final exponentiation
 
 The six initial Frobenius maps are replaced by one conjugation. Since Fp12 is
