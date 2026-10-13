@@ -91,8 +91,22 @@ pub fn sign(prepared: &[u8; SECRET_LEN], message: &[u8], ctx: &[u8], rnd: &[u8; 
         s_1_hat_mont: reader.vector(), s_2_hat_mont: reader.vector(), t_0_hat_mont: reader.vector(),
     };
     let matrix = reader.matrix();
+    sign_with_key(&key, &matrix, message, ctx, rnd)
+}
+
+/// Seeded one-shot signing reuses the matrix from key generation on the stack.
+/// The context must already be validated to at most 255 bytes. This performs no
+/// managed preparation, serialization or retained caching; it avoids only the
+/// redundant second matrix expansion within the same synchronous operation.
+pub fn sign_from_seed(seed: &[u8; 32], message: &[u8], ctx: &[u8], rnd: &[u8; 32]) -> [u8; 2420] {
+    let mut matrix = core::array::from_fn(|_| core::array::from_fn(|_| T([0; 256])));
+    let (_public, key) = key_gen_internal_with_matrix::<false, 4, 4, 1312, 2560>(2, seed, Some(&mut matrix));
+    sign_with_key(&key, &matrix, message, ctx, rnd)
+}
+
+fn sign_with_key(key: &PrivateKey<4, 4>, matrix: &Matrix, message: &[u8], ctx: &[u8], rnd: &[u8; 32]) -> [u8; 2420] {
     sign_internal_with_matrix::<false, 4, 4, 32, 2420, 2560, 768>(
-        78, 131_072, 95_232, 80, 39, &key, message, ctx, &[], &[], *rnd, false, Some(&matrix),
+        78, 131_072, 95_232, 80, 39, key, message, ctx, &[], &[], *rnd, false, Some(matrix),
     )
 }
 

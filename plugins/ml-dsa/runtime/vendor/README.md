@@ -11,7 +11,10 @@ rejection sampling, and acceptance rules are unchanged. Existing entry points
 call the same bodies with no cached matrix. The prepared factories retain the
 matrix from key generation through an optional output (the direct path still
 returns only its original key pair) or expand a public key once; consumers pass it to
-those same algorithm bodies. Direct verification still rejects malformed hints
+those same algorithm bodies. One-shot seeded signing also reuses its already
+computed matrix on the stack, with no managed cache or cache serialization.
+Direct public-key derivation passes no matrix output and makes no such copy.
+Direct verification still rejects malformed hints
 before expanding a matrix.
 
 The private cache encoding uses explicit signed LE32 coefficients in upstream

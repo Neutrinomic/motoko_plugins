@@ -5,7 +5,7 @@
 #![cfg_attr(not(test), feature(simd_wasm64))]
 
 use fips204::ml_dsa_44::{KG, PK_LEN, SIG_LEN, PublicKey};
-use fips204::traits::{KeyGen, SerDes, Signer, Verifier};
+use fips204::traits::{KeyGen, SerDes, Verifier};
 use fips204::motoko_prepared::{self as prepared, PUBLIC_LEN, SECRET_LEN};
 
 const INVALID_SECRET_KEY: i64 = -1;
@@ -32,11 +32,9 @@ fn sign(secret: &[u8], message: &[u8], ctx: &[u8], randomness: &[u8], output: &m
     let seed = seed(secret)?;
     context(ctx)?;
     let randomness = randomness.try_into().map_err(|_| INVALID_RANDOMNESS)?;
-    let (_public, secret) = KG::keygen_from_seed(seed);
-    // The only possible upstream error is context length, checked above. No
-    // hidden RNG: this API consumes exactly the supplied FIPS 204 rnd value.
-    let signature = secret.try_sign_with_seed(randomness, message, ctx)
-        .map_err(|_| INVALID_CONTEXT)?;
+    // Keep key generation's matrix only for this call, avoiding a second
+    // expansion. No managed cache or hidden RNG is involved.
+    let signature = prepared::sign_from_seed(seed, message, ctx, randomness);
     output[..SIG_LEN].copy_from_slice(&signature);
     Ok(SIG_LEN)
 }

@@ -35,7 +35,8 @@ The caller supplies cryptographically secure entropy for the 32-byte secret
 seed. `publicKey` deterministically performs FIPS 204 key generation from it.
 No expanded private-key import is exposed: a seed is compact, unambiguous, and
 cannot contain inconsistent precomputed secret components. Signing expands the
-seed on every call; its benchmark includes that work. `sign` uses the standard's
+seed on every call; its benchmark includes that work. It reuses the matrix
+computed during that call rather than expanding it twice. `sign` uses the standard's
 deterministic all-zero `rnd`; `signRandomized` takes an explicit fresh 32-byte
 `rnd` for hedged signing. The plugin neither calls an RNG nor maintains hidden key state.
 
