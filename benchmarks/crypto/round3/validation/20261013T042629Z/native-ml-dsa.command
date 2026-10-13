@@ -1,0 +1,1 @@
+env -u RUSTFLAGS CARGO_ENCODED_RUSTFLAGS= cargo test --manifest-path /srv/shared/code/motoko_experiments/plugins/_build/signature-round3/integration/Cargo.toml --locked --release --package motoko-compute-ml-dsa --target-dir /srv/shared/code/motoko_experiments/plugins/_build/signature-round3/integration/_build/round3-final-native --jobs 2 -- --test-threads=1 

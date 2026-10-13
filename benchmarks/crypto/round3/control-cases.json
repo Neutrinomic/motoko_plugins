@@ -1,0 +1,857 @@
+{
+  "methodology": "Delivered round-two curve fixtures and exact oracles; the only actor change is an untimed memory query.",
+  "source_manifest_sha256": "b821853628fb4754af1b5c776d241a89c756dab7225857df150ce24d9086a1a4",
+  "cases": [
+    {
+      "name": "api-secp256k1-derivePublicKey-fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "api-secp256k1-derivePublicKey",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/api-secp256k1-derivePublicKey-fast/main.mo",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "operations_per_sample": 1,
+      "notes": "One direct public API call. Blob inputs prepared before measurement; Result matching and output assertion outside measurement.",
+      "fixture_provenance": "Independent Python affine elliptic-curve arithmetic retained in immutable curve-hotspots fixture snapshot.",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/cases/api-secp256k1-derivePublicKey-fast/main.mo",
+      "control_source_sha256": "5b8f95e88cb1da3f8fe739462198d8fa4a5a5f200f7d95ce3d3f74f08533669a"
+    },
+    {
+      "name": "api-secp256k1-compressPublicKey-fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "api-secp256k1-compressPublicKey",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/api-secp256k1-compressPublicKey-fast/main.mo",
+      "expected_hex": "033de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "operations_per_sample": 1,
+      "notes": "One direct public API call. Blob inputs prepared before measurement; Result matching and output assertion outside measurement.",
+      "fixture_provenance": "Independent Python affine elliptic-curve arithmetic retained in immutable curve-hotspots fixture snapshot.",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/cases/api-secp256k1-compressPublicKey-fast/main.mo",
+      "control_source_sha256": "9c6a9e84087303723dd36ae7c8702bd8fb05f88adabcb325a5357e926296bc95"
+    },
+    {
+      "name": "api-secp256k1-decompressPublicKey-fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "api-secp256k1-decompressPublicKey",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/api-secp256k1-decompressPublicKey-fast/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "operations_per_sample": 1,
+      "notes": "One direct public API call. Blob inputs prepared before measurement; Result matching and output assertion outside measurement.",
+      "fixture_provenance": "Independent Python affine elliptic-curve arithmetic retained in immutable curve-hotspots fixture snapshot.",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/cases/api-secp256k1-decompressPublicKey-fast/main.mo",
+      "control_source_sha256": "af0944ba9dde9a07ace9c27ebc843453a6e45ec2e50ae4c38073093301e5e901"
+    },
+    {
+      "name": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-convert-compressed-to-uncompressed",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-convert-compressed-to-uncompressed/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-convert-compressed-to-uncompressed/main.mo",
+      "control_source_sha256": "1a7f039e6babaf4da6bafa9b37586e98bca2ba94f40474624028387ae6e81e60"
+    },
+    {
+      "name": "r2-secp256k1-public-key-uncompressed",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-public-key-uncompressed",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-public-key-uncompressed/main.mo",
+      "expected_hex": "043de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda09436a121ccb9f3e2290a304a140e26b0ee801ab882acf19cc4453329e13d50e9b1",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-public-key-uncompressed/main.mo",
+      "control_source_sha256": "fa7dfee55a2b988b9acd33e923e35cb23d2554ca0b99ed14a255f82db167fd50"
+    },
+    {
+      "name": "r2-secp256k1-point-add-compressed-distinct",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-point-add-compressed-distinct",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-point-add-compressed-distinct/main.mo",
+      "expected_hex": "02813c2d82216f139b682bf8d21b14c104881ebb8be47f8730ec4652a1b5a34cad",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-point-add-compressed-distinct/main.mo",
+      "control_source_sha256": "3b321121588a377aff7435f5d24eceebda18f231487e64f9866bb63c31189a2d"
+    },
+    {
+      "name": "r2-secp256k1-point-multiply-compressed",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-point-multiply-compressed",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-point-multiply-compressed/main.mo",
+      "expected_hex": "03b8f79e2952a414a89ccd0356208f5a18275539bdb7d99e3effd664842d100cd1",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-point-multiply-compressed/main.mo",
+      "control_source_sha256": "cc53a1bd78317cf6febf412a874aeacf920e79147516b2f97e0ef3f13faa63fb"
+    },
+    {
+      "name": "r2-secp256k1-base-multiply-full-width",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-base-multiply-full-width",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-base-multiply-full-width/main.mo",
+      "expected_hex": "039193c50bbcb78cc870c74b2fbab8c0d77c29e9661d2cf575610da3505e22b3c7",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-base-multiply-full-width/main.mo",
+      "control_source_sha256": "5bd08e2e75ed5a25ed4636ab4f1d891f05c860c7da39dc2933871fb73685f0dd"
+    },
+    {
+      "name": "r2-secp256k1-tweak-compressed-full-width",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-tweak-compressed-full-width",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-tweak-compressed-full-width/main.mo",
+      "expected_hex": "027204f63bd127a3099a68691064c8afb7a9cf13a0dd7caa4710253195b3c370c0",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-tweak-compressed-full-width/main.mo",
+      "control_source_sha256": "90a6ec309bbfe030cca9896a6d024c2b7d76d06ff1ef35d32de3ec43ee536532"
+    },
+    {
+      "name": "secp256k1_sign_rfc6979_fast",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "secp256k1_sign_rfc6979",
+      "plugins": [
+        "secp256k1"
+      ],
+      "expected_hex": "385cd1a83f1e9b94a03b6a704abaed20879541ff0af652704b55d1bd0473d8536938f2a4e0b4167e44c697f45390f12e2891edef3030ab6fcc32877ddf519ae8",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "round3/controls/secp256k1_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/secp256k1_sign_rfc6979_fast/main.mo",
+      "control_source_sha256": "7b06c67269377755e3fd2140d4b997909977166b0db8e47ea8fcfd4d3210e608"
+    },
+    {
+      "name": "r2-secp256k1-verify-compressed-low-s",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-verify-compressed-low-s",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-verify-compressed-low-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-verify-compressed-low-s/main.mo",
+      "control_source_sha256": "713dbe2e3d19298e54c278caa188285ac09a1e804bc25ac7020e213c4deac9a2"
+    },
+    {
+      "name": "r2-secp256k1-der-encode-ordinary",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-der-encode-ordinary",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-der-encode-ordinary/main.mo",
+      "expected_hex": "3045022100d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e35402203fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-der-encode-ordinary/main.mo",
+      "control_source_sha256": "5c91357b1c179f9f1d342c31ad2aed3f7ecb5d665f397245b7eb5b25f6a8c084"
+    },
+    {
+      "name": "r2-secp256k1-der-decode-ordinary",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-der-decode-ordinary",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-der-decode-ordinary/main.mo",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-der-decode-ordinary/main.mo",
+      "control_source_sha256": "6811935a5c21294b3dd441f52d4f11ceb810b5ce4e7298f93e93f4fcdc320470"
+    },
+    {
+      "name": "r2-secp256k1-normalize-high-s",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-normalize-high-s",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-normalize-high-s/main.mo",
+      "expected_hex": "d0bfec6830081bd5912493cfc19ff0898a356da46b8b9c2bfad9cc488200e3543fa033ad5437f4e4ff0b5adc783e10807b2ad5f6625eeca59b19c78692a57eaf",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-normalize-high-s/main.mo",
+      "control_source_sha256": "720880e3da24b5f86f61889d2c4e11a6eea4633e526f542d75eb8787dc5858bf"
+    },
+    {
+      "name": "r2-secp256k1-x-only-compressed",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-x-only-compressed",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-x-only-compressed/main.mo",
+      "expected_hex": "3de4db4dba29cd84f76025cce8ee805db78a9162633de0a82309ba4d4bdda094",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-x-only-compressed/main.mo",
+      "control_source_sha256": "32384e8a76930279c4002c911e73a7db9b9eb844ec6f3893089ca96d532b4695"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-sign-message-32",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-schnorr-sign-message-32",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-schnorr-sign-message-32/main.mo",
+      "expected_hex": "6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Official BIP340 vector1; https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv; frozen CSV SHA256 01c8cabba63b4c9b2f44c975902990086a4fe56eee9d265b187d1e2c1d98ccfb",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-schnorr-sign-message-32/main.mo",
+      "control_source_sha256": "9958a3f3c93692b1313fb7473f06d3793531e824433dbae4b6812f990dbcde8e"
+    },
+    {
+      "name": "r2-secp256k1-schnorr-verify-message-32",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-schnorr-verify-message-32",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-schnorr-verify-message-32/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Official BIP340 vector1; https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv; frozen CSV SHA256 01c8cabba63b4c9b2f44c975902990086a4fe56eee9d265b187d1e2c1d98ccfb",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-schnorr-verify-message-32/main.mo",
+      "control_source_sha256": "835ea034d9a55d34d6cd09095823706b5daf8d2ebe0e00252b7ebf3c7bd326aa"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-public-full-width",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-tweak-x-only-public-full-width",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-tweak-x-only-public-full-width/main.mo",
+      "expected_hex": "03464ba5b8c027406a45d4570cce4d9b7f9a6829cf8f7056aadd86208ec50d3d7c",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-tweak-x-only-public-full-width/main.mo",
+      "control_source_sha256": "c92f51ffd3f0fa5f581c92df98e3e418190f0e2ce54428e5473323388ec4d318"
+    },
+    {
+      "name": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "family": "secp256k1",
+      "implementation": "fast",
+      "comparison": "r2-secp256k1-tweak-x-only-secret-even-y",
+      "plugins": [
+        "secp256k1"
+      ],
+      "source": "round3/controls/r2-secp256k1-tweak-x-only-secret-even-y/main.mo",
+      "expected_hex": "d0e22a80e2bd5932e010831a4f5111a51c7330fc8963303c597563d4dcd8e353",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-secp256k1-tweak-x-only-secret-even-y/main.mo",
+      "control_source_sha256": "ddbfaa73552b17dff66aa17dbe5d54b41420629907fdad9198a458ab76f2a58f"
+    },
+    {
+      "name": "r2-p256-public-key-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-public-key-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-public-key-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-public-key-uncompressed/main.mo",
+      "control_source_sha256": "8a1c9a1b2443f0b50a93c7b94f1caa9cdadb48036039a0c7d8660fef2fc7a349"
+    },
+    {
+      "name": "api-p256-derivePublicKey-fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "api-p256-derivePublicKey",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/api-p256-derivePublicKey-fast/main.mo",
+      "expected_hex": "026d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3",
+      "operations_per_sample": 1,
+      "notes": "One direct public API call. Blob inputs prepared before measurement; Result matching and output assertion outside measurement.",
+      "fixture_provenance": "Independent Python affine elliptic-curve arithmetic retained in immutable curve-hotspots fixture snapshot.",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/cases/api-p256-derivePublicKey-fast/main.mo",
+      "control_source_sha256": "0de61ae3c22fb3002ba1855836b438b618bcd3974fda8f008ee83d7f42c6ffd8"
+    },
+    {
+      "name": "r2-p256-convert-compressed-to-uncompressed",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-convert-compressed-to-uncompressed",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-convert-compressed-to-uncompressed/main.mo",
+      "expected_hex": "046d33a2e93baba5821aabd9afafc7b6d4d98fd6ac591c39512cbb3a7ad234eba3cb5ffefe828dd0e8e11718e03bba72875bb17decb14272a3ced0bdf3d61f633a",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-convert-compressed-to-uncompressed/main.mo",
+      "control_source_sha256": "4d8f5bb59f52632b13d5cc6c86afe60af06e9e00ed493a22738c2331ab2b460f"
+    },
+    {
+      "name": "p256_sign_rfc6979_fast",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "p256_sign_rfc6979",
+      "plugins": [
+        "p256"
+      ],
+      "expected_hex": "4304eef8b664375abd59a86fbe10e682b1e30276fe1f9efa71a9001d8a8e3da37d33976a24a49d93115167b94823a227beefb2755c3fe023492e8ff387041a86",
+      "benchmark_kind": "absolute-only",
+      "notes": "Absolute-only RFC6979 signing, including deterministic nonce derivation. Mops ecdsa supplied-nonce signing omits this work, so no direct speedup is asserted.",
+      "source": "round3/controls/p256_sign_rfc6979_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/p256_sign_rfc6979_fast/main.mo",
+      "control_source_sha256": "065c48041f72b15beecbf421ffe47f61ff4c0a43d088390a3713bccbe2dd00c3"
+    },
+    {
+      "name": "r2-p256-verify-compressed-low-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-verify-compressed-low-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-verify-compressed-low-s/main.mo",
+      "expected_hex": "01",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-verify-compressed-low-s/main.mo",
+      "control_source_sha256": "a453e8659192795cc7ed212fee9c6d4cbb36400da56c4b8468945356c8d47fda"
+    },
+    {
+      "name": "r2-p256-der-encode-ordinary",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-encode-ordinary",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-der-encode-ordinary/main.mo",
+      "expected_hex": "304402202ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d87380022063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-der-encode-ordinary/main.mo",
+      "control_source_sha256": "6b4ff4baac8dc3785f306af44bd0369a7ed013dfb2d8ba20b3c070c12495ac6b"
+    },
+    {
+      "name": "r2-p256-der-decode-ordinary",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-der-decode-ordinary",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-der-decode-ordinary/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-der-decode-ordinary/main.mo",
+      "control_source_sha256": "1a9ab2740f8e07f6effba9396be90c4103c832aabe8ab12b95d1280a4c13f83c"
+    },
+    {
+      "name": "r2-p256-normalize-high-s",
+      "family": "p256",
+      "implementation": "fast",
+      "comparison": "r2-p256-normalize-high-s",
+      "plugins": [
+        "p256"
+      ],
+      "source": "round3/controls/r2-p256-normalize-high-s/main.mo",
+      "expected_hex": "2ffed967e386af91708dc61ea1c44b53152cd0ff029a0936d3bbb4e301d8738063e9536ae6f5886a5757f2acaafc6dbdb829cecb45d459d83184c8619cd30265",
+      "operations_per_sample": 1,
+      "notes": "One existing public API call; immutable Blob inputs are prepared before measurement. Result interpretation and expected-output checking are outside measurement.",
+      "fixture_provenance": "Independent Python affine arithmetic, compact ECDSA algebra verification and minimal DER integer encoding; fixed public test scalars. No plugin outputs used as expected values.",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/cases/r2-p256-normalize-high-s/main.mo",
+      "control_source_sha256": "394b9e4ee082cb9ebd2159bbb3e40e27b72f08b245f442cd4e8225897f21e2f7"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_validate_g1_valid",
+      "expected_hex": "00992130dd08dade3de583ff690bd76ec81de1e540ba572866ec7039ab1f0183def658b1abc777d229db0433c830bbeaec",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 independent generator multiplication, compression, decompression and subgroup_check. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_validate_g1_valid",
+      "notes": "Canonical compressed point validation including subgroup check. Full-width scalar-derived nonidentity point.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_validate_g1_valid/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_validate_g1_valid/main.mo",
+      "control_source_sha256": "3fffdddbaafef7d3666388cdd16d5faf3628aa349efe6bfa2093aebcc334be63"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_validate_g2_valid",
+      "expected_hex": "0095190c6b7bd37da5764c81e43aa0986aa2514fe39e089239789e6cd8c515cc785d6110c8656080c40a73555c559ac20f12bbdb441b0001211e36f12f6e585b4bc7775341f3c9b845ec4dcd314bd444feb94c9cbf57dfadec91e439b02c77211b",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 independent generator multiplication, compression, decompression and subgroup_check. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_validate_g2_valid",
+      "notes": "Canonical compressed point validation including subgroup check. Full-width scalar-derived nonidentity point.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_validate_g2_valid/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_validate_g2_valid/main.mo",
+      "control_source_sha256": "5a75200db4d2925cc953287e60fe2ea0a4cef1a9ea89288b5e27471e136d83f6"
+    },
+    {
+      "name": "bls12_381_g1_add_validated_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g1_add_validated",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "a572cbea904d67468808c8eb50a9450c9721db309128012543902d0ac358a62ae28f75bb8f1c7c42c39a8c5529bf0f4e",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement.",
+      "source": "round3/controls/bls12_381_g1_add_validated_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_g1_add_validated_fast/main.mo",
+      "control_source_sha256": "00da887cdee888349d3789fcc21b03869c77fc0be87487fd4b021a9e65c3fed8"
+    },
+    {
+      "name": "bls12_381_g2_add_validated_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_add_validated",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "aa4edef9c1ed7f729f520e47730a124fd70662a904ba1074728114d1031e1572c6c886f6b57ec72a6178288c47c335771638533957d540a9d2370f17cc7ed5863bc0b995b8825e0ee1ea1e1e4d00dbae81f14b0bf3611b78c952aacab827a053",
+      "notes": "Both sides decode and subgroup-check two input points, add them and return compressed canonical bytes inside measurement. Wire representations differ: Motoko baseline consumes EIP2537 uncompressed coordinates because it has no compressed G2 decoder; native additionally performs square-root recovery.",
+      "source": "round3/controls/bls12_381_g2_add_validated_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_g2_add_validated_fast/main.mo",
+      "control_source_sha256": "bf9324a29e6c846859d887049030c11d169d671cb6c4115e003c18be89efca93"
+    },
+    {
+      "name": "bls12_381_g1_mul_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g1_mul",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "b36bb0cb2098dced2a7f73194928bd2b3887a2716cf87f26bc30198d199f319c0837094342924611300d2419a22a9105",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "round3/controls/bls12_381_g1_mul_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_g1_mul_fast/main.mo",
+      "control_source_sha256": "8bac7694feabcb4e9a36e36d9df64ea51171ee5cfd17aaf4c6186656cda29238"
+    },
+    {
+      "name": "bls12_381_g2_mul_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_mul",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "9757e7dbd984e5d54cfbd9fb8bc970dc28a2ab63ddb27e0a5c7ccee3bea02bf5c35492c91fde905c97f866c57119be4618c2c8363f2317d1331be0d1b9d751617f4ad9d1f020104546cd3c69eeba793c4ccbe2a93a6cfd8631a92002de1b67af",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "round3/controls/bls12_381_g2_mul_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_g2_mul_fast/main.mo",
+      "control_source_sha256": "1c9d7b617ca0a97d55ef409b8a679f93609db9b4ec202b218d2edcf1950a170c"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_g1_msm_n8",
+      "expected_hex": "00987b3d766574492cfa7ca3a4b836f6bb2d3fff6808babce6e950f6d9e1c937c893ef68575bd8b762f653b37cf54787bf",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0: sum of independent pointwise scalar products cross-checked against generator multiplication by sum(point_factor * scalar) mod r. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_g1_msm_n8",
+      "notes": "8 packed points/scalars; complete public API includes validation, decoding, MSM and encoding. Distinct nonidentity points and dense canonical 255-bit public scalars; identical prefixes across sizes. Input packing is outside measurement.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_g1_msm_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_g1_msm_n8/main.mo",
+      "control_source_sha256": "0abd054fb7b5cd9f4b64cc65621408f5a249b13647726ed13d5c3bcb522e9688"
+    },
+    {
+      "name": "bls12_381_g2_msm_8_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_g2_msm_8",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "b552e62de03ae2f5e6989fbeef018df87855ab795bd388943f9e96bf9369f7152891376ca5872374aea2a8d9d5548b8007d3eb0a6861725104c33ed27f2ceed1b749b607597cb422ce0e5b6d26cc8865ab5df1c7fde09572995cd43c8c71bbfa",
+      "notes": "Identical group arithmetic on canonical generator(s) and full-width 254-bit scalar(s). Native compressed public API includes point decoding, subgroup validation and encoding. Baseline operates on prepared trusted points and normalizes output outside measurement; therefore its instruction cost is a conservative lower bound for an equivalent validating byte API.",
+      "source": "round3/controls/bls12_381_g2_msm_8_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_g2_msm_8_fast/main.mo",
+      "control_source_sha256": "284695acace74238cbca470a2bd1c936af41f335c90adcfe42310db788fed661"
+    },
+    {
+      "name": "bls12_381_map_to_g1_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_map_to_g1",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "99306391252335df0cc818cceedf113db5fea963fd013afccff5b6fadcb22a1a35a586179ffe391d6010796afaf01950",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+      "source": "round3/controls/bls12_381_map_to_g1_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_map_to_g1_fast/main.mo",
+      "control_source_sha256": "cba97eca6a9df6cba9b5b2d6af15528f77924e329fb0037f39b808f54e8fe9a1"
+    },
+    {
+      "name": "bls12_381_map_to_g2_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_map_to_g2",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "95a167a9ab4f153abd546b063dd051a5a59a7c02e575607478f831793c2532af3331376f3a678dfcc17cd4503f6cbe2f0098bc417b0850f1943800205caeaaa06c7936ddf8e612491d216ad8d1f9a017d6d7f87fb9263bfe186a80a0797133e6",
+      "notes": "Both implementations perform simplified SWU, isogeny and effective cofactor clearing for the same canonical field element. Native includes field-byte decoding and compressed output; baseline uses a prepared field value and output encoding is outside measurement.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+      "source": "round3/controls/bls12_381_map_to_g2_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_map_to_g2_fast/main.mo",
+      "control_source_sha256": "e315e83e86e52d83d42cbf40d0af4dbfbb6018398db12583e8260c2ea3491ab4"
+    },
+    {
+      "name": "bls12_381_hash_to_g1_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_hash_to_g1",
+      "plugins": [
+        "bls12-381"
+      ],
+      "benchmark_kind": "absolute-only",
+      "expected_hex": "83567bc5ef9c690c2ab2ecdf6a96ef1c139cc0b2f284dca0a9a7943388a49a3aee664ba5379a7655d3c68900be2f6903",
+      "notes": "Absolute-only complete RFC9380 hash-to-curve for message abc, official test DST; Mops package has no whole-message hash-to-curve entry point.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 9ed93f6ae3e5d3e2ef48d7f3a954ac4ccc0702f693e62b2f48798348618ef6cc",
+      "source": "round3/controls/bls12_381_hash_to_g1_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_hash_to_g1_fast/main.mo",
+      "control_source_sha256": "ac76447ef88ee3b17b1895248c36061c183f2e6cdd6ce1d4577d436b4a55bd3a"
+    },
+    {
+      "name": "bls12_381_hash_to_g2_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_hash_to_g2",
+      "plugins": [
+        "bls12-381"
+      ],
+      "benchmark_kind": "absolute-only",
+      "expected_hex": "939cddbccdc5e91b9623efd38c49f81a6f83f175e80b06fc374de9eb4b41dfe4ca3a230ed250fbe3a2acf73a41177fd802c2d18e033b960562aae3cab37a27ce00d80ccd5ba4b7fe0e7a210245129dbec7780ccc7954725f4168aff2787776e6",
+      "notes": "Absolute-only complete RFC9380 hash-to-curve for message abc, official test DST; Mops package has no whole-message hash-to-curve entry point.",
+      "fixture_provenance": "RFC9380 official abc vector: Q0 from the published u[0], multiplied independently with Python affine arithmetic by h_eff from RFC9380 section8.8; h_eff*(Q0+Q1) independently checked against published P. Snapshot curve-cases/rfc9380-fields.json; original SHA256 7ff2010d99cd886ab8e951ae1ed657b57e6b95fe6029fa4a0f519ea5ca29f126",
+      "source": "round3/controls/bls12_381_hash_to_g2_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_hash_to_g2_fast/main.mo",
+      "control_source_sha256": "1549474c26a8cdc8fc291a2c3e594be39724b521720ed3d34aca9ec5dcd453e5"
+    },
+    {
+      "name": "bls12_381_pairing_identity_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "round3/controls/bls12_381_pairing_identity_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_pairing_identity_fast/main.mo",
+      "control_source_sha256": "d7f542c9334ca69ab77e7967131f3f43a665e03802db76576d504025f528aee4"
+    },
+    {
+      "name": "bls12_381_verify_ic_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ic_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "notes": "Absolute-only IC BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "round3/controls/bls12_381_verify_ic_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ic_valid_fast/main.mo",
+      "control_source_sha256": "cf50dfd98c74bac6bb1643ce9a1d6cda867ecc5c35ce19671441e4bbf1b561c4"
+    },
+    {
+      "name": "bls12_381_verify_ethereum_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ethereum_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "notes": "Absolute-only Ethereum BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "round3/controls/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "control_source_sha256": "edeb37e5ff77534c4a4fcb3ab3ae068c03a8e34e0e5093528a4d5acf0f8a822f"
+    },
+    {
+      "adapter_description": "",
+      "api_function": "verifyEthereumProof",
+      "benchmark_kind": "absolute-only",
+      "comparison": "api_bls12_381_verify_ethereum_proof",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/PopProve/PopVerify; proof generated and independently verified. Retained in round2/api-curves/bls/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_verify_ethereum_proof_fast",
+      "notes": "One valid Ethereum POP proof for a deterministic full-width scalar-derived key; key/proof decoding, subgroup validation, hash-to-curve and verification all measured.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/api_bls12_381_verify_ethereum_proof_fast/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/bls/cases/api_bls12_381_verify_ethereum_proof_fast/main.mo",
+      "control_source_sha256": "bacab98acb5db44af9b6625c4b1ac69555650e8a992088ffb7cdeb723b5ae477"
+    },
+    {
+      "adapter_description": "",
+      "api_function": "g1Aggregate",
+      "benchmark_kind": "exact-api",
+      "comparison": "api_bls12_381_g1_aggregate_n4",
+      "expected_hex": "00921711ace93edc907fcda5850062e73cd41c49ae3c1b318502fd97a46f300a47b618cca1977186b137e28e2cf7855371",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 pointwise sum cross-checked with generator multiplication by sum of four full-width point factors mod r. Retained in round2/api-curves/bls/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_g1_aggregate_n4_fast",
+      "notes": "Four distinct nonidentity subgroup points derived from dense 255-bit public scalars; complete packed-input validation, subgroup checks, group sum and compressed output are inside timing.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/api_bls12_381_g1_aggregate_n4_fast/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/bls/cases/api_bls12_381_g1_aggregate_n4_fast/main.mo",
+      "control_source_sha256": "520f87621be0bd0b2500e2cabf6138a97825e25eef85b4385b9770909e00f6ee"
+    },
+    {
+      "adapter_description": "",
+      "api_function": "g2Aggregate",
+      "benchmark_kind": "absolute-only",
+      "comparison": "api_bls12_381_g2_aggregate_n4",
+      "expected_hex": "00a6e5b7ab41f60bf501763e34cb890ef206aa542db65df6f83288ae78af1e611b88a3e5649251092ee0299538151be1f20534e02efd679b70f2b94cfb3f44e94e70fe914d9676ae63c98f5d19653ffe1b36d293784e017c25b1d12a3966853e30",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 pointwise sum cross-checked with generator multiplication by sum of four full-width point factors mod r. Retained in round2/api-curves/bls/fixtures.json.",
+      "implementation": "fast",
+      "name": "api_bls12_381_g2_aggregate_n4_fast",
+      "notes": "Four distinct nonidentity subgroup points derived from dense 255-bit public scalars; complete packed-input validation, subgroup checks, group sum and compressed output are inside timing.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/api_bls12_381_g2_aggregate_n4_fast/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/bls/cases/api_bls12_381_g2_aggregate_n4_fast/main.mo",
+      "control_source_sha256": "fde6ea882b3f87480a252bfb182dedc9beeeb46809d77476dd79f879a9fe9a1d"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 hash_to_G1 with IC NUL DST; scalar-derived G2 keys and aggregated G1 signatures; independent pairing-product identity verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "notes": "2 distinct G2 keys and pairwise-distinct 32-byte messages. Complete IC basic aggregate API including duplicate scan, validation, hashing and pairing.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_aggregate_ic_distinct_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_distinct_n2/main.mo",
+      "control_source_sha256": "1c27c78a68ba124417e31c81c476015263a7b28109634f1b1f1627251517d861"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "notes": "2 distinct keys, valid PoPs and distinct 32-byte messages. Complete Ethereum POP aggregate API, including every proof check and message hash.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_aggregate_ethereum_distinct_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_distinct_n2/main.mo",
+      "control_source_sha256": "e922eafd9af0f8fa2b09a4fcfcf8404ba8b04e666c40b323cdcab2c6eab26175"
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "notes": "2 distinct keys and valid PoPs signing the same 32-byte message. Complete fast aggregate API includes every PoP verification, key aggregation and final signature verification; no prevalidated-proof assumption.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/controls/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/main.mo",
+      "control_source_sha256": "e2db95d0c7202517029d98cc3d3f7023ca2cfd70e01d0ee2ab4f7803ddf0d157"
+    }
+  ]
+}

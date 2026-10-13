@@ -20,6 +20,59 @@ See the [package guide](packages/fast/) for the API and storage caveats:
 switching an import does not migrate existing Core container values or stable
 data.
 
+## Current signature performance
+
+New `mo:fast/Ed25519`, `RSA` and `MLDSA` modules provide signing, verification
+and key operations. The existing Secp256k1, P256 and BLS plugins also improve.
+These are **PocketIC instructions per public call**, median of three fresh
+canisters, using unchanged compiler `92b1bde`, RTS and ABI 1.
+
+| Plugin | Input | Sign instructions | Verify instructions | Allocated B, sign / verify |
+| --- | --- | ---: | ---: | ---: |
+| Ed25519 | 32-byte message | 1,802,738 | 2,306,648 | 120 / 32 |
+| Secp256k1 ECDSA | 32-byte SHA-256 digest | 3,618,817 | 2,735,020 | 120 / 32 |
+| Secp256k1 BIP340 | 32-byte message | 5,099,055 | 2,519,140 | 120 / 32 |
+| P256 ECDSA | 32-byte SHA-256 digest | 7,225,034 | 12,873,707 | 120 / 32 |
+| RSA-3072 PSS | 32-byte SHA-256 digest; 32-byte signing salt | 550,857,988 | 9,822,506 | 440 / 32 |
+| ML-DSA-44 | 1-byte message; 59-byte context | 14,753,165 | 3,806,359 | 2,480 / 32 |
+
+ECDSA and RSA rows exclude message hashing. Ed25519 signs the original message;
+ML-DSA signing includes full expansion of its secret seed on every call. Its
+other tested inputs cost 10.296–27.592M signing instructions because rejection
+sampling varies. The algorithms, signature sizes and security profiles differ;
+these rows are not interchangeable-security comparisons. RSA keys are generated
+externally and imported with the tested OpenSSL helper.
+
+Separate public-key derivation costs 0.889M instructions for Ed25519, 2.518M
+for Secp256k1, 4.969M for P256, 1.947M for RSA's imported CRT key, and 5.109M
+for ML-DSA. None of these calls generates randomness.
+
+Fresh byte-oriented Motoko verification controls use the same valid inputs:
+
+| Verification | Motoko `ecdsa@8.0.1` instructions | Current plugin instructions | Instruction ratio | Allocated B, Motoko / plugin |
+| --- | ---: | ---: | ---: | ---: |
+| Secp256k1 ECDSA | 135,628,126 | 2,735,020 | **49.59×** | 10,763,472 / 32 |
+| P256 ECDSA | 341,837,259 | 12,873,707 | **26.55×** | 25,290,680 / 32 |
+
+Parsing and validation are included; reusable Motoko curve construction is
+outside timing. This valid-input comparison does not establish identical error
+semantics. Allocation includes temporary garbage and returned values; it does
+not measure native stack scratch or retained live memory.
+
+Against the delivered plugins, Secp256k1 ECDSA verification uses **72.90% fewer
+instructions**, Schnorr verification **74.61% fewer**, and P256 signing
+**46.32% fewer**; P256 verification arithmetic is unchanged. BLS valid aggregate
+cases save **4.11–43.36%**, but two-message IC duplicate rejection rises from
+1,896 to 7,891 instructions and 0 to 216 allocated bytes. Whole-canister Wasm
+shrinks 68,691–68,732 B for Secp256k1; it grows 8,416 B for P256,
+10,499 B for Ed25519 versus its initial backend, and 11,042–23,669 B for BLS.
+
+All **98 final cases × 3 trials** passed independent output checks. Integrated
+validation passed 54 native tests, 14 Motoko fixtures across all execution
+engines, 7 rejection fixtures, 62 Ash methods, and packaging for all 23 plugins.
+[Crypto API benchmarks](benchmark_crypto.md) ·
+[Full signature results, memory limits and reproduction](benchmarks/crypto/round3/RESULTS.md).
+
 ## Current collection performance
 
 The second optimization round reduces costs from the **already delivered

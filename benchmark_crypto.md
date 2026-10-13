@@ -1,5 +1,91 @@
 # Crypto public API benchmarks
 
+## Current signatures — round three
+
+The current signature plugins were measured on 2026-10-13 with PocketIC 10.0.0,
+compiler `92b1bde` and the unchanged RTS/SDK. Each value is the median of three
+fresh-canister trials; every measured result matched its independent oracle.
+The table contains **plugins**, including RSA and ML-DSA. Some earlier raw
+screen manifests call those implementations `native`; that historical label
+means their compiled plugin kernel, not a pure Motoko library.
+
+| Plugin | Input | Sign instructions | Verify instructions | Allocated B, sign / verify |
+| --- | --- | ---: | ---: | ---: |
+| Ed25519 | 32-byte message | 1,802,738 | 2,306,648 | 120 / 32 |
+| Secp256k1 ECDSA | 32-byte SHA-256 digest | 3,618,817 | 2,735,020 | 120 / 32 |
+| Secp256k1 BIP340 | 32-byte message | 5,099,055 | 2,519,140 | 120 / 32 |
+| P256 ECDSA | 32-byte SHA-256 digest | 7,225,034 | 12,873,707 | 120 / 32 |
+| RSA-3072 PSS | 32-byte SHA-256 digest; 32-byte signing salt | 550,857,988 | 9,822,506 | 440 / 32 |
+| ML-DSA-44 | 1-byte message; 59-byte context | 14,753,165 | 3,806,359 | 2,480 / 32 |
+
+Inputs and reusable setup are prepared before the measured call. ECDSA and
+RSA prehash rows exclude message hashing; RSA uses exponent 65537,
+PSS/MGF1-SHA256 and exactly 32 salt bytes. Its message API costs 550,867,405
+instructions to sign and 9,831,924 to verify the tested 47-byte message.
+Ed25519 is pure Ed25519 over message bytes. ML-DSA-44 uses official NIST case 4;
+its signing cost includes full seed expansion, not a prepared secret key.
+Other ML-DSA fixtures sign in 10,296,367–27,591,733 instructions; rejection
+sampling, key and context make signing cost nonmonotonic in message length.
+
+The algorithms use different key/signature sizes and security profiles,
+including ML-DSA's post-quantum design. Cross-algorithm instruction counts do
+not establish interchangeable security or a universal fastest verifier. RSA
+key generation is external; the plugin includes a tested OpenSSL import helper,
+CRT consistency validation and a post-signature public-operation fault check.
+
+### Fresh Motoko verification controls
+
+| Verification | Motoko `ecdsa@8.0.1` instructions | Current plugin instructions | Instruction ratio | Allocated B, Motoko / plugin |
+| --- | ---: | ---: | ---: | ---: |
+| Secp256k1 ECDSA | 135,628,126 | 2,735,020 | **49.59×** | 10,763,472 / 32 |
+| P256 ECDSA | 341,837,259 | 12,873,707 | **26.55×** | 25,290,680 / 32 |
+
+These two controls are fresh measurements against the pinned Motoko library,
+not reused historical timings. Both sides include byte decoding and validation
+for the same valid compact low-S signature and compressed public key; reusable
+Motoko curve construction is excluded. Error semantics and all malformed-input
+behavior are not asserted equivalent. No fresh Motoko counterpart was measured
+for Ed25519, RSA, ML-DSA or the BLS aggregate profiles.
+
+### Changes to existing plugins
+
+Secp256k1 combines 10×26-bit field arithmetic with public-only GLV/NAF
+verification and removes an unused predicate output buffer: ECDSA verification
+falls from 10,093,580 to 2,735,020 instructions, Schnorr from 9,920,568 to
+2,519,140, and each now allocates 32 rather than 56 B. P256 reuses its existing
+constant-time comb for signing: 13,458,880 → 7,225,034 instructions;
+verification arithmetic and its matched counts are unchanged.
+
+BLS valid aggregate workloads save 4.11–43.36% of instructions. For example,
+eight distinct IC messages fall from 1,288,036,398 to 855,389,985 instructions
+and 197,520 to 180,184 allocated bytes. Small duplicate-message rejection gets
+more expensive: two entries rise from 1,896 / 0 B to 7,891 / 216 B.
+Whole-canister Wasm changes are −68,732 to −68,691 B for Secp256k1,
++8,416 B for P256, +10,499 B for Ed25519 versus its initial serial64 backend,
+and +11,042 to +23,669 B for BLS. These are canister sizes, not runtime-only sizes.
+
+Allocation is cumulative managed-heap allocation, including returned values
+and garbage. It excludes native stack scratch. Every final measured operation
+reported zero synchronous reclamation. Separate heap/capacity snapshots are
+neither true peaks nor retained-live-memory measurements; four GC increments
+may not finish a collection. The dedicated GC tests separately establish
+retained-value correctness during actual reclamation.
+
+[Full results and key derivation](benchmarks/crypto/round3/RESULTS.md) ·
+[98-case final measurements](benchmarks/crypto/results/round3-final-direct/results.json) ·
+[Fresh Motoko controls](benchmarks/crypto/results/round3-motoko-verification-controls/results.json) ·
+[Measurement/reproduction protocol](benchmarks/crypto/round3/README.md).
+
+## Historical round-two API results
+
+The **155-callable tables below are the earlier round-two measurements**.
+They remain unchanged for provenance, including their previous Secp256k1,
+P256 and BLS values. Use the current signature results above for the current implementation;
+no new measurements of the other crypto modules are claimed here.
+
+<details>
+<summary>Show historical 155-callable benchmark tables and their original methodology</summary>
+
 155 public callables. **Native** means pure Motoko from pinned Mops packages; **Plugin** means the optimized `mo:fast` implementation. `Native/plugin` is the measured instruction ratio (larger favors the plugin). Empty native cells mean no correct counterpart for the listed operation in the pinned packages. Marked rows use the closest available code with the contract differences explained below.
 
 Each value is the median of three fresh-canister trials. Inputs and reusable setup are prepared before measurement; only the named operation and result assignment are timed. Exact independent output checks run afterward. Instructions are IC instructions/op, including measured call overhead; allocated bytes are cumulative allocation/op, not live heap. Whole-canister Wasm sizes, all workload sizes, hashes and individual trials are retained in the [machine-readable evidence](benchmarks/crypto/round2/api-measurements.json).
@@ -267,3 +353,5 @@ Pinned packages: `sha2@0.1.14`, `blake3@0.1.2`, `ecdsa@8.0.1`, `bitcoin@0.2.1`, 
 Pure Motoko secret-key arithmetic can be variable-time; ratios compare mathematical outputs, not side-channel guarantees. The pinned packages lack BIP340, complete RFC 9380/BLS signature profiles, BIP143, and retained Taproot-hasher construction counterparts; those cells remain empty. Per-row explanations and all adapter sources are in the evidence file.
 
 See [optimization results](benchmarks/crypto/round2/RESULTS.md) for before/after changes, regressions and Wasm-size tradeoffs; the [original Mops comparison report](benchmarks/crypto/RESULTS.md) remains unchanged.
+
+</details>

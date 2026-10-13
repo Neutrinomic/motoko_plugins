@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# Execute only when the central validation slot is assigned.
+# Start in the pinned compiler's existing Nix environment, for example:
+#   cd /srv/shared/code/motoko_experiments/motoko_sha
+#   nix develop --command bash /absolute/path/to/integration/_build/round3-final-gates.sh
+# All dist artifacts must already be built with this exact host. This script
+# deliberately does not build plugins, rebuild moc, accept expectations or
+# modify an installed toolchain. Ash must already select the pinned toolchain.
+set -euo pipefail
+
+plugins_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+compiler_root=/srv/shared/code/motoko_experiments/motoko_sha
+compiler_revision=92b1bdecbc7bc67fd51ad226f8d147d15494fc09
+ash_source=/srv/shared/code/ash
+run_id=$(date -u +%Y%m%dT%H%M%SZ)
+logs=$plugins_root/_build/round3-final-gates/$run_id
+mkdir -p -- "$logs"
+export MOTOKO_ROOT=$compiler_root
+export PATH="$compiler_root/bin:$PATH"
+unset SKIP_RUNNING SKIP_VALIDATE
+export EXTRA_MOC_ARGS=--sanity-checks
+
+if [[ $(git -C "$compiler_root" rev-parse HEAD) != "$compiler_revision" ]]; then
+  echo "Final gates require compiler revision $compiler_revision" >&2
+  exit 2
+fi
+: "${MOTOKO_CORE:?Run inside the pinned Motoko Nix environment}"
+for executable in cargo ocamlopt test-runner wasm-validate wasmtime bun mops; do
+  command -v "$executable" > /dev/null
+done
+[[ -x "$compiler_root/bin/moc" && -x "$compiler_root/src/moc" ]]
+[[ -f "$ash_source/src/index.ts" ]]
+
+# A missing final lane/artifact must not silently shorten the validation set.
+python3 - "$plugins_root" <<'PY'
+import json, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+for path in sorted((root / 'plugins').glob('*/plugin.json')):
+    manifest = json.loads(path.read_text())
+    files = ['plugin.cmxs']
+    if manifest.get('runtime_crate') is not None:
+        files.append('runtime.wasm')
+    for filename in files:
+        artifact = root / 'dist' / path.parent.name / filename
+        if not artifact.is_file():
+            raise SystemExit(f'Missing final artifact: {artifact}')
+for name in ['ed25519', 'rsa', 'ml-dsa', 'secp256k1', 'p256', 'bls12-381']:
+    if not (root / 'plugins' / name / 'plugin.json').is_file():
+        raise SystemExit(f'Missing final plugin lane: {name}')
+PY
+
+printf 'phase\tstarted_utc\tfinished_utc\texit_code\n' > "$logs/status.tsv"
+start_phase=${ROUND3_START_PHASE:-}
+run_gate() {
+  local phase=$1
+  shift
+  if [[ -n "$start_phase" && "$phase" != "$start_phase" ]]; then return; fi
+  start_phase=
+  local started
+  started=$(date -u +%FT%TZ)
+  printf '%s\n' "$phase"
+  printf '%q ' "$@" > "$logs/$phase.command"
+  printf '\n' >> "$logs/$phase.command"
+  local status=0
+  "$@" > "$logs/$phase.log" 2>&1 || status=$?
+  printf '%s\t%s\t%s\t%s\n' "$phase" "$started" "$(date -u +%FT%TZ)" "$status" >> "$logs/status.tsv"
+  if ((status != 0)); then
+    tail -n 80 -- "$logs/$phase.log" >&2
+    echo "Gate failed; complete evidence: $logs/$phase.log" >&2
+    return "$status"
+  fi
+}
+
+[[ -d "$plugins_root/packages/fast/.mops/core@2.5.0/src" ]]
+cd -- "$plugins_root"
+run_gate build-config python3 "$plugins_root/tests/build-config.py"
+run_gate whitespace git diff --check
+
+# Separate invocations preserve each runtime's standalone feature selection.
+# Release exercises optimized kernels, while bounded build concurrency keeps
+# this gate from monopolizing the central scheduling budget.
+for plugin in ed25519 rsa ml-dsa secp256k1 p256 bls12-381; do
+  encoded_cfg=$(python3 - "$plugins_root/plugins/$plugin/plugin.json" <<'PY'
+import json, sys
+cfg = json.load(open(sys.argv[1])).get('runtime_cfg', [])
+print('\x1f'.join(token for value in cfg for token in ['--cfg', value]))
+PY
+)
+  run_gate "native-$plugin" env -u RUSTFLAGS CARGO_ENCODED_RUSTFLAGS="$encoded_cfg" cargo test \
+    --manifest-path "$plugins_root/Cargo.toml" --locked --release \
+    --package "motoko-compute-$plugin" \
+    --target-dir "$plugins_root/_build/round3-final-native" --jobs 2 \
+    -- --test-threads=1
+done
+
+# test-runner uses moc from PATH and infers run/fail flags from the absolute
+# fixture path. Ordinary run fixtures cover source, prelowered IR, lowered IR,
+# Wasm validation and Wasm execution. No --just-tc, acceptance or skip flags.
+# Include the Bitcoin users of secp256k1 as downstream regression coverage.
+cd -- "$compiler_root"
+for fixture in \
+  crypto-ed25519 crypto-rsa crypto-mldsa crypto-secp256k1 crypto-p256 \
+  crypto-bls crypto-bls-hash crypto-bls-round2 \
+  crypto-bitcoin-address crypto-bitcoin-bip32 \
+  crypto-bitcoin-transaction crypto-bitcoin-transaction-vectors; do
+  source=$plugins_root/packages/fast/tests/run/$fixture.mo
+  [[ -f "$source" ]]
+  run_gate "motoko-$fixture" test-runner -b -j 1 "$source"
+done
+for fixture in crypto-composed signature-composition; do
+  source=$plugins_root/tests/integration/run/$fixture.mo
+  [[ -f "$source" ]]
+  run_gate "motoko-$fixture" test-runner -b -j 1 "$source"
+done
+# Ed25519 has new plugin-local argument/arity rejection cases. P256 and BLS
+# already have package-level argument/prehash/arity/intrinsic coercion cases.
+# RSA and MLDSA currently provide runtime typed-error checks, not fail fixtures.
+run_gate motoko-crypto-fail test-runner -b -j 1 \
+  "$plugins_root/plugins/ed25519/tests/fail" \
+  "$plugins_root/packages/fast/tests/fail/crypto-p256-argument.mo" \
+  "$plugins_root/packages/fast/tests/fail/crypto-p256-prehash.mo" \
+  "$plugins_root/packages/fast/tests/fail/crypto-bls-argument.mo" \
+  "$plugins_root/packages/fast/tests/fail/crypto-bls-arity.mo" \
+  "$plugins_root/packages/fast/tests/fail/crypto-bls-ordinary-function.mo"
+
+cd -- "$plugins_root"
+# P256 runs the entire suite, including all 15 formerly deferred Ash methods.
+# Per-suite helper invocation checks mocArgs support and records isolated logs.
+for suite in Ed25519 RSA MLDSA Secp256k1 P256 BLS12381 SignatureComposition; do
+  run_gate "ash-$suite" "$plugins_root/scripts/test-ash.sh" \
+    --ash-source "$ash_source" "$suite"
+done
+
+run_gate expectations python3 "$plugins_root/tests/check-expectations.py"
+# Includes all registered packages: unused output identity, native-only
+# collections, standalone public .cmxs source/IR interpretation, missing/invalid
+# runtime diagnostics, directory/file identity and toolchain/ABI rejection.
+cd -- "$compiler_root"
+run_gate packaging python3 "$plugins_root/tests/packaging.py" --motoko "$compiler_root"
+cd -- "$plugins_root"
+run_gate final-whitespace git diff --check
+[[ -z "$start_phase" ]]
+printf 'All final gates passed. Logs: %s\n' "$logs"

@@ -1,0 +1,36 @@
+{
+  "cases": [
+    {
+      "name": "api-secp256k1-verifyPrehash-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round3/controls/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "Secp256k1.verifyPrehash",
+      "plugin_case": "r2-secp256k1-verify-compressed-low-s",
+      "fixture_case": "r2-secp256k1-verify-compressed-low-s",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/pure/ecdsa/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "control_source_sha256": "437dc06eb53e294be790f3cca503c75601422a5fbb70759b7281af664fca6bb7"
+    },
+    {
+      "name": "api-p256-verifyPrehash-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round3/controls/api-p256-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "P256.verifyPrehash",
+      "plugin_case": "r2-p256-verify-compressed-low-s",
+      "fixture_case": "r2-p256-verify-compressed-low-s",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/pure/ecdsa/api-p256-verifyPrehash-ecdsa/main.mo",
+      "control_source_sha256": "786e36eea07273861926a0a543c58f75cb82be4b02db84f0b15766d491cce52d"
+    }
+  ]
+}

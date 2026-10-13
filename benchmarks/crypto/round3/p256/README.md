@@ -10,7 +10,7 @@ remain unchanged. No compiler, RTS or SDK changes are involved.
 |---|---:|---:|---:|---:|
 | RFC6979 signing | 13,458,880 | 7,225,034 | 46.32% | 120 |
 | `derivePublicKey` | 5,207,095 | 4,968,688 | 4.58% | 96 |
-| Compressed-key verification | 12,873,756 | 12,873,756 | 0% | 32 |
+| Compressed-key verification | 12,873,707 | 12,873,707 | 0% | 32 |
 
 All 30 workloads passed in three fresh canisters each for the baseline and
 candidate, for 180 trials. Every selected case is retained in the

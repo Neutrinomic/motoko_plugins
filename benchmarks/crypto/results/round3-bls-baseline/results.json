@@ -1,0 +1,1925 @@
+{
+  "protocol": "crypto-round3-v1",
+  "stage": "round3-bls-baseline",
+  "expected_case_count": 17,
+  "complete": true,
+  "recorded_utc": "2026-10-13T04:09:01.780Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "b2afd0aba243c9bb9b4eea70854ff72afde867882de0ff15b729de7c6fa71aa6",
+  "runner_sha256": "6504befb334bcb32de90b16fd303c010a0183f30ca6ea2995ed482827bcc5123",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes. memory_metrics fixtures additionally query occupied heap, Wasm capacity and cumulative RTS counters after setup GC, after the run message, and after four further forced GC increments. These snapshots are outside measurement; after_run includes any message-end GC. Four increments are not guaranteed to complete collection. Snapshots are neither true peaks nor a measurement of retained live data; the result remains reachable until the oracle query.",
+  "cases": [
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n2",
+      "notes": "2 copies of the same canonical key, PoP and 32-byte message. Complete Ethereum POP aggregate API, including required proof checks on each call. Repetition is valid under this profile.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ethereum_repeated_key_message_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_repeated_key_message_n2/main.mo",
+      "control_source_sha256": "a81ee6fb1e3d73d76275acc3a91d9961be167aa3ffc276f949ce148649df0afd",
+      "returncode": 0,
+      "source_sha256": "cdf7335e0b6e42428b48e352f2c6b97354d4764ca088204a32455a9d3b93f9d0",
+      "wasm": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n2/fast/main.wasm",
+      "wasm_sha256": "c433a1111140e7be2bd12bb97335927c86d01e1e279bd0029b407aa83ae58f3a",
+      "wasm_bytes": 808476,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 708658473,
+          "allocated_bytes": 85488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322528,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5408248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5408248,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5478264,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5478264,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 708658473,
+          "allocated_bytes": 85488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322528,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5408248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5408248,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5478264,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5478264,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 708658473,
+          "allocated_bytes": 85488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322528,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5408248,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5408248,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5478264,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5478264,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ethereum_distinct_n2",
+      "notes": "2 distinct keys, valid PoPs and distinct 32-byte messages. Complete Ethereum POP aggregate API, including every proof check and message hash.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ethereum_distinct_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_distinct_n2/main.mo",
+      "control_source_sha256": "e922eafd9af0f8fa2b09a4fcfcf8404ba8b04e666c40b323cdcab2c6eab26175",
+      "returncode": 0,
+      "source_sha256": "4ea5c33f25cb57e010e23fce094a7fd9d8126819da020c5b2ebd59f172b6aee8",
+      "wasm": "round2_bls12_381_aggregate_ethereum_distinct_n2/fast/main.wasm",
+      "wasm_sha256": "b214710da9b0a7e214bfeb460ddf8dbb3c1e47580c13ae3a964d95e8719e67b8",
+      "wasm_bytes": 808921,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1093955874,
+          "allocated_bytes": 144576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5467608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5467608,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5537624,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5537624,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 1093955874,
+          "allocated_bytes": 144576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5467608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5467608,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5537624,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5537624,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 1093955874,
+          "allocated_bytes": 144576,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5467608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5467608,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5537624,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5537624,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2",
+      "notes": "2 distinct keys and valid PoPs signing the same 32-byte message. Complete fast aggregate API includes every PoP verification, key aggregation and final signature verification; no prevalidated-proof assumption.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/main.mo",
+      "control_source_sha256": "e2db95d0c7202517029d98cc3d3f7023ca2cfd70e01d0ee2ab4f7803ddf0d157",
+      "returncode": 0,
+      "source_sha256": "02bf9f7b3af9f27fe6168e038e6644fba2a5381e32faa048bad616f08feb8fe6",
+      "wasm": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n2/fast/main.wasm",
+      "wasm_sha256": "68eaf6aa7be7f59a4ca1db2af96c6c897d274dea101a3b7e6172f193bb473b1e",
+      "wasm_bytes": 803029,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 887685951,
+          "allocated_bytes": 119160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322320,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322320,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5441712,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5441712,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5511728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5511728,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 887685951,
+          "allocated_bytes": 119160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322320,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322320,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5441712,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5441712,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5511728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5511728,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 887685951,
+          "allocated_bytes": 119160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322320,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322320,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5441712,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5441712,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5511728,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5511728,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 hash_to_G1 with IC NUL DST; scalar-derived G2 keys and aggregated G1 signatures; independent pairing-product identity verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_distinct_n2",
+      "notes": "2 distinct G2 keys and pairwise-distinct 32-byte messages. Complete IC basic aggregate API including duplicate scan, validation, hashing and pairing.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ic_distinct_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_distinct_n2/main.mo",
+      "control_source_sha256": "1c27c78a68ba124417e31c81c476015263a7b28109634f1b1f1627251517d861",
+      "returncode": 0,
+      "source_sha256": "66ad3530b0280f4de9ffe0e39207addf2cf41b5f8c9a77f1bde24fe692a54380",
+      "wasm": "round2_bls12_381_aggregate_ic_distinct_n2/fast/main.wasm",
+      "wasm_sha256": "748bd40fc06c8b0b9d21fcbb81b369735d671da63af114b19cf3ac036378336b",
+      "wasm_bytes": 809565,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 468894403,
+          "allocated_bytes": 66240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322632,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5389104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5389104,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5459120,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5459120,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 468894403,
+          "allocated_bytes": 66240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322632,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5389104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5389104,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5459120,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5459120,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 468894403,
+          "allocated_bytes": 66240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322632,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5389104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5389104,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5459120,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5459120,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_late_duplicate_n2",
+      "expected_hex": "ff09",
+      "family": "bls12-381",
+      "fixture_provenance": "Public IC basic-aggregate contract: duplicate message rejection precedes signature/key cryptography. Canonical inputs are independently generated with py_ecc 8.0.0. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_late_duplicate_n2",
+      "notes": "2 entries, only final message duplicates penultimate; measures complete duplicate scan and required rejection before cryptography. Signature is from the corresponding distinct-message fixture.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ic_late_duplicate_n2/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_late_duplicate_n2/main.mo",
+      "control_source_sha256": "72d7c2a3fd6cbd26c15742b28b27895ea37908b2a9884421846be286f16d7b72",
+      "returncode": 0,
+      "source_sha256": "f1d65bc6a03725815a2f8ceb66795902468e0f60e71f3f97cc179cac8cc1794c",
+      "wasm": "round2_bls12_381_aggregate_ic_late_duplicate_n2/fast/main.wasm",
+      "wasm_sha256": "1bfa4379156ee99db3dab29cd0544dddad54f8ed661ec7c11c2e5b4bdf9a0c14",
+      "wasm_bytes": 809444,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1896,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322568,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322568,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 1896,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322568,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322568,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 1896,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322568,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322568,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322800,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322800,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392816,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n8",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n8",
+      "notes": "8 copies of the same canonical key, PoP and 32-byte message. Complete Ethereum POP aggregate API, including required proof checks on each call. Repetition is valid under this profile.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ethereum_repeated_key_message_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_repeated_key_message_n8/main.mo",
+      "control_source_sha256": "e268dcf0b1ebf59177b8df1b3f2728eb169211aaf487f7d3d87f914d8e809d5c",
+      "returncode": 0,
+      "source_sha256": "d4dc214c86f7bb679a46e5ea20e778b166756fe2d65e290b5d4c7d41476e37f7",
+      "wasm": "round2_bls12_381_aggregate_ethereum_repeated_key_message_n8/fast/main.wasm",
+      "wasm_sha256": "ce9f1a2f4e90fa03da82419c9f4e8aea820c2776b5a2fc6d70b462f2c6f08ade",
+      "wasm_bytes": 808656,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 997512481,
+          "allocated_bytes": 97104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5420008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5420008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5490024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5490024,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 997512481,
+          "allocated_bytes": 97104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5420008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5420008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5490024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5490024,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 997512481,
+          "allocated_bytes": 97104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5322672,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322672,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5420008,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5420008,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5490024,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5490024,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ethereum_distinct_n8",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ethereum_distinct_n8",
+      "notes": "8 distinct keys, valid PoPs and distinct 32-byte messages. Complete Ethereum POP aggregate API, including every proof check and message hash.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ethereum_distinct_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ethereum_distinct_n8/main.mo",
+      "control_source_sha256": "48a3e2a0fa86d58ace8721a33bc01f9595634afa7acbda5a4e8400790d5528b6",
+      "returncode": 0,
+      "source_sha256": "ff7db025c1281dc40d7220df402af3a6b8048e6e870b1d8d050a5df8adac581b",
+      "wasm": "round2_bls12_381_aggregate_ethereum_distinct_n8/fast/main.wasm",
+      "wasm_sha256": "c5733ad0eab5342b343d2ecb771efa1811840335240300fbac96a56be5fc2ef6",
+      "wasm_bytes": 811771,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 3717682205,
+          "allocated_bytes": 510720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5324576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324576,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5835528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5835528,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5905544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5905544,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 3717682205,
+          "allocated_bytes": 510720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5324576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324576,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5835528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5835528,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5905544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5905544,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 3717682205,
+          "allocated_bytes": 510720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5324576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324576,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5835528,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5835528,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5905544,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5905544,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 G2ProofOfPossession SkToPk/Sign/PopProve/Aggregate; all key PoPs and each aggregate independently verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8",
+      "notes": "8 distinct keys and valid PoPs signing the same 32-byte message. Complete fast aggregate API includes every PoP verification, key aggregation and final signature verification; no prevalidated-proof assumption.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8/main.mo",
+      "control_source_sha256": "f8945cff4a14256f38e34365d0fc5b32385bc528af0bbf4aafcb8b68fd526ffa",
+      "returncode": 0,
+      "source_sha256": "b7760fed7c028f51364cd9a31a114c38dd216c893c4a60bab5991190e00b6f31",
+      "wasm": "round2_bls12_381_fast_aggregate_ethereum_distinct_keys_n8/fast/main.wasm",
+      "wasm_sha256": "55bc1e39633e1770987e8353dbb786913d33235791e66294f154f1fd7f8442fc",
+      "wasm_bytes": 805093,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 2680034928,
+          "allocated_bytes": 358344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5682240,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5682240,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5752256,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5752256,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 2680034928,
+          "allocated_bytes": 358344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5682240,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5682240,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5752256,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5752256,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 2680034928,
+          "allocated_bytes": 358344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323664,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5682240,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5682240,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5752256,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5752256,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_distinct_n8",
+      "expected_hex": "0001",
+      "family": "bls12-381",
+      "fixture_provenance": "py_ecc 8.0.0 hash_to_G1 with IC NUL DST; scalar-derived G2 keys and aggregated G1 signatures; independent pairing-product identity verified. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_distinct_n8",
+      "notes": "8 distinct G2 keys and pairwise-distinct 32-byte messages. Complete IC basic aggregate API including duplicate scan, validation, hashing and pairing.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ic_distinct_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_distinct_n8/main.mo",
+      "control_source_sha256": "9c1f5f78073bb3d5a035361b9f6c2d75d24672e5df1b70f177a3324636c5d414",
+      "returncode": 0,
+      "source_sha256": "baa9822f9e8046970c098dae1b17c20275b61567a4988ac48f1dfcc9702e8427",
+      "wasm": "round2_bls12_381_aggregate_ic_distinct_n8/fast/main.wasm",
+      "wasm_sha256": "2bb794906b8c761a373b0f2db7402346a77f9b5c60e30b4f59f958ee08cba3b6",
+      "wasm_bytes": 811533,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 1288036398,
+          "allocated_bytes": 197520,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323880,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5521632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5521632,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5591648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5591648,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 1288036398,
+          "allocated_bytes": 197520,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323880,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5521632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5521632,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5591648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5591648,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 1288036398,
+          "allocated_bytes": 197520,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323880,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323880,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5521632,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5521632,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5591648,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5591648,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_late_duplicate_n8",
+      "expected_hex": "ff09",
+      "family": "bls12-381",
+      "fixture_provenance": "Public IC basic-aggregate contract: duplicate message rejection precedes signature/key cryptography. Canonical inputs are independently generated with py_ecc 8.0.0. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_late_duplicate_n8",
+      "notes": "8 entries, only final message duplicates penultimate; measures complete duplicate scan and required rejection before cryptography. Signature is from the corresponding distinct-message fixture.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ic_late_duplicate_n8/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_late_duplicate_n8/main.mo",
+      "control_source_sha256": "70fdd1c9b0d5a5839405e3b9bfb1a3aec0844618b16eeaecf687b54acf8be873",
+      "returncode": 0,
+      "source_sha256": "bfa7f57123951466d5bd1d023f981c313e53810f631d6469c516b87f8cc3cf99",
+      "wasm": "round2_bls12_381_aggregate_ic_late_duplicate_n8/fast/main.wasm",
+      "wasm_sha256": "3b1859314e8b7a9ba639f0e928fc5f6f11a55468a26265fad16e4a25a25b04df",
+      "wasm_bytes": 811413,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 8175,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324048,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394064,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 8175,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324048,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394064,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 8175,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5323816,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5323816,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5324048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5324048,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5394064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5394064,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "benchmark_kind": "absolute-only",
+      "comparison": "round2_bls12_381_aggregate_ic_late_duplicate_n127",
+      "expected_hex": "ff09",
+      "family": "bls12-381",
+      "fixture_provenance": "Deterministic integer-encoded messages independently checked for uniqueness before the final duplicate; standard py_ecc G1/G2 generator encodings. Expected error follows the public IC API contract. Retained inputs/results: round2/curve-hotspots/bls/fixtures.json; generator/oracle/corpus hashes: provenance.json.",
+      "implementation": "fast",
+      "name": "round2_bls12_381_aggregate_ic_late_duplicate_n127",
+      "notes": "127 canonical generator keys and 32-byte messages; only the final message repeats the penultimate. Exercises all 8001 pairwise comparisons before duplicate rejection. Canonical generator signature is not valid for these messages; duplicateMessage must win before cryptography.",
+      "operations_per_sample": 1,
+      "plugins": [
+        "bls12-381"
+      ],
+      "source": "round3/bls12-381/cases/round2_bls12_381_aggregate_ic_late_duplicate_n127/main.mo",
+      "memory_metrics": true,
+      "control_source": "round2/curve-hotspots/bls/cases/round2_bls12_381_aggregate_ic_late_duplicate_n127/main.mo",
+      "control_source_sha256": "01c799411fa19dcaec0181e854bb4d9885b21a342d3de4eec0b4676ef48c5e12",
+      "returncode": 0,
+      "source_sha256": "878fdf1352903a1aaca3085259e26b36d31c8c4a000734b2174bf574471caade",
+      "wasm": "round2_bls12_381_aggregate_ic_late_duplicate_n127/fast/main.wasm",
+      "wasm_sha256": "87a9103ecc8088678b4617a656ce07573d30da920a0fdcffe55ecd9d0c2ebf84",
+      "wasm_bytes": 827030,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 306828,
+          "allocated_bytes": 2120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5332312,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5332312,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5334664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5334664,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5404680,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5404680,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 306828,
+          "allocated_bytes": 2120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5332312,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5332312,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5334664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5334664,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5404680,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5404680,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 306828,
+          "allocated_bytes": 2120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "330afa93fd1eff4c271df44ed32f583e5d28ea65475cdb6840572d17059b8191",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5332312,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5332312,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5334664,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5334664,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5404680,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5404680,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_identity_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_pairing_identity",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "notes": "Pairing product e(G1,G2)*e(-G1,G2)=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "round3/bls12-381/cases/bls12_381_pairing_identity_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_pairing_identity_fast/main.mo",
+      "control_source_sha256": "d7f542c9334ca69ab77e7967131f3f43a665e03802db76576d504025f528aee4",
+      "returncode": 0,
+      "source_sha256": "eb2345fc65dd23a1146a77defde314b6d806c86afc211a12559af8024eeb4076",
+      "wasm": "bls12_381_pairing_identity_fast/fast/main.wasm",
+      "wasm_sha256": "4fb47156d1071662cbdcf08f6844708d242db2d69d910118a3597a82bdcd03df",
+      "wasm_bytes": 792688,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 99939097,
+          "allocated_bytes": 696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322032,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392048,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 99939097,
+          "allocated_bytes": 696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322032,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392048,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 99939097,
+          "allocated_bytes": 696,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321104,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321104,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5322032,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5322032,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5392048,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5392048,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_pairing_nonidentity_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_pairing_nonidentity",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "notes": "Nondegenerate generator pairing e(G1,G2)!=1. Native compressed API validates subgroup membership; baseline uses prepared trusted generator points.",
+      "source": "round3/bls12-381/cases/bls12_381_pairing_nonidentity_fast/main.mo",
+      "operations_per_sample": 1,
+      "fixture_provenance": "generate-curves.py independent Python affine arithmetic; fixed non-secret scalars; ECDSA algebra checked before emitting; BLS standard generators checked for curve and subgroup membership.",
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_pairing_nonidentity_fast/main.mo",
+      "control_source_sha256": "e527b47b96b50ac63cd8d97db776c00b64ac45b49b9abd9d6da1af15a785cef9",
+      "returncode": 0,
+      "source_sha256": "8bba842bee0409ddd66645076c7ffa530685016a19447563f2392863731c5717",
+      "wasm": "bls12_381_pairing_nonidentity_fast/fast/main.wasm",
+      "wasm_sha256": "417481cce3ab86324d1347b439a3f289a24dc1f94c0f433fcf42c3a3248aa69e",
+      "wasm_bytes": 792544,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 183562156,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5320960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5320960,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341288,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411304,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411304,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 183562156,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5320960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5320960,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341288,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411304,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411304,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 183562156,
+          "allocated_bytes": 20096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5320960,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5320960,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5341288,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5341288,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5411304,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5411304,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ic_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ic_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "notes": "Absolute-only IC BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "round3/bls12-381/cases/bls12_381_verify_ic_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ic_valid_fast/main.mo",
+      "control_source_sha256": "cf50dfd98c74bac6bb1643ce9a1d6cda867ecc5c35ce19671441e4bbf1b561c4",
+      "returncode": 0,
+      "source_sha256": "20dd2b595d86a92ef35127d8cf65338579ea609e41f5e2edce337e6ae42c3d11",
+      "wasm": "bls12_381_verify_ic_valid_fast/fast/main.wasm",
+      "wasm_sha256": "ab95640bbcda79689fabb63b46d32b1ececb7ad0adcca477086ae3e724825240",
+      "wasm_bytes": 792847,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ic_wrong_message_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ic_wrong_message",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "ic-verify-bls-signature 0.6.0 published agent-rs IC certificate vector, mirrored in plugins/bls12-381/runtime/src/tests.rs",
+      "notes": "Absolute-only IC BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile. Message first byte flipped from the valid fixture.",
+      "source": "round3/bls12-381/cases/bls12_381_verify_ic_wrong_message_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ic_wrong_message_fast/main.mo",
+      "control_source_sha256": "3ac49031b1cfafae4b764ccba4d06cb063ce8c2f9d8233b17139801f0afa9cff",
+      "returncode": 0,
+      "source_sha256": "46cbbdbc8e454d8183f35dc603b8854ab5c08a3750058346fc2650239d9eb9bb",
+      "wasm": "bls12_381_verify_ic_wrong_message_fast/fast/main.wasm",
+      "wasm_sha256": "4a808e0858139501290a691fc050ee0ead3c8ec8e64e33685015b9aefbba3d17",
+      "wasm_bytes": 792847,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 236236649,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321080,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321080,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360592,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430608,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430608,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ethereum_valid_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ethereum_valid",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "01",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "notes": "Absolute-only Ethereum BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile.",
+      "source": "round3/bls12-381/cases/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ethereum_valid_fast/main.mo",
+      "control_source_sha256": "edeb37e5ff77534c4a4fcb3ab3ae068c03a8e34e0e5093528a4d5acf0f8a822f",
+      "returncode": 0,
+      "source_sha256": "2768e644eba567776ee2e7485f3494734c905dcf04460a061a5953950abba84c",
+      "wasm": "bls12_381_verify_ethereum_valid_fast/fast/main.wasm",
+      "wasm_sha256": "18d0a81725c5924bed0d0b27067a833e40e9b483ba792b9cb17131726cbde892",
+      "wasm_bytes": 792833,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bls12_381_verify_ethereum_wrong_message_fast",
+      "family": "bls12-381",
+      "implementation": "fast",
+      "comparison": "bls12_381_verify_ethereum_wrong_message",
+      "plugins": [
+        "bls12-381"
+      ],
+      "expected_hex": "00",
+      "benchmark_kind": "absolute-only",
+      "fixture_provenance": "Ethereum bls12-381-tests v0.1.2 verify_valid_case_195246ee3bd3b6ec.json (CC0-1.0), https://github.com/ethereum/bls12-381-tests/releases/tag/v0.1.2",
+      "notes": "Absolute-only Ethereum BLS verification including domain-specific message hashing, point/subgroup validation and pairing. Mops bls12-381 0.2.0 exposes primitives but no matching signature profile. Message first byte flipped from the valid fixture.",
+      "source": "round3/bls12-381/cases/bls12_381_verify_ethereum_wrong_message_fast/main.mo",
+      "operations_per_sample": 1,
+      "dependency_lock": "dependencies/mops.lock",
+      "memory_metrics": true,
+      "control_source": "curve-cases/bls12_381_verify_ethereum_wrong_message_fast/main.mo",
+      "control_source_sha256": "e2460a91a3f0b03df10e60f20931205ae67ec7f9075275765d9621fca56e9957",
+      "returncode": 0,
+      "source_sha256": "14819f0977d155cb7f55653f20a9b16ff639eaca629abea52368ab7584b1f4ca",
+      "wasm": "bls12_381_verify_ethereum_wrong_message_fast/fast/main.wasm",
+      "wasm_sha256": "758dec6bab7413e6d7af96ffac3b25e288bf2faa6acbf4a7dbb752b9c9421b49",
+      "wasm_bytes": 792833,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 286386819,
+          "allocated_bytes": 39280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5321064,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5321064,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 5360576,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5360576,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 5430592,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5430592,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}

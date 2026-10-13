@@ -1,0 +1,237 @@
+{
+  "protocol": "crypto-round3-v1",
+  "stage": "round3-motoko-verification-controls",
+  "expected_case_count": 2,
+  "complete": true,
+  "recorded_utc": "2026-10-13T04:09:46.633Z",
+  "trials": 3,
+  "node_version": "v24.11.1",
+  "build_sha256": "23c04e6afe23d7bdddf30f7e5febdf13d4d9313cedc590e0dae16e46972f09a8",
+  "runner_sha256": "6504befb334bcb32de90b16fd303c010a0183f30ca6ea2995ed482827bcc5123",
+  "methodology": "Fresh canister per case, implementation and trial. configure runs separately before four forced GC increments. One synchronous operation is measured using performanceCounter(0), rts_total_allocation and rts_reclaimed. Output serialization/checking executes after the counters in a separate query; expected bytes are independent oracles. Cumulative allocation includes transient allocation and synchronous GC; end-of-message GC is excluded. No empty-loop subtraction. Each implementation is separately compiled; Wasm sizes are total canister artifact sizes. memory_metrics fixtures additionally query occupied heap, Wasm capacity and cumulative RTS counters after setup GC, after the run message, and after four further forced GC increments. These snapshots are outside measurement; after_run includes any message-end GC. Four increments are not guaranteed to complete collection. Snapshots are neither true peaks nor a measurement of retained live data; the result remains reachable until the oracle query.",
+  "cases": [
+    {
+      "name": "api-secp256k1-verifyPrehash-ecdsa",
+      "family": "secp256k1",
+      "implementation": "ecdsa",
+      "comparison": "r2-secp256k1-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round3/controls/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "Secp256k1.verifyPrehash",
+      "plugin_case": "r2-secp256k1-verify-compressed-low-s",
+      "fixture_case": "r2-secp256k1-verify-compressed-low-s",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/pure/ecdsa/api-secp256k1-verifyPrehash-ecdsa/main.mo",
+      "control_source_sha256": "437dc06eb53e294be790f3cca503c75601422a5fbb70759b7281af664fca6bb7",
+      "returncode": 0,
+      "source_sha256": "de397695f13a21ac586bcea70238ebe9d4d250857ffec8f9a92359c460d52367",
+      "wasm": "api-secp256k1-verifyPrehash-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "8a7aed72f1ce68686f60dcddd2f8e488de5049f5a8eb6b8e36f18d2094d1fa24",
+      "wasm_bytes": 661862,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338776,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338776,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16102480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16102480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16172496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16172496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338776,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338776,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16102480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16102480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16172496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16172496,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 135628126,
+          "allocated_bytes": 10763472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5338776,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5338776,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 16102480,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16102480,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 16172496,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 16172496,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "api-p256-verifyPrehash-ecdsa",
+      "family": "p256",
+      "implementation": "ecdsa",
+      "comparison": "r2-p256-verify-compressed-low-s",
+      "plugins": [],
+      "source": "round3/controls/api-p256-verifyPrehash-ecdsa/main.mo",
+      "expected_hex": "01",
+      "notes": "Byte-oriented composition of pinned ecdsa@8.0.1 APIs. Input decoding, strict length/range validation, operation, SEC1/DER/compact serialization and array-to-Blob conversion are measured. Only reusable curve construction and immutable input literals are outside timing. Fixture comes from the independent frozen curve oracle; no plugin outputs were used. Typed error text differs from the native API; comparison is for this valid input. ecdsa Signature normalizes S before verifyHashed; this low-S fixture has identical ECDSA semantics. Package P-256 has a half-order boundary quirk, so this row does not assert complete validation equivalence.",
+      "api": "P256.verifyPrehash",
+      "plugin_case": "r2-p256-verify-compressed-low-s",
+      "fixture_case": "r2-p256-verify-compressed-low-s",
+      "memory_metrics": true,
+      "control_source": "round2/api-curves/pure/ecdsa/api-p256-verifyPrehash-ecdsa/main.mo",
+      "control_source_sha256": "786e36eea07273861926a0a543c58f75cb82be4b02db84f0b15766d491cce52d",
+      "returncode": 0,
+      "source_sha256": "24d94fe3debae44bfd8092defb49dcab38a6f3b48350a036d51c346fadde6c8a",
+      "wasm": "api-p256-verifyPrehash-ecdsa/ecdsa/main.wasm",
+      "wasm_sha256": "d14116432911cd365664dbe3e477e9d1894cc58f46b275228aa705f7cf56668b",
+      "wasm_bytes": 661862,
+      "measurements": [
+        {
+          "trial": 0,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 30652128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30652128,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 30722144,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30722144,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 1,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 30652128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30652128,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 30722144,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30722144,
+              "reclaimed_bytes": 0
+            }
+          }
+        },
+        {
+          "trial": 2,
+          "instructions": 341837259,
+          "allocated_bytes": 25290680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1,
+          "output_sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a",
+          "correct": true,
+          "memory": {
+            "before_run": {
+              "occupied_heap_bytes": 5361216,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 5361216,
+              "reclaimed_bytes": 0
+            },
+            "after_run": {
+              "occupied_heap_bytes": 30652128,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30652128,
+              "reclaimed_bytes": 0
+            },
+            "after_gc": {
+              "occupied_heap_bytes": 30722144,
+              "wasm_capacity_bytes": 134217728,
+              "total_allocation_bytes": 30722144,
+              "reclaimed_bytes": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failed_measurements": 0,
+  "pocket_ic_version": "pocket-ic-server 10.0.0",
+  "pocket_ic_sha256": "6303d3418bb20eb3b67e21cecbe68cc450b08dcbf2ec0896d831da4ccca6a990"
+}
