@@ -915,6 +915,7 @@ available as historical evidence.
 | Plugin | `mo:fast` module | Description |
 | --- | --- | --- |
 | [CandidX](plugins/candidx/) | `CandidX.encode(...)` → `#ok Blob` / `#err Text` | Canonical Candid encoding from typed Motoko values |
+| [ICWire](plugins/icwire/) | `ICWire.encode(value)`, `ICWire.decode<T>(bytes)`, `ICWire.estimateSize(value)` | Raw positional binary payloads with compile-time schemas, bounded decoding and allocation-free admission sizing |
 | [CBOR](plugins/cbor/) | `CBOR.encode(value)`, `CBOR.decode<T>(bytes)` | Deterministic CBOR encoding and typed decoding with `#ok`/`#err` results |
 | [JSON](plugins/json/) | `JSON.encode(value)`, `JSON.decode<T>(text)` | Typed JSON encoding/decoding with `#ok`/`#err` results |
 | [Mutable map](plugins/mutable-map/) | `Map.get`, `Map.add`, `Map.remove` | In-place ordered maps with generic keys/values, shared payloads, and managed GC writes |

@@ -1,6 +1,6 @@
 # Public module tests with Ash
 
-These 46 configurations define **392 test-method executions** (386 distinct
+These 47 configurations define **417 test-method executions** (411 distinct
 Motoko method declarations) on PocketIC through Ash. They exercise the public
 `mo:fast` modules, independent wire and cryptographic vectors, comparisons with
 Core containers, Bitcoin composition, error recovery, persistence, and GC.
@@ -74,6 +74,7 @@ does not require unrelated plugins.
 | [HMAC](HMAC.mo) | 4 | RFC4231 SHA256/SHA512 vectors, key/padding boundaries, prepared keys, independent streams and reset | [Config](HMAC.ash.json) · [Inventory](coverage/HMAC.md) |
 | [HashLifecycle](HashLifecycle.mo) | 1 | Streaming hash states and prepared HMAC survive messages and confirmed collection, then replay exact answers | [Config](HashLifecycle.ash.json) · [Assertions](../../../../tests/crypto-audit/round5/hashes/Public.mo) |
 | [HistoryRing](HistoryRing.mo) | 8 | Sequence oracle, capacity/wrap boundaries, bulk drops, large Nats, reference release, incremental GC | [Config](HistoryRing.ash.json) · [Inventory](coverage/HistoryRing.md) |
+| [ICWire](ICWire.mo) | 25 | Independent positional-wire vectors, typed round trips, schema ordering, malformed input, exact quotas, allocation-free sizing, confirmed GC retention | [Config](ICWire.ash.json) · [Inventory](coverage/ICWire.md) |
 | [IndexedPriorityQueue](IndexedPriorityQueue.mo) | 11 | Independent model, cancellation/rescheduling, nullable keys, callback traces and reads, mixed scalar/callback dispatch, minimum-priority access | [Config](IndexedPriorityQueue.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
 | [IndexedPriorityQueueGC](IndexedPriorityQueueGC.mo) | 3 | Shared native helpers, cyclic queue/handle references, incremental GC and detached-handle reclamation | [Config](IndexedPriorityQueueGC.ash.json) · [Inventory](coverage/IndexedPriorityQueue.md) |
 | [Map](Map.mo) | 17 | 58 existing functions, mutable aliases, differential operations, B-tree boundaries, scalar keys | [Config](Map.ash.json) · [Inventory](coverage/Map.md) |
@@ -96,10 +97,10 @@ does not require unrelated plugins.
 | [SetGC](SetGC.mo) | 2 | Shared native helpers, mixed element types, incremental GC and write barriers | [Config](SetGC.ash.json) · [Inventory](coverage/SetGC.md) |
 | [SignatureComposition](SignatureComposition.mo) | 4 | Seven plugins share signature/hash/HMAC pipelines, recover after errors and retain inputs/results across GC | [Config](SignatureComposition.ash.json) · [Inventory](coverage/SignatureComposition.md) |
 | [Smoke](Smoke.mo) | 7 | Package imports, codec results, hash pipeline, both map modules and Core conversion | [Config](Smoke.ash.json) · [Inventory](#smoke-inventory) |
-| **Total** | **392** | | |
+| **Total** | **417** | | |
 
 `CoreAPI` runs its six source methods twice, once with Core containers and once
-with Fast containers. Every other configuration names one canister, for 47
+with Fast containers. Every other configuration names one canister, for 48
 configured canisters in total. Counts include the direct, prepared-key,
 composition and round-five regression suites listed above. A method may contain
 many vectors; these totals count methods rather than individual assertions or

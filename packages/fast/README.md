@@ -6,6 +6,7 @@ its calls specialize directly to the plugin implementation.
 | Import | API | Required compiler plugin |
 |---|---|---|
 | `mo:fast/CandidX` | `encode(...)` → `#ok Blob` / `#err Text`; `estimateSize(...)` → conservative `Nat` | `candidx` |
+| `mo:fast/ICWire` | `encode(value)`, `decode<T>(bytes)` → `#ok` / `#err {kind; offset}`; `estimateSize(value)` → conservative `Nat` | `icwire` |
 | `mo:fast/JSON` | `encode(value)`, `decode<T>(text)` | `json` |
 | `mo:fast/CBOR` | `encode(value)`, `decode<T>(bytes)` | `cbor` |
 | `mo:fast/SHA256` | `digest(bytes)` → 32-byte Blob | `sha256` |
@@ -167,6 +168,16 @@ explicit concrete Motoko type; malformed data and conversion failures return
 `#err`. Their full type mappings and limits are documented for
 [JSON](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/json) and
 [CBOR](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/cbor).
+
+[`ICWire`](https://github.com/Neutrinomic/motoko_plugins/tree/main/plugins/icwire)
+encodes one immutable typed value as a raw positional payload, with no header,
+field tags or record framing. Writers and readers must share the exact schema;
+field or variant changes need explicit contract-version handling. Decoding is
+bounded, and the caller owns message identity and transport. The format is
+inspired by Rust IC Wire but is not byte-compatible with Postcard or Candid.
+See its guide for the complete wire contract and limits.
+`estimateSize(value)` bounds admission without encoding or scratch allocation;
+`unwrap(result)` traps on codec errors and `toOption(result)` maps them to null.
 
 CandidX encodes zero or more arguments: `CandidX.encode(a, b)` and
 `CandidX.encode((a, b))` encode two arguments and one tuple, respectively.
