@@ -1,0 +1,4805 @@
+{
+  "label": "icwire-pass4",
+  "recorded_utc": "2026-10-19T09:38:00.387Z",
+  "wasm_sha256": "e2bebf584de4177718f29f66d6d75d174a0230d665e0bde78fa8e7f4ff0beb1c",
+  "wasm_bytes": 692280,
+  "trials": 3,
+  "source_sha256": "a557e8c107ac10003af527a7363401852e8c8826d3868c79f89afa8aa652eab5",
+  "cases_sha256": "77b29581c92cf34855f5fd0ed2cc4fad254c3c17118fdd35a37b31fbca92a027",
+  "runner_sha256": "8902e26bfc43a3e9da176600a7d669aa540097ce594ab11b820360aee1d8f09e",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "control",
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 1,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 2,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "scalar-nat64",
+      "family": "scalar",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "scalar_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "scalar_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "scalar_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "scalar_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "scalar_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "scalar_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 679,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "206b4f01ff5c699027972fb92f05dfea248060cf222f06df58438484e90a6a87"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 1033,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 679,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "206b4f01ff5c699027972fb92f05dfea248060cf222f06df58438484e90a6a87"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 1033,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 679,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 12,
+          "output_sha256": "206b4f01ff5c699027972fb92f05dfea248060cf222f06df58438484e90a6a87"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 1033,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "tiny-record",
+      "family": "tiny",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "tiny_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "tiny_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "tiny_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "tiny_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "tiny_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "tiny_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 1590,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 63,
+          "output_sha256": "8cda66078792a938e16b27a6c322017d6cdcc0fc1d12b530d2336b22626930b9"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 4359,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 1590,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 63,
+          "output_sha256": "8cda66078792a938e16b27a6c322017d6cdcc0fc1d12b530d2336b22626930b9"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 4359,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 1590,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 63,
+          "output_sha256": "8cda66078792a938e16b27a6c322017d6cdcc0fc1d12b530d2336b22626930b9"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 4359,
+          "allocated_bytes": 496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-0",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 798,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 765,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 798,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 765,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 798,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 765,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-32",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 830,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bbf35b94b2857142edf10aded0b95819b67f447ad411e9a5f436f92fc06b44f9"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 797,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 830,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bbf35b94b2857142edf10aded0b95819b67f447ad411e9a5f436f92fc06b44f9"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 797,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 830,
+          "allocated_bytes": 96,
+          "reclaimed_bytes": 0,
+          "output_bytes": 40,
+          "output_sha256": "bbf35b94b2857142edf10aded0b95819b67f447ad411e9a5f436f92fc06b44f9"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 797,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-1024",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 1822,
+          "allocated_bytes": 1088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1032,
+          "output_sha256": "a13a3b7c84808c6ffb5df9e007ecda0533d34c4de1225f3fe6dd1f25d2ab805a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 1789,
+          "allocated_bytes": 1080,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 1822,
+          "allocated_bytes": 1088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1032,
+          "output_sha256": "a13a3b7c84808c6ffb5df9e007ecda0533d34c4de1225f3fe6dd1f25d2ab805a"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 1789,
+          "allocated_bytes": 1080,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 1822,
+          "allocated_bytes": 1088,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1032,
+          "output_sha256": "a13a3b7c84808c6ffb5df9e007ecda0533d34c4de1225f3fe6dd1f25d2ab805a"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 1789,
+          "allocated_bytes": 1080,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-65536",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 386334,
+          "allocated_bytes": 65600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "8c3fe6485318bf86e526241fd5f4463a8d2a1912bd25a959f6d07b01dffaf38e"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 386301,
+          "allocated_bytes": 65592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 386334,
+          "allocated_bytes": 65600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "8c3fe6485318bf86e526241fd5f4463a8d2a1912bd25a959f6d07b01dffaf38e"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 386301,
+          "allocated_bytes": 65592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 386334,
+          "allocated_bytes": 65600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65544,
+          "output_sha256": "8c3fe6485318bf86e526241fd5f4463a8d2a1912bd25a959f6d07b01dffaf38e"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 386301,
+          "allocated_bytes": 65592,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-0",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 3536,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 144,
+          "output_sha256": "57d3be5e405903a31da01adcc63af6286f8e2ef23f7f6dd12dde25f61d082206"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 8445,
+          "allocated_bytes": 608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 3536,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 144,
+          "output_sha256": "57d3be5e405903a31da01adcc63af6286f8e2ef23f7f6dd12dde25f61d082206"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 8445,
+          "allocated_bytes": 608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 3536,
+          "allocated_bytes": 200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 144,
+          "output_sha256": "57d3be5e405903a31da01adcc63af6286f8e2ef23f7f6dd12dde25f61d082206"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 8445,
+          "allocated_bytes": 608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-32",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 3568,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 176,
+          "output_sha256": "02ef3d69b248d24efe196d12cebad55f9854b449ce9f5b5bbb45b4b5e63b2fc7"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 8477,
+          "allocated_bytes": 640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 3568,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 176,
+          "output_sha256": "02ef3d69b248d24efe196d12cebad55f9854b449ce9f5b5bbb45b4b5e63b2fc7"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 8477,
+          "allocated_bytes": 640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 3568,
+          "allocated_bytes": 232,
+          "reclaimed_bytes": 0,
+          "output_bytes": 176,
+          "output_sha256": "02ef3d69b248d24efe196d12cebad55f9854b449ce9f5b5bbb45b4b5e63b2fc7"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 8477,
+          "allocated_bytes": 640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-1024",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 4560,
+          "allocated_bytes": 1224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1168,
+          "output_sha256": "52b32a51884c209a04d59b78f77f43ab35b4564e0cb695e8dc31d38d870984ce"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 9469,
+          "allocated_bytes": 1632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 4560,
+          "allocated_bytes": 1224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1168,
+          "output_sha256": "52b32a51884c209a04d59b78f77f43ab35b4564e0cb695e8dc31d38d870984ce"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 9469,
+          "allocated_bytes": 1632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 4560,
+          "allocated_bytes": 1224,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1168,
+          "output_sha256": "52b32a51884c209a04d59b78f77f43ab35b4564e0cb695e8dc31d38d870984ce"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 9469,
+          "allocated_bytes": 1632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-65536",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 389072,
+          "allocated_bytes": 65736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65680,
+          "output_sha256": "36ac1ad59317e796f58ac9c1218410c2780944effa9cd81d2fbe6dacc6121987"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 393981,
+          "allocated_bytes": 66144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 389072,
+          "allocated_bytes": 65736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65680,
+          "output_sha256": "36ac1ad59317e796f58ac9c1218410c2780944effa9cd81d2fbe6dacc6121987"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 393981,
+          "allocated_bytes": 66144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 389072,
+          "allocated_bytes": 65736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65680,
+          "output_sha256": "36ac1ad59317e796f58ac9c1218410c2780944effa9cd81d2fbe6dacc6121987"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 393981,
+          "allocated_bytes": 66144,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-child-32",
+      "family": "child",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "child_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "child_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "child_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "child_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 3138,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 190,
+          "output_sha256": "9dc6d1ff7fd7e358c0f7b12aad60c302f5e34b5aab7f95519ca61959d32b96f1"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 8875,
+          "allocated_bytes": 728,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 3138,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 190,
+          "output_sha256": "9dc6d1ff7fd7e358c0f7b12aad60c302f5e34b5aab7f95519ca61959d32b96f1"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 8875,
+          "allocated_bytes": 728,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 3138,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 190,
+          "output_sha256": "9dc6d1ff7fd7e358c0f7b12aad60c302f5e34b5aab7f95519ca61959d32b96f1"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 8875,
+          "allocated_bytes": 728,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-child-1024",
+      "family": "child",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "child_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "child_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "child_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "child_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 4130,
+          "allocated_bytes": 1240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1182,
+          "output_sha256": "0dd251377ccd9f3283ee318ef7445774933df030277b84eb2a1001ef6ba59825"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 9867,
+          "allocated_bytes": 1720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 4130,
+          "allocated_bytes": 1240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1182,
+          "output_sha256": "0dd251377ccd9f3283ee318ef7445774933df030277b84eb2a1001ef6ba59825"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 9867,
+          "allocated_bytes": 1720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 4130,
+          "allocated_bytes": 1240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1182,
+          "output_sha256": "0dd251377ccd9f3283ee318ef7445774933df030277b84eb2a1001ef6ba59825"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 9867,
+          "allocated_bytes": 1720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "block_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "block_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 5367,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 234,
+          "output_sha256": "8fa1825e2c2e6af250603c63124429d3999575e8d58021952448b7f52d58ad93"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 12985,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 5367,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 234,
+          "output_sha256": "8fa1825e2c2e6af250603c63124429d3999575e8d58021952448b7f52d58ad93"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 12985,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 5367,
+          "allocated_bytes": 296,
+          "reclaimed_bytes": 0,
+          "output_bytes": 234,
+          "output_sha256": "8fa1825e2c2e6af250603c63124429d3999575e8d58021952448b7f52d58ad93"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 12985,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "block_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "block_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 62799,
+          "allocated_bytes": 3184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3125,
+          "output_sha256": "6024ce9978c017e8ecae235225bbd1505d030e4d202c082b182c8e463fa755e2"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 245832,
+          "allocated_bytes": 7680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 62799,
+          "allocated_bytes": 3184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3125,
+          "output_sha256": "6024ce9978c017e8ecae235225bbd1505d030e4d202c082b182c8e463fa755e2"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 245832,
+          "allocated_bytes": 7680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 62799,
+          "allocated_bytes": 3184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3125,
+          "output_sha256": "6024ce9978c017e8ecae235225bbd1505d030e4d202c082b182c8e463fa755e2"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 245832,
+          "allocated_bytes": 7680,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1024",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "block_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "block_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 2908618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 2826303,
+          "allocated_bytes": 98392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 98333,
+          "output_sha256": "c96e96ee1ccc915fed5aba87fd1f51879d7c07cf1f954f63d4944f22c3673f39"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 5965044,
+          "allocated_bytes": 229888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 2908618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 2826303,
+          "allocated_bytes": 98392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 98333,
+          "output_sha256": "c96e96ee1ccc915fed5aba87fd1f51879d7c07cf1f954f63d4944f22c3673f39"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 5965044,
+          "allocated_bytes": 229888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 2908618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 2826303,
+          "allocated_bytes": 98392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 98333,
+          "output_sha256": "c96e96ee1ccc915fed5aba87fd1f51879d7c07cf1f954f63d4944f22c3673f39"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 5965044,
+          "allocated_bytes": 229888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "batch_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "batch_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 5528,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 349,
+          "output_sha256": "8815b88e2c9f77118e4a26bf50c1e53b810db37122f6dae6e410ecaa54998fae"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 15280,
+          "allocated_bytes": 1056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 5528,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 349,
+          "output_sha256": "8815b88e2c9f77118e4a26bf50c1e53b810db37122f6dae6e410ecaa54998fae"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 15280,
+          "allocated_bytes": 1056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 5528,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 349,
+          "output_sha256": "8815b88e2c9f77118e4a26bf50c1e53b810db37122f6dae6e410ecaa54998fae"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 15280,
+          "allocated_bytes": 1056,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "batch_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "batch_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 276711,
+          "allocated_bytes": 13528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 13465,
+          "output_sha256": "0bf25bb74811c6a5b4d904aca8fdd40ef5aca56f6f6e67ac1b76a4bf2ef02974"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 645205,
+          "allocated_bytes": 27192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 276711,
+          "allocated_bytes": 13528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 13465,
+          "output_sha256": "0bf25bb74811c6a5b4d904aca8fdd40ef5aca56f6f6e67ac1b76a4bf2ef02974"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 645205,
+          "allocated_bytes": 27192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 276711,
+          "allocated_bytes": 13528,
+          "reclaimed_bytes": 0,
+          "output_bytes": 13465,
+          "output_sha256": "0bf25bb74811c6a5b4d904aca8fdd40ef5aca56f6f6e67ac1b76a4bf2ef02974"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 645205,
+          "allocated_bytes": 27192,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1024",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "batch_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "batch_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 5459257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13397244,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13477438,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 5137767,
+          "allocated_bytes": 215320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 215257,
+          "output_sha256": "b35a4d896aaf7a21669644f095a17719b1e72c2fd7ea051755a13c4c97e9fdb2"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 10443533,
+          "allocated_bytes": 426552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 5459257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13397244,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13477438,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 5137767,
+          "allocated_bytes": 215320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 215257,
+          "output_sha256": "b35a4d896aaf7a21669644f095a17719b1e72c2fd7ea051755a13c4c97e9fdb2"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 10443533,
+          "allocated_bytes": 426552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 5459257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13397244,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13477438,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 5137767,
+          "allocated_bytes": 215320,
+          "reclaimed_bytes": 0,
+          "output_bytes": 215257,
+          "output_sha256": "b35a4d896aaf7a21669644f095a17719b1e72c2fd7ea051755a13c4c97e9fdb2"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 10443533,
+          "allocated_bytes": 426552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-0",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "numbers_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "numbers_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 738,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 1438,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 738,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 1438,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 738,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 8,
+          "output_sha256": "ff726d944f2f7e762f1c9f09b78612a32d918b8e1f507b4fcafa73216e15571a"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 1438,
+          "allocated_bytes": 240,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-1",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "numbers_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "numbers_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 773,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 16,
+          "output_sha256": "e41cb9e6c1515318c5887c558bbdaee7a0a7cb5d035c35c4cae82e11fff5fff0"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 1494,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 773,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 16,
+          "output_sha256": "e41cb9e6c1515318c5887c558bbdaee7a0a7cb5d035c35c4cae82e11fff5fff0"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 1494,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 773,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 16,
+          "output_sha256": "e41cb9e6c1515318c5887c558bbdaee7a0a7cb5d035c35c4cae82e11fff5fff0"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 1494,
+          "allocated_bytes": 248,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-4096",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "numbers_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "numbers_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 224215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1006424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 926424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 224098,
+          "allocated_bytes": 32832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32776,
+          "output_sha256": "577e58966e65f1181a608033f54b9cf7bed50c908184d07eb0f45d20fadbf1ae"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 362149,
+          "allocated_bytes": 33008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 224215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 1006424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 926424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 224098,
+          "allocated_bytes": 32832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32776,
+          "output_sha256": "577e58966e65f1181a608033f54b9cf7bed50c908184d07eb0f45d20fadbf1ae"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 362149,
+          "allocated_bytes": 33008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 224215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 1006424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 926424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 224098,
+          "allocated_bytes": 32832,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32776,
+          "output_sha256": "577e58966e65f1181a608033f54b9cf7bed50c908184d07eb0f45d20fadbf1ae"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 362149,
+          "allocated_bytes": 33008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1",
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nested_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nested_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nested_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nested_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 1041,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 28,
+          "output_sha256": "fc3debf3507276f157de6a566ae3d3bad62a1609f70b825e573abd70bcb7473a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 2737,
+          "allocated_bytes": 472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 1041,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 28,
+          "output_sha256": "fc3debf3507276f157de6a566ae3d3bad62a1609f70b825e573abd70bcb7473a"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 2737,
+          "allocated_bytes": 472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 1041,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 28,
+          "output_sha256": "fc3debf3507276f157de6a566ae3d3bad62a1609f70b825e573abd70bcb7473a"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 2737,
+          "allocated_bytes": 472,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1024",
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nested_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nested_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nested_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nested_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 8257447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 3833721,
+          "allocated_bytes": 133440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43272,
+          "output_sha256": "811639a925044dc32024e089d59bbfded48fe57f868956fe51b16f3fce7dea1b"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 7606808,
+          "allocated_bytes": 194984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 8257447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 3833721,
+          "allocated_bytes": 133440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43272,
+          "output_sha256": "811639a925044dc32024e089d59bbfded48fe57f868956fe51b16f3fce7dea1b"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 7606808,
+          "allocated_bytes": 194984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 8257447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 3833721,
+          "allocated_bytes": 133440,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43272,
+          "output_sha256": "811639a925044dc32024e089d59bbfded48fe57f868956fe51b16f3fce7dea1b"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 7606808,
+          "allocated_bytes": 194984,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}

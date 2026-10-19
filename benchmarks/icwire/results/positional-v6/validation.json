@@ -1,0 +1,45 @@
+{
+  "plugin_sha256": "1d06c4422fa8986a4c860e8bb9aa46b249a7ed82119bc5be2b5106f2dd7eaa9a",
+  "runtime_sha256": "2a2eb9c020a03bca8763eb729101e0d7ddf2ada48f111311eda04a1971b449be",
+  "benchmarks": {
+    "workloads": 105,
+    "trials_per_phase": 3,
+    "observations_including_control": 1893,
+    "failed_observations": 0,
+    "strict_native_encode_and_decode_gate": "passed",
+    "strict_candidx_encode_and_decode_gate": "passed",
+    "results": "results.json",
+    "all_phase_statistics": "summary.csv"
+  },
+  "native_runtime_tests": {"passed": 30, "failed": 0},
+  "public_ash_tests": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "command": "bun /srv/shared/code/ash/src/index.ts test packages/fast/tests/ash/ICWire.ash.json --verbose",
+    "log": "public-tests.txt",
+    "log_sha256": "3c4206fcc607a5c4f1d18cc488c1467b7f42f5e319e3f6a731cc2f954b5b2a1c",
+    "wasm_sha256": "1fed334d3101065dcf5f27d45e82c1524271a7fdea936fe8e58633a1db7985f6"
+  },
+  "compiler_fixtures": {
+    "passed": 14,
+    "failed": 0,
+    "execution_modes": ["source", "IR", "lowered IR", "Wasm"],
+    "expectation_check_passed": true,
+    "compact_integer_literal_goldens": 137,
+    "compact_integer_digest": "12769816510900063284",
+    "mutation_and_error_cases": 5420,
+    "corpora": [
+      {"name": "float", "cases": 360, "digest": "9783736509695960368"},
+      {"name": "bool", "cases": 1536, "digest": "1508219329511502596"},
+      {"name": "bigint", "cases": 2589, "digest": "8983336313364657010"},
+      {"name": "packet", "cases": 935, "digest": "2198715107887470345"}
+    ]
+  },
+  "packaging": {
+    "passed": true,
+    "command": "_build/icwire-env.sh python3 tests/packaging.py --motoko ../motoko_sha"
+  },
+  "takt_conventions": {"satisfied": 1125, "violations": 0, "inconclusive": 0},
+  "wire_contract": "Headerless positional values; exact schema agreement; no field identifiers, record framing or type descriptors."
+}

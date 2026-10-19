@@ -1,0 +1,925 @@
+{
+  "suite": "icwire-scalars",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "cases": [
+    {
+      "name": "control",
+      "index": 0,
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "null",
+      "index": 1,
+      "family": "null_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "bool-false",
+      "index": 2,
+      "family": "bool_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "bool_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "bool_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "bool_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "bool_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "bool_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "bool_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "bool-true",
+      "index": 3,
+      "family": "bool_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "bool_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "bool_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "bool_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "bool_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "bool_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "bool_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat-0",
+      "index": 4,
+      "family": "nat_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nat_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nat_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nat_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nat_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nat_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nat_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat-127",
+      "index": 5,
+      "family": "nat_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nat_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nat_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nat_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nat_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nat_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nat_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat-128",
+      "index": 6,
+      "family": "nat_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nat_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nat_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nat_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nat_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nat_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nat_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat-18446744073709551616",
+      "index": 7,
+      "family": "nat_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nat_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nat_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nat_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nat_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "nat_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "nat_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int--65",
+      "index": 8,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int--1",
+      "index": 9,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int-0",
+      "index": 10,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int-63",
+      "index": 11,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int-64",
+      "index": 12,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "int--18446744073709551617",
+      "index": 13,
+      "family": "int_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "int_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "int_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "int_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "int_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "int_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "int_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat64-max",
+      "index": 14,
+      "family": "fixed",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "fixed_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "fixed_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "fixed_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "fixed_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "fixed_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "fixed_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "text-empty",
+      "index": 15,
+      "family": "text_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "text_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "text_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "text_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "text_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "text_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "text-short",
+      "index": 16,
+      "family": "text_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "text_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "text_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "text_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "text_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "text_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "text-unicode",
+      "index": 17,
+      "family": "text_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "text_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "text_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "text_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "text_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "text_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "text-4096",
+      "index": 18,
+      "family": "text_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "text_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "text_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "text_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "text_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "text_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-0",
+      "index": 19,
+      "family": "blob_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-32",
+      "index": 20,
+      "family": "blob_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-65536",
+      "index": 21,
+      "family": "blob_value",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_value_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_value_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_value_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_value_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "blob_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "blob_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    }
+  ]
+}

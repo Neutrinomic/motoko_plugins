@@ -1,0 +1,140 @@
+{
+  "label": "size-candid",
+  "recorded_utc": "2026-10-19T09:36:08.148Z",
+  "wasm_sha256": "842004580f612c20f4fab232f249cfad390ed08ad3068abd5e3f7f6ae8b05a7d",
+  "wasm_bytes": 411938,
+  "trials": 1,
+  "source_sha256": "48b0c03c26ee9995ef8f4454da5f9c9978d01df10ea7defc2a2c214118da3647",
+  "cases_sha256": "9e06217594f278da6bc166ffe24df207ce1d741f93378e4182748e7fdc2e0a6f",
+  "runner_sha256": "8902e26bfc43a3e9da176600a7d669aa540097ce594ab11b820360aee1d8f09e",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "takt-event-32",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 457505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1015917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}

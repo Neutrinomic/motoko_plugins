@@ -1,0 +1,459 @@
+{
+  "suite": "icwire",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "cases": [
+    {
+      "name": "control",
+      "index": 0,
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "scalar-nat64",
+      "index": 1,
+      "family": "scalar",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "scalar_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "scalar_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "tiny-record",
+      "index": 2,
+      "family": "tiny",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "tiny_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "tiny_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-0",
+      "index": 3,
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-32",
+      "index": 4,
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-1024",
+      "index": 5,
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "blob-65536",
+      "index": 6,
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-event-0",
+      "index": 7,
+      "family": "event",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-event-32",
+      "index": 8,
+      "family": "event",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-event-1024",
+      "index": 9,
+      "family": "event",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-event-65536",
+      "index": 10,
+      "family": "event",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-child-32",
+      "index": 11,
+      "family": "child",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "takt-child-1024",
+      "index": 12,
+      "family": "child",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1",
+      "index": 13,
+      "family": "block",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "index": 14,
+      "family": "block",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1024",
+      "index": 15,
+      "family": "block",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1",
+      "index": 16,
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "index": 17,
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1024",
+      "index": 18,
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-0",
+      "index": 19,
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-1",
+      "index": 20,
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-4096",
+      "index": 21,
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1",
+      "index": 22,
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1024",
+      "index": 23,
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ]
+    }
+  ]
+}

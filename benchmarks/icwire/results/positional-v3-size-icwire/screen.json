@@ -1,0 +1,329 @@
+{
+  "label": "positional-v3-size-icwire",
+  "recorded_utc": "2026-10-19T09:59:43.934Z",
+  "wasm_sha256": "47acb86707e5a0ab1298a94cd4b70ebfb624d4cb1e2bc1c41c7c2f45ccac62b8",
+  "wasm_bytes": 787616,
+  "trials": 1,
+  "source_sha256": "cd6d5b06e6e4762f87ad231eacdfd2a35716a072f5ffede2bdc81518db91a8f1",
+  "cases_sha256": "350dfbe8e12232287b2ff211d897a2be1760e5fc3e02dcae67e2785f53ef81e0",
+  "runner_sha256": "0342df3dfca7d0c187cca55564da6efc36da74081f52dc3e2d58626e07ad504f",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Linear-memory capacity and occupied-heap counters are sampled immediately outside the timed interval. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "control",
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "overhead",
+          "instructions": 313,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5348560,
+          "heap_after": 5348560,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-32",
+      "family": "event",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 3372,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5349432,
+          "heap_after": 5349568,
+          "output_bytes": 78,
+          "output_sha256": "2c0b8843bdc6667e460814b78c53229a941a42fcb1401b79652c8a952ef79809"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 4186,
+          "allocated_bytes": 424,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5349432,
+          "heap_after": 5349856,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "family": "block",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "block_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "block_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 56373,
+          "allocated_bytes": 1376,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5363616,
+          "heap_after": 5364992,
+          "output_bytes": 1319,
+          "output_sha256": "e6fb50233d0c358686a478c2a3479a85fe626916ebb60dde9270260aeaf58016"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 101094,
+          "allocated_bytes": 7464,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5363616,
+          "heap_after": 5371080,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "batch_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "batch_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 266770,
+          "allocated_bytes": 6576,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5424264,
+          "heap_after": 5430840,
+          "output_bytes": 6516,
+          "output_sha256": "43949e48be1fa20e15b52ebe72c85ee24f2441e5b756b9074d56b6ef09b5809a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 547593,
+          "allocated_bytes": 26976,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5424264,
+          "heap_after": 5451240,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "scalar-null",
+      "family": "null_value",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "null_value_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_value_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 670,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5348616,
+          "heap_after": 5348672,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 639,
+          "allocated_bytes": 56,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5348616,
+          "heap_after": 5348672,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "mixed-int-array-4096",
+      "family": "mixed_int_array",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "mixed_int_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "mixed_int_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 12093272,
+          "allocated_bytes": 445296,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5826648,
+          "heap_after": 6271944,
+          "output_bytes": 30033,
+          "output_sha256": "2b1e448141f94b9dc5fa4fa48d65605f901c471fdcec3457b7223817dc21caeb"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 13072549,
+          "allocated_bytes": 682824,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5826648,
+          "heap_after": 6509472,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "text-array-4096",
+      "family": "text_array",
+      "phases": [
+        {
+          "label": "icwire_encode",
+          "method": "text_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 1274830,
+          "allocated_bytes": 22592,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5403944,
+          "heap_after": 5426536,
+          "output_bytes": 22530,
+          "output_sha256": "424eeee37b84138bac3f44e59314b5c039ec1be43a812cb69af85b3574a3f5b9"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 2962345,
+          "allocated_bytes": 164048,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 5403944,
+          "heap_after": 5567992,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}

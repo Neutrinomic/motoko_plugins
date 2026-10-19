@@ -1,0 +1,1917 @@
+{
+  "label": "positional-v1-capacity",
+  "recorded_utc": "2026-10-19T09:49:17.799Z",
+  "wasm_sha256": "3719153d1da4a88879927484a9f80ef429c53fdb42a0dec4cc846efc73b63b94",
+  "wasm_bytes": 321850,
+  "trials": 3,
+  "source_sha256": "802b37c8e8ee2b6d7f43be53dde97977ee06e5f8d47e178ddd46490daebc2c80",
+  "cases_sha256": "b03e62ea62f12dba79765611dc7b2d84ccd5778fd761bf4fb9b6469a4517f146",
+  "runner_sha256": "8902e26bfc43a3e9da176600a7d669aa540097ce594ab11b820360aee1d8f09e",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 84,
+  "cases": [
+    {
+      "name": "control",
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 1,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "trial": 2,
+          "phase": "overhead",
+          "instructions": 296,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "null-array-1024",
+      "family": "null_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 85272,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 85272,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 85272,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "null-array-1034",
+      "family": "null_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 94264,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a553ef55334225e15de21760e9cc3d37fe2cf09c0c3eccd22fd694f5ee43e37b"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 86092,
+          "allocated_bytes": 8480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 94264,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a553ef55334225e15de21760e9cc3d37fe2cf09c0c3eccd22fd694f5ee43e37b"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 86092,
+          "allocated_bytes": 8480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 94264,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "d5d75794c77c1769ac68c1d92c5291ac0a103c93f4e5e2e78a7e891c1993b021"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 174286,
+          "allocated_bytes": 8352,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a553ef55334225e15de21760e9cc3d37fe2cf09c0c3eccd22fd694f5ee43e37b"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 86092,
+          "allocated_bytes": 8480,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "null-array-1035",
+      "family": "null_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 94354,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister q32mw-x3777-77777-aaatq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister rwuiy-yt777-77777-aaaua-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister rrvom-vl777-77777-aaauq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister rywfq-dd777-77777-aaava-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7f9512bb270838a37ba1a6f3d2abbc601fcab1a1efd5eaee660c3baf995ed7c4"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 86174,
+          "allocated_bytes": 8488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 94354,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister rnru5-cl777-77777-aaawq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister res7b-ud777-77777-aaaxa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister rdtzv-z3777-77777-aaaxq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister t6ox5-kt777-77777-aaaya-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7f9512bb270838a37ba1a6f3d2abbc601fcab1a1efd5eaee660c3baf995ed7c4"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 86174,
+          "allocated_bytes": 8488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 94354,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister txn4b-43777-77777-aaazq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister tcknm-5t777-77777-aaa2a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister tflly-ql777-77777-aaa2q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister tmiae-gd777-77777-aaa3a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7f9512bb270838a37ba1a6f3d2abbc601fcab1a1efd5eaee660c3baf995ed7c4"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 86174,
+          "allocated_bytes": 8488,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "null-array-4096",
+      "family": "null_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister sbgek-jl777-77777-aaa4q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister sifpw-7d777-77777-aaa5a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister spejc-s3777-77777-aaa5q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister s2dyp-tt777-77777-aaa6a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 497176,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister statt-f3777-77777-aaa7q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister znwbn-6t777-77777-aabaa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister zkxhz-tl777-77777-aabaq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister zdumf-fd777-77777-aabba-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 497176,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister zwt5i-el777-77777-aabcq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister z7qwu-sd777-77777-aabda-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister zyrqa-73777-77777-aabdq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister yv7uo-qt777-77777-aabea-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 497176,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "null-array-65536",
+      "family": "null_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "null_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "null_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "null_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "null_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "null_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "null_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister y447s-g3777-77777-aabfq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister yj3o7-ht777-77777-aabga-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister yo2il-kl777-77777-aabgq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister yhzdx-4d777-77777-aabha-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 6735303,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 22en7-pl777-77777-aabiq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 2thgd-zd777-77777-aabja-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 2ugax-u3777-77777-aabjq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 2bbr2-vt777-77777-aabka-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 6735303,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 2ic2g-d3777-77777-aablq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 3fm6i-mt777-77777-aabma-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: null_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 3cny4-bl777-77777-aabmq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: null_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 3lota-xd777-77777-aabna-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vz>\\n@deserialize<vz>\\n$lambda\\nnull_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 6735303,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "unit-array-1024",
+      "family": "unit_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "unit_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "unit_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "unit_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "unit_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "unit_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "unit_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 145688,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 145688,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 93364,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 11,
+          "output_sha256": "e1cf0ec339056c6ae98f6307153fd76eaa1913a22401d43f9b5d08664c33b31b"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 172626,
+          "allocated_bytes": 8272,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "61ac7c75c16cdd20f942a5a9816f9f4da96b54a9605c1e562b8197c15d46579e"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 145688,
+          "allocated_bytes": 8400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "unit-array-1036",
+      "family": "unit_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "unit_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "unit_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "unit_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "unit_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "unit_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "unit_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 94444,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 7b6ro-j3777-77777-aabxq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 54d7g-2t777-77777-aabya-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 53czs-xl777-77777-aabyq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 5sbso-bd777-77777-aabza-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a6c0feb3a5fdfca1950fcceb54e503b8866e89d572219aeb2b9eaae79d851ec4"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 147380,
+          "allocated_bytes": 8496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 94444,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 5hgdd-al777-77777-aab2q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 5ofi7-wd777-77777-aab3a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 5jeol-33777-77777-aab3q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 4ekkf-ut777-77777-aab4a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a6c0feb3a5fdfca1950fcceb54e503b8866e89d572219aeb2b9eaae79d851ec4"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 147380,
+          "allocated_bytes": 8496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 94444,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 4njbz-c3777-77777-aab5q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 4yoqu-dt777-77777-aab6a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 47pwa-ol777-77777-aab6q-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister 4wm54-yd777-77777-aab7a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "a6c0feb3a5fdfca1950fcceb54e503b8866e89d572219aeb2b9eaae79d851ec4"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 147380,
+          "allocated_bytes": 8496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "unit-array-1037",
+      "family": "unit_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "unit_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "unit_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "unit_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "unit_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "unit_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "unit_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 94534,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister lma6v-dl777-77777-aacaq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister lfdvj-vd777-77777-aacba-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister lcct5-y3777-77777-aacbq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister lxfcq-zt777-77777-aacca-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7727945052273df2a3fad2a8616c8a9d22e96677e0f68c59ded3f5b99a216999"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 147521,
+          "allocated_bytes": 8504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 94534,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister l6gjm-p3777-77777-aacdq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ktinc-at777-77777-aacea-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister kujlw-nl777-77777-aaceq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister k5kak-3d777-77777-aacfa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7727945052273df2a3fad2a8616c8a9d22e96677e0f68c59ded3f5b99a216999"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 147521,
+          "allocated_bytes": 8504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 94534,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister kinrh-2l777-77777-aacgq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister kbo23-md777-77777-aacha-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister kgp4p-b3777-77777-aachq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister i3ssh-st777-77777-aacia-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "7727945052273df2a3fad2a8616c8a9d22e96677e0f68c59ded3f5b99a216999"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 147521,
+          "allocated_bytes": 8504,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "unit-array-4096",
+      "family": "unit_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "unit_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "unit_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "unit_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "unit_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "unit_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "unit_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister isrz3-e3777-77777-aacjq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ihwiw-ft777-77777-aacka-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister iaxoc-il777-77777-aackq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ijuf6-6d777-77777-aacla-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 738840,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister je2bq-rl777-77777-aacmq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister jnzkm-hd777-77777-aacna-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister jkymy-k3777-77777-aacnq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister j775v-lt777-77777-aacoa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 738840,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 369844,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister jw4wj-53777-77777-aacpq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 828,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister mkhmm-wt777-77777-aacqa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister mngky-3l777-77777-aacqq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister mefbe-nd777-77777-aacra-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 782,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "86181bc0971b0e5defb5c89cbe832d0a100b44d10ae5b76d4dad94752ad83e02"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 738840,
+          "allocated_bytes": 32976,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "unit-array-65536",
+      "family": "unit_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "unit_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "unit_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "unit_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "unit_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "unit_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "unit_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister mrcqj-ml777-77777-aacsq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister myb3v-2d777-77777-aacta-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister m7a5b-x3777-77777-aactq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister nsozp-yt777-77777-aacua-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 10601927,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister n3nst-o3777-77777-aacvq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister nokd6-pt777-77777-aacwa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister njlfk-cl777-77777-aacwq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister naiow-ud777-77777-aacxa-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 1,
+          "phase": "icwire_decode",
+          "instructions": 10601927,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6539468,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister p5va6-hl777-77777-aacyq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 851,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "error": "Error: bytesResult: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister puwlc-rd777-77777-aacza-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nbytesResult\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":false}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "error": "Error: unit_array_candid_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister ptxnw-43777-77777-aaczq-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candid_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "error": "Error: unit_array_candidx_decode: {\"Err\":{\"reject_code\":\"CanisterError\",\"reject_message\":\"Error from Canister pgq43-5t777-77777-aac2a-cai: Canister called `ic0.trap` with message: 'IDL error: exceeded value limit'\\nCanister Backtrace:\\nic_trap\\nidl_limit_check\\n@deserialize_go<vu>\\n@deserialize<vu>\\n$lambda\\nunit_array_candidx_decode\\n.\\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://docs.internetcomputer.org/references/execution-errors#trapped-explicitly\",\"error_code\":\"CanisterCalledTrap\",\"certified\":true}}"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_encode",
+          "instructions": 805,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "output_bytes": 3,
+          "output_sha256": "a196ac8f73a0972283c92fd2ca163bdbb85e26fd7d4dea9c1b2dbc719d30db63"
+        },
+        {
+          "trial": 2,
+          "phase": "icwire_decode",
+          "instructions": 10601927,
+          "allocated_bytes": 524496,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}

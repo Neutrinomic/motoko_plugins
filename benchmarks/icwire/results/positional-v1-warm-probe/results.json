@@ -1,0 +1,785 @@
+{
+  "label": "warm-probe",
+  "recorded_utc": "2026-10-19T09:52:20.186Z",
+  "wasm_sha256": "0ed02f96244877c6e0864a185d05dec49dc3d2c13d6f6fd0dbe06c1b83b5bfb9",
+  "wasm_bytes": 1365619,
+  "trials": 1,
+  "source_sha256": "565b9a0fc49d7a9597886dc05189275af0331ba443ebe1350cf396e7f93a5826",
+  "cases_sha256": "8b959f2a040b86f20a19d284523f1bb225760cfa9455447fe821ad86d953723a",
+  "runner_sha256": "0342df3dfca7d0c187cca55564da6efc36da74081f52dc3e2d58626e07ad504f",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Linear-memory capacity and occupied-heap counters are sampled immediately outside the timed interval. Warm-capacity lane: configure allocates and retains an 8 MiB Blob, then the normal clear call drops it and four forced GC increments run before the measured update. Allocation/page costs within the interval remain included, with no subtraction. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "control",
+      "family": "control",
+      "phases": [
+        {
+          "label": "overhead",
+          "method": "control",
+          "kind": "control",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "overhead",
+          "instructions": 313,
+          "allocated_bytes": 0,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782528,
+          "heap_after": 13782528,
+          "output_bytes": 0,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "scalar-nat64",
+      "family": "scalar",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "scalar_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "scalar_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "scalar_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "scalar_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "scalar_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "scalar_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1114,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782872,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 706,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782840,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 81870,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782816,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 81870,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782816,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 689,
+          "allocated_bytes": 64,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782832,
+          "output_bytes": 8,
+          "output_sha256": "ed049108bc18f2c64369e8d0ea42850bdd1a7d1dd340cfde716315579702a76c"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 80514,
+          "allocated_bytes": 32,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13782768,
+          "heap_after": 13782800,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-32",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "event_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "event_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 84177,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784360,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 83798,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784192,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 93967,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784296,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 93967,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784296,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 83372,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784120,
+          "output_bytes": 78,
+          "output_sha256": "2c0b8843bdc6667e460814b78c53229a941a42fcb1401b79652c8a952ef79809"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 84222,
+          "allocated_bytes": 424,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13783984,
+          "heap_after": 13784408,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "block_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "block_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 146019,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13814072,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 408098,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13821224,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 371175,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13819672,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 351580,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13819680,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 136373,
+          "allocated_bytes": 1376,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13812336,
+          "output_bytes": 1319,
+          "output_sha256": "e6fb50233d0c358686a478c2a3479a85fe626916ebb60dde9270260aeaf58016"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 183120,
+          "allocated_bytes": 7464,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13810960,
+          "heap_after": 13818424,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "batch_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "batch_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 537522,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13902416,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1164508,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13905200,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1015934,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13917880,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 1014926,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13917880,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 506770,
+          "allocated_bytes": 6576,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13895192,
+          "output_bytes": 6516,
+          "output_sha256": "43949e48be1fa20e15b52ebe72c85ee24f2441e5b756b9074d56b6ef09b5809a"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 557337,
+          "allocated_bytes": 26976,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13888616,
+          "heap_after": 13915592,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "big-nat-array-4096",
+      "family": "big_nat_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "big_nat_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "big_nat_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "big_nat_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "big_nat_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "big_nat_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "big_nat_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 24179909,
+          "allocated_bytes": 417896,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 15921008,
+          "output_bytes": 77835,
+          "output_sha256": "7406ca1cbe761a18022901e677087738d67a3e145f8f539809baa472865225ad"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 24175228,
+          "allocated_bytes": 340040,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 15843152,
+          "output_bytes": 77835,
+          "output_sha256": "7406ca1cbe761a18022901e677087738d67a3e145f8f539809baa472865225ad"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 44658705,
+          "allocated_bytes": 622672,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 16125784,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 44578705,
+          "allocated_bytes": 622672,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 16125784,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 24146510,
+          "allocated_bytes": 340032,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 15843144,
+          "output_bytes": 77826,
+          "output_sha256": "17f8452b79acb5326b5b3fc785c8cd0efff64f11595bbee0c757b59c923ea722"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 47972946,
+          "allocated_bytes": 622800,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 15503112,
+          "heap_after": 16125912,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "text-array-4096",
+      "family": "text_array",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "text_array_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "text_array_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "text_array_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "text_array_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_encode",
+          "method": "text_array_icwire_encode",
+          "kind": "control",
+          "require_no_gc": false
+        },
+        {
+          "label": "icwire_decode",
+          "method": "text_array_icwire_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1518917,
+          "allocated_bytes": 45160,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 13950832,
+          "output_bytes": 22539,
+          "output_sha256": "e5b81a95197949974b894635eb0aad631b84a33255be146eccf5206352f92836"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1401852,
+          "allocated_bytes": 22600,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 13928272,
+          "output_bytes": 22539,
+          "output_sha256": "e5b81a95197949974b894635eb0aad631b84a33255be146eccf5206352f92836"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 3406057,
+          "allocated_bytes": 163920,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 14069592,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 3406057,
+          "allocated_bytes": 163920,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 14069592,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_encode",
+          "instructions": 1274830,
+          "allocated_bytes": 22592,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 13928264,
+          "output_bytes": 22530,
+          "output_sha256": "424eeee37b84138bac3f44e59314b5c039ec1be43a812cb69af85b3574a3f5b9"
+        },
+        {
+          "trial": 0,
+          "phase": "icwire_decode",
+          "instructions": 3480617,
+          "allocated_bytes": 164048,
+          "reclaimed_bytes": 0,
+          "memory_before": 134217728,
+          "memory_after": 134217728,
+          "heap_before": 13905672,
+          "heap_after": 14069720,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}

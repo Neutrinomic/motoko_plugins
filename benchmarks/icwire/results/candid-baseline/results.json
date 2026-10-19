@@ -1,0 +1,3246 @@
+{
+  "label": "candid-baseline",
+  "recorded_utc": "2026-10-19T09:23:50.223Z",
+  "wasm_sha256": "4ffb8d894161a66d3ac86b77fab0836e31370cba8958166135b3ea72062f44bf",
+  "wasm_bytes": 525807,
+  "trials": 3,
+  "source_sha256": "947c8a0e8b1e570d95595d569ccc94c396514da8f3e79da6e5374e9faf757270",
+  "cases_sha256": "3eb6f117bae4359affdb0c5afa1f9249971760379a235f60c3964b930d2a6030",
+  "runner_sha256": "8902e26bfc43a3e9da176600a7d669aa540097ce594ab11b820360aee1d8f09e",
+  "node_version": "v24.11.1",
+  "variant_width": 0,
+  "variant_payload": "none",
+  "measurement_protocol": {
+    "fresh_canister": "per workload/trial/phase",
+    "forced_gc_calls_before_phase": 4,
+    "synchronous_gc": "included in instruction count; reclaimed_bytes reported",
+    "end_of_message_gc": "excluded",
+    "canister_cleanup": "stop and delete after each completed phase"
+  },
+  "methodology": "Fresh canister per workload/trial/phase. Configure constructs immutable fixtures and each format input outside timing; four forced GC increments follow. Encode/decode are separate synchronous updates, including success unwrapping and retaining the result. Counter/assignment overhead is included. Synchronous GC is included and reported; end-of-message GC is excluded. Byte counts belong to encode phases; decode replies are a 2-byte correctness marker. Fresh-per-phase override: each implementation phase installs and configures an independent canister; configure must produce equivalent inputs without depending on the canister ID or previous phases.",
+  "correctness": "The unmeasured bytesResult query compares every complete decoded value with its independent deterministic fixture; encode phases also decode and compare before returning bytes. CandidX bytes additionally match host canonicalization of ordinary Candid. Schemas mirror Takt Events/child admission and Reactor Batch from their v1 contracts; Rechain is a representative action batch, not an integration benchmark.",
+  "failed_measurements": 0,
+  "cases": [
+    {
+      "name": "scalar-nat64",
+      "family": "scalar",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "scalar_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "scalar_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "scalar_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "scalar_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1097,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 689,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 15,
+          "output_sha256": "1b8bfcacd897965b49ed7557a8a5b0e6faf22edd8dc3206e2cd7dd8721c40b5c"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 1853,
+          "allocated_bytes": 48,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "tiny-record",
+      "family": "tiny",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "tiny_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "tiny_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "tiny_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "tiny_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 2160,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 1514,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 52,
+          "output_sha256": "dc2abaacd9818fc3d242ddceb23608e5ce4b7d8836d3258d334dd92a4a724a55"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 6708,
+          "allocated_bytes": 152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-0",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1239,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 888,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "11237faad6e46fac57d24564513cac2e47057e050f50b457801640dfb0989422"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2716,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-32",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1331,
+          "allocated_bytes": 168,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 948,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42,
+          "output_sha256": "aaa60322252ad801f5811f5de73565db91107cf920bc994ebf71520cc756428d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2748,
+          "allocated_bytes": 112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-1024",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3339,
+          "allocated_bytes": 2152,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 1963,
+          "allocated_bytes": 1096,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1035,
+          "output_sha256": "d7f156045404c3e2098120b6d318515b8a42354e98dde2d7da683d2fdc73674d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 3783,
+          "allocated_bytes": 1104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "blob-65536",
+      "family": "blob",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "blob_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "blob_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "blob_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "blob_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 612387,
+          "allocated_bytes": 131176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 386498,
+          "allocated_bytes": 65608,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65548,
+          "output_sha256": "14f5d9054c65a08e7b05ce9ab74676ed66dea65ab19d6417eda5123b9240d370"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 388344,
+          "allocated_bytes": 65616,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-0",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 4068,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3721,
+          "allocated_bytes": 176,
+          "reclaimed_bytes": 0,
+          "output_bytes": 119,
+          "output_sha256": "b055af9a9b23ffa55d45ea2de19fcbbe603a3bcd356df5cfad5f282b07f4f0c9"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13918,
+          "allocated_bytes": 280,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-32",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 4160,
+          "allocated_bytes": 376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3781,
+          "allocated_bytes": 208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 151,
+          "output_sha256": "82c881fbd62c11cc79a6538ad01de0a517243a4a883f2eefd7aab0fbe0bec564"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13950,
+          "allocated_bytes": 312,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-1024",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6168,
+          "allocated_bytes": 2360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 4796,
+          "allocated_bytes": 1200,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1144,
+          "output_sha256": "5acc975480fa07d5a6a7f6fa80c5d08e2df3253ce06edf5a21fd340229155643"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 14985,
+          "allocated_bytes": 1304,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-event-65536",
+      "family": "event",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "event_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "event_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "event_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "event_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 615216,
+          "allocated_bytes": 131400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 389331,
+          "allocated_bytes": 65720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 65657,
+          "output_sha256": "9674c1f5167a8a355214b7cdc4831629017da5971e265cf4aa10f38ce9e3bb93"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 399546,
+          "allocated_bytes": 65816,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-child-32",
+      "family": "child",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "child_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "child_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3864,
+          "allocated_bytes": 392,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "9e07111442981fa3450f17318943a4d666ad4136caa397a562475214bafcd4c7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 3455,
+          "allocated_bytes": 216,
+          "reclaimed_bytes": 0,
+          "output_bytes": 157,
+          "output_sha256": "b427bcbfd1e03d20650b6c8953f7e42df776c162cb6f7f116ff21ad313f38104"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 14220,
+          "allocated_bytes": 408,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "takt-child-1024",
+      "family": "child",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "child_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "child_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "child_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "child_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 5872,
+          "allocated_bytes": 2376,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "6dda1d68f28a2ec4e32c268d6de272948b2b3d13a11f3c7ea3f710a0f69f88bf"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 4470,
+          "allocated_bytes": 1208,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1150,
+          "output_sha256": "eb1f06e82cc7e81ce69f8eb0f5fac1096b7c5b695b072dcad8f9b66c06fb4100"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 15255,
+          "allocated_bytes": 1400,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6018,
+          "allocated_bytes": 600,
+          "reclaimed_bytes": 0,
+          "output_bytes": 259,
+          "output_sha256": "e42250a9d3365f00759db281629934d268ee0420e6b7900c9c2d2a7b90b97fc7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 50040,
+          "allocated_bytes": 5552,
+          "reclaimed_bytes": 0,
+          "output_bytes": 200,
+          "output_sha256": "e6372142cb97715f1dc8ac628cb0e7b003371ca84df1960a44c3152e52859f35"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 33041,
+          "allocated_bytes": 752,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 28175,
+          "allocated_bytes": 736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-32",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 66002,
+          "allocated_bytes": 3112,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1518,
+          "output_sha256": "82b231aeb6c2221d59d83098dbdb421a2ac91a383e3e6b6ded4b423b73a44636"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 328081,
+          "allocated_bytes": 10264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 1502,
+          "output_sha256": "7afad93eff417fc8ff5fafa531b9df3ac76ecea1933fc5a31ca9df89e5b50b77"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 291158,
+          "allocated_bytes": 8712,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 271563,
+          "allocated_bytes": 8720,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "rechain-actions-1024",
+      "family": "block",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "block_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "block_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "block_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "block_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 2748618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 2748618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 2748618,
+          "allocated_bytes": 86888,
+          "reclaimed_bytes": 0,
+          "output_bytes": 43407,
+          "output_sha256": "67dfcf7d10e4f05869b3ab28b1b71953d8c40bcf871fa6db4b53aa574490a1e7"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 9432553,
+          "allocated_bytes": 51560,
+          "reclaimed_bytes": 0,
+          "output_bytes": 42647,
+          "output_sha256": "98fd5af50ed0f08c6a6c02960dc0b736334c63d3cbbd128e04b8055f125bf5b2"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 9456583,
+          "allocated_bytes": 266632,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 8799824,
+          "allocated_bytes": 266640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 6583,
+          "allocated_bytes": 872,
+          "reclaimed_bytes": 0,
+          "output_bytes": 397,
+          "output_sha256": "61925bc7e49b751bcf1c77e5127602c33e7e385a1cc347fbb23e038d923abccc"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 56490,
+          "allocated_bytes": 5736,
+          "reclaimed_bytes": 0,
+          "output_bytes": 310,
+          "output_sha256": "ba659cf21444e86a13db2a637bc19db195b8895d39cfba763be9540f11903c78"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 38253,
+          "allocated_bytes": 968,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 32352,
+          "allocated_bytes": 936,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-64",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 297505,
+          "allocated_bytes": 13800,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6860,
+          "output_sha256": "d20dd185a757b4b9865d3248af18491ae44c94e605bb97ffac14f1d42f63f933"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 924491,
+          "allocated_bytes": 16584,
+          "reclaimed_bytes": 0,
+          "output_bytes": 6842,
+          "output_sha256": "10f0b6c50ab345b444ebe80c4faab94683d6ddbeca0d453b2cad8a4889ce1f2e"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 855917,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 934909,
+          "allocated_bytes": 29264,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "reactor-frames-1024",
+      "family": "batch",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "batch_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "batch_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "batch_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "batch_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 5299257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 13398446,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 13476236,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 5299257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 13398446,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 13476236,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 5299257,
+          "allocated_bytes": 214344,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107133,
+          "output_sha256": "73cba62f158e89074fe5302e37ee04f9d6480c2b23d845aad87a334366ff854e"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 14019977,
+          "allocated_bytes": 117008,
+          "reclaimed_bytes": 0,
+          "output_bytes": 107115,
+          "output_sha256": "4fa66c1f043774cdc886e4d6fae2d7e2ad766156bed308de0b90ba74fe6a400b"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 13398446,
+          "allocated_bytes": 463328,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 13476236,
+          "allocated_bytes": 463184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-0",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1152,
+          "allocated_bytes": 104,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "925148c4e3e9408d2046a13bf0cf08023e48bdc02a7c9d9bfa2d3a5cc10b79ea"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 804,
+          "allocated_bytes": 72,
+          "reclaimed_bytes": 0,
+          "output_bytes": 10,
+          "output_sha256": "d0bfe858e2776acdddd3f21da88065b04649124bde124b2210e7e5de05e43c8d"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2599,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-1",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1297,
+          "allocated_bytes": 120,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 867,
+          "allocated_bytes": 80,
+          "reclaimed_bytes": 0,
+          "output_bytes": 18,
+          "output_sha256": "997990ae401c2ead90feb3f578e8e6bc2699ef18597537e4dce3de0e88fe2887"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 2805,
+          "allocated_bytes": 88,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nat64-array-4096",
+      "family": "numbers",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "numbers_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "numbers_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "numbers_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "numbers_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 384215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 1166424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 1086424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 384215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 1166424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 1086424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 720436,
+          "allocated_bytes": 65640,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 384215,
+          "allocated_bytes": 32840,
+          "reclaimed_bytes": 0,
+          "output_bytes": 32779,
+          "output_sha256": "a2ea0375d5a41756e08d5b155271e0dd06bb943de95d22a743916f8ac984d246"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 1166424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 1086424,
+          "allocated_bytes": 32848,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1",
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nested_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nested_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 1642,
+          "allocated_bytes": 184,
+          "reclaimed_bytes": 0,
+          "output_bytes": 54,
+          "output_sha256": "61c1eaa7539528fa8c7dddc2226098c956f9eaf817fe1ff86665199941f13eae"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 10337,
+          "allocated_bytes": 960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 24,
+          "output_sha256": "fda89472d0dbaad664602d1c9db9467566e21928fae173b4dd3810fe42d8d802"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 7283,
+          "allocated_bytes": 160,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 4186,
+          "allocated_bytes": 136,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    },
+    {
+      "name": "nested-options-1024",
+      "family": "nested",
+      "phases": [
+        {
+          "label": "candid_encode",
+          "method": "nested_candid_encode",
+          "kind": "ordinary_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_encode",
+          "method": "nested_candidx_encode",
+          "kind": "canonical_candid",
+          "require_no_gc": false
+        },
+        {
+          "label": "candid_decode",
+          "method": "nested_candid_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        },
+        {
+          "label": "candidx_decode",
+          "method": "nested_candidx_decode",
+          "kind": "checked_decode",
+          "require_no_gc": false
+        }
+      ],
+      "measurements": [
+        {
+          "trial": 0,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 0,
+          "phase": "candid_decode",
+          "instructions": 8260228,
+          "allocated_bytes": 194960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 0,
+          "phase": "candidx_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 1,
+          "phase": "candid_decode",
+          "instructions": 8260228,
+          "allocated_bytes": 194960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 1,
+          "phase": "candidx_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_encode",
+          "instructions": 3850106,
+          "allocated_bytes": 132776,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_encode",
+          "instructions": 6819245,
+          "allocated_bytes": 119360,
+          "reclaimed_bytes": 0,
+          "output_bytes": 21294,
+          "output_sha256": "5cbe851ca7a3868b0924dc4b2b8b63810a58af44fccba1043f5229b364a89d99"
+        },
+        {
+          "trial": 2,
+          "phase": "candid_decode",
+          "instructions": 8260228,
+          "allocated_bytes": 194960,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        },
+        {
+          "trial": 2,
+          "phase": "candidx_decode",
+          "instructions": 8177447,
+          "allocated_bytes": 194672,
+          "reclaimed_bytes": 0,
+          "output_bytes": 2,
+          "output_sha256": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df"
+        }
+      ]
+    }
+  ],
+  "pocket_ic_version": "pocket-ic-server 16.0.0"
+}
