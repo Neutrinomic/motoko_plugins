@@ -65,6 +65,14 @@ corresponding Result API, including grouped byte offsets such as
 already aborts the current message. Keep the Result API when a caller needs to
 recover from malformed input or a resource limit.
 
+`ICWire.decodeOptional<T>(bytes)` returns `?T` directly, with `null` for
+malformed input or a resource-limit failure. It is equivalent to
+`ICWire.toOption(ICWire.decode<T>(bytes))`, using the same validation and
+exact-schema rules while avoiding the intermediate Result and discarded
+error diagnostics. Successful nullable payloads remain wrapped in the outer
+option, so `decodeOptional<Null>("")` returns `?null`, distinct from failure.
+Use `decode` when the caller needs the error kind or byte offset.
+
 `ICWire.estimateSize(value)` returns the exact encoded byte size without
 encoding or allocating scratch storage. Fixed-width arrays use only their
 count. Signed integer sizing borrows the magnitude without temporary values.

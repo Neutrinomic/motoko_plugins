@@ -16,6 +16,13 @@ scratch storage, including allocation-free signed bigint sizing. It returns the 
 Nat sentinel `2 ** 61 - 1` on bound failure. Float sizing does not validate
 finiteness. Encoding and decoding bytes are unaffected by this admission API.
 
+`from_icwire_optional` is a compiler intrinsic using the existing decoder
+runtime exports. Its final success wraps the decoded value with the compiler's
+optional-value constructor; failure returns null without constructing a Result
+or error object. Raw decoding visitors are shared with Result and trapping
+calls because their value construction, validation and failure propagation are
+identical. Only the call-site result handling differs.
+
 All exports have prefix `icwire_`. `c`, pointers, lengths, flags and `usize`
 are wasm64 `i64`; `u64` is `i64`, `f64` is `f64`. Borrowed input remains valid
 for a single synchronous GC-free call. The first error is sticky. Check `ok`

@@ -24,6 +24,10 @@ module {
   /// Decode a complete message using an explicit concrete type.
   public let decode = Prim.from_icwire;
 
+  /// Decode a complete message, returning null on malformed input.
+  /// Equivalent to `toOption(decode<T>(bytes))` without its Result wrapper.
+  public let decodeOptional = Prim.from_icwire_optional;
+
   /// Encode trusted data directly; failures trap with the same diagnostic as
   /// `unwrap(encode(value))`, without allocating a successful Result wrapper.
   public let encodeOrTrap = Prim.to_icwire_or_trap;

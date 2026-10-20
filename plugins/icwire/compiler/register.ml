@@ -19,6 +19,20 @@ let decode = C.{
     | _ -> Error "from_icwire requires one explicit result type");
   evaluate = Mo_values.Compute_plugin.pure Reference.decode;
 }
+let optional_evaluate type_arguments types values =
+  match Reference.decode type_arguments types values with
+  | Ok (Mo_values.Value.Variant ("ok", value)) -> Ok (Mo_values.Value.Opt value)
+  | Ok (Mo_values.Value.Variant ("err", _)) -> Ok Mo_values.Value.Null
+  | Ok _ -> Error "ICWire invalid codec result"
+  | Error message -> Error message
+let decode_optional = C.{decode with
+  result_type = (fun type_arguments types ->
+    match decode.result_type type_arguments types, type_arguments with
+    | Ok _, [typ] -> Ok (Type.Opt typ) | Error message, _ -> Error message
+    | _ -> Error "from_icwire_optional requires one explicit result type");
+  id = "icwire_decode_optional"; name = "from_icwire_optional";
+  evaluate = C.pure optional_evaluate;
+}
 let encode_bounded = C.{
   id = "icwire_encode_bounded"; name = "to_icwire_bounded"; arguments = Shared; type_parameters = [];
   result_type = (fun _ -> function
@@ -90,5 +104,5 @@ let () = P.register P.{
     "utf8_valid",2,1;
   ] @ [signature "leaf_float" [I64Type; I64Type] [F64Type];
        signature "write_float" [I64Type; F64Type; I64Type] []];
-  bindings = [encode, (module Encoder); encode_bounded, (module Bounded); decode, (module Decoder); encode_or_trap, (module Encode_or_trap); decode_or_trap, (module Decode_or_trap); encode_bounded_or_trap, (module Encode_bounded_or_trap); estimate, (module Estimate)];
+  bindings = [encode, (module Encoder); encode_bounded, (module Bounded); decode, (module Decoder); decode_optional, (module Decode_optional); encode_or_trap, (module Encode_or_trap); decode_or_trap, (module Decode_or_trap); encode_bounded_or_trap, (module Encode_bounded_or_trap); estimate, (module Estimate)];
 }

@@ -11,18 +11,23 @@ module G = InstrList
 open G
 
 module MakeMode (B : Plugin_codegen.Backend)
-  (Mode : sig val trap : bool end) = struct
+  (Mode : sig val trap : bool val optional : bool end) = struct
   open B
   module Common = Generator.Make(B)
   open Common
 
-  let success env value =
-    if Mode.trap then value else Variant.inject env "ok" value
+  let success env typ value =
+    if Mode.trap then value
+    else if Mode.optional then Opt.inject env typ value
+    else Variant.inject env "ok" value
 
-  let decoded_result env c value =
+  let decoded_result env typ c value =
     if Mode.trap then
       cc env c "ok" ^^
       E.if0 G.nop (cc env c "trap_error" ^^ G.i Unreachable) ^^ value
+    else if Mode.optional then
+      cc env c "ok" ^^ E.if1 I64Type
+        (Opt.inject env typ value) (Opt.null_lit env)
     else result env c value
 
   let box_word env p bits =
@@ -157,7 +162,7 @@ module MakeMode (B : Plugin_codegen.Backend)
     let set_result, get_result = new_local env "icwire_result" in
     source ^^ Blob.payload_ptr_unskewed env ^^ source ^^ Blob.len env ^^ invoke env "new" ^^ set_context ^^
       c ^^ decode env (Schema.bounded_depth typ) typ ^^ set_value ^^ cc env c "finish" ^^
-      decoded_result env c value ^^ set_result ^^ cc env c "done" ^^ get_result
+      decoded_result env typ c value ^^ set_result ^^ cc env c "done" ^^ get_result
 
   (* A root byte string has no recursive nodes. Prove its complete canonical
      ULEB prefix and exact total size before scalar validation and the SDK copy.
@@ -181,7 +186,7 @@ module MakeMode (B : Plugin_codegen.Backend)
       let maximum = min (if p = Principal then 30 else Schema.max_bytes)
         ((1 lsl (7 * width)) - 1 + width) in
       let data = ptr ^^ num width ^^ binary I64Op.Add in
-      let success = success env (data ^^ payload ^^
+      let success = success env (Prim p) (data ^^ payload ^^
         (if p = Text then Text.of_ptr_size env else if p = Principal then Principal.of_ptr_size env else Blob.of_ptr_size env)) in
       len ^^ num (minimum + width) ^^ compile_comparison I64Op.GeU ^^
       len ^^ num maximum ^^ compile_comparison I64Op.LeU ^^ binary I64Op.And ^^ E.if1 I64Type
@@ -196,12 +201,12 @@ module MakeMode (B : Plugin_codegen.Backend)
     source ^^ Blob.payload_ptr_unskewed env ^^ set_ptr ^^
     source ^^ Blob.len env ^^ set_len ^^ candidate 1
 
-  let root_fixed env source width validate value otherwise =
+  let root_fixed env typ source width validate value otherwise =
     let set_ptr, ptr = new_local env "icwire_root_scalar_bytes" in
     source ^^ Blob.payload_ptr_unskewed env ^^ set_ptr ^^
     source ^^ Blob.len env ^^ num width ^^ compile_comparison I64Op.Eq ^^ E.if1 I64Type
       (validate ptr) (num 0) ^^ E.if1 I64Type
-      (success env (value ptr)) otherwise
+      (success env typ (value ptr)) otherwise
 
   (* Canonical two-to-nine-byte root integers fit an unboxed 63-bit payload.
      Inspect only ranges proven by the exact Blob length; malformed encodings
@@ -256,7 +261,7 @@ module MakeMode (B : Plugin_codegen.Backend)
         binary I64Op.And else G.nop) ^^
       E.if1 I64Type
         (assembled ^^ set_value ^^ canonical ^^ E.if1 I64Type
-          (success env (value ^^
+          (success env (Prim (if signed then Int else Nat)) (value ^^
             if signed then BigNum.from_signed_word64 env else BigNum.from_word64 env))
           otherwise)
         otherwise in
@@ -275,10 +280,10 @@ module MakeMode (B : Plugin_codegen.Backend)
       ptr ^^ G.i (Load {ty = I64Type; align = 0; offset = 0L; sz = size}) in
     let byte ptr = load Nat8 8 ptr in
     match p with
-    | Null -> root_fixed env source 0 (fun _ -> num 1) (fun _ -> Opt.null_lit env) otherwise
-    | Bool -> root_fixed env source 1
+    | Null -> root_fixed env (Prim p) source 0 (fun _ -> num 1) (fun _ -> Opt.null_lit env) otherwise
+    | Bool -> root_fixed env (Prim p) source 1
         (fun ptr -> byte ptr ^^ num 1 ^^ compile_comparison I64Op.LeU) byte otherwise
-    | Nat | Int -> root_fixed env source 1
+    | Nat | Int -> root_fixed env (Prim p) source 1
         (fun ptr -> byte ptr ^^ num 128 ^^ compile_comparison I64Op.LtU)
         (fun ptr -> byte ptr ^^
           if p = Int then num 57 ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.Shl)) ^^
@@ -287,9 +292,9 @@ module MakeMode (B : Plugin_codegen.Backend)
         (root_integer_short env source (p = Int) otherwise)
     | Nat8 | Nat16 | Nat32 | Nat64 | Int8 | Int16 | Int32 | Int64 ->
       let _, bits = word_kind p in
-      root_fixed env source (bits / 8) (fun _ -> num 1)
+      root_fixed env (Prim p) source (bits / 8) (fun _ -> num 1)
         (fun ptr -> load p bits ptr ^^ box_word env p bits) otherwise
-    | Char -> root_fixed env source 4
+    | Char -> root_fixed env (Prim p) source 4
         (fun ptr -> load Nat32 32 ptr ^^ num 0x10ffff ^^ compile_comparison I64Op.LeU ^^
           load Nat32 32 ptr ^^ num 0xd800 ^^ compile_comparison I64Op.LtU ^^
           load Nat32 32 ptr ^^ num 0xdfff ^^ compile_comparison I64Op.GtU ^^
@@ -300,7 +305,7 @@ module MakeMode (B : Plugin_codegen.Backend)
     | Float | Float32 ->
       let bits = if p = Float then 64 else 32 in
       let exponent = if p = Float then 0x7ff0000000000000L else 0x7f800000L in
-      root_fixed env source (bits / 8)
+      root_fixed env (Prim p) source (bits / 8)
         (fun ptr -> load (if p = Float then Nat64 else Nat32) bits ptr ^^
           compile_unboxed_const exponent ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.And)) ^^
           compile_unboxed_const exponent ^^ compile_comparison I64Op.Ne)
@@ -320,6 +325,9 @@ module MakeMode (B : Plugin_codegen.Backend)
 end
 
 module Make (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = false end)
+  MakeMode(B)(struct let trap = false let optional = false end)
 module MakeOrTrap (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = true end)
+  MakeMode(B)(struct let trap = true let optional = false end)
+
+module MakeOptional (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false let optional = true end)
