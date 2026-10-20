@@ -109,6 +109,9 @@ module {
   public func replaceNat<V>(self : Map<Nat, V>, key : Nat, value : V) : ?V {
     Prim.mmap_replace_static<Nat, V>(self, key, value)
   };
+  public func takeNat<V>(self : Map<Nat, V>, key : Nat) : ?V {
+    Prim.mmap_take_static<Nat, V>(self, key)
+  };
   public func getText<V>(self : Map<Text, V>, key : Text) : ?V {
     Prim.mmap_get_static<Text, V>(self, key)
   };

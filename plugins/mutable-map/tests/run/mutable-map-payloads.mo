@@ -85,3 +85,60 @@ assert Map.getBlob<Nat>(blobs, "\00\ff") == ?1;
 assert Map.replaceBlob<Nat>(blobs, "\00", 3) == ?2;
 Map.removeBlob<Nat>(blobs, "\00\ff");
 assert Map.getBlob<Nat>(blobs, "\00\ff") == null;
+
+// Public Nat take preserves absence versus a stored null option and returns
+// managed payloads by reference, even for keys outside the machine-word range.
+let optional = Map.empty<Nat, ?Nat>();
+let huge : Nat = 184467440737095516160;
+Map.addNat(optional, 0, null);
+Map.addNat(optional, huge, ?42);
+assert Map.takeNat(optional, 1) == null;
+assert Map.size(optional) == 2;
+assert Map.takeNat(optional, 0) == ?null;
+assert Map.getNat(optional, 0) == null;
+assert Map.size(optional) == 1;
+assert Map.takeNat(optional, huge) == ??42;
+assert Map.takeNat(optional, huge) == null;
+assert Map.isEmpty(optional);
+
+type Mixed = {#text : Text; #payload : Value; #optional : ?Nat};
+let mixed = Map.empty<Nat, Mixed>();
+Map.addNat(mixed, 1, #text("kept"));
+Map.addNat(mixed, huge, #payload(payload));
+Map.addNat(mixed, 3, #optional(null));
+switch (Map.takeNat(mixed, huge)) {
+  case (?#payload(value)) {
+    let before = payload.count;
+    value.count += 1;
+    assert payload.count == before + 1;
+    assert value.callback() == 4;
+  };
+  case _ { assert false };
+};
+switch (Map.takeNat(mixed, 3)) {
+  case (?#optional(null)) {};
+  case _ { assert false };
+};
+switch (Map.takeNat(mixed, 1)) {
+  case (?#text("kept")) {};
+  case _ { assert false };
+};
+assert Map.isEmpty(mixed);
+
+// Descending removal crosses internal nodes and collapses the root while
+// preserving nullable values and the size reported after every take.
+let many = Map.empty<Nat, ?Nat>();
+var remaining = 1200;
+while (remaining > 0) {
+  remaining -= 1;
+  Map.addNat(many, remaining, if (remaining % 7 == 0) null else ?remaining);
+};
+remaining := 1200;
+while (remaining > 0) {
+  remaining -= 1;
+  let expected : ?Nat = if (remaining % 7 == 0) null else ?remaining;
+  assert Map.takeNat(many, remaining) == ?expected;
+  assert Map.takeNat(many, remaining) == null;
+  assert Map.size(many) == remaining;
+};
+assert Map.isEmpty(many);
