@@ -94,7 +94,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               | Tup ts -> G.concat_mapi (fun index t ->
                   child t (value ^^ Tuple.load_n env (Int64.of_int index))) ts
               | Obj (Object, fields, _) -> G.concat_map (fun f ->
-                  child f.typ (value ^^ Object.load_idx_raw env f.lab)) (Schema.sort_fields fields)
+                  child f.typ (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fields)
               | Variant fields -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
                   (List.mapi (fun ordinal f -> Variant.hash_variant_label env f.Type.lab,
                     reserve (num (Exact.ordinal_width ordinal)) ^^

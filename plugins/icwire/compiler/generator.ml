@@ -100,7 +100,7 @@ module Make (B : Plugin_codegen.Backend) = struct
             Arr.for_each env value (value ^^ Arr.len env) (child t)
           | Obj (Object, fields, _) ->
             G.concat_map (fun f -> child f.Type.typ
-              (value ^^ Object.load_idx_raw env f.lab)) (Schema.sort_fields fields)
+              (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fields)
           | Variant fields ->
             choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun ordinal f -> Variant.hash_variant_label env f.Type.lab,

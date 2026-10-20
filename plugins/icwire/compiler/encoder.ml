@@ -221,7 +221,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               (child ~paid:false t (value ^^ Opt.project env t)) G.nop
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts
           | Obj (Object, fs, _) -> G.concat_map (fun f ->
-              child f.typ (value ^^ Object.load_idx_raw env f.lab))
+              child f.typ (value ^^ Object.load env typ f.lab))
               (Schema.sort_fields fs)
           | Variant fs -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun index f -> Variant.hash_variant_label env f.lab,
@@ -315,7 +315,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               (word 8 (num 1) ^^ child t (value ^^ Opt.project env t)) (word 8 (num 0))
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts
           | Obj (Object, fs, _) -> G.concat_map (fun f ->
-              child f.typ (value ^^ Object.load_idx_raw env f.lab)) (Schema.sort_fields fs)
+              child f.typ (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fs)
           | Variant fs -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun index f -> Variant.hash_variant_label env f.lab,
                 (if index < 128 then word 8 (num index) else Strm.write_word_leb env position (num index)) ^^
