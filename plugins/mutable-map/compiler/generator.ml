@@ -66,12 +66,15 @@ module Make (B : P.Backend) = struct
     first ^^ set ^^ G.loop0 (G.with_current_depth (fun loop ->
       get ^^ limit ^^ lt ^^ E.if0 (body get ^^ get ^^ num 1 ^^ add ^^ set ^^ G.branch_to_ loop) G.nop))
   let shift_right env arr_type _value_type arr first finish =
-    Arr.move_within env arr_type arr first (first ^^ num 1 ^^ add)
-      (finish ^^ first ^^ sub)
+    bind env "shift_array" arr (fun arr ->
+      finish ^^ first ^^ gt ^^ E.if0
+        (Arr.move_within env arr_type arr first (first ^^ num 1 ^^ add)
+          (finish ^^ first ^^ sub)) G.nop)
   let shift_left env arr_type value_type arr first finish =
     bind env "shift_array" arr (fun arr ->
-      Arr.move_within env arr_type arr (first ^^ num 1 ^^ add) first
-        (finish ^^ first ^^ sub) ^^
+      finish ^^ first ^^ gt ^^ E.if0
+        (Arr.move_within env arr_type arr (first ^^ num 1 ^^ add) first
+          (finish ^^ first ^^ sub)) G.nop ^^
       Arr.set env arr_type value_type arr finish (null env))
   let ordering_name = function
     | Dynamic -> "callback"
