@@ -65,17 +65,13 @@ module Make (B : P.Backend) = struct
     let set, get = new_local env ("mmap_" ^ name) in
     first ^^ set ^^ G.loop0 (G.with_current_depth (fun loop ->
       get ^^ limit ^^ lt ^^ E.if0 (body get ^^ get ^^ num 1 ^^ add ^^ set ^^ G.branch_to_ loop) G.nop))
-  let shift_right env arr_type value_type arr first finish =
-    bind env "shift_array" arr (fun arr ->
-      let set, get = new_local env "mmap_shift_right" in
-      finish ^^ set ^^ G.loop0 (G.with_current_depth (fun loop ->
-        get ^^ first ^^ gt ^^ E.if0
-          (Arr.set env arr_type value_type arr get (arr ^^ get ^^ num 1 ^^ sub ^^ Arr.get env) ^^
-           get ^^ num 1 ^^ sub ^^ set ^^ G.branch_to_ loop) G.nop)))
+  let shift_right env arr_type _value_type arr first finish =
+    Arr.move_within env arr_type arr first (first ^^ num 1 ^^ add)
+      (finish ^^ first ^^ sub)
   let shift_left env arr_type value_type arr first finish =
     bind env "shift_array" arr (fun arr ->
-      loop_up env "shift_left" first finish (fun i ->
-        Arr.set env arr_type value_type arr i (arr ^^ i ^^ num 1 ^^ add ^^ Arr.get env)) ^^
+      Arr.move_within env arr_type arr (first ^^ num 1 ^^ add) first
+        (finish ^^ first ^^ sub) ^^
       Arr.set env arr_type value_type arr finish (null env))
   let ordering_name = function
     | Dynamic -> "callback"

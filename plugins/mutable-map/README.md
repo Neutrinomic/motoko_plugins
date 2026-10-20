@@ -11,6 +11,8 @@ there is no serialization boundary or private plugin heap. Writes use the SDK's
 typed managed mutation operations and the runtime's GC barriers. `clone`
 explicitly copies nodes and their arrays while sharing keys, values, and entry
 tuples. Changing either clone's bindings does not change the other clone.
+Node shifts validate their complete array ranges once, then copy in the safe
+overlap direction while retaining the normal GC write barrier for every slot.
 
 ```motoko
 import Map "mo:fast/Map";

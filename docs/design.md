@@ -226,7 +226,7 @@ managed structural sharing, callbacks, scalar comparison helpers, and a
 codegen-only package.
 
 Managed plugins can also construct and update ordinary mutable Motoko arrays
-and record fields through `Arr.tabulate_mut`, `Arr.set`, `Object.lit`,
+and record fields through `Arr.tabulate_mut`, `Arr.set`, `Arr.move_within`, `Object.lit`,
 `Object.load`, and `Object.set`. The SDK checks container shape, field mutability,
 and assignment subtyping during compilation. Generated stores retain runtime
 bounds checks and the compiler's existing forwarding and GC write barriers.
@@ -234,6 +234,14 @@ State belongs to the caller's managed objects and can persist like ordinary
 Motoko data; there is no separate plugin heap. Setter operands are evaluated
 once, left to right, before bounds checking and storing. See the
 [independent mutation audit](audits/managed-mutation-sdk/README.md).
+
+`Arr.move_within` copies an overlapping range within one mutable array. It
+evaluates array, source index, destination index and length once in that order,
+then validates both complete ranges before writing. Empty ranges may start at
+the array end. It resolves forwarding once and borrows cursors only inside its
+no-safepoint loop; every pointer destination still uses the normal write
+barrier. Collection kernels use it for B-tree shifts without repeating a
+bounds check and forwarding resolution for each element.
 
 The no-safepoint invariant is part of this compiler ABI. A future collector
 that moves objects during allocation would require changing this adapter or
