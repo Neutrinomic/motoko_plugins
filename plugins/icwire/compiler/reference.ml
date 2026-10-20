@@ -10,12 +10,12 @@ module N = Numerics
 type error = {kind : string; offset : int}
 exception Invalid of error
 type state = {input : string; mutable at : int;
-  mutable depth : int; mutable items : int}
+  mutable depth : int; mutable items : int; output_limit : int}
 let max_bytes = Schema.max_bytes
 let max_items = 1_000_000
 let max_depth = 128
 let max_integer_bytes = 4096
-let state input = {input; at = 0; depth = 0; items = 0}
+let state ?(output_limit = max_bytes) input = {input; at = 0; depth = 0; items = 0; output_limit}
 let fail_at offset kind = raise (Invalid {kind; offset})
 let fail s kind = fail_at s.at kind
 let charge s = s.items <- s.items + 1; if s.items > max_items then fail s "limit"
@@ -105,7 +105,11 @@ let rec decode_value s typ =
   | Prim Bool -> V.Bool (read_bool s)
   | Prim Text -> V.Text (read_bytes s 1)
   | Prim Blob -> V.Blob (read_bytes s 0)
-  | Prim Principal -> V.Blob (read_bytes s 2)
+  | Prim Principal | Obj (Actor, _, _) -> V.Blob (read_bytes s 2)
+  | Func (Shared _, _, _, _, _) ->
+    let principal = decode_value s (Obj (Actor, [], [])) in
+    let method_name = decode_value s (Prim Text) in
+    V.Tup [principal; method_name]
   | Prim Char -> let start = s.at in let code = read_word s 4 in
     if code > 0x10ffffL || (code >= 0xd800L && code <= 0xdfffL) then fail_at start "char";
     V.Char (Int64.to_int code)
@@ -133,7 +137,7 @@ let rec decode_value s typ =
 
 type writer = Buffer.t
 let append s out data =
-  if String.length data > max_bytes - s.at then fail s "limit";
+  if String.length data > s.output_limit - s.at then fail s "limit";
   Buffer.add_string out data; s.at <- s.at + String.length data
 let write_byte s out value = append s out (String.make 1 (Char.chr value))
 let write_word s out width bits =
@@ -143,7 +147,7 @@ let write_bytes s out kind data =
   if kind = 1 && not (valid_utf8 data) then fail s "utf8";
   if kind = 2 && String.length data > 29 then fail s "principal";
   let prefix = leb (big_int_of_int (String.length data)) false in
-  if String.length data + String.length prefix > max_bytes - s.at then fail s "limit";
+  if String.length data + String.length prefix > s.output_limit - s.at then fail s "limit";
   write_length s out (String.length data); append s out data
 let write_integer s out width signed n =
   if width = 0 then begin
@@ -161,7 +165,11 @@ let rec encode_value s out typ value =
   | Prim Bool, V.Bool value -> write_byte s out (if value then 1 else 0)
   | Prim Text, V.Text value -> write_bytes s out 1 value
   | Prim Blob, V.Blob value -> write_bytes s out 0 value
-  | Prim Principal, V.Blob value -> write_bytes s out 2 value
+  | (Prim Principal | Obj (Actor, _, _)), V.Blob value -> write_bytes s out 2 value
+  | Func (Shared _, _, _, _, _), V.Tup [principal; method_name] ->
+    encode_value s out (Obj (Actor, [], [])) principal;
+    encode_value s out (Prim Text) method_name
+  | Func (Shared _, _, _, _, _), V.Func _ -> fail s "type"
   | Prim Char, V.Char value -> write_word s out 4 (Int64.of_int value)
   | Prim (Nat | Int as p), V.Int n -> write_integer s out 0 (p = Int) (N.Int.to_big_int n)
   | Prim Nat8, V.Nat8 n -> write_integer s out 1 false (N.Nat8.to_big_int n)
@@ -202,6 +210,14 @@ let encode _type_arguments types values = match types, values with
     encode_value s out typ value;
     V.Blob (Buffer.contents out))
   | _ -> Result.Error "to_icwire expects exactly one argument (parenthesize a tuple argument)"
+let encode_bounded _type_arguments types values = match types, values with
+  | [typ; _], [value; V.Int limit] -> protect (fun () ->
+    let limit = N.Int.to_big_int limit in
+    if sign_big_int limit < 0 || gt_big_int limit (big_int_of_int max_bytes) then fail_at 0 "limit";
+    let s = state ~output_limit:(int_of_big_int limit) "" and out = Buffer.create 128 in
+    encode_value s out typ value;
+    V.Blob (Buffer.contents out))
+  | _ -> Result.Error "to_icwire_bounded expects a value and a Nat byte bound"
 let decode type_arguments _types values = match type_arguments, values with
   | [typ], [V.Blob input] -> protect (fun () ->
     let s = state input in
@@ -226,19 +242,20 @@ let rec measure_value s typ value =
   | Prim (Nat32 | Int32 | Char | Float32), _ -> add 4
   | Prim (Nat64 | Int64 | Float), _ -> add 8
   | Prim Text, V.Text value | Prim Blob, V.Blob value -> bytes (String.length value)
-  | Prim Principal, V.Blob value ->
+  | (Prim Principal | Obj (Actor, _, _)), V.Blob value ->
     if String.length value > 29 then fail s "principal";
     bytes (String.length value)
+  | Func (Shared _, _, _, _, _), V.Tup [principal; method_name] ->
+    measure_value s (Obj (Actor, [], [])) principal;
+    measure_value s (Prim Text) method_name
+  | Func (Shared _, _, _, _, _), V.Func _ -> fail s "type"
   | Prim (Nat | Int as p), V.Int value ->
     let n = N.Int.to_big_int value in
-    let compact_bound = power_int_positive_int 2 61 in
-    let boxed_int = p = Int &&
-      (lt_big_int n (minus_big_int compact_bound) || ge_big_int n compact_bound) in
-    if num_bits_big_int n > max_integer_bytes * 7 - (if boxed_int then 1 else 0) then fail s "limit";
-    let length = if p = Nat then leb_size n else if boxed_int then leb_size (abs_big_int n) + 1 else
+    if num_bits_big_int n > max_integer_bytes * 7 then fail s "limit";
+    let length = if p = Nat then leb_size n else
       let signless = if sign_big_int n < 0 then pred_big_int (abs_big_int n) else n in
       max 1 ((num_bits_big_int signless + 7) / 7) in
-    if not boxed_int && length > max_integer_bytes then fail s "limit";
+    if length > max_integer_bytes then fail s "limit";
     add length
   | Opt _, V.Null -> add 1
   | Opt typ, V.Opt value -> add 1; measure_value s typ value

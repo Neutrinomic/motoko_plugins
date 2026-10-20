@@ -69,6 +69,14 @@ module Make (B : Plugin_codegen.Backend) = struct
             num kind ^^ invoke env "check_bytes" ^^ E.if0
               (bytes env value (if p = Text then Text.to_blob env else G.nop)
                 (fun ptr len -> c ^^ ptr ^^ len ^^ num kind ^^ invoke env "write_bytes")) G.nop
+          | Obj (Actor, _, _) ->
+            c ^^ value ^^ Blob.len env ^^ num 2 ^^
+            invoke env "check_bytes" ^^ E.if0
+              (bytes env value G.nop (fun ptr len ->
+                c ^^ ptr ^^ len ^^ num 2 ^^ invoke env "write_bytes")) G.nop
+          | Func (Shared _, _, _, _, _) ->
+            child Schema.actor_reference (value ^^ SharedFunc.principal env) ^^
+            child Type.text (value ^^ SharedFunc.method_name env)
           | Prim Char -> c ^^ value ^^ TaggedSmallWord.lsb_adjust_codepoint env ^^ invoke env "write_char"
           | Prim (Nat | Int as p) ->
             value ^^ BitTagged.if_tagged_scalar env []
@@ -112,12 +120,14 @@ module Make (B : Plugin_codegen.Backend) = struct
         "offset", (fun () -> c ^^ num 2 ^^ invoke env "error_part" ^^ BoxedWord64.box env Nat64);
       ]))
 
-  let compile_encode env specialization =
-    let typ = match specialization.Mo_values.Compute_plugin.argument_types with [typ] -> typ | _ -> assert false in
+  let compile_encode ?limit env specialization =
+    let typ = match specialization.Mo_values.Compute_plugin.argument_types with typ::_ -> typ | _ -> assert false in
     let set_value, value = new_local env "icwire_value" in
     let set_context, c = new_local env "icwire_context" in
     let set_result, get_result = new_local env "icwire_result" in
-    set_value ^^ num 0 ^^ num 0 ^^ invoke env "new" ^^ set_context ^^
+    set_value ^^ (match limit with
+      | None -> num 0 ^^ num 0 ^^ invoke env "new"
+      | Some limit -> limit ^^ invoke env "new_bounded") ^^ set_context ^^
     value ^^ c ^^ encode env typ ^^
     result env c (c ^^ num 0 ^^ invoke env "output_part" ^^ c ^^ num 1 ^^ invoke env "output_part" ^^ Blob.of_ptr_size env) ^^
     set_result ^^ cc env c "done" ^^ get_result

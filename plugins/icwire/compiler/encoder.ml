@@ -35,6 +35,8 @@ module Make (B : Plugin_codegen.Backend) = struct
       | None ->
         memo := TM.add typ 129 !memo;
         let children = match typ with
+          | Func (Shared _, _, _, _, _) ->
+            [Schema.actor_reference; Type.text]
           | Opt t | Array t -> [t]
           | Tup ts -> ts
           | Obj (Object, fs, _) | Variant fs -> List.map (fun f -> f.typ) fs
@@ -50,6 +52,7 @@ module Make (B : Plugin_codegen.Backend) = struct
     if TM.mem typ seen then max_items + 1 else
     let seen = TM.add typ () seen in
     match typ with
+    | Func (Shared _, _, _, _, _) -> 3
     | Tup ts -> required_sum seen 1 ts
     | Obj (Object, fs, _) -> required_sum seen 1 (List.map (fun f -> f.typ) fs)
     | _ -> 1
@@ -96,7 +99,7 @@ module Make (B : Plugin_codegen.Backend) = struct
      Choose their minimal LEB width, then fill fixed groups directly. Packing
      up to eight output bytes per store trades generated code for instructions;
      managed values still pass only through the SDK's scalar/word adapters. *)
-  let write_compact env position signed word =
+  let write_compact ?(before_emit = fun _ -> G.nop) env position signed word =
     let initialize_key, key = if signed then
       let set, get = new_local env "icwire_signed_width_key" in
       word ^^ compile_mul_const 2L ^^ word ^^
@@ -124,7 +127,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         G.i (Store {ty = (if count = 8 then I64Type else I32Type); align = 0;
           offset = Int64.of_int start; sz = (if count = 1 then Some Pack8 else if count = 2 then Some Pack16 else None)}) ^^
         chunks (start + count) (remaining - count)
-      in chunks 0 width ^^ position ^^ compile_add_const (Int64.of_int width) ^^ G.setter_for position in
+      in before_emit width ^^ chunks 0 width ^^ position ^^ compile_add_const (Int64.of_int width) ^^ G.setter_for position in
     let rec select first last =
       if first = last then emit first else
       let middle = first + (last - first) / 2 in
@@ -135,12 +138,11 @@ module Make (B : Plugin_codegen.Backend) = struct
       (key ^^ num 16_384 ^^ compile_comparison I64Op.LtU ^^
        E.if0 (emit 2) (select 3 10))
 
-  let rec measure ?(prepaid = false) ?(dynamic = false) ?(estimate = false) env typ =
+  let rec measure ?(prepaid = false) ?(dynamic = false) env typ =
     let typ = normalize typ in
     let sharing = match typ with Prim _ | Non -> Func.Never | _ -> Func.Always in
     Func.share_code sharing env (Strm.name_for
-      ((if prepaid then "icwire_measure_paid" else "icwire_measure") ^ (if dynamic then "_depth" else "") ^
-       (if estimate then "_bound" else "")) [typ])
+      ((if prepaid then "icwire_measure_paid" else "icwire_measure") ^ (if dynamic then "_depth" else "")) [typ])
       (["value", I64Type; "position", I64Type; "remaining", I64Type] @
        if dynamic then ["depth", I64Type] else [])
       [I64Type; I64Type] (fun env args ->
@@ -182,16 +184,14 @@ module Make (B : Plugin_codegen.Backend) = struct
                (if p = Int then word ^^ compile_mul_const 2L ^^ word ^^
                   G.i (Binary (Wasm_exts.Values.I64 I64Op.Xor)) ^^ set_word else G.nop) ^^
                advance (I32Leb.compile_leb128_size word))
-              (value ^^ BigNumLibtommath.fits_unsigned_bits env (if estimate && p = Int then 28_671 else 28_672) ^^
+              (value ^^ BigNumLibtommath.fits_unsigned_bits env 28_672 ^^
                E.if0 G.nop failed ^^
-               (* Exact negative SLEB sizing copies a bigint in the RTS. The
-                  allocation-free admission estimator instead reserves one
-                  extra byte beyond the magnitude's unsigned LEB width. *)
-               value ^^ buffer_size env (if estimate && p = Int then Prim Nat else typ) ^^
-               G.i Drop ^^ (if estimate && p = Int then compile_add_const 1L else G.nop) ^^ set_length ^^
+               (* Compiler-owned limb sizing borrows the magnitude and handles
+                  signed boundaries without allocating a temporary bigint. *)
+               value ^^ BigNum.leb128_size env (p = Int) ^^ set_length ^^
                (* The magnitude precheck already proves Nat's ULEB <= 4096.
                   Int may still need an additional sign bit at that boundary. *)
-               (if p = Nat || estimate then G.nop else reject (length ^^ num 4096 ^^ compile_comparison I64Op.GtU)) ^^
+               (if p = Nat then G.nop else reject (length ^^ num 4096 ^^ compile_comparison I64Op.GtU)) ^^
                advance length)
           | _ -> assert false in
         let child ?(paid = true) ?(depth_checked = false) t v =
@@ -207,11 +207,15 @@ module Make (B : Plugin_codegen.Backend) = struct
               v ^^ set_value ^^ primitive t value
             | _ -> v ^^ position ^^ remaining ^^
               (if dynamic then depth ^^ compile_add_const 1L else G.nop) ^^
-              measure ~prepaid:paid ~dynamic ~estimate env t ^^
+              measure ~prepaid:paid ~dynamic env t ^^
               set_remaining ^^ set_position ^^
               reject (position ^^ num max_bytes ^^ compile_comparison I64Op.GtU) in
         let body = match typ with
           | Prim _ -> primitive typ value
+          | Obj (Actor, _, _) -> primitive (Prim Principal) value
+          | Func (Shared _, _, _, _, _) ->
+            child Schema.actor_reference (value ^^ SharedFunc.principal env) ^^
+            child Type.text (value ^^ SharedFunc.method_name env)
           | Opt t -> bytes 1 ^^ value ^^ Opt.is_some env ^^ E.if0
               (child ~paid:false t (value ^^ Opt.project env t)) G.nop
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts
@@ -289,7 +293,7 @@ module Make (B : Plugin_codegen.Backend) = struct
             let set_word, word = new_local env "icwire_integer_word" in
             value ^^ BitTagged.if_tagged_scalar env []
               (value ^^ BigNum.to_word64 env ^^ set_word ^^ write_compact env position (p = Int) word)
-              ((if p = Nat then Strm.write_bignum_leb else Strm.write_bignum_sleb) env position value)
+              (value ^^ position ^^ BigNum.write_leb128 env (p = Int) ^^ position ^^ add ^^ set_position)
           | Prim (Blob | Principal) -> Strm.write_blob env position value
           | Prim Text -> Strm.write_text env position value
           | _ -> assert false in
@@ -302,6 +306,10 @@ module Make (B : Plugin_codegen.Backend) = struct
               (if contains_float t then reject (position ^^ compile_eq_const 0L) else G.nop) in
         let body = match typ with
           | Prim _ -> primitive typ value
+          | Obj (Actor, _, _) -> primitive (Prim Principal) value
+          | Func (Shared _, _, _, _, _) ->
+            child Schema.actor_reference (value ^^ SharedFunc.principal env) ^^
+            child Type.text (value ^^ SharedFunc.method_name env)
           | Opt t -> value ^^ Opt.is_some env ^^ E.if0
               (word 8 (num 1) ^^ child t (value ^^ Opt.project env t)) (word 8 (num 0))
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts

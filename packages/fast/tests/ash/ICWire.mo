@@ -86,7 +86,7 @@ persistent actor {
       let after = Prim.rts_total_allocation();
       assert before == after;
       let wire = ICWire.unwrap(ICWire.encode(value));
-      assert size >= wire.size() and size <= wire.size() + 2;
+      assert size == wire.size();
       assert ICWire.toOption(ICWire.decode<Sized>(wire)) == ?value;
       assert ICWire.toOption(ICWire.decode<Sized>("")) == null;
       assert ICWire.unwrap(#ok (7 : Nat)) == 7;
@@ -104,7 +104,7 @@ persistent actor {
           case (#err _) assert positiveSize == 2 ** 61 - 1;
         };
         switch (ICWire.encode(negative)) {
-          case (#ok bytes) assert negativeSize >= bytes.size();
+          case (#ok bytes) assert negativeSize == bytes.size();
           case (#err _) assert negativeSize == 2 ** 61 - 1;
         };
       };
@@ -746,7 +746,11 @@ persistent actor {
       note = ??"still present"; choice = #_2_("shared scratch must not escape");
       owner = Principal.fromText("2vxsx-fae"); numbers = [-(2 ** 256) - 1, 2 ** 128, -65];
     };
-    retainedWire := ok(ICWire.encode(expected));
+    // Deliberately reserve spare capacity so finalization leaves a filler tail.
+    // The retained logical bytes and later failed writes must survive real GC.
+    retainedWire := ok(ICWire.encodeBounded(expected, 65_536));
+    assert ICWire.encode(expected) == #ok retainedWire;
+    expect(ICWire.encodeBounded(expected, 1), "limit", 0);
     retained := ?ok(ICWire.decode<Row>(retainedWire));
     retainedError := ?error(ICWire.decode<Text>("\01\ff"));
     let natBoundaries = mediumNats();
@@ -771,6 +775,7 @@ persistent actor {
       assert ICWire.decode<Int>(ok(ICWire.encode(-(2 ** (128 + i) : Int)))) == #ok (-(2 ** (128 + i) : Int));
       ignore error(ICWire.decode<Nat>("\80\00"));
       ignore error(ICWire.decode<[Bool]>("\04\00\01\02"));
+      ignore error(ICWire.encodeBounded(expected, 64));
       ignore ok(ICWire.decode<Text>(ok(ICWire.encode(ascii(1024 + i)))));
       i += 1;
     };

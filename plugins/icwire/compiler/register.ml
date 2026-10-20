@@ -19,6 +19,15 @@ let decode = C.{
     | _ -> Error "from_icwire requires one explicit result type");
   evaluate = Mo_values.Compute_plugin.pure Reference.decode;
 }
+let encode_bounded = C.{
+  id = "icwire_encode_bounded"; name = "to_icwire_bounded"; arguments = Shared; type_parameters = [];
+  result_type = (fun _ -> function
+    | [typ; bound] when Type.normalize bound = Type.Prim Type.Nat ->
+      (match Schema.validate typ with
+        | Ok () -> Ok (Schema.result_type (Type.Prim Type.Blob)) | Error e -> Error e)
+    | _ -> Error "to_icwire_bounded expects a value and a Nat byte bound");
+  evaluate = Mo_values.Compute_plugin.pure Reference.encode_bounded;
+}
 let estimate = C.{
   id = "icwire_estimate_size"; name = "icwire_estimate_size";
   arguments = Shared; type_parameters = [];
@@ -34,7 +43,7 @@ let i n = List.init n (fun _ -> I64Type)
 let () = P.register P.{
   abi = 1; types = []; name = "icwire"; runtime = Some "runtime.wasm";
   imports = List.map (fun (name, args, results) -> signature name (i args) (i results)) [
-    "new",2,1; "done",1,0; "ok",1,1; "enter",1,1; "leave",1,0;
+    "new",2,1; "new_bounded",1,1; "done",1,0; "ok",1,1; "node",1,1; "enter",1,1; "leave",1,0;
     "check_bytes",3,1; "check_bigint",2,1; "finish",1,0;
     "error_part",2,1; "fail",2,0;
     "output_part",2,1; "scalar_ptr",1,1; "scalar_len",1,1; "read_bool",1,1; "write_bool",2,0;
@@ -43,9 +52,9 @@ let () = P.register P.{
     "read_array",1,1; "write_array",2,0; "read_length",1,1; "write_length",2,0;
     "leaf_null",1,0; "leaf_bool",1,1; "leaf_word",3,1; "leaf_char",1,1;
     "leaf_bytes",2,1; "leaf_text",1,1; "leaf_bigint",2,1; "read_words",2,1; "read_bools",1,1;
-    "read_floats",2,1; "integer_chunk",3,1;
+    "read_floats",2,1;
     "utf8_valid",2,1;
   ] @ [signature "leaf_float" [I64Type; I64Type] [F64Type];
        signature "write_float" [I64Type; F64Type; I64Type] []];
-  bindings = [encode, (module Encoder); decode, (module Decoder); estimate, (module Estimate)];
+  bindings = [encode, (module Encoder); encode_bounded, (module Bounded); decode, (module Decoder); estimate, (module Estimate)];
 }

@@ -27,6 +27,24 @@ scripts/build.sh --motoko /path/to/motoko icwire
 ```
 
 `ICWire.encode(value)` returns `ICWire.Result<Blob>`.
+`ICWire.encodeBounded(value, maxBytes)` returns the same result and exactly the
+same bytes, using a caller-provided bound on the complete encoded payload.
+`maxBytes` is a `Nat` from zero through 16 MiB. Exceeding it returns `#err` with
+kind `limit` at the first value that does not fit; a bound above 16 MiB returns
+`limit` at offset zero. A bound is a total byte capacity, not a schema with
+separate maxima for individual fields, strings or arrays.
+
+For composite variable-size values, bounded encoding writes in one traversal
+into unpublished capacity, checks byte, node, depth and scalar limits while
+writing, and finalizes the Blob at its actual length. It never pads the wire
+message to the bound. Reserved capacity counts toward allocation until GC;
+finalization makes its unused tail reclaimable but does not rewind the heap.
+Choose a close, independently known bound and measure the relevant workload. Calling
+`estimateSize` solely to supply the bound still traverses the value first.
+Scalar and fixed-width roots retain cheap exact sizing and allocation, where
+a capacity reservation would not remove a traversal. The ordinary encoder
+remains appropriate when the size bound is unknown or excessively loose.
+
 `ICWire.decode<T>(bytes)` requires an explicit concrete result type and returns
 `ICWire.Result<T>`. The result is `{#ok : T; #err : ICWire.Error}`, with
 `Error = {kind : Text; offset : Nat64}`. Decode offsets are byte offsets into
@@ -39,15 +57,10 @@ kind and byte offset on failure. `ICWire.toOption(result)` converts success to
 `?value` and failure to `null`. These ordinary generic helpers operate on the
 result after the codec intrinsic has specialized at the concrete call site.
 
-`ICWire.estimateSize(value)` returns a conservative byte bound without encoding
-or allocating scratch storage. The bound is exact except that boxed `Int`
-values reserve up to one extra byte each to avoid the runtime's allocating
-negative-integer size calculation. Fixed-width arrays use only their count.
-Boxing depends on runtime representation, so reserve this margin for every
-`Int` field when calculating an independent expected bound.
-It returns `2 ** 61 - 1` if a byte, node, depth or integer bound is exceeded;
-conservative bounds can reject otherwise encodable values close to a limit.
-In particular, boxed `Int` magnitudes must fit 28,671 bits for estimation.
+`ICWire.estimateSize(value)` returns the exact encoded byte size without
+encoding or allocating scratch storage. Fixed-width arrays use only their
+count. Signed integer sizing borrows the magnitude without temporary values.
+It returns `2 ** 61 - 1` if a byte, node, depth or integer bound is exceeded.
 Float values are sized without checking finiteness; `encode` still rejects
 NaN and infinity. This is an admission size bound, not an encodability check.
 
@@ -78,6 +91,8 @@ checked before allocation or traversal.
 | `Blob` | Unsigned LEB128 byte length followed by those bytes |
 | `Text` | Unsigned LEB128 UTF-8 byte length followed by valid UTF-8 |
 | `Principal` | Unsigned LEB128 byte length followed by at most 29 principal bytes |
+| Actor reference | The same principal-byte representation |
+| Shared function reference | Actor principal followed by the method name as `Text` |
 | `?T` | One byte `0` for null, or `1` followed by the payload of `T` |
 | `[T]` | Unsigned LEB128 element count followed by consecutive element payloads |
 | Tuple | Consecutive element payloads, without a count |
@@ -97,6 +112,13 @@ its `0` option byte; it is never omitted. Records add no count, length, tags or
 field delimiters. Variant ordinals start at zero in the sorted case list, so
 the first 128 cases each need only one discriminant byte. Nested options and
 `?Null` preserve their ordinary `0`/`1` tags.
+
+Shared references contain no signature or protocol tag. The static actor or
+function type determines whether a call uses Candid or ICWire. Function
+signatures, including recursive callback result types, are not traversed as
+payloads. An actor reference charges one typed node; a shared function charges
+its root plus its actor and method-name children. Decoding validates principal
+length and UTF-8 exactly as for the corresponding scalar types.
 
 Examples, in hexadecimal:
 
@@ -154,12 +176,19 @@ Fixed-width arrays, including floats, use their count during size admission.
 Float finiteness is checked while writing. If measurement or writing
 rejects a value, a bounded streaming visitor reports the first error and its
 precise output position. Any partially written Blob remains unpublished.
+`encodeBounded` skips whole-value measurement for variable-size composites.
+Its byte-capacity checks use the supplied bound without weakening the global
+node, depth or integer limits. The compiler owns unpublished Blob allocation
+and finalization, including GC filler objects and the allocation barrier;
+the plugin never changes a managed Blob header directly. Failed output is
+finalized and discarded before diagnostic fallback.
 
 Decoding borrows input slices and constructs ordinary managed Motoko values
 directly. Primitive admission and decoding are combined. Boolean, fixed-width
 integer and floating-point arrays validate their input before constructing
-the array through direct loads. Medium integers use bounded 63-bit chunks and
-reuse the arithmetic radix within each decoder helper. These specializations
+the array through direct loads. Larger integers construct their final managed
+magnitude directly from the validated bytes without intermediate arithmetic
+values. These specializations
 favor instruction cost over generated-code size and temporary allocation;
 the benchmark reports both. The compiler owns heap layouts, allocation and
 GC barriers. Calls are
@@ -167,8 +196,9 @@ synchronous, retain no input pointers or plugin state, and have no callbacks
 or GC safepoints. Temporary buffers used by the streaming encoder, unpublished
 output Blobs and abandoned decoded values are reclaimed by normal Motoko GC.
 
-Supported compositions include recursive immutable records, variants and
-arrays under these dynamic limits. Mutable values, functions, actors, `Any`
+Supported compositions include recursive immutable records, variants, arrays,
+actors and shared function references under these dynamic limits. Mutable
+values, local functions, `Any`
 and runtime handles are rejected during compilation. Both float widths reject
 NaN and infinity on encoding and decoding.
 

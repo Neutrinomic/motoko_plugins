@@ -23,56 +23,20 @@ module Make (B : Plugin_codegen.Backend) = struct
     let set, get = new_local env "icwire_decoded" in
     code ^^ set ^^ check env c (Tuple.compile_unit env) ^^ get
 
-  (* Three 63-bit chunks cover at most 27 canonical LEB bytes. This bounds
-     intermediate managed values while avoiding one bignum operation per byte.
-     Larger integers retain the RTS decoder's bounded temporary storage. *)
-  let medium_integer env c factor_cache signed length =
-    let set_factor, factor = Lazy.force factor_cache in
-    let set_value, value = new_local env "icwire_integer_value" in
-    let set_top, top = new_local env "icwire_integer_top" in
-    let set_middle, middle = new_local env "icwire_integer_middle" in
-    let set_low, low = new_local env "icwire_integer_low" in
-    let set_negative, negative = new_local env "icwire_integer_negative" in
-    let binary op = G.i (Binary (Wasm_exts.Values.I64 op)) in
-    let read_chunk index = c ^^ num index ^^ num (if signed then 1 else 0) ^^ invoke env "integer_chunk" in
-    let three = length ^^ num 18 ^^ compile_comparison I64Op.GtU in
-    let nonzero value = value ^^ num 0 ^^ compile_comparison I64Op.Ne in
-    let append chunk =
-      value ^^ factor ^^ BigNum.compile_mul env ^^ set_value ^^
-      chunk ^^ compile_eq_const 0L ^^ E.if0 G.nop
-        (value ^^ chunk ^^ BigNum.from_word64 env ^^ BigNum.compile_add env ^^ set_value) in
-    read_chunk 0 ^^ set_low ^^
-    three ^^ E.if1 I64Type (read_chunk 1) (num 0) ^^ set_middle ^^
-    three ^^ E.if1 I64Type (read_chunk 2) (read_chunk 1) ^^ set_top ^^
-    (if signed then
-      top ^^ num 0 ^^ compile_comparison I64Op.LtS ^^ set_negative ^^
-      negative ^^ E.if0
-        (* Convert the bounded two's-complement chunks to magnitude, retaining
-           the low-to-high borrow in unboxed locals before any SDK arithmetic. *)
-        (num 0 ^^ top ^^ binary I64Op.Sub ^^ nonzero (low ^^ middle ^^ binary I64Op.Or) ^^ binary I64Op.Sub ^^ set_top ^^
-         num 0 ^^ middle ^^ binary I64Op.Sub ^^ nonzero low ^^ binary I64Op.Sub ^^
-         compile_unboxed_const Int64.max_int ^^ binary I64Op.And ^^ set_middle ^^
-         num 0 ^^ low ^^ binary I64Op.Sub ^^ compile_unboxed_const Int64.max_int ^^ binary I64Op.And ^^ set_low)
-        G.nop
-      else G.nop) ^^
-    (* Leaves inline into their parent helper. A normal managed local caches
-       this immutable radix across array iterations and sibling fields. Wasm
-       locals begin at zero; initialize only when a medium integer is seen. *)
-    factor ^^ compile_eq_const 0L ^^ E.if0
-      (compile_unboxed_const Int64.min_int ^^ BigNum.from_word64 env ^^ set_factor) G.nop ^^
-    top ^^ BigNum.from_word64 env ^^ set_value ^^
-    three ^^ E.if0 (append middle) G.nop ^^ append low ^^
-    (if signed then negative ^^ E.if1 I64Type (value ^^ BigNum.compile_neg env) value else value)
-
-  let rec decode env typ =
+  (* The compiler-owned bridge constructs a complete bigint from validated
+     LEB bytes in one managed allocation. No temporary arithmetic values or
+     plugin-owned assumptions about the managed bigint layout are needed. *)
+  let rec decode env static_depth typ =
     let typ = Type.normalize typ in
-    Func.share_code1 Func.Always env (Generator.name_for "fast_decode" typ)
+    Func.share_code1 Func.Always env (Generator.name_for (if static_depth then "flat_decode" else "fast_decode") typ)
       ("context", I64Type) [I64Type] (fun env c ->
         let unit = Tuple.compile_unit env in
-        let factor_cache = lazy (new_local env "icwire_integer_radix") in
-        let child t = read env c factor_cache t in
+        let child t = read env c static_depth t in
         let body = match typ with
-          | Prim _ -> leaf env c factor_cache typ
+          | Prim _ | Obj (Actor, _, _) -> leaf env c typ
+          | Func (Shared _, _, _, _, _) ->
+            child Schema.actor_reference ^^ child Type.text ^^
+            SharedFunc.of_parts env
           | Opt payload -> checked env c (cc env c "read_bool") ^^ E.if1 I64Type
               (Opt.inject env payload (child payload)) (Opt.null_lit env)
           | Tup ts -> G.concat_map child ts ^^ Tuple.from_stack env (List.length ts)
@@ -122,21 +86,30 @@ module Make (B : Plugin_codegen.Backend) = struct
             let tag = checked env c (cc env c "read_length") in
             choose env tag (List.mapi (fun index f -> Int64.of_int index,
               Variant.inject env f.lab (child f.typ)) (Schema.sort_fields fields))
-              (Some I64Type) (fail env c 2 ^^ unit)
-          | Non -> fail env c 0 ^^ unit
+              (Some I64Type) (fail env c 2 ^^ unit ^^ G.i Return)
+          | Non -> fail env c 0 ^^ unit ^^ G.i Return
           | _ -> invalid_arg "ICWire unsupported decoder type escaped validation"
         in
         match typ with
-        | Prim _ -> body
-        | _ -> cc env c "enter" ^^ E.if1 I64Type
-            (checked env c body ^^ cc env c "leave") unit)
+        | Prim _ | Obj (Actor, _, _) -> body
+        | _ -> cc env c (if static_depth then "node" else "enter") ^^ E.if1 I64Type
+            (* Every child and tag has already checked its runtime read. Direct
+               invalid-variant/None branches return above, so reaching this
+               epilogue proves success without another runtime ok call. *)
+            (body ^^ (if static_depth then G.nop else cc env c "leave")) unit)
 
-  and read env c factor_cache typ =
+  and read env c static_depth typ =
     match Type.normalize typ with
-    | Prim _ as typ -> leaf env c factor_cache typ
-    | _ -> checked env c (c ^^ decode env typ)
+    | (Prim _ | Obj (Actor, _, _)) as typ -> leaf env c typ
+    | _ -> checked env c (c ^^ decode env static_depth typ)
 
-  and leaf env c factor_cache = function
+  and leaf env c = function
+    | Obj (Actor, _, _) ->
+      let set_ptr, ptr = new_local env "icwire_actor_bytes" in
+      c ^^ num 2 ^^ invoke env "leaf_bytes" ^^ set_ptr ^^
+      ptr ^^ num 0 ^^ compile_comparison I64Op.Ne ^^ E.if0 G.nop
+        (Tuple.compile_unit env ^^ G.i Return) ^^
+      ptr ^^ cc env c "scalar_len" ^^ Actor.of_ptr_size env
     | Prim Null -> cc env c "leaf_null" ^^ check env c (Tuple.compile_unit env) ^^ Opt.null_lit env
     | Prim Bool -> checked env c (cc env c "leaf_bool")
     | Prim (Text | Blob | Principal as p) ->
@@ -149,13 +122,9 @@ module Make (B : Plugin_codegen.Backend) = struct
       TaggedSmallWord.msb_adjust Char ^^ TaggedSmallWord.tag env Char
     | Prim (Nat | Int as p) ->
       let set, get = new_local env "icwire_small_integer" in
-      let set_length, length = new_local env "icwire_integer_length" in
       c ^^ num (if p = Int then 1 else 0) ^^ invoke env "leaf_bigint" ^^ set ^^
       check env c (Tuple.compile_unit env) ^^ get ^^ compile_eq_const Int64.min_int ^^ E.if1 I64Type
-        (cc env c "scalar_len" ^^ set_length ^^
-         length ^^ num 27 ^^ compile_comparison I64Op.LeU ^^ E.if1 I64Type
-           (medium_integer env c factor_cache (p = Int) length)
-           (cc env c "scalar_ptr" ^^ length ^^ BigNum.of_leb128 env (p = Int)))
+        (cc env c "scalar_ptr" ^^ cc env c "scalar_len" ^^ BigNum.of_leb128 env (p = Int))
         (get ^^ (if p = Int then BigNum.from_signed_word64 env else BigNum.from_word64 env))
     | Prim (Nat8 | Nat16 | Nat32 | Nat64 | Int8 | Int16 | Int32 | Int64 as p) ->
       let signed, bits = word_kind p in
@@ -173,7 +142,7 @@ module Make (B : Plugin_codegen.Backend) = struct
     let set_value, value = new_local env "icwire_value" in
     let set_result, get_result = new_local env "icwire_result" in
     source ^^ Blob.payload_ptr_unskewed env ^^ source ^^ Blob.len env ^^ invoke env "new" ^^ set_context ^^
-      c ^^ decode env typ ^^ set_value ^^ cc env c "finish" ^^
+      c ^^ decode env (Schema.bounded_depth typ) typ ^^ set_value ^^ cc env c "finish" ^^
       result env c value ^^ set_result ^^ cc env c "done" ^^ get_result
 
   (* A root byte string has no recursive nodes. Prove its complete canonical
@@ -220,6 +189,68 @@ module Make (B : Plugin_codegen.Backend) = struct
       (validate ptr) (num 0) ^^ E.if1 I64Type
       (Variant.inject env "ok" (value ptr)) otherwise
 
+  (* Canonical two-to-nine-byte root integers fit an unboxed 63-bit payload.
+     Inspect only ranges proven by the exact Blob length; malformed encodings
+     retain the general decoder's validation order and precise first error. *)
+  let root_integer_short env source signed otherwise =
+    let set_ptr, ptr = new_local env "icwire_root_integer_bytes" in
+    let set_packed, packed = new_local env "icwire_root_integer_packed" in
+    let set_last, last = new_local env "icwire_root_integer_last" in
+    let set_value, value = new_local env "icwire_root_integer_value" in
+    let binary op = G.i (Binary (Wasm_exts.Values.I64 op)) in
+    let load width offset =
+      ptr ^^ G.i (Load {ty = I64Type; align = 0; offset = Int64.of_int offset;
+        sz = (match width with 1 -> Some (Pack8, ZX) | 2 -> Some (Pack16, ZX)
+          | 4 -> Some (Pack32, ZX) | 8 -> None | _ -> assert false)}) in
+    let rec load_packed width offset =
+      let chunk = if width >= 8 then 8 else if width >= 4 then 4
+        else if width >= 2 then 2 else 1 in
+      load chunk offset ^^
+      (if width = chunk then G.nop else
+        load_packed (width - chunk) (offset + chunk) ^^ num (chunk * 8) ^^
+        binary I64Op.Shl ^^ binary I64Op.Or) in
+    let mask count =
+      let rec loop i bits = if i = count then bits else
+        loop (i + 1) (Int64.logor bits (Int64.shift_left 128L (i * 8))) in
+      loop 0 0L in
+    let width_case width =
+      let bytes = min width 8 in
+      let rec payload index =
+        let group = packed ^^
+          (if index = 0 then G.nop else num index ^^ binary I64Op.ShrU) ^^
+          compile_unboxed_const (Int64.shift_left 127L (index * 7)) ^^ binary I64Op.And in
+        if index = 0 then group else payload (index - 1) ^^ group ^^ binary I64Op.Or in
+      let bits = width * 7 in
+      let assembled = payload (bytes - 1) ^^
+        (if width = 9 then last ^^ num 56 ^^ binary I64Op.Shl ^^ binary I64Op.Or else G.nop) ^^
+        (if signed then num (64 - bits) ^^ binary I64Op.Shl ^^
+          num (64 - bits) ^^ binary I64Op.ShrS else G.nop) in
+      let canonical =
+        if signed then
+          (* A shortest SLEB of this width lies outside the preceding width's
+             signed interval. Unsigned wrapping addition tests both ends. *)
+          value ^^ compile_unboxed_const (Int64.shift_left 1L (bits - 8)) ^^
+          binary I64Op.Add ^^ compile_unboxed_const (Int64.shift_left 1L (bits - 7)) ^^
+          compile_comparison I64Op.GeU
+        else value ^^ compile_unboxed_const (Int64.shift_left 1L (bits - 7)) ^^
+          compile_comparison I64Op.GeU in
+      load_packed bytes 0 ^^ set_packed ^^
+      (if width = 9 then load 1 8 ^^ set_last else G.nop) ^^
+      packed ^^ compile_unboxed_const (mask bytes) ^^ binary I64Op.And ^^
+      compile_unboxed_const (mask (width - 1)) ^^ compile_comparison I64Op.Eq ^^
+      (if width = 9 then last ^^ num 128 ^^ compile_comparison I64Op.LtU ^^
+        binary I64Op.And else G.nop) ^^
+      E.if1 I64Type
+        (assembled ^^ set_value ^^ canonical ^^ E.if1 I64Type
+          (Variant.inject env "ok" (value ^^
+            if signed then BigNum.from_signed_word64 env else BigNum.from_word64 env))
+          otherwise)
+        otherwise in
+    source ^^ Blob.payload_ptr_unskewed env ^^ set_ptr ^^
+    choose env (source ^^ Blob.len env)
+      (List.init 8 (fun index -> let width = index + 2 in
+        Int64.of_int width, width_case width)) (Some I64Type) otherwise
+
   let root_scalar env source p otherwise =
     let load p bits ptr =
       let signed, _ = word_kind p in
@@ -238,7 +269,8 @@ module Make (B : Plugin_codegen.Backend) = struct
         (fun ptr -> byte ptr ^^
           if p = Int then num 57 ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.Shl)) ^^
             num 57 ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.ShrS)) ^^ BigNum.from_signed_word64 env
-          else BigNum.from_word64 env) otherwise
+          else BigNum.from_word64 env)
+        (root_integer_short env source (p = Int) otherwise)
     | Nat8 | Nat16 | Nat32 | Nat64 | Int8 | Int16 | Int32 | Int64 ->
       let _, bits = word_kind p in
       root_fixed env source (bits / 8) (fun _ -> num 1)

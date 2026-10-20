@@ -5,11 +5,14 @@ frame, field identifier, field length or schema on the wire. Records concatenate
 every field in ascending unsigned Candid-hash order, including absent options
 as the byte zero. Variants encode the zero-based position in that same sorted
 schema as canonical ULEB32, then their payload. Peers must share the schema.
+Actor references use the Principal representation. Shared function references
+concatenate an actor reference and UTF-8 method Text, charging their composite
+root and those two children. Their signature and Candid/ICWire protocol remain
+in the static type and add no bytes, nodes or recursive traversal.
 
 `icwire_estimate_size` is a compiler intrinsic, not a runtime export. It reuses
-the generated bounded measurement visitor without constructing output or
-scratch storage. Boxed signed integers reserve one byte beyond their unsigned
-magnitude width and reject magnitudes above 28,671 bits. It returns the compact
+the generated exact measurement visitor without constructing output or
+scratch storage, including allocation-free signed bigint sizing. It returns the compact
 Nat sentinel `2 ** 61 - 1` on bound failure. Float sizing does not validate
 finiteness. Encoding and decoding bytes are unaffected by this admission API.
 
@@ -20,8 +23,10 @@ before using decoded values or constructing managed objects.
 
 ```
 new(ptr: usize, len: usize) -> usize       // context borrowing decode input
+new_bounded(limit: usize) -> usize        // diagnostic writer with total byte cap
 done(c) -> ()
 ok(c) -> usize                           // 0/1
+node(c) -> usize                         // typed-node charge for a statically depth-proven root, 0/1
 enter(c) -> usize                        // typed node + nesting charge, 0/1
 leave(c) -> ()
 collection(c, count: usize) -> usize     // preflight remaining typed-node budget
@@ -47,7 +52,6 @@ read_bytes(c, kind: usize) -> ()        // ULEB32 length + bytes; 0 Blob,1 Text,
 write_bytes(c, ptr: usize, len: usize, kind: usize) -> ()
 utf8_valid(ptr: usize, len: usize) -> usize // pure validator for a proven input range
 read_bigint(c, signed: usize) -> ()     // borrowed canonical ULEB/SLEB
-integer_chunk(c, index: usize, signed: usize) -> u64 // <=9-byte/63-bit chunk
 write_bigint(c, ptr: usize, len: usize, signed: usize) -> ()
 write_small(c, value: u64, signed: usize) -> ()
 read_array(c) -> usize                 // ULEB32 count + node preflight
@@ -74,8 +78,22 @@ bytes and reject redundant high zero groups or values exceeding `u32::MAX`.
 Limits are 16 MiB total bytes, 1,000,000 typed nodes, depth 128 and 4096 bytes per
 Nat/Int LEB. Records do not add any work charge beyond their node and their
 typed fields. `collection` runs before managed array allocation. `leaf_*` checks
-depth and charges one node without transient depth writes. Composite nodes
-retain `enter`/`leave`.
+depth and charges one node without transient depth writes. For a finite root
+schema whose maximum possible value path has at most 128 nodes, generated
+composite visitors use `node` instead of `enter`/`leave`: the compiler has proved
+the depth limit for the entire call, while every node is still charged in its
+original traversal order. Arrays add a depth level regardless of their count.
+Mode-specific helper names prevent these visitors from being reused by a
+recursive or potentially deeper root, which retains runtime `enter`/`leave`.
+Shallow values of a potentially deeper schema still decode normally. Scalar
+validation, byte limits, node limits and first-error offsets are unchanged.
+
+`new_bounded` is used only by failed compiler-specialized bounded writes to
+recover their precise first error. It applies the supplied output capacity to
+every diagnostic append. Bounds above 16 MiB create an already-failed context
+with `limit` at offset zero. The successful bounded path writes directly into
+a compiler-owned unpublished Blob and finalizes its actual length through the
+SDK; it does not allocate a runtime context or intermediate output vector.
 
 `read_words` runs inside an entered array. It reads/preflights the count,
 checks child depth for nonempty arrays, validates the entire fixed-width byte
@@ -101,13 +119,12 @@ bytes; larger values return `0x8000000000000000`, and the scalar getters supply 
 borrowed LEB. That sentinel is outside both nine-byte ULEB and SLEB ranges.
 Check `ok` before inspecting it. `write_small` avoids a temporary managed Blob.
 
-For validated LEB values up to 27 bytes, `integer_chunk` reads at most nine bytes
-starting at `index * 9`, returning their 63-bit payload. Only the last chunk is
-sign-extended when `signed` is set. Index must be 0, 1 or 2 and point inside the
-scalar. This helper allocates nothing; generated code combines two or three
-chunks through managed BigNum operations. Larger LEB values keep the SDK's
-general conversion path. `leaf_bytes` returns its borrowed payload pointer
-directly; `scalar_len` supplies the length after `ok` succeeds.
+For validated LEB values longer than nine bytes, the compiler-owned BigNum
+bridge constructs the final managed integer directly from its borrowed LEB
+slice in one allocation. It packs magnitude limbs without intermediate managed
+arithmetic values. The plugin never depends on managed bigint heap offsets.
+`leaf_bytes` returns its borrowed payload pointer directly; `scalar_len` supplies
+the length after `ok` succeeds.
 
 `leaf_bytes` and `leaf_text` return zero exactly on failure. A successful
 borrowed Rust slice has a nonzero pointer even when empty. Generated code may

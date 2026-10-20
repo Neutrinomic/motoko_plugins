@@ -23,8 +23,8 @@ for (value in ([0, 1, 63, 64, 127, 128, 255, 16383, 16384, 2 ** 63 - 1, 2 ** 63,
   let signed : Int = value;
   let positiveSize = Wire.unwrap(Wire.encode(signed)).size();
   let negativeSize = Wire.unwrap(Wire.encode(-signed - 1)).size();
-  assert Wire.estimateSize(signed) >= positiveSize and Wire.estimateSize(signed) <= positiveSize + 1;
-  assert Wire.estimateSize(-signed - 1) >= negativeSize and Wire.estimateSize(-signed - 1) <= negativeSize + 1;
+  assert Wire.estimateSize(signed) == positiveSize;
+  assert Wire.estimateSize(-signed - 1) == negativeSize;
 };
 type Chain = ?(Nat8, Chain);
 func chain(n : Nat) : Chain {
@@ -49,8 +49,8 @@ let largestNat : Nat = 2 ** (4096 * 7) - 1;
 let signedBoundary : Int = 2 ** (4096 * 7 - 1);
 assert Wire.estimateSize(largestNat) == 4096;
 assert Wire.estimateSize(largestNat + 1) == rejected;
-assert Wire.estimateSize(signedBoundary - 1) == 4097;
-assert Wire.estimateSize(-signedBoundary) == rejected;
+assert Wire.estimateSize(signedBoundary - 1) == 4096;
+assert Wire.estimateSize(-signedBoundary) == 4096;
 assert Wire.estimateSize(signedBoundary) == rejected;
 assert Wire.estimateSize(-signedBoundary - 1) == rejected;
 

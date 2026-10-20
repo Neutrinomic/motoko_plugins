@@ -60,6 +60,7 @@ pub struct Context {
     depth: usize,
     items: usize,
     writing: bool,
+    output_limit: usize,
 }
 impl Context {
     fn new(input: &'static [u8]) -> Self {
@@ -72,6 +73,7 @@ impl Context {
             depth: 0,
             items: 0,
             writing: false,
+            output_limit: MAX_BYTES,
             error: (input.len() > MAX_BYTES).then_some(Error {
                 kind: "limit",
                 offset: 0,
@@ -94,6 +96,20 @@ impl Context {
                 self.at
             },
         );
+    }
+    // The compiler uses this only when the complete root schema proves every
+    // possible value path has at most MAX_DEPTH nodes. All typed nodes still
+    // count toward the shared item budget, in the original traversal order.
+    fn node(&mut self) -> bool {
+        if self.error.is_some() {
+            return false;
+        }
+        if self.items == MAX_ITEMS {
+            self.fail("limit");
+            return false;
+        }
+        self.items += 1;
+        true
     }
     fn enter(&mut self) -> bool {
         if !self.leaf() {
@@ -135,7 +151,7 @@ impl Context {
         if self.error.is_some() {
             return false;
         }
-        if n > MAX_BYTES - self.output.len() {
+        if n > self.output_limit - self.output.len() {
             self.fail("limit");
             return false;
         }
@@ -566,45 +582,6 @@ impl Context {
             }
         }
     }
-    fn integer_chunk(&mut self, index: usize, signed: bool) -> u64 {
-        if self.error.is_some() {
-            return 0;
-        }
-        let start = index.saturating_mul(9);
-        if index >= 3 || self.scalar.len() > 27 || start >= self.scalar.len() {
-            self.fail("type");
-            return 0;
-        }
-        // The scalar was already validated by read_bigint. One chunk holds at
-        // most 63 payload bits; assembling it needs no managed number or Blob.
-        let end = (start + 9).min(self.scalar.len());
-        let data = &self.scalar[start..end];
-        let word = if data.len() == 9 {
-            // Low and middle chunks are always full-width. The exact-length
-            // guard proves every load and avoids their per-byte loop overhead.
-            u64::from(data[0] & 127)
-                | u64::from(data[1] & 127) << 7
-                | u64::from(data[2] & 127) << 14
-                | u64::from(data[3] & 127) << 21
-                | u64::from(data[4] & 127) << 28
-                | u64::from(data[5] & 127) << 35
-                | u64::from(data[6] & 127) << 42
-                | u64::from(data[7] & 127) << 49
-                | u64::from(data[8] & 127) << 56
-        } else {
-            let mut word = 0u64;
-            for (i, byte) in data.iter().enumerate() {
-                word |= u64::from(byte & 127) << (i * 7);
-            }
-            word
-        };
-        if signed && end == self.scalar.len() {
-            let bits = (end - start) * 7;
-            ((word << (64 - bits)) as i64 >> (64 - bits)) as u64
-        } else {
-            word
-        }
-    }
     fn write_bigint(&mut self, data: &[u8], signed: bool) {
         self.writing = true;
         if self.error.is_some() {
@@ -658,6 +635,17 @@ pub unsafe extern "C" fn icwire_new(ptr: usize, len: usize) -> usize {
     Box::into_raw(Box::new(Context::new(unsafe { bytes(ptr, len) }))) as usize
 }
 #[unsafe(no_mangle)]
+pub unsafe extern "C" fn icwire_new_bounded(limit: usize) -> usize {
+    let mut context = Context::new(&[]);
+    context.writing = true;
+    if limit > MAX_BYTES {
+        context.fail("limit");
+    } else {
+        context.output_limit = limit;
+    }
+    Box::into_raw(Box::new(context)) as usize
+}
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn icwire_done(c: usize) {
     unsafe {
         drop(Box::from_raw(c as *mut Context));
@@ -666,6 +654,10 @@ pub unsafe extern "C" fn icwire_done(c: usize) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn icwire_ok(c: usize) -> usize {
     unsafe { ctx(c) }.error.is_none() as usize
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn icwire_node(c: usize) -> usize {
+    unsafe { ctx(c) }.node() as usize
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn icwire_enter(c: usize) -> usize {
@@ -825,10 +817,6 @@ pub unsafe extern "C" fn icwire_read_bigint(c: usize, signed: usize) {
     unsafe { ctx(c) }.read_bigint(signed != 0);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn icwire_integer_chunk(c: usize, index: usize, signed: usize) -> u64 {
-    unsafe { ctx(c) }.integer_chunk(index, signed != 0)
-}
-#[unsafe(no_mangle)]
 pub unsafe extern "C" fn icwire_write_bigint(c: usize, ptr: usize, len: usize, signed: usize) {
     let c = unsafe { ctx(c) };
     if len > MAX_LEB_BYTES {
@@ -964,6 +952,29 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn static_node_charge_preserves_budget_and_first_error() {
+        for items in [0, MAX_ITEMS - 1, MAX_ITEMS] {
+            let mut dynamic = c(&[7]);
+            dynamic.items = items;
+            dynamic.at = 1;
+            let mut proven = c(&[7]);
+            proven.items = items;
+            proven.at = 1;
+            assert_eq!(proven.node(), dynamic.leaf());
+            assert_eq!((proven.items, proven.at, proven.depth),
+                (dynamic.items, dynamic.at, dynamic.depth));
+            assert_eq!(proven.error.as_ref().map(|e| (e.kind, e.offset)),
+                dynamic.error.as_ref().map(|e| (e.kind, e.offset)));
+        }
+        let mut prior = c(&[7]);
+        prior.items = MAX_ITEMS;
+        prior.fail_at("bool", 0);
+        assert_eq!(unsafe { icwire_node(ptr(&mut prior)) }, 0);
+        assert_eq!(prior.items, MAX_ITEMS);
+        assert_eq!((kind(&prior), offset(&prior)), ("bool", 0));
+    }
+
     #[test]
     fn all_fixed_width_words_and_sign_extension() {
         for bits in [8, 16, 32, 64] {
@@ -1799,145 +1810,25 @@ mod tests {
         }
     }
     #[test]
-    fn medium_integer_chunks_reconstruct_signed_and_unsigned_128bit_values() {
-        let encode = |mut value: u128, signed: bool| {
-            let mut data = Vec::new();
-            loop {
-                let byte = (value & 127) as u8;
-                value = if signed {
-                    ((value as i128) >> 7) as u128
-                } else {
-                    value >> 7
-                };
-                let done = if signed {
-                    value == 0 && byte & 64 == 0 || value == u128::MAX && byte & 64 != 0
-                } else {
-                    value == 0
-                };
-                data.push(byte | if done { 0 } else { 128 });
-                if done {
-                    return data;
-                }
-            }
-        };
-        let mut random = 0x2545f4914f6cdd1du128;
-        for iteration in 0..10000 {
-            random ^= random << 23;
-            random ^= random >> 17;
-            random ^= random << 47;
-            let value = match iteration {
-                0 => 0,
-                1 => u128::MAX,
-                2 => 1 << 63,
-                3 => 1 << 126,
-                4 => 1 << 127,
-                5 => (1u128 << 127) - 1,
-                _ => random,
-            };
-            for signed in [false, true] {
-                let data = encode(value, signed);
-                let mut r = c(&data);
-                r.read_bigint(signed);
-                clean(&r);
-                let top = (data.len() - 1) / 9;
-                let high = unsafe { icwire_integer_chunk(ptr(&mut r), top, signed as usize) };
-                let mut restored = if signed {
-                    (high as i64 as i128) as u128
-                } else {
-                    high as u128
-                };
-                for index in (0..top).rev() {
-                    restored =
-                        restored.wrapping_shl(63).wrapping_add(unsafe {
-                            icwire_integer_chunk(ptr(&mut r), index, signed as usize)
-                        } as u128);
-                }
-                clean(&r);
-                assert_eq!(restored, value);
-                assert_eq!(r.scalar, data);
-            }
-        }
-    }
-    #[test]
-    fn medium_integer_chunk_boundaries_and_large_fallback() {
-        for length in 10usize..=27 {
-            let top = (length - 1) / 9;
-            let high_bit = ((length - 1) % 9) * 7;
-            let mut positive = vec![0x80; length];
-            *positive.last_mut().unwrap() = 1;
-            for signed in [false, true] {
-                let mut r = c(&positive);
-                r.read_bigint(signed);
-                clean(&r);
-                for index in 0..=top {
-                    assert_eq!(
-                        r.integer_chunk(index, signed),
-                        if index == top { 1 << high_bit } else { 0 }
-                    );
-                }
-                clean(&r);
-            }
-            let mut negative = vec![0xff; length];
-            *negative.last_mut().unwrap() = 0x7e;
-            let mut r = c(&negative);
-            r.read_bigint(true);
-            clean(&r);
-            for index in 0..=top {
-                let expected = if index == top {
-                    (-(1i64 << high_bit) - 1) as u64
-                } else {
-                    (1 << 63) - 1
-                };
-                assert_eq!(r.integer_chunk(index, true), expected);
-            }
-            clean(&r);
-        }
-        let mut data = vec![0x80; 28];
-        *data.last_mut().unwrap() = 1;
-        let mut r = c(&data);
-        assert_eq!(unsafe { icwire_leaf_bigint(ptr(&mut r), 0) }, BIG_INTEGER);
-        clean(&r);
-        assert_eq!(r.scalar, data);
-        assert_eq!(r.scalar.as_ptr(), r.input.as_ptr());
-        r.integer_chunk(0, false);
-        assert_eq!(kind(&r), "type");
-        for index in [1, 3, usize::MAX] {
-            let mut r = c(&[1]);
-            r.read_bigint(false);
-            r.integer_chunk(index, false);
-            assert_eq!(kind(&r), "type");
-        }
-    }
-    #[test]
-    fn full_integer_chunks_match_signed_and_unsigned_golden_values() {
-        // Nonuniform payload groups exercise every bit position in each full
-        // chunk, including a full signed top chunk at lengths 9, 18 and 27.
-        for chunks in 1..=3 {
-            for (signed, terminal, top) in [
-                (false, 0x09, 0x0910_1c30_5080_c101u64),
-                (true, 0x09, 0x0910_1c30_5080_c101),
-                (false, 0x49, 0x4910_1c30_5080_c101),
-                (true, 0x49, 0xc910_1c30_5080_c101),
-            ] {
-                let mut data = Vec::new();
-                for _ in 0..chunks {
-                    data.extend(0x81u8..=0x89);
-                }
+    fn large_integer_validation_borrows_exact_bytes() {
+        // The compiler constructs managed integers from this validated slice.
+        // Exercise limb/word boundaries and the largest supported scalar.
+        for length in [10, 11, 17, 18, 19, 26, 27, 28, 59, 60, 61, 127, 4096] {
+            for (signed, terminal) in [(false, 1), (true, 1), (true, 0x7e)] {
+                let mut data = vec![0x81; length];
                 *data.last_mut().unwrap() = terminal;
+                data.push(42); // following field must remain unread
                 let mut r = c(&data);
-                r.read_bigint(signed);
+                assert_eq!(
+                    unsafe { icwire_leaf_bigint(ptr(&mut r), signed as usize) },
+                    BIG_INTEGER
+                );
                 clean(&r);
-                for index in 0..chunks {
-                    assert_eq!(
-                        r.integer_chunk(index, signed),
-                        if index == chunks - 1 {
-                            top
-                        } else {
-                            0x0910_1c30_5080_c101
-                        }
-                    );
-                }
-                clean(&r);
+                assert_eq!(r.scalar, &data[..length]);
+                assert_eq!(r.scalar.as_ptr(), r.input.as_ptr());
+                assert_eq!(r.at, length);
+                assert_eq!(r.items, 1);
+                assert_eq!(r.depth, 0);
             }
         }
     }
