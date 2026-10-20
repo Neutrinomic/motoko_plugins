@@ -104,18 +104,32 @@ module Make (B : P.Backend) = struct
         let node = List.nth args 0 and comparator = List.nth args 1 and needle = List.nth args 2 in
         let set_lo, lo = new_local env "mmap_lo" and set_hi, hi = new_local env "mmap_hi" in
         let set_found, found = new_local env "mmap_found" in
+        let search load_at =
+          G.loop0 (G.with_current_depth (fun loop ->
+            lo ^^ hi ^^ lt ^^ E.if0
+              (bind env "mid" (lo ^^ hi ^^ add ^^ half) (fun mid ->
+               bind env "order" (compare env ordering kt comparator needle
+                 (key env (nonnull env (load_at mid)))) (fun order ->
+                 order ^^ num 0 ^^ eq ^^ E.if0
+                   (mid ^^ set_lo ^^ num 1 ^^ set_found)
+                   (order ^^ num 0 ^^ compile_comparison I64Op.LtS ^^ E.if0
+                      (mid ^^ set_hi) (mid ^^ num 1 ^^ add ^^ set_lo) ^^
+                    G.branch_to_ loop)))) G.nop))
+        in
         bind env "search_entries" (entries env nt node) (fun slots ->
-        num 0 ^^ set_lo ^^ checked_count env nt node ^^ set_hi ^^ num 0 ^^ set_found ^^
-        G.loop0 (G.with_current_depth (fun loop ->
-          lo ^^ hi ^^ lt ^^ E.if0
-            (bind env "mid" (lo ^^ hi ^^ add ^^ half) (fun mid ->
-             bind env "order" (compare env ordering kt comparator needle
-               (key env (nonnull env (slots ^^ mid ^^ Arr.get env)))) (fun order ->
-               order ^^ num 0 ^^ eq ^^ E.if0
-                 (mid ^^ set_lo ^^ num 1 ^^ set_found)
-                 (order ^^ num 0 ^^ compile_comparison I64Op.LtS ^^ E.if0
-                    (mid ^^ set_hi) (mid ^^ num 1 ^^ add ^^ set_lo) ^^ G.branch_to_ loop)))) G.nop)) ^^
-        lo ^^ found)))
+          num 0 ^^ set_lo ^^ checked_count env nt node ^^ set_hi ^^
+          num 0 ^^ set_found ^^
+          (match ordering with
+          | Scalar (T.Nat | T.Int) ->
+            (* Binary-search midpoints remain below the initial count. Only
+               native scalar comparison runs while the prefix is borrowed;
+               BigNum boxing may allocate but introduces no GC safepoint. *)
+            let _, fields = T.as_obj (T.normalize nt) in
+            let array_type = T.lookup_val_field "entries" fields in
+            hi ^^ num 0 ^^ gt ^^ E.if0
+              (Arr.with_prefix env array_type slots hi search) G.nop
+          | _ -> search (fun index -> slots ^^ index ^^ Arr.get env)) ^^
+          lo ^^ found)))
   let split env nt et parent index =
     invoke [parent; index] (helper env "split" 2 0 (fun env args ->
       let parent = List.nth args 0 and index = List.nth args 1 in

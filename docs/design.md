@@ -243,6 +243,14 @@ no-safepoint loop; every pointer destination still uses the normal write
 barrier. Collection kernels use it for B-tree shifts without repeating a
 bounds check and forwarding resolution for each element.
 
+`Arr.with_prefix` validates a logical array prefix once and provides indexed
+managed-value loads from a borrowed base. This is a trusted native-plugin
+operation: callers must prove every index is below the saved prefix length,
+keep the loader inside its body, and prevent GC safepoints in that body or its
+callees. Allocation and Wasm memory growth preserve these logical addresses.
+Mutable-map uses this only inside nonempty native `Nat`/`Int` node searches;
+arbitrary comparators keep the usual managed array loads.
+
 The no-safepoint invariant is part of this compiler ABI. A future collector
 that moves objects during allocation would require changing this adapter or
 introducing rooted handles before these plugins could use it.
