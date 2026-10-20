@@ -24,6 +24,18 @@ module {
   /// Decode a complete message using an explicit concrete type.
   public let decode = Prim.from_icwire;
 
+  /// Encode trusted data directly; failures trap with the same diagnostic as
+  /// `unwrap(encode(value))`, without allocating a successful Result wrapper.
+  public let encodeOrTrap = Prim.to_icwire_or_trap;
+
+  /// Decode directly, trapping with `unwrap(decode<T>(bytes))` diagnostics.
+  /// Use ordinary `decode` when malformed input needs a recoverable result.
+  public let decodeOrTrap = Prim.from_icwire_or_trap;
+
+  /// The same caller-bounded encoding as `encodeBounded`, with direct success
+  /// and the identical diagnostic trap on failure.
+  public let encodeBoundedOrTrap = Prim.to_icwire_bounded_or_trap;
+
   /// Exact encoded byte size without encoding or scratch allocation.
   /// Fixed-width arrays use their length rather than visiting each element.
   /// Returns `2 ** 61 - 1` when a byte, node, depth or integer bound is exceeded.

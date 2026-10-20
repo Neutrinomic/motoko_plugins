@@ -10,10 +10,20 @@ open Type
 module G = InstrList
 open G
 
-module Make (B : Plugin_codegen.Backend) = struct
+module MakeMode (B : Plugin_codegen.Backend)
+  (Mode : sig val trap : bool end) = struct
   open B
   module Common = Generator.Make(B)
   open Common
+
+  let success env value =
+    if Mode.trap then value else Variant.inject env "ok" value
+
+  let decoded_result env c value =
+    if Mode.trap then
+      cc env c "ok" ^^
+      E.if0 G.nop (cc env c "trap_error" ^^ G.i Unreachable) ^^ value
+    else result env c value
 
   let box_word env p bits =
     if bits = 64 then BoxedWord64.box env p
@@ -147,7 +157,7 @@ module Make (B : Plugin_codegen.Backend) = struct
     let set_result, get_result = new_local env "icwire_result" in
     source ^^ Blob.payload_ptr_unskewed env ^^ source ^^ Blob.len env ^^ invoke env "new" ^^ set_context ^^
       c ^^ decode env (Schema.bounded_depth typ) typ ^^ set_value ^^ cc env c "finish" ^^
-      result env c value ^^ set_result ^^ cc env c "done" ^^ get_result
+      decoded_result env c value ^^ set_result ^^ cc env c "done" ^^ get_result
 
   (* A root byte string has no recursive nodes. Prove its complete canonical
      ULEB prefix and exact total size before scalar validation and the SDK copy.
@@ -171,7 +181,7 @@ module Make (B : Plugin_codegen.Backend) = struct
       let maximum = min (if p = Principal then 30 else Schema.max_bytes)
         ((1 lsl (7 * width)) - 1 + width) in
       let data = ptr ^^ num width ^^ binary I64Op.Add in
-      let success = Variant.inject env "ok" (data ^^ payload ^^
+      let success = success env (data ^^ payload ^^
         (if p = Text then Text.of_ptr_size env else if p = Principal then Principal.of_ptr_size env else Blob.of_ptr_size env)) in
       len ^^ num (minimum + width) ^^ compile_comparison I64Op.GeU ^^
       len ^^ num maximum ^^ compile_comparison I64Op.LeU ^^ binary I64Op.And ^^ E.if1 I64Type
@@ -191,7 +201,7 @@ module Make (B : Plugin_codegen.Backend) = struct
     source ^^ Blob.payload_ptr_unskewed env ^^ set_ptr ^^
     source ^^ Blob.len env ^^ num width ^^ compile_comparison I64Op.Eq ^^ E.if1 I64Type
       (validate ptr) (num 0) ^^ E.if1 I64Type
-      (Variant.inject env "ok" (value ptr)) otherwise
+      (success env (value ptr)) otherwise
 
   (* Canonical two-to-nine-byte root integers fit an unboxed 63-bit payload.
      Inspect only ranges proven by the exact Blob length; malformed encodings
@@ -246,7 +256,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         binary I64Op.And else G.nop) ^^
       E.if1 I64Type
         (assembled ^^ set_value ^^ canonical ^^ E.if1 I64Type
-          (Variant.inject env "ok" (value ^^
+          (success env (value ^^
             if signed then BigNum.from_signed_word64 env else BigNum.from_word64 env))
           otherwise)
         otherwise in
@@ -308,3 +318,8 @@ module Make (B : Plugin_codegen.Backend) = struct
       | _ -> fallback in
     Plugin_codegen.{representation = Managed; code = G.concat arguments ^^ set_source ^^ body}
 end
+
+module Make (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false end)
+module MakeOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true end)

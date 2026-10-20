@@ -10,7 +10,8 @@ open Type
 module G = InstrList
 open G
 
-module Make (B : Plugin_codegen.Backend) = struct
+module MakeMode (B : Plugin_codegen.Backend)
+  (Mode : sig val trap : bool end) = struct
   open B
   module Exact = Encoder.Make(B)
   module Diagnostic = Generator.Make(B)
@@ -140,12 +141,13 @@ module Make (B : Plugin_codegen.Backend) = struct
     let set_blob, blob = new_local env "icwire_bounded_blob" in
     let set_start, start = new_local env "icwire_bounded_start" in
     let set_position, position = new_local env "icwire_bounded_position" in
-    let diagnose = value ^^ Diagnostic.compile_encode ~limit env specialization in
+    let diagnose = value ^^ Diagnostic.compile_encode ~limit ~trap:Mode.trap env specialization in
     let body = if cheap_measure typ then
       let set_size, size = new_local env "icwire_bounded_exact_size" in
       let finish =
         position ^^ blob ^^ Blob.payload_ptr_unskewed env ^^ size ^^ add ^^ compile_comparison I64Op.Eq ^^
-        E.else_trap_with env "ICWire bounded output mismatch" ^^ Variant.inject env "ok" blob in
+        E.else_trap_with env "ICWire bounded output mismatch" ^^
+        (if Mode.trap then blob else Variant.inject env "ok" blob) in
       value ^^ num 0 ^^ num max_items ^^ (if dynamic then num 0 else G.nop) ^^
       Exact.measure ~dynamic env typ ^^ G.i Drop ^^ set_size ^^
       size ^^ limit ^^ compile_comparison I64Op.GtU ^^ E.if1 I64Type diagnose
@@ -159,7 +161,8 @@ module Make (B : Plugin_codegen.Backend) = struct
         (if dynamic then num 0 else G.nop) ^^ write ~dynamic env typ ^^ G.i Drop ^^ set_position ^^
         position ^^ compile_eq_const 0L ^^ E.if1 I64Type
           (blob ^^ num 0 ^^ Blob.finish env ^^ G.i Drop ^^ diagnose)
-          (Variant.inject env "ok" (blob ^^ position ^^ start ^^ sub ^^ Blob.finish env)) in
+          ((if Mode.trap then Fun.id else Variant.inject env "ok")
+            (blob ^^ position ^^ start ^^ sub ^^ Blob.finish env)) in
     let code = get_value ^^ set_value ^^ get_bound ^^ set_bound ^^
       bound ^^ BitTagged.if_tagged_scalar env [I64Type]
         (bound ^^ BigNum.to_word64 env)
@@ -168,3 +171,8 @@ module Make (B : Plugin_codegen.Backend) = struct
       limit ^^ num max_bytes ^^ compile_comparison I64Op.GtU ^^ E.if1 I64Type diagnose body in
     Plugin_codegen.{representation = Managed; code}
 end
+
+module Make (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false end)
+module MakeOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true end)

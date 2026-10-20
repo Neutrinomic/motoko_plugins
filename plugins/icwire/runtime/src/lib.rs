@@ -31,9 +31,12 @@ mod host {
     fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
         fail()
     }
+    pub fn trap(message: &[u8]) -> ! {
+        unsafe { compute_plugin_trap(message.as_ptr(), message.len()) }
+    }
     fn fail() -> ! {
         let message = b"ICWire plugin: runtime allocation or invariant failure";
-        unsafe { compute_plugin_trap(message.as_ptr(), message.len()) }
+        trap(message)
     }
 }
 
@@ -49,6 +52,46 @@ const BIG_INTEGER: u64 = 1 << 63;
 struct Error {
     kind: &'static str,
     offset: usize,
+}
+
+// Match `ICWire.unwrap`: debug_show Nat64 groups decimal digits in threes.
+// Only the error path formats text; successful direct codecs allocate none.
+fn error_message<'a>(error: &Error, output: &'a mut [u8; 96]) -> &'a [u8] {
+    let mut digits = [0u8; 26];
+    let mut start = digits.len();
+    let mut value = error.offset;
+    let mut group = 0;
+    loop {
+        start -= 1;
+        digits[start] = b'0' + (value % 10) as u8;
+        value /= 10;
+        group += 1;
+        if value == 0 {
+            break;
+        }
+        if group == 3 {
+            start -= 1;
+            digits[start] = b'_';
+            group = 0;
+        }
+    }
+    let mut length = 0;
+    for part in [b"ICWire ".as_slice(), error.kind.as_bytes(), b" at byte ", &digits[start..]] {
+        output[length..length + part.len()].copy_from_slice(part);
+        length += part.len();
+    }
+    &output[..length]
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn icwire_trap_error(c: usize) -> ! {
+    let error = unsafe { ctx(c) }.error.as_ref().expect("ICWire error required");
+    let mut output = [0u8; 96];
+    let message = error_message(error, &mut output);
+    #[cfg(not(test))]
+    host::trap(message);
+    #[cfg(test)]
+    panic!("{}", core::str::from_utf8(message).expect("ASCII ICWire error"));
 }
 pub struct Context {
     input: &'static [u8],
@@ -913,6 +956,28 @@ pub unsafe extern "C" fn icwire_leaf_bigint(c: usize, signed: usize) -> u64 {
 mod tests {
     use super::*;
     use alloc::vec;
+
+    #[test]
+    fn trap_diagnostic_matches_motoko_grouped_offsets() {
+        for (offset, expected) in [
+            (0, "0"), (1, "1"), (999, "999"), (1_000, "1_000"),
+            (1_024, "1_024"), (999_999, "999_999"), (1_000_000, "1_000_000"),
+            (16_777_216, "16_777_216"),
+        ] {
+            let mut output = [0u8; 96];
+            let error = Error {kind: "float", offset};
+            assert_eq!(error_message(&error, &mut output),
+                alloc::format!("ICWire float at byte {expected}").as_bytes());
+        }
+        let mut output = [0u8; 96];
+        let error = Error {kind: "truncated", offset: usize::MAX};
+        let expected = if usize::BITS == 64 {
+            "ICWire truncated at byte 18_446_744_073_709_551_615"
+        } else {
+            "ICWire truncated at byte 4_294_967_295"
+        };
+        assert_eq!(error_message(&error, &mut output), expected.as_bytes());
+    }
 
     fn c(input: &[u8]) -> Context {
         Context::new(Box::leak(input.to_vec().into_boxed_slice()))

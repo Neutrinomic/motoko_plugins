@@ -34,6 +34,7 @@ check_bytes(c, len: usize, kind: usize) -> usize
 check_bigint(c, len: usize) -> usize
 finish(c) -> ()                         // require all input consumed
 error_part(c, part: usize) -> usize     // 0 kind ptr, 1 kind len, 2 byte offset
+trap_error(c) -> unreachable          // exact ICWire.unwrap diagnostic, no allocation
 fail(c, code: usize) -> ()              // 2 variant, 3 canonical, other type
 output_part(c, part: usize) -> usize    // 0 ptr, 1 len
 scalar_ptr(c) -> usize                 // borrowed bytes/LEB pointer
@@ -142,3 +143,10 @@ offset zero. ULEB32 overflow is `canonical`; a valid byte length above 16 MiB is
 
 `utf8_valid` accepts only a pointer/length range already proven inside the
 immutable input by generated code; it does not read a length prefix or allocate.
+
+Direct `OrTrap` entries share the ordinary visitors and validation order but
+return their successful value without constructing `#ok`. On failure they call
+`trap_error` with the sticky diagnostic. It emits the same
+`ICWire <kind> at byte <offset>` text as `ICWire.unwrap`, with decimal digits
+grouped in threes by underscores, and aborts the message. Explicit Result
+entries retain their recoverable `#err` values.

@@ -120,7 +120,7 @@ module Make (B : Plugin_codegen.Backend) = struct
         "offset", (fun () -> c ^^ num 2 ^^ invoke env "error_part" ^^ BoxedWord64.box env Nat64);
       ]))
 
-  let compile_encode ?limit env specialization =
+  let compile_encode ?limit ?(trap = false) env specialization =
     let typ = match specialization.Mo_values.Compute_plugin.argument_types with typ::_ -> typ | _ -> assert false in
     let set_value, value = new_local env "icwire_value" in
     let set_context, c = new_local env "icwire_context" in
@@ -129,7 +129,10 @@ module Make (B : Plugin_codegen.Backend) = struct
       | None -> num 0 ^^ num 0 ^^ invoke env "new"
       | Some limit -> limit ^^ invoke env "new_bounded") ^^ set_context ^^
     value ^^ c ^^ encode env typ ^^
-    result env c (c ^^ num 0 ^^ invoke env "output_part" ^^ c ^^ num 1 ^^ invoke env "output_part" ^^ Blob.of_ptr_size env) ^^
-    set_result ^^ cc env c "done" ^^ get_result
+    (let output = c ^^ num 0 ^^ invoke env "output_part" ^^
+      c ^^ num 1 ^^ invoke env "output_part" ^^ Blob.of_ptr_size env in
+     if trap then cc env c "ok" ^^ E.if1 I64Type output
+       (cc env c "trap_error" ^^ G.i Unreachable)
+     else result env c output) ^^ set_result ^^ cc env c "done" ^^ get_result
 
 end

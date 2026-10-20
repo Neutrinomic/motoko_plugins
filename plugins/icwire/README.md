@@ -57,6 +57,14 @@ kind and byte offset on failure. `ICWire.toOption(result)` converts success to
 `?value` and failure to `null`. These ordinary generic helpers operate on the
 result after the codec intrinsic has specialized at the concrete call site.
 
+`encodeOrTrap(value)`, `encodeBoundedOrTrap(value, maxBytes)` and
+`decodeOrTrap<T>(bytes)` produce their successful value directly. They preserve
+the exact bytes, limits and diagnostic traps of applying `unwrap` to the
+corresponding Result API, including grouped byte offsets such as
+`ICWire float at byte 1_024`. Use them for trusted data when a codec failure
+already aborts the current message. Keep the Result API when a caller needs to
+recover from malformed input or a resource limit.
+
 `ICWire.estimateSize(value)` returns the exact encoded byte size without
 encoding or allocating scratch storage. Fixed-width arrays use only their
 count. Signed integer sizing borrows the magnitude without temporary values.

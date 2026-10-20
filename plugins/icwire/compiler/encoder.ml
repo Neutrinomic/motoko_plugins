@@ -14,7 +14,8 @@ module G = InstrList
 open G
 module TM = Map.Make (Type.Ord)
 
-module Make (B : Plugin_codegen.Backend) = struct
+module MakeMode (B : Plugin_codegen.Backend)
+  (Mode : sig val trap : bool end) = struct
   open B
   module Diagnostic = Generator.Make(B)
   let num n = compile_unboxed_const (Int64.of_int n)
@@ -340,19 +341,26 @@ module Make (B : Plugin_codegen.Backend) = struct
       let set_size, size = new_local env "icwire_measured_size" in
       let set_blob, blob = new_local env "icwire_final_blob" in
       let set_position, position = new_local env "icwire_final_position" in
+      let diagnostic = value ^^
+        Diagnostic.compile_encode ~trap:Mode.trap env specialization in
       let finish =
         position ^^ blob ^^ Blob.payload_ptr_unskewed env ^^ size ^^ add ^^ compile_comparison I64Op.Eq ^^
         E.else_trap_with env "ICWire measured output mismatch" ^^
-        Variant.inject env "ok" blob in
+        (if Mode.trap then blob else Variant.inject env "ok" blob) in
       G.concat arguments ^^ set_value ^^
       value ^^ num 0 ^^ num max_items ^^ (if dynamic then num 0 else G.nop) ^^
       measure ~dynamic env typ ^^ G.i Drop ^^ set_size ^^
       size ^^ num max_bytes ^^ compile_comparison I64Op.GtU ^^ E.if1 I64Type
-        (value ^^ Diagnostic.compile_encode env specialization)
+        diagnostic
         (alloc_blob env size ^^ set_blob ^^ blob ^^ Blob.payload_ptr_unskewed env ^^ set_position ^^
          value ^^ position ^^ write env typ ^^ set_position ^^
          (if contains_float typ then position ^^ compile_eq_const 0L ^^ E.if1 I64Type
-            (value ^^ Diagnostic.compile_encode env specialization) finish
+            diagnostic finish
           else finish))
     in Plugin_codegen.{representation = Managed; code}
 end
+
+module Make (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false end)
+module MakeOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true end)
