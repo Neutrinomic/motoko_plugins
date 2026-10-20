@@ -69,6 +69,9 @@ function keeps this optimization. Unrecognized comparators, including effectful
 comparators and `Float.compare`, retain ordinary callback behavior; matching a
 function name or key type is insufficient.
 
+Compact `Nat` and `Int` keys compare directly in registers. Boxed and mixed
+representations keep the ordinary arbitrary-precision comparison path.
+
 Scalar helpers remain optional and use ascending natural ordering without a
 comparator argument. They must only be used on maps built with that ordering.
 The lower-level

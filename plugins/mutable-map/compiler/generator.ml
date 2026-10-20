@@ -80,6 +80,16 @@ module Make (B : P.Backend) = struct
     | Dynamic -> "callback"
     | Scalar prim -> "static_" ^ T.string_of_typ (T.Prim prim)
   let compare env ordering kt comparator a b = match ordering with
+    | Scalar ((T.Nat | T.Int) as prim) ->
+      bind env "compare_a" a (fun a ->
+      bind env "compare_b" b (fun b ->
+        a ^^ b ^^ G.i (Binary (Wasm_exts.Values.I64 I64Op.Or)) ^^
+        BitTagged.if_tagged_scalar env [I64Type]
+          (* Compact Nat/Int share the same tag and signed representation.
+             Boxed operands retain the existing arbitrary-precision path. *)
+          (a ^^ b ^^ compile_comparison I64Op.LtS ^^
+           ifv (num (-1)) (a ^^ b ^^ eq ^^ ifv (num 0) (num 1)))
+          (a ^^ b ^^ Compare.scalar env prim)))
     | Scalar prim -> a ^^ b ^^ Compare.scalar env prim
     | Dynamic ->
       bind env "order_tag"
