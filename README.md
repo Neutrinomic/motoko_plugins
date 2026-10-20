@@ -1024,6 +1024,16 @@ for the compiler package flags. It is not published to the registry yet. Load
 only the native plugins used by your imported modules; Mops resolves source
 imports, while `--plugin` loads the matching compiler extension.
 
+Tripwire emits memory32 by default; `--wasm64` selects memory64. Plugin values,
+kernel pointers and object layouts retain their 64-bit ABI on both targets.
+The compiler lowers memory and table addressing after linking its Wasm64 RTS
+and plugin kernels, so the same built plugin package supports either target.
+Keep the existing Wasm64 Rust kernel build target; building those kernels as
+Rust wasm32 would change their signatures and layouts. Memory32 reserves the
+last 64-KiB page and allows at most 4 GiB minus that page of linear memory.
+The [five-plugin target tests](tests/wasm32/) cover ICWire, Map, Queue,
+HistoryRing and SHA256, including wire identity and confirmed garbage collection.
+
 The build creates a matching dynamically linked native compiler and independent
 packages in `dist/<name>/`, each containing `plugin.cmxs`. Kernel-based packages
 also contain `runtime.wasm`; the collection packages emit managed Wasm directly.
