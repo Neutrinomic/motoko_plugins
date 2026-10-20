@@ -18,8 +18,13 @@ let name_for operation typ =
       names := TypeMap.add typ n !names; n in
   "@icwire_" ^ operation ^ "_" ^ string_of_int n
 
-module Make (B : Plugin_codegen.Backend) = struct
+module MakeMode (B : Plugin_codegen.Backend)
+  (Mode : sig val compact : bool end) = struct
   open B
+  let name_for operation typ =
+    name_for (operation ^ if Mode.compact then "_compact" else "") typ
+  let load_field env typ label =
+    if Mode.compact then Object.load_idx_raw env label else Object.load env typ label
   let num n = compile_unboxed_const (Int64.of_int n)
   let invoke env name = call env "icwire" ("icwire_" ^ name)
   let cc env c name = c ^^ invoke env name
@@ -81,7 +86,8 @@ module Make (B : Plugin_codegen.Backend) = struct
           | Prim (Nat | Int as p) ->
             value ^^ BitTagged.if_tagged_scalar env []
               (c ^^ value ^^ BigNum.to_word64 env ^^ num (if p = Int then 1 else 0) ^^ invoke env "write_small")
-              (c ^^ value ^^ buffer_size env typ ^^ G.i Drop ^^ invoke env "check_bigint" ^^ E.if0
+              (c ^^ value ^^ (if Mode.compact then BigNum.leb128_size env (p = Int)
+                else buffer_size env typ ^^ G.i Drop) ^^ invoke env "check_bigint" ^^ E.if0
               (bytes env value (BigNum.to_leb128 env (p = Int)) (fun ptr len ->
                 c ^^ ptr ^^ len ^^ num (if p = Int then 1 else 0) ^^ invoke env "write_bigint")) G.nop)
           | Prim (Nat8 | Nat16 | Nat32 | Nat64 | Int8 | Int16 | Int32 | Int64 as p) ->
@@ -100,7 +106,7 @@ module Make (B : Plugin_codegen.Backend) = struct
             Arr.for_each env value (value ^^ Arr.len env) (child t)
           | Obj (Object, fields, _) ->
             G.concat_map (fun f -> child f.Type.typ
-              (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fields)
+              (value ^^ load_field env typ f.lab)) (Schema.sort_fields fields)
           | Variant fields ->
             choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun ordinal f -> Variant.hash_variant_label env f.Type.lab,
@@ -136,3 +142,6 @@ module Make (B : Plugin_codegen.Backend) = struct
      else result env c output) ^^ set_result ^^ cc env c "done" ^^ get_result
 
 end
+
+module Make (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let compact = false end)

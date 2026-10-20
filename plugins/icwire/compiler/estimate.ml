@@ -7,9 +7,10 @@ open Wasm_exts.Types
 module G = InstrList
 open G
 
-module Make (B : Plugin_codegen.Backend) = struct
+module MakeMode (B : Plugin_codegen.Backend)
+  (Mode : sig val compact : bool end) = struct
   open B
-  module Encoder = Encoder.Make(B)
+  module Encoder = Encoder.MakeMode(B)(struct let trap = false let compact = Mode.compact end)
 
   let compile env specialization arguments =
     let typ = match specialization.Mo_values.Compute_plugin.argument_types with
@@ -24,3 +25,8 @@ module Make (B : Plugin_codegen.Backend) = struct
       BigNum.from_word64 env in
     Plugin_codegen.{representation = Managed; code}
 end
+
+module Make (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let compact = false end)
+module MakeCompact (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let compact = true end)

@@ -11,10 +11,10 @@ module G = InstrList
 open G
 
 module MakeMode (B : Plugin_codegen.Backend)
-  (Mode : sig val trap : bool end) = struct
+  (Mode : sig val trap : bool val compact : bool end) = struct
   open B
-  module Exact = Encoder.Make(B)
-  module Diagnostic = Generator.Make(B)
+  module Exact = Encoder.MakeMode(B)(Mode)
+  module Diagnostic = Generator.MakeMode(B)(Mode)
   let num = Exact.num
   let add = Exact.add
   let sub = Exact.sub
@@ -25,8 +25,8 @@ module MakeMode (B : Plugin_codegen.Backend)
     let typ = normalize typ in
     let sharing = match typ with Prim _ | Non -> Func.Never | _ -> Func.Always in
     Func.share_code sharing env (Strm.name_for
-      ((if prepaid then "icwire_bounded_paid" else "icwire_bounded") ^
-       (if dynamic then "_depth" else "")) [typ])
+      (Exact.operation ((if prepaid then "icwire_bounded_paid" else "icwire_bounded") ^
+       (if dynamic then "_depth" else ""))) [typ])
       (["value", I64Type; "position", I64Type; "end", I64Type; "remaining", I64Type] @
        if dynamic then ["depth", I64Type] else [])
       [I64Type; I64Type] (fun env args ->
@@ -94,7 +94,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               | Tup ts -> G.concat_mapi (fun index t ->
                   child t (value ^^ Tuple.load_n env (Int64.of_int index))) ts
               | Obj (Object, fields, _) -> G.concat_map (fun f ->
-                  child f.typ (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fields)
+                  child f.typ (value ^^ Exact.load_field env typ f.lab)) (Schema.sort_fields fields)
               | Variant fields -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
                   (List.mapi (fun ordinal f -> Variant.hash_variant_label env f.Type.lab,
                     reserve (num (Exact.ordinal_width ordinal)) ^^
@@ -142,7 +142,7 @@ module MakeMode (B : Plugin_codegen.Backend)
     let set_start, start = new_local env "icwire_bounded_start" in
     let set_position, position = new_local env "icwire_bounded_position" in
     let diagnose = value ^^ Diagnostic.compile_encode ~limit ~trap:Mode.trap env specialization in
-    let body = if cheap_measure typ then
+    let body = if Mode.compact then diagnose else if cheap_measure typ then
       let set_size, size = new_local env "icwire_bounded_exact_size" in
       let finish =
         position ^^ blob ^^ Blob.payload_ptr_unskewed env ^^ size ^^ add ^^ compile_comparison I64Op.Eq ^^
@@ -173,6 +173,10 @@ module MakeMode (B : Plugin_codegen.Backend)
 end
 
 module Make (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = false end)
+  MakeMode(B)(struct let trap = false let compact = false end)
 module MakeOrTrap (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = true end)
+  MakeMode(B)(struct let trap = true let compact = false end)
+module MakeCompact (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false let compact = true end)
+module MakeCompactOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true let compact = true end)

@@ -15,9 +15,12 @@ open G
 module TM = Map.Make (Type.Ord)
 
 module MakeMode (B : Plugin_codegen.Backend)
-  (Mode : sig val trap : bool end) = struct
+  (Mode : sig val trap : bool val compact : bool end) = struct
   open B
-  module Diagnostic = Generator.Make(B)
+  module Diagnostic = Generator.MakeMode(B)(Mode)
+  let operation name = if Mode.compact then name ^ "_compact" else name
+  let load_field env typ label =
+    if Mode.compact then Object.load_idx_raw env label else Object.load env typ label
   let num n = compile_unboxed_const (Int64.of_int n)
   let add = G.i (Binary (Wasm_exts.Values.I64 I64Op.Add))
   let sub = G.i (Binary (Wasm_exts.Values.I64 I64Op.Sub))
@@ -141,9 +144,9 @@ module MakeMode (B : Plugin_codegen.Backend)
 
   let rec measure ?(prepaid = false) ?(dynamic = false) env typ =
     let typ = normalize typ in
-    let sharing = match typ with Prim _ | Non -> Func.Never | _ -> Func.Always in
+    let sharing = match typ with Prim _ | Non when not Mode.compact -> Func.Never | _ -> Func.Always in
     Func.share_code sharing env (Strm.name_for
-      ((if prepaid then "icwire_measure_paid" else "icwire_measure") ^ (if dynamic then "_depth" else "")) [typ])
+      (operation ((if prepaid then "icwire_measure_paid" else "icwire_measure") ^ (if dynamic then "_depth" else ""))) [typ])
       (["value", I64Type; "position", I64Type; "remaining", I64Type] @
        if dynamic then ["depth", I64Type] else [])
       [I64Type; I64Type] (fun env args ->
@@ -202,7 +205,7 @@ module MakeMode (B : Plugin_codegen.Backend)
             (if depth_checked then G.nop else check_depth (1 + schema_depth t)) ^^
             (if paid then G.nop else charge (num (required_nodes t))) ^^ bytes n
           | None -> match t with
-            | Prim _ ->
+            | Prim _ when not Mode.compact ->
               let set_value, value = new_local env "icwire_scalar" in
               (if depth_checked then G.nop else check_depth 2) ^^ (if paid then G.nop else charge (num 1)) ^^
               v ^^ set_value ^^ primitive t value
@@ -221,7 +224,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               (child ~paid:false t (value ^^ Opt.project env t)) G.nop
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts
           | Obj (Object, fs, _) -> G.concat_map (fun f ->
-              child f.typ (value ^^ Object.load env typ f.lab))
+              child f.typ (value ^^ load_field env typ f.lab))
               (Schema.sort_fields fs)
           | Variant fs -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun index f -> Variant.hash_variant_label env f.lab,
@@ -255,8 +258,8 @@ module MakeMode (B : Plugin_codegen.Backend)
 
   let rec write env typ =
     let typ = normalize typ in
-    let sharing = match typ with Prim _ | Non -> Func.Never | _ -> Func.Always in
-    Func.share_code sharing env (Strm.name_for "icwire_direct_write" [typ])
+    let sharing = match typ with Prim _ | Non when not Mode.compact -> Func.Never | _ -> Func.Always in
+    Func.share_code sharing env (Strm.name_for (operation "icwire_direct_write") [typ])
       ["value", I64Type; "position", I64Type] [I64Type] (fun env args ->
         let value, position = match args with [v;p] -> v,p | _ -> assert false in
         let set_position = G.setter_for position in
@@ -315,7 +318,7 @@ module MakeMode (B : Plugin_codegen.Backend)
               (word 8 (num 1) ^^ child t (value ^^ Opt.project env t)) (word 8 (num 0))
           | Tup ts -> G.concat_mapi (fun i t -> child t (value ^^ Tuple.load_n env (Int64.of_int i))) ts
           | Obj (Object, fs, _) -> G.concat_map (fun f ->
-              child f.typ (value ^^ Object.load env typ f.lab)) (Schema.sort_fields fs)
+              child f.typ (value ^^ load_field env typ f.lab)) (Schema.sort_fields fs)
           | Variant fs -> Diagnostic.choose env (value ^^ Variant.get_variant_tag env)
               (List.mapi (fun index f -> Variant.hash_variant_label env f.lab,
                 (if index < 128 then word 8 (num index) else Strm.write_word_leb env position (num index)) ^^
@@ -334,6 +337,10 @@ module MakeMode (B : Plugin_codegen.Backend)
          else emit_body (G.i Unreachable)) ^^ position)
 
   let compile env specialization arguments =
+    if Mode.compact then
+      Plugin_codegen.{representation = Managed;
+        code = G.concat arguments ^^ Diagnostic.compile_encode ~trap:Mode.trap env specialization}
+    else
     let typ = match specialization.Mo_values.Compute_plugin.argument_types with [t] -> t | _ -> assert false in
     let dynamic = schema_depth typ > 128 in
     let code =
@@ -361,6 +368,10 @@ module MakeMode (B : Plugin_codegen.Backend)
 end
 
 module Make (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = false end)
+  MakeMode(B)(struct let trap = false let compact = false end)
 module MakeOrTrap (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = true end)
+  MakeMode(B)(struct let trap = true let compact = false end)
+module MakeCompact (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false let compact = true end)
+module MakeCompactOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true let compact = true end)

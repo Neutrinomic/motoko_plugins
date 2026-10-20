@@ -88,6 +88,39 @@ let encode_bounded_or_trap = C.{encode_bounded with
 
 let signature name params results = "icwire_" ^ name, params, results
 let i n = List.init n (fun _ -> I64Type)
+
+(* Forced policy IDs are distinct from the default-policy intrinsic. Policy is
+   a code generation choice only: all bindings share their schema and evaluator. *)
+let forced policy binding = C.{binding with
+  id = binding.id ^ "_" ^ policy; name = binding.name ^ "_" ^ policy}
+module Compact_encoder = struct module Make = Encoder.MakeCompact end
+module Compact_bounded = struct module Make = Bounded.MakeCompact end
+module Compact_decoder = struct module Make = Decoder.MakeCompact end
+module Compact_optional = struct module Make = Decoder.MakeCompactOptional end
+module Compact_encode_trap = struct module Make = Encoder.MakeCompactOrTrap end
+module Compact_decode_trap = struct module Make = Decoder.MakeCompactOrTrap end
+module Compact_bounded_trap = struct module Make = Bounded.MakeCompactOrTrap end
+module Compact_estimate = struct module Make = Estimate.MakeCompact end
+let ordinary_bindings = [
+  encode, (module Encoder : P.Generator);
+  encode_bounded, (module Bounded : P.Generator);
+  decode, (module Decoder : P.Generator);
+  decode_optional, (module Decode_optional : P.Generator);
+  encode_or_trap, (module Encode_or_trap : P.Generator);
+  decode_or_trap, (module Decode_or_trap : P.Generator);
+  encode_bounded_or_trap, (module Encode_bounded_or_trap : P.Generator);
+  estimate, (module Estimate : P.Generator);
+]
+let compact_bindings = [
+  encode, (module Compact_encoder : P.Generator);
+  encode_bounded, (module Compact_bounded : P.Generator);
+  decode, (module Compact_decoder : P.Generator);
+  decode_optional, (module Compact_optional : P.Generator);
+  encode_or_trap, (module Compact_encode_trap : P.Generator);
+  decode_or_trap, (module Compact_decode_trap : P.Generator);
+  encode_bounded_or_trap, (module Compact_bounded_trap : P.Generator);
+  estimate, (module Compact_estimate : P.Generator);
+]
 let () = P.register P.{
   abi = 1; types = []; name = "icwire"; runtime = Some "runtime.wasm";
   imports = List.map (fun (name, args, results) -> signature name (i args) (i results)) [
@@ -104,5 +137,7 @@ let () = P.register P.{
     "utf8_valid",2,1;
   ] @ [signature "leaf_float" [I64Type; I64Type] [F64Type];
        signature "write_float" [I64Type; F64Type; I64Type] []];
-  bindings = [encode, (module Encoder); encode_bounded, (module Bounded); decode, (module Decoder); decode_optional, (module Decode_optional); encode_or_trap, (module Encode_or_trap); decode_or_trap, (module Decode_or_trap); encode_bounded_or_trap, (module Encode_bounded_or_trap); estimate, (module Estimate)];
+  bindings = ordinary_bindings @
+    List.map (fun (binding, generator) -> forced "compact" binding, generator) compact_bindings @
+    List.map (fun (binding, generator) -> forced "speed" binding, generator) ordinary_bindings;
 }

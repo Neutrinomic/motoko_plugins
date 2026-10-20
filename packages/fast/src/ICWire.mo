@@ -47,6 +47,34 @@ module {
   /// and infinity. This function is a size bound, not an encodability check.
   public let estimateSize = Prim.icwire_estimate_size;
 
+  /// Force smaller generated codecs regardless of Tripwire's default or
+  /// endpoint policy. The wire format and errors are identical. Encoding uses
+  /// a temporary streaming buffer; decoding shares scalar visitors. This can
+  /// cost more instructions and allocation than `Speed`.
+  public module Compact {
+    public let encode = Prim.to_icwire_compact;
+    public let encodeBounded = Prim.to_icwire_bounded_compact;
+    public let decode = Prim.from_icwire_compact;
+    public let decodeOptional = Prim.from_icwire_optional_compact;
+    public let encodeOrTrap = Prim.to_icwire_or_trap_compact;
+    public let decodeOrTrap = Prim.from_icwire_or_trap_compact;
+    public let encodeBoundedOrTrap = Prim.to_icwire_bounded_or_trap_compact;
+    public let estimateSize = Prim.icwire_estimate_size_compact;
+  };
+
+  /// Force the instruction-oriented specialized codecs regardless of
+  /// Tripwire's default or endpoint policy. Prefer this for measured hot paths.
+  public module Speed {
+    public let encode = Prim.to_icwire_speed;
+    public let encodeBounded = Prim.to_icwire_bounded_speed;
+    public let decode = Prim.from_icwire_speed;
+    public let decodeOptional = Prim.from_icwire_optional_speed;
+    public let encodeOrTrap = Prim.to_icwire_or_trap_speed;
+    public let decodeOrTrap = Prim.from_icwire_or_trap_speed;
+    public let encodeBoundedOrTrap = Prim.to_icwire_bounded_or_trap_speed;
+    public let estimateSize = Prim.icwire_estimate_size_speed;
+  };
+
   /// Extract a trusted codec result, trapping with its diagnostic on failure.
   public func unwrap<T>(result : Result<T>) : T {
     switch result {

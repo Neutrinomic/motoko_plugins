@@ -181,7 +181,7 @@ before allocating their managed storage, including arrays of unit values.
 Byte lengths are checked against the remaining input before access or copying.
 Callers can enforce lower application payload limits.
 
-Encoding first measures the exact output size and admits values against the
+The `speed` encoder first measures the exact output size and admits values against the
 byte and item limits. Finite schemas use compile-time depth bounds; recursive
 or deeper schemas track the actual visited depth during measurement.
 It then allocates the final Blob once and writes directly into it, including
@@ -192,7 +192,7 @@ Fixed-width arrays, including floats, use their count during size admission.
 Float finiteness is checked while writing. If measurement or writing
 rejects a value, a bounded streaming visitor reports the first error and its
 precise output position. Any partially written Blob remains unpublished.
-`encodeBounded` skips whole-value measurement for variable-size composites.
+The `speed` implementation of `encodeBounded` skips whole-value measurement for variable-size composites.
 Its byte-capacity checks use the supplied bound without weakening the global
 node, depth or integer limits. The compiler owns unpublished Blob allocation
 and finalization, including GC filler objects and the allocation barrier;
@@ -217,6 +217,36 @@ actors and shared function references under these dynamic limits. Mutable
 values, local functions, `Any`
 and runtime handles are rejected during compilation. Both float widths reject
 NaN and infinity on encoding and decoding.
+
+## Code generation policies
+
+Tripwire supports two policies with the same positional wire bytes, schemas,
+resource limits and diagnostics. The default is `speed`, preserving the current
+instruction-oriented implementation. `compact` emits smaller codecs by using
+shared scalar visitors and a streaming encoder instead of separate specialized
+measurement and writing visitors. Its temporary streaming buffer can increase
+instructions and allocation; measure the tradeoff for the actual payload.
+
+Set a compilation default with `--icwire-opt compact` or `--icwire-opt speed`.
+Use `--icwire-opt-endpoint NAME=LEVEL` for an automatic public endpoint's codecs.
+These choices do not change the protocol, require matching levels at peers, or
+turn automatic encoding into caller-bounded encoding. A producer using either
+level can communicate with a consumer using either level under the same schema.
+
+For local control, both `ICWire.Compact` and `ICWire.Speed` provide all eight
+operations: `encode`, `encodeBounded`, `decode`, `decodeOptional`, `encodeOrTrap`,
+`decodeOrTrap`, `encodeBoundedOrTrap` and `estimateSize`. These namespaces force
+their policy regardless of the compilation or endpoint default. For example:
+
+```motoko
+let settingsBytes = ICWire.Compact.encodeOrTrap(settings);
+let eventBytes = ICWire.Speed.encodeOrTrap(event);
+```
+
+The unsuffixed operations follow the compiler's selected policy. Use an explicit
+namespace inside a shared helper when that helper needs its own policy: choosing
+a policy on a caller does not create separately optimized copies of previously
+compiled helper functions. Typed payloads carry no policy marker or descriptor.
 
 ## Benchmarks
 

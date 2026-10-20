@@ -11,9 +11,9 @@ module G = InstrList
 open G
 
 module MakeMode (B : Plugin_codegen.Backend)
-  (Mode : sig val trap : bool val optional : bool end) = struct
+  (Mode : sig val trap : bool val optional : bool val compact : bool end) = struct
   open B
-  module Common = Generator.Make(B)
+  module Common = Generator.MakeMode(B)(Mode)
   open Common
 
   let success env typ value =
@@ -43,12 +43,14 @@ module MakeMode (B : Plugin_codegen.Backend)
      plugin-owned assumptions about the managed bigint layout are needed. *)
   let rec decode env static_depth typ =
     let typ = Type.normalize typ in
-    Func.share_code1 Func.Always env (Generator.name_for (if static_depth then "flat_decode" else "fast_decode") typ)
+    Func.share_code1 Func.Always env (Generator.name_for
+      ((if static_depth then "flat_decode" else "fast_decode") ^ if Mode.compact then "_compact" else "") typ)
       ("context", I64Type) [I64Type] (fun env c ->
         let unit = Tuple.compile_unit env in
         let child t = read env c static_depth t in
         let body = match typ with
-          | Prim _ | Obj (Actor, _, _) -> leaf env c typ
+          | Prim _ | Obj (Actor, _, _) ->
+            if Mode.compact then c ^^ shared_leaf env typ else leaf env c typ
           | Func (Shared _, _, _, _, _) ->
             child Schema.actor_reference ^^ child Type.text ^^
             SharedFunc.of_parts env
@@ -115,8 +117,15 @@ module MakeMode (B : Plugin_codegen.Backend)
 
   and read env c static_depth typ =
     match Type.normalize typ with
-    | (Prim _ | Obj (Actor, _, _)) as typ -> leaf env c typ
+    | (Prim _ | Obj (Actor, _, _)) as typ ->
+      if Mode.compact then checked env c (c ^^ shared_leaf env typ) else leaf env c typ
     | _ -> checked env c (c ^^ decode env static_depth typ)
+
+  (* A failed leaf returns its placeholder from this helper, rather than its
+     parent. [read] checks the status before that placeholder can be consumed. *)
+  and shared_leaf env typ =
+    Func.share_code1 Func.Always env (Generator.name_for "leaf_decode_compact" typ)
+      ("context", I64Type) [I64Type] (fun env c -> leaf env c typ)
 
   and leaf env c = function
     | Obj (Actor, _, _) ->
@@ -317,7 +326,7 @@ module MakeMode (B : Plugin_codegen.Backend)
     let typ = match specialization.Mo_values.Compute_plugin.type_arguments with [typ] -> typ | _ -> assert false in
     let set_source, source = new_local env "icwire_source" in
     let fallback = general env typ source in
-    let body = match Type.normalize typ with
+    let body = if Mode.compact then fallback else match Type.normalize typ with
       | Prim (Blob | Text | Principal as p) -> root_bytes env source p fallback
       | Prim p -> root_scalar env source p fallback
       | _ -> fallback in
@@ -325,9 +334,15 @@ module MakeMode (B : Plugin_codegen.Backend)
 end
 
 module Make (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = false let optional = false end)
+  MakeMode(B)(struct let trap = false let optional = false let compact = false end)
 module MakeOrTrap (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = true let optional = false end)
+  MakeMode(B)(struct let trap = true let optional = false let compact = false end)
 
 module MakeOptional (B : Plugin_codegen.Backend) =
-  MakeMode(B)(struct let trap = false let optional = true end)
+  MakeMode(B)(struct let trap = false let optional = true let compact = false end)
+module MakeCompact (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false let optional = false let compact = true end)
+module MakeCompactOrTrap (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = true let optional = false let compact = true end)
+module MakeCompactOptional (B : Plugin_codegen.Backend) =
+  MakeMode(B)(struct let trap = false let optional = true let compact = true end)
