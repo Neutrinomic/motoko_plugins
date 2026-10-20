@@ -123,8 +123,12 @@ module Make (B : Plugin_codegen.Backend) = struct
     | Prim (Nat | Int as p) ->
       let set, get = new_local env "icwire_small_integer" in
       c ^^ num (if p = Int then 1 else 0) ^^ invoke env "leaf_bigint" ^^ set ^^
-      check env c (Tuple.compile_unit env) ^^ get ^^ compile_eq_const Int64.min_int ^^ E.if1 I64Type
-        (cc env c "scalar_ptr" ^^ cc env c "scalar_len" ^^ BigNum.of_leb128 env (p = Int))
+      (* The runtime returns the bigint sentinel on every failed read, so a
+         direct word already proves success. Check status only before borrowing
+         the fallback bytes; ordinary nested integers need no extra call. *)
+      get ^^ compile_eq_const Int64.min_int ^^ E.if1 I64Type
+        (check env c (Tuple.compile_unit env) ^^
+         cc env c "scalar_ptr" ^^ cc env c "scalar_len" ^^ BigNum.of_leb128 env (p = Int))
         (get ^^ (if p = Int then BigNum.from_signed_word64 env else BigNum.from_word64 env))
     | Prim (Nat8 | Nat16 | Nat32 | Nat64 | Int8 | Int16 | Int32 | Int64 as p) ->
       let signed, bits = word_kind p in
