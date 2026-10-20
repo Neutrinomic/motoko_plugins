@@ -72,6 +72,10 @@ function name or key type is insufficient.
 Compact `Nat` and `Int` keys compare directly in registers. Boxed and mixed
 representations keep the ordinary arbitrary-precision comparison path.
 
+`minEntry` and `maxEntry` use native descent along the outermost child links.
+They return the existing stored entry without allocating a tuple or invoking
+the comparator. Their cost is proportional to the tree height.
+
 Scalar helpers remain optional and use ascending natural ordering without a
 comparator argument. They must only be used on maps built with that ordering.
 The lower-level

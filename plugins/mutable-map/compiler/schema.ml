@@ -1,7 +1,8 @@
 open Mo_types
 module T = Type
 
-type operation = Get | Get_entry | Contains | Add | Insert | Swap | Replace | Remove | Delete | Take
+type operation = Get | Get_entry | Contains | Add | Insert | Swap | Replace
+  | Remove | Delete | Take | Min_entry | Max_entry
 type ordering = Callback | Static
 let entry k v = T.Tup [k; v]
 let node_constructor =
@@ -31,14 +32,17 @@ let types ordering = function
   | [_; _] -> Error "mutable map static ordering requires an integer, Bool, Char, Text, Blob, or Principal key"
   | _ -> Error "mutable map operations require explicit key and value types"
 let arguments operation ordering ts = Result.map (fun (k, v) ->
-  let args = if ordering = Callback then [map k v; compare k; k] else [map k v; k] in
+  let args = match operation with
+    | Min_entry | Max_entry -> [map k v]
+    | _ -> if ordering = Callback then [map k v; compare k; k] else [map k v; k] in
   match operation with Add | Insert | Swap | Replace -> args @ [v] | _ -> args) (types ordering ts)
 let result operation ordering ts _ = Result.map (fun (k, v) -> match operation with
   | Get | Swap | Replace | Take -> T.Opt v
-  | Get_entry -> T.Opt (entry k v)
+  | Get_entry | Min_entry | Max_entry -> T.Opt (entry k v)
   | Contains | Insert | Delete -> T.bool
   | Add | Remove -> T.unit) (types ordering ts)
 let name = function
   | Get -> "get" | Get_entry -> "get_entry" | Contains -> "contains"
   | Add -> "add" | Insert -> "insert" | Swap -> "swap" | Replace -> "replace"
   | Remove -> "remove" | Delete -> "delete" | Take -> "take"
+  | Min_entry -> "min_entry" | Max_entry -> "max_entry"

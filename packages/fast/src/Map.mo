@@ -137,28 +137,12 @@ module {
     Prim.mmap_replace_static<Blob, V>(self, key, value)
   };
 
-  func extreme<K, V>(self : Map<K, V>, reverse : Bool) : ?(K, V) {
-    var tree = self.root;
-    var depth = 0;
-    loop {
-      if (depth > 128) malformed();
-      switch tree {
-        case null { return null };
-        case (?node) {
-          let n = count(node);
-          if (n == 0) malformed();
-          if (node.children.size() == 0) {
-            let result = node.entries[if (reverse) (n - 1 : Nat) else 0];
-            switch result { case null malformed(); case _ { return result } }
-          };
-          tree := child(node, if (reverse) n else 0);
-        }
-      };
-      depth += 1;
-    }
+  public func minEntry<K, V>(self : Map<K, V>) : ?(K, V) {
+    Prim.mmap_min_entry<K, V>(self)
   };
-  public func minEntry<K, V>(self : Map<K, V>) : ?(K, V) { extreme(self, false) };
-  public func maxEntry<K, V>(self : Map<K, V>) : ?(K, V) { extreme(self, true) };
+  public func maxEntry<K, V>(self : Map<K, V>) : ?(K, V) {
+    Prim.mmap_max_entry<K, V>(self)
+  };
 
   // A cursor owns a small growable stack. No per-entry stack cells or copied
   // payloads are allocated; entries are returned directly from the node slots.

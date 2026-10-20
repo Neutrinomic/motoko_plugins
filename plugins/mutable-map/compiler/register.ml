@@ -21,5 +21,6 @@ let () = P.register P.{
   bindings = List.concat_map (fun ordering ->
     List.map (fun operation -> binding operation ordering)
       [Get; Get_entry; Contains; Add; Insert; Swap; Replace; Remove; Delete; Take])
-    [Callback; Static];
+    [Callback; Static] @
+    [binding Min_entry Callback; binding Max_entry Callback];
 }

@@ -286,6 +286,29 @@ module Make (B : P.Backend) = struct
           (nonnull env (child env nt current (if right then checked_count env nt current else num 0)) ^^ set_node ^^
            depth ^^ num 1 ^^ add ^^ set_depth ^^ G.branch_to_ loop))) ^^
       nonnull env (item env nt current (if right then checked_count env nt current ^^ num 1 ^^ sub else num 0))))
+  (* Public extrema preserve the ordinary Map traversal contract: nullable
+     child links end the search, and the depth limit is 128 rather than the
+     stricter internal mutation guard. Return the stored entry unchanged. *)
+  let public_extreme env nt mt map reverse =
+    invoke [map] (helper env (if reverse then "max_entry" else "min_entry")
+      1 1 (fun env args ->
+        let set_node, current = new_local env "mmap_extreme_entry_node" in
+        let set_depth, depth = new_local env "mmap_extreme_entry_depth" in
+        let set_result, result = new_local env "mmap_extreme_entry_result" in
+        field env mt (List.hd args) "root" ^^ set_node ^^
+        num 0 ^^ set_depth ^^ null env ^^ set_result ^^
+        G.loop0 (G.with_current_depth (fun loop ->
+          depth ^^ num 128 ^^ gt ^^ E.if0 (invalid env) G.nop ^^
+          present env current ^^ E.if0
+            (bind env "extreme_entry_count" (count env nt current) (fun n ->
+              n ^^ num 0 ^^ eq ^^ E.if0 (invalid env) G.nop ^^
+              leaf env nt current ^^ E.if0
+                (nonnull env (item env nt current
+                   (if reverse then n ^^ num 1 ^^ sub else num 0)) ^^
+                 set_result)
+                (child env nt current (if reverse then n else num 0) ^^
+                 set_node ^^ depth ^^ num 1 ^^ add ^^ set_depth ^^
+                 G.branch_to_ loop))) G.nop)) ^^ result))
   (* Before descending, grow a minimal child by borrowing or merging, so its
      subsequent removal cannot underflow. Collapse an empty root before any
      comparator can reenter a read of this map. *)
@@ -336,19 +359,21 @@ module Make (B : P.Backend) = struct
     let kt, vt = match specialization.C.type_arguments with
       | [k; v] -> k, v | _ -> invalid_arg "mutable-map: type arguments" in
     let nt = Schema.node kt vt and et = Schema.entry kt vt and mt = Schema.map kt vt in
-    let map, comparator, needle, payload = match source_ordering, arguments with
-      | Callback, map :: comparator :: needle :: rest -> map, comparator, needle, rest
-      | Static, map :: needle :: rest -> map, num 0, needle, rest
+    let map, comparator, needle, payload = match operation, source_ordering, arguments with
+      | (Min_entry | Max_entry), _, [map] -> map, num 0, num 0, []
+      | _, Callback, map :: comparator :: needle :: rest -> map, comparator, needle, rest
+      | _, Static, map :: needle :: rest -> map, num 0, needle, rest
       | _ -> invalid_arg "mutable-map: arguments" in
     let payload = match payload with [v] -> v | _ -> null env in
     let old_result old = match operation with
-      | Get_entry -> old
+      | Get_entry | Min_entry | Max_entry -> old
       | Get | Swap | Replace | Take -> present env old ^^ ifv (Opt.inject env vt (value env old)) (null env)
       | Contains | Delete -> present env old
       | Insert -> present env old ^^ num 0 ^^ eq
       | Add | Remove -> Tuple.compile_unit env
     in
     let code = match operation with
+      | Min_entry | Max_entry -> public_extreme env nt mt map (operation = Max_entry)
       | Get | Get_entry | Contains | Replace ->
         let set_node, current = new_local env "mmap_result_node" in
         let set_index, index = new_local env "mmap_result_index" in
@@ -383,7 +408,9 @@ module Make (B : P.Backend) = struct
       | Static, [] -> invalid_arg "missing key type"
     in
     let representation = P.Managed in
-    let code = match source_ordering with
+    let code = if operation = Min_entry || operation = Max_entry then
+      compile_body operation source_ordering comparison env specialization arguments
+    else match source_ordering with
       | Callback ->
         Compare.dispatch env ~comparator_index:1 arguments [I64Type]
           (fun child_env primitive arguments ->

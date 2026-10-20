@@ -96,9 +96,10 @@ let evaluate operation ordering context ts _types args continuation =
   let protect f = try f () with Invalid -> continuation (Error "mutable-map: malformed tree") in
   protect (fun () ->
     let kt = match ts with [kt; _] -> kt | _ -> invalid () in
-    let map, comparator, needle, payload = match ordering, args with
-      | Callback, map :: comparator :: needle :: rest -> map, comparator, needle, rest
-      | Static, map :: needle :: rest -> map, V.Null, needle, rest
+    let map, comparator, needle, payload = match operation, ordering, args with
+      | (Min_entry | Max_entry), _, [map] -> map, V.Null, V.Null, []
+      | _, Callback, map :: comparator :: needle :: rest -> map, comparator, needle, rest
+      | _, Static, map :: needle :: rest -> map, V.Null, needle, rest
       | _ -> invalid () in
     let payload = match payload with [v] -> v | _ -> V.Null in
     let compare a b cont = match ordering with
@@ -159,10 +160,27 @@ let evaluate operation ordering context ts _types args continuation =
           in delete (d + 1) next needle cont
         end) in
     let finish old = continuation (Ok (match operation with
-      | Get_entry -> old | Get | Swap | Replace | Take -> value old
+      | Get_entry | Min_entry | Max_entry -> old
+      | Get | Swap | Replace | Take -> value old
       | Contains | Delete -> V.Bool (old <> V.Null)
       | Insert -> V.Bool (old = V.Null) | Add | Remove -> V.Tup [])) in
     match operation with
+    | Min_entry | Max_entry ->
+      let rec walk depth current =
+        if depth > 128 then invalid ();
+        match current with
+        | V.Null -> V.Null
+        | V.Opt node ->
+          let n = match read node "count" with
+            | V.Nat32 n -> N.Nat32.to_int n | _ -> invalid () in
+          if n = 0 then invalid ();
+          if leaf node then
+            let result = item node (if operation = Max_entry then n - 1 else 0) in
+            ignore (unwrap result); result
+          else walk (depth + 1)
+            (get (array node "children") (if operation = Max_entry then n else 0))
+        | _ -> invalid ()
+      in finish (walk 0 (read map "root"))
     | Get | Get_entry | Contains | Replace -> search 0 (read map "root") (fun node index ->
         let old = match node with V.Null -> V.Null | _ -> item (unwrap node) index in
         if operation = Replace && node <> V.Null then set_item (unwrap node) index replacement;
