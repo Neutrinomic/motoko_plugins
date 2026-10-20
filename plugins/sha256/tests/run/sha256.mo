@@ -32,6 +32,18 @@ assert apply(digest, "abc") == Prim.sha256("abc");
 let callbacks : [Blob -> Blob] = [func(data) { hash(data) }, digest];
 assert callbacks[1]("abc") == callbacks[0]("abc");
 
+// Segmentation preserves byte concatenation, including empty and crossing parts.
+assert Prim.sha256_parts([]) == hash("");
+assert Prim.sha256_parts(["", "a", "", "bc", ""]) == hash("abc");
+let partsHash = Prim.sha256_parts;
+assert partsHash(["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "a"]) ==
+  hash("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+assert partsHash(["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aa"]) ==
+  hash("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+func joinedHash(parts : [Blob]) : Blob { partsHash(parts) };
+func applyParts(hash : [Blob] -> Blob, parts : [Blob]) : Blob {hash(parts)};
+assert applyParts(joinedHash, ["ab", "c"]) == hash("abc");
+
 // A returned result remains valid across later calls and allocations.
 let saved = Prim.sha256("abc");
 var i = 0;

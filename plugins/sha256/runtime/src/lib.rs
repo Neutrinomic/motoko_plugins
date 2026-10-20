@@ -219,6 +219,87 @@ pub unsafe extern "C" fn sha256_digest(input: *const u8, len: usize, output: *mu
     }
 }
 
+/// One compiler-created descriptor borrows an immutable Blob payload.
+/// Descriptor storage and payloads may be unaligned.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct Part {
+    input: *const u8,
+    len: usize,
+}
+
+/// # Safety
+/// `parts` points to `count` readable descriptors, each describing readable
+/// immutable bytes. `output` points to 32 writable bytes. The compiler resolves
+/// forwarding before borrowing and introduces no GC safepoint until return.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sha256_digest_parts(parts: *const Part, count: usize, output: *mut u8) {
+    let mut length = 0u64;
+    for index in 0..count {
+        let part = unsafe { parts.add(index).read_unaligned() };
+        length = length.wrapping_add(part.len as u64);
+    }
+    let mut state = INITIAL;
+    let mut tail = [0u8; 64];
+    let mut index = 0;
+    let mut input = core::ptr::null();
+    let mut remaining = 0;
+    let mut final_length_block = false;
+    loop {
+        let mut finished = false;
+        let block = if final_length_block {
+            tail.fill(0);
+            tail[56..].copy_from_slice(&length.wrapping_mul(8).to_be_bytes());
+            finished = true;
+            tail.as_ptr()
+        } else {
+            let mut used = 0;
+            loop {
+                while remaining == 0 && index < count {
+                    let part = unsafe { parts.add(index).read_unaligned() };
+                    input = part.input;
+                    remaining = part.len;
+                    index += 1;
+                }
+                if remaining == 0 {
+                    tail[used] = 0x80;
+                    tail[used + 1..].fill(0);
+                    if used < 56 {
+                        tail[56..].copy_from_slice(&length.wrapping_mul(8).to_be_bytes());
+                        finished = true;
+                    } else {
+                        final_length_block = true;
+                    }
+                    break tail.as_ptr();
+                }
+                // Complete blocks within a part are compressed in place.
+                if used == 0 && remaining >= 64 {
+                    let block = input;
+                    input = unsafe { input.add(64) };
+                    remaining -= 64;
+                    break block;
+                }
+                // Only blocks crossing part boundaries use the stack buffer.
+                let take = core::cmp::min(64 - used, remaining);
+                unsafe { core::ptr::copy_nonoverlapping(input, tail.as_mut_ptr().add(used), take) };
+                input = unsafe { input.add(take) };
+                remaining -= take;
+                used += take;
+                if used == 64 {
+                    break tail.as_ptr();
+                }
+            }
+        };
+        // Keep one copy of the unrolled compression rounds for all input and
+        // padding blocks, including blocks borrowed directly from a part.
+        compress(&mut state, unsafe { &*block.cast::<[u8; 64]>() });
+        if finished {
+            break;
+        }
+    }
+    unsafe { write_digest(&state, output) };
+}
+
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo<'_>) -> ! {
@@ -256,6 +337,64 @@ mod tests {
         assert_eq!(output[0], 0xa5);
         assert_eq!(output[33], 0xa5);
         assert_eq!(borrowed, saved);
+    }
+
+    fn check_parts(input: &[u8], cuts: &[usize]) {
+        let mut parts = Vec::new();
+        let mut start = 0;
+        for &end in cuts {
+            assert!(end >= start && end <= input.len());
+            parts.push(Part { input: input[start..].as_ptr(), len: end - start });
+            start = end;
+        }
+        parts.push(Part { input: input[start..].as_ptr(), len: input.len() - start });
+        let mut descriptors = vec![0xa5u8; 2 + parts.len() * core::mem::size_of::<Part>()];
+        for (index, part) in parts.iter().enumerate() {
+            unsafe {
+                descriptors.as_mut_ptr().add(1 + index * core::mem::size_of::<Part>())
+                    .cast::<Part>().write_unaligned(*part);
+            }
+        }
+        let saved = descriptors.clone();
+        let mut output = [0xa5; 34];
+        unsafe {
+            sha256_digest_parts(descriptors.as_ptr().add(1).cast::<Part>(), parts.len(), output.as_mut_ptr().add(1));
+        }
+        assert_eq!(&output[1..33], digest(input));
+        assert_eq!(output[0], 0xa5);
+        assert_eq!(output[33], 0xa5);
+        assert_eq!(descriptors, saved);
+    }
+
+    #[test]
+    fn segmented_boundaries_and_randomized_splits() {
+        let mut output = [0; 32];
+        unsafe { sha256_digest_parts(core::ptr::null(), 0, output.as_mut_ptr()) };
+        assert_eq!(output, digest(b""));
+        for length in [0, 1, 2, 31, 32, 33, 55, 56, 63, 64, 65, 119, 120, 127, 128, 129, 1024, 65537] {
+            let input: Vec<u8> = (0..length).map(|i| (i * 131 + 17) as u8).collect();
+            for split in 0..=core::cmp::min(length, 140) {
+                check_parts(&input, &[0, split, split, length]);
+            }
+            check_parts(&input, &(0..=length).collect::<Vec<_>>());
+        }
+        let mut random = 0x85ec_33a9u32;
+        for _ in 0..256 {
+            random = random.wrapping_mul(1664525).wrapping_add(1013904223);
+            let length = random as usize % 8193;
+            let input: Vec<u8> = (0..length).map(|_| {
+                random = random.wrapping_mul(1664525).wrapping_add(1013904223);
+                (random >> 24) as u8
+            }).collect();
+            let mut cuts = Vec::new();
+            let mut end = 0;
+            while end < length {
+                random = random.wrapping_mul(1664525).wrapping_add(1013904223);
+                end = core::cmp::min(length, end + random as usize % 130);
+                cuts.push(end);
+            }
+            check_parts(&input, &cuts);
+        }
     }
 
     #[test]
